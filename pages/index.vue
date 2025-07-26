@@ -127,7 +127,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useToast } from 'primevue/usetoast'
+import { useSnackbar } from '~/composables/useSnackbar'
 
 // Meta
 definePageMeta({
@@ -135,17 +135,17 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Nuxt 3 + Vue 3 + TypeScript + Tailwind + PrimeVue',
+  title: 'WBM Band Website - Modern Nuxt 3 Application',
   meta: [
     {
       name: 'description',
-      content: 'A modern full-stack application built with the latest web technologies'
+      content: 'A modern full-stack application built with Nuxt 3, Vue 3, TypeScript, Tailwind CSS, and PrimeVue'
     }
   ]
 })
 
 // Composables
-const toast = useToast()
+const snackbar = useSnackbar()
 
 // Reactive state
 const isSubmitting = ref(false)
@@ -157,62 +157,62 @@ const form = ref({
 
 // Methods
 const showSuccess = () => {
-  toast.add({
-    severity: 'success',
-    summary: 'Success',
-    detail: 'Primary button clicked!',
-    life: 3000
-  })
+  snackbar.success(
+    'Success!',
+    'Primary button clicked successfully'
+  )
 }
 
 const showInfo = () => {
-  toast.add({
-    severity: 'info',
-    summary: 'Info',
-    detail: 'Secondary button clicked!',
-    life: 3000
-  })
+  snackbar.info(
+    'Information',
+    'Secondary button clicked for more info'
+  )
 }
 
 const showWarn = () => {
-  toast.add({
-    severity: 'warn',
-    summary: 'Warning',
-    detail: 'Outline button clicked!',
-    life: 3000
-  })
+  snackbar.warning(
+    'Warning!',
+    'Outline button clicked - proceed with caution'
+  )
 }
 
 const handleSubmit = async () => {
   if (!form.value.name || !form.value.email) {
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Please fill in all required fields',
-      life: 3000
-    })
+    snackbar.error(
+      'Validation Error',
+      'Please fill in all required fields (Name and Email)',
+      5000
+    )
     return
   }
 
   isSubmitting.value = true
   
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  
-  toast.add({
-    severity: 'success',
-    summary: 'Form Submitted',
-    detail: `Thank you ${form.value.name}! Your message has been received.`,
-    life: 4000
-  })
-  
-  // Reset form
-  form.value = {
-    name: '',
-    email: '',
-    message: ''
+  try {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    snackbar.success(
+      'Form Submitted Successfully!',
+      `Thank you ${form.value.name}! Your message has been received and we'll get back to you soon.`,
+      6000
+    )
+    
+    // Reset form
+    form.value = {
+      name: '',
+      email: '',
+      message: ''
+    }
+  } catch (error) {
+    snackbar.error(
+      'Submission Failed',
+      'There was an error submitting your form. Please try again.',
+      5000
+    )
+  } finally {
+    isSubmitting.value = false
   }
-  
-  isSubmitting.value = false
 }
 </script>

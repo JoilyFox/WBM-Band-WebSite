@@ -8,7 +8,7 @@
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
             <h1 class="text-xl font-bold text-surface-50">
-              Your App
+              WBM Band Website
             </h1>
           </div>
           
@@ -16,7 +16,7 @@
             <Button 
               label="Get Started" 
               class="btn-primary"
-              @click="showToast"
+              @click="showWelcome"
             />
           </nav>
         </div>
@@ -27,25 +27,21 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <slot />
     </main>
-
-    <!-- Toast Container -->
-    <PrimeToast position="top-right" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast'
+import { useSnackbar } from '~/composables/useSnackbar'
 
 // Composables
-const toast = useToast()
+const snackbar = useSnackbar()
 
 // Methods
-const showToast = () => {
-  toast.add({
-    severity: 'info',
-    summary: 'Welcome!',
-    detail: 'Your Nuxt 3 app is ready to go!',
-    life: 3000
-  })
+const showWelcome = () => {
+  snackbar.success(
+    'Welcome to WBM Band!',
+    'Your modern Nuxt 3 application is ready to rock! 🎸',
+    5000
+  )
 }
 </script>
