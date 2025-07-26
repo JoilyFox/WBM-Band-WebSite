@@ -235,6 +235,71 @@
         </div>
       </div>
     </section>
+
+    <!-- Error Page Demo -->
+    <section class="mt-16">
+      <div class="card max-w-4xl mx-auto animate-scale-in">
+        <h3 class="text-xl font-semibold text-surface-50 mb-6 text-center">
+          Error Page System Demo
+        </h3>
+        
+        <p class="text-surface-300 text-center mb-6">
+          Test the error page functionality with different scenarios and custom messages.
+        </p>
+        
+        <!-- Error Demo Buttons -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <Button 
+            label="404 Page Not Found"
+            class="btn-outline"
+            icon="pi pi-question-circle"
+            @click="redirectTo404"
+          />
+          <Button 
+            label="Data Load Error"
+            class="btn-outline"
+            icon="pi pi-exclamation-triangle"
+            @click="() => redirectToDataError()"
+          />
+          <Button 
+            label="Access Denied"
+            class="btn-outline"
+            icon="pi pi-ban"
+            @click="redirectToAccessError"
+          />
+          <Button 
+            label="Under Maintenance"
+            class="btn-outline"
+            icon="pi pi-wrench"
+            @click="redirectToMaintenance"
+          />
+          <Button 
+            label="Custom Error"
+            class="btn-outline"
+            icon="pi pi-cog"
+            @click="redirectToCustomError"
+          />
+          <Button 
+            label="Navigate to /unknown"
+            class="btn-outline"
+            icon="pi pi-search"
+            @click="navigateToUnknown"
+          />
+        </div>
+        
+        <!-- Instructions -->
+        <div class="p-4 bg-amber-900/20 rounded-lg border border-amber-800/30">
+          <h4 class="text-sm font-semibold text-amber-200 mb-2">🚀 Error Page Features:</h4>
+          <ul class="text-sm text-amber-300 space-y-1">
+            <li>• <strong>Automatic 404 handling</strong> - Navigate to any unknown URL to see the error page</li>
+            <li>• <strong>Custom error messages</strong> - Pass custom title, message, button text via query params</li>
+            <li>• <strong>Multiple error types</strong> - Different icons and styling for different error scenarios</li>
+            <li>• <strong>Easy programmatic redirect</strong> - Use the useErrorPage composable in your components</li>
+            <li>• <strong>Glassmorphism design</strong> - Modern, responsive design that matches your app's theme</li>
+          </ul>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -512,6 +577,31 @@ const clearPostsCache = async () => {
   } catch (error) {
     snackbar.error('Failed to clear posts cache', 'An error occurred')
   }
+}
+
+// Error Page Demo methods
+const { 
+  redirectTo404, 
+  redirectToDataError, 
+  redirectToAccessError, 
+  redirectToMaintenance, 
+  redirectToError 
+} = useErrorPage()
+
+const router = useRouter()
+
+const redirectToCustomError = () => {
+  return redirectToError({
+    title: 'Custom Error Example',
+    message: 'This is a custom error message to demonstrate how you can pass your own title, message, button text, and navigation target.',
+    buttonText: 'Back to Demo',
+    buttonLink: '/',
+    buttonIcon: 'pi pi-arrow-left'
+  })
+}
+
+const navigateToUnknown = () => {
+  return router.push('/this-page-does-not-exist')
 }
 
 // Initialize cache stats on mount

@@ -7,6 +7,7 @@ This directory contains documentation for all the main features of the WBM Band 
 - [API Caching](./api-caching.md) - Browser-based API response caching system with localStorage fallback
 - [Global Loading System](./global-loading-system.md) - Top bar progress indicator for async operations
 - [Snackbar Notifications](./snackbar-notifications.md) - Custom notification system with modern animations and multiple types
+- [Error Page System](./error-page-system.md) - Comprehensive error handling with custom messages and glassmorphism design
 
 ## Tech Stack
 

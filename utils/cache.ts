@@ -27,7 +27,7 @@ export class ApiCache {
     
     if (!('caches' in window)) {
       this._useLocalStorage = true
-      console.warn('Cache API not supported, using localStorage fallback')
+      console.info('Cache API not supported, using localStorage fallback')
     }
   }
 
