@@ -1,0 +1,48 @@
+/* PrimeVue Button Component Styles */
+@layer components {
+  /* Custom button variants for PrimeVue buttons */
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-surface-950 font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+  
+  .btn-primary .p-button-icon {
+    @apply mr-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary-800 hover:bg-secondary-700 text-surface-50 font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2;
+  }
+  
+  .btn-secondary .p-button-icon {
+    @apply mr-2;
+  }
+  
+  .btn-outline {
+    @apply border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-surface-950 font-medium px-4 py-2 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+  
+  .btn-outline .p-button-icon {
+    @apply mr-2;
+  }
+
+  /* PrimeVue Button override styles */
+  .p-button {
+    &.p-button-sm {
+      @apply px-3 py-1.5 text-sm;
+    }
+    
+    &.p-button-lg {
+      @apply px-6 py-3 text-lg;
+    }
+    
+    /* Icon spacing for all PrimeVue buttons */
+    .p-button-icon {
+      @apply mr-2;
+    }
+    
+    /* Remove margin for icon-only buttons */
+    &.p-button-icon-only .p-button-icon {
+      @apply mr-0;
+    }
+  }
+}

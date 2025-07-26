@@ -1,83 +1,21 @@
 /* Import PrimeIcons */
 @import 'primeicons/primeicons.css';
 
+/* Base styles */
+@import './base.scss';
+
+/* General components */
+@import './components/general.scss';
+
+/* PrimeVue component customizations */
+@import './primevue/buttons.scss';
+@import './primevue/dialog.scss';
+@import './primevue/inputs.scss';
+
+/* Utilities */
+@import './utilities.scss';
+  
+/* Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Custom base styles */
-@layer base {
-  html {
-    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
-  }
-  
-  body {
-    @apply bg-surface-950 text-surface-50;
-  }
-}
-
-/* Custom component styles */
-@layer components {
-  /* Button variants */
-  .btn-primary {
-    @apply bg-primary-500 hover:bg-primary-600 text-surface-950 font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
-  }
-  
-  .btn-primary .p-button-icon {
-    @apply mr-2;
-  }
-  
-  .btn-secondary {
-    @apply bg-secondary-800 hover:bg-secondary-700 text-surface-50 font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2;
-  }
-  
-  .btn-secondary .p-button-icon {
-    @apply mr-2;
-  }
-  
-  .btn-outline {
-    @apply border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-surface-950 font-medium px-4 py-2 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
-  }
-  
-  .btn-outline .p-button-icon {
-    @apply mr-2;
-  }
-  
-  /* Card component */
-  .card {
-    @apply bg-surface-900 rounded-xl shadow-sm border border-surface-800 p-6;
-  }
-  
-  /* Input variants */
-  .input-primary {
-    @apply w-full px-3 py-2 bg-surface-800 border border-surface-700 text-surface-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
-  }
-  
-  /* Text variants */
-  .text-heading {
-    @apply text-surface-50 font-semibold;
-  }
-  
-  .text-body {
-    @apply text-surface-200;
-  }
-  
-  .text-muted {
-    @apply text-surface-400;
-  }
-}
-
-/* Custom utility classes */
-@layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-in-out;
-  }
-  
-  .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
-  }
-  
-  .animate-scale-in {
-    animation: scaleIn 0.2s ease-out;
-  }
-}

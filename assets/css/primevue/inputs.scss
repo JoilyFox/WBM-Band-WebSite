@@ -1,0 +1,64 @@
+/* PrimeVue Input Component Styles */
+@layer components {
+  .p-inputtext {
+    @apply bg-surface-800 border border-surface-700 text-surface-50 rounded-lg px-3 py-2 transition-all duration-200;
+    
+    &:focus {
+      @apply border-primary-500 ring-2 ring-primary-500 ring-opacity-20 outline-none;
+    }
+    
+    &:disabled {
+      @apply bg-surface-900 text-surface-500 cursor-not-allowed;
+    }
+    
+    &.p-invalid {
+      @apply border-error-500 ring-2 ring-error-500 ring-opacity-20;
+    }
+  }
+
+  .p-textarea {
+    @apply bg-surface-800 border border-surface-700 text-surface-50 rounded-lg px-3 py-2 transition-all duration-200 resize-none;
+    
+    &:focus {
+      @apply border-primary-500 ring-2 ring-primary-500 ring-opacity-20 outline-none;
+    }
+    
+    &:disabled {
+      @apply bg-surface-900 text-surface-500 cursor-not-allowed;
+    }
+  }
+
+  .p-dropdown {
+    @apply bg-surface-800 border border-surface-700 rounded-lg;
+    
+    .p-dropdown-label {
+      @apply text-surface-50 px-3 py-2;
+    }
+    
+    .p-dropdown-trigger {
+      @apply text-surface-400 hover:text-surface-50 transition-colors;
+    }
+    
+    &:not(.p-disabled):hover {
+      @apply border-surface-600;
+    }
+    
+    &.p-focus {
+      @apply border-primary-500 ring-2 ring-primary-500 ring-opacity-20;
+    }
+  }
+
+  .p-dropdown-panel {
+    @apply bg-surface-800 border border-surface-700 rounded-lg shadow-xl;
+    
+    .p-dropdown-items {
+      .p-dropdown-item {
+        @apply text-surface-50 px-3 py-2 hover:bg-surface-700 transition-colors;
+        
+        &.p-highlight {
+          @apply bg-primary-500 text-surface-950;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,54 @@
+/* General Component Styles */
+@layer components {
+  /* Card component */
+  .card {
+    @apply bg-surface-900 rounded-xl shadow-sm border border-surface-800 p-6;
+  }
+  
+  .card-header {
+    @apply border-b border-surface-700 pb-4 mb-4;
+  }
+  
+  .card-title {
+    @apply text-lg font-semibold text-surface-50;
+  }
+  
+  .card-content {
+    @apply text-surface-200;
+  }
+
+  /* Input variants */
+  .input-primary {
+    @apply w-full px-3 py-2 bg-surface-800 border border-surface-700 text-surface-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+  }
+  
+  .input-secondary {
+    @apply w-full px-3 py-2 bg-surface-700 border border-surface-600 text-surface-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-all duration-200;
+  }
+
+  /* Text variants */
+  .text-heading {
+    @apply text-surface-50 font-semibold;
+  }
+  
+  .text-body {
+    @apply text-surface-200;
+  }
+  
+  .text-muted {
+    @apply text-surface-400;
+  }
+  
+  .text-accent {
+    @apply text-primary-500;
+  }
+
+  /* Layout components */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .section-padding {
+    @apply py-16 lg:py-24;
+  }
+}

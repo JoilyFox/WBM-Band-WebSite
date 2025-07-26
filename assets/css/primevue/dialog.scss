@@ -1,0 +1,30 @@
+/* PrimeVue Dialog Component Styles */
+@layer components {
+  .p-dialog {
+    @apply bg-surface-800 border border-surface-700 rounded-xl shadow-2xl;
+    
+    .p-dialog-header {
+      @apply bg-surface-800 border-b border-surface-700 px-6 py-4;
+      
+      .p-dialog-title {
+        @apply text-surface-50 font-semibold text-lg;
+      }
+      
+      .p-dialog-header-icon {
+        @apply text-surface-400 hover:text-surface-50 transition-colors;
+      }
+    }
+    
+    .p-dialog-content {
+      @apply px-6 py-4 text-surface-200;
+    }
+    
+    .p-dialog-footer {
+      @apply px-6 py-4 border-t border-surface-700 bg-surface-800;
+    }
+  }
+  
+  .p-dialog-mask {
+    @apply bg-black bg-opacity-50 backdrop-blur-sm;
+  }
+}
