@@ -129,6 +129,112 @@
         </form>
       </div>
     </section>
+
+    <!-- API Caching Demo -->
+    <section class="mt-16">
+      <div class="card max-w-4xl mx-auto animate-scale-in">
+        <h3 class="text-xl font-semibold text-surface-50 mb-6 text-center">
+          API Caching System Demo
+        </h3>
+        
+        <!-- Cache Stats -->
+        <div class="mb-6 p-4 bg-surface-900/50 rounded-lg border border-surface-800">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium text-surface-200">Cache Statistics</span>
+            <Button 
+              label="Refresh Stats"
+              size="sm"
+              class="btn-outline"
+              @click="refreshCacheStats"
+              :loading="statsLoading"
+            />
+          </div>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span class="text-surface-400">Entries:</span>
+              <span class="text-surface-200 ml-2">{{ cacheStats.entries }}</span>
+            </div>
+            <div>
+              <span class="text-surface-400">Size:</span>
+              <span class="text-surface-200 ml-2">{{ formatBytes(cacheStats.size) }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- API Test Buttons -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Button 
+            label="Fetch Users (Cached)"
+            class="btn-primary"
+            icon="pi pi-users"
+            @click="fetchUsers"
+            :loading="usersLoading"
+          />
+          <Button 
+            label="Fetch Posts (Cached)"
+            class="btn-secondary"
+            icon="pi pi-file"
+            @click="fetchPosts"
+            :loading="postsLoading"
+          />
+          <Button 
+            label="Get Stats (Cached)"
+            class="btn-outline"
+            icon="pi pi-chart-bar"
+            @click="fetchStats"
+            :loading="statsApiLoading"
+          />
+          <Button 
+            label="Slow Endpoint"
+            class="btn-outline"
+            icon="pi pi-clock"
+            @click="fetchSlowData"
+            :loading="slowLoading"
+          />
+        </div>
+        
+        <!-- Cache Management -->
+        <div class="flex flex-wrap gap-3 mb-6">
+          <Button 
+            label="Clear All Cache"
+            class="btn-outline"
+            icon="pi pi-trash"
+            @click="clearAllCache"
+          />
+          <Button 
+            label="Clear Users Cache"
+            class="btn-outline"
+            icon="pi pi-user-minus"
+            @click="clearUsersCache"
+          />
+          <Button 
+            label="Clear Posts Cache"
+            class="btn-outline"
+            icon="pi pi-file-minus"
+            @click="clearPostsCache"
+          />
+        </div>
+        
+        <!-- API Response Display -->
+        <div v-if="apiResponse" class="mt-6">
+          <h4 class="text-lg font-semibold text-surface-50 mb-3">Last API Response:</h4>
+          <div class="bg-surface-900/70 rounded-lg p-4 border border-surface-800">
+            <pre class="text-sm text-surface-300 overflow-auto max-h-64">{{ JSON.stringify(apiResponse, null, 2) }}</pre>
+          </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="mt-6 p-4 bg-primary-900/20 rounded-lg border border-primary-800/30">
+          <h4 class="text-sm font-semibold text-primary-200 mb-2">💡 Try This:</h4>
+          <ul class="text-sm text-primary-300 space-y-1">
+            <li>• Click "Fetch Users" twice - notice the second call is instant (cached)</li>
+            <li>• Try the "Slow Endpoint" - it takes 3+ seconds first time, instant when cached</li>
+            <li>• Clear specific cache entries and see the difference</li>
+            <li>• Check cache stats to monitor storage usage</li>
+          </ul>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -154,6 +260,7 @@ useHead({
 // Composables
 const snackbar = useSnackbar()
 const { showLoading, hideLoading, setProgress, isLoading: isGlobalLoading } = useGlobalLoading()
+const api = useApi()
 
 // Reactive state
 const isSubmitting = ref(false)
@@ -162,6 +269,15 @@ const form = ref({
   email: '',
   message: ''
 })
+
+// API Demo state
+const usersLoading = ref(false)
+const postsLoading = ref(false)
+const statsApiLoading = ref(false)
+const slowLoading = ref(false)
+const statsLoading = ref(false)
+const apiResponse = ref<any>(null)
+const cacheStats = ref({ entries: 0, size: 0 })
 
 // Methods
 const showSuccess = () => {
@@ -241,4 +357,165 @@ const handleSubmit = async () => {
     isSubmitting.value = false
   }
 }
+
+// Utility functions
+const formatBytes = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+// API Demo methods
+const refreshCacheStats = async () => {
+  statsLoading.value = true
+  try {
+    const stats = await api.getCacheStats()
+    cacheStats.value = stats
+  } catch (error) {
+    console.error('Failed to get cache stats:', error)
+  } finally {
+    statsLoading.value = false
+  }
+}
+
+const fetchUsers = async () => {
+  usersLoading.value = true
+  try {
+    const startTime = Date.now()
+    const result = await api.get('/api/users', {
+      cache: { enabled: true, ttl: 2 * 60 * 1000 } // 2 minutes cache
+    })
+    const duration = Date.now() - startTime
+    
+    if (result) {
+      apiResponse.value = { ...result, _meta: { duration: `${duration}ms`, cached: duration < 100 } }
+      snackbar.success(
+        'Users Fetched!',
+        `Retrieved ${result.data?.length || 0} users in ${duration}ms${duration < 100 ? ' (cached)' : ''}`,
+        3000
+      )
+    }
+  } finally {
+    usersLoading.value = false
+    await refreshCacheStats()
+  }
+}
+
+const fetchPosts = async () => {
+  postsLoading.value = true
+  try {
+    const startTime = Date.now()
+    const result = await api.get('/api/posts', {
+      cache: { enabled: true, ttl: 3 * 60 * 1000 } // 3 minutes cache
+    })
+    const duration = Date.now() - startTime
+    
+    if (result) {
+      apiResponse.value = { ...result, _meta: { duration: `${duration}ms`, cached: duration < 100 } }
+      snackbar.success(
+        'Posts Fetched!',
+        `Retrieved ${result.data?.length || 0} posts in ${duration}ms${duration < 100 ? ' (cached)' : ''}`,
+        3000
+      )
+    }
+  } finally {
+    postsLoading.value = false
+    await refreshCacheStats()
+  }
+}
+
+const fetchStats = async () => {
+  statsApiLoading.value = true
+  try {
+    const startTime = Date.now()
+    const result = await api.get('/api/stats', {
+      cache: { enabled: true, ttl: 1 * 60 * 1000 } // 1 minute cache
+    })
+    const duration = Date.now() - startTime
+    
+    if (result) {
+      apiResponse.value = { ...result, _meta: { duration: `${duration}ms`, cached: duration < 100 } }
+      snackbar.info(
+        'Stats Fetched!',
+        `Retrieved app statistics in ${duration}ms${duration < 100 ? ' (cached)' : ''}`,
+        3000
+      )
+    }
+  } finally {
+    statsApiLoading.value = false
+    await refreshCacheStats()
+  }
+}
+
+const fetchSlowData = async () => {
+  slowLoading.value = true
+  try {
+    const startTime = Date.now()
+    const result = await api.get('/api/slow-endpoint', {
+      cache: { enabled: true, ttl: 5 * 60 * 1000 } // 5 minutes cache
+    })
+    const duration = Date.now() - startTime
+    
+    if (result) {
+      apiResponse.value = { ...result, _meta: { duration: `${duration}ms`, cached: duration < 2000 } }
+      snackbar.warning(
+        'Slow Endpoint Complete!',
+        `Took ${duration}ms${duration < 2000 ? ' (cached - much faster!)' : ' (first load - very slow)'}`,
+        4000
+      )
+    }
+  } finally {
+    slowLoading.value = false
+    await refreshCacheStats()
+  }
+}
+
+const clearAllCache = async () => {
+  try {
+    await api.clearCache()
+    await refreshCacheStats()
+    snackbar.success(
+      'Cache Cleared!',
+      'All cached API responses have been removed',
+      3000
+    )
+  } catch (error) {
+    snackbar.error('Failed to clear cache', 'An error occurred while clearing the cache')
+  }
+}
+
+const clearUsersCache = async () => {
+  try {
+    await api.clearCache('users')
+    await refreshCacheStats()
+    snackbar.info(
+      'Users Cache Cleared!',
+      'Cached users data has been removed',
+      3000
+    )
+  } catch (error) {
+    snackbar.error('Failed to clear users cache', 'An error occurred')
+  }
+}
+
+const clearPostsCache = async () => {
+  try {
+    await api.clearCache('posts')
+    await refreshCacheStats()
+    snackbar.info(
+      'Posts Cache Cleared!',
+      'Cached posts data has been removed',
+      3000
+    )
+  } catch (error) {
+    snackbar.error('Failed to clear posts cache', 'An error occurred')
+  }
+}
+
+// Initialize cache stats on mount
+onMounted(() => {
+  refreshCacheStats()
+})
 </script>
