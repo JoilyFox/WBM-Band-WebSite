@@ -1,78 +1,44 @@
 # WBM Band Website - Documentation
 
-This directory contains comprehensive documentation for all the core features and components of the WBM Band Website.
+This directory contains documentation for all the main features of the WBM Band Website application.
 
-## Core Features Documentation
+## Features Documentation
 
+- [API Caching](./api-caching.md) - Browser-based API response caching system with localStorage fallback
+- [Global Loading System](./global-loading-system.md) - Top bar progress indicator for async operations
 - [Snackbar Notifications](./snackbar-notifications.md) - Custom notification system with modern animations and multiple types
-
-## Project Structure
-
-```
-├── components/
-│   └── common/
-│       └── Snackbar.vue           # Global snackbar component
-├── composables/
-│   └── useSnackbar.ts            # Snackbar composable hook
-├── store/
-│   └── snackbar.ts               # Pinia store for snackbar state
-├── docs/
-│   ├── README.md                 # This file
-│   └── snackbar-notifications.md # Snackbar documentation
-└── ...
-```
 
 ## Tech Stack
 
 - **Framework**: Nuxt 3 with Vue 3 Composition API
-- **Styling**: Tailwind CSS + SCSS for advanced styling
-- **State Management**: Pinia for reactive state
-- **UI Components**: PrimeVue for icons and base components
+- **Styling**: Tailwind CSS + SCSS with modular architecture
+- **State Management**: Pinia for reactive state management
+- **UI Components**: PrimeVue with custom extensions
 - **TypeScript**: Full type safety across the application
-
-## Getting Started
-
-### Prerequisites
-- Node.js 18+ 
-- npm or yarn package manager
-
-### Installation
-```bash
-npm install
-npm run dev
-```
-
-### Using Components
-
-All components are auto-imported in Nuxt 3. To use any feature:
-
-```vue
-<script setup>
-import { useSnackbar } from '~/composables/useSnackbar';
-
-const snackbar = useSnackbar();
-
-const showNotification = () => {
-  snackbar.success('Operation completed!', 'Data saved successfully');
-};
-</script>
-```
+- **Icons**: PrimeIcons for consistent iconography
 
 ## Adding New Documentation
 
-When adding a new feature, please:
+To add documentation for a new feature:
 
-1. **Create a new `.md` file** in the `docs/` directory
-2. **Follow the documentation template** (see template below)
-3. **Update this README** to include your new feature
-4. **Include practical examples** and API references
+1. **Create a new `.md` file** in the `docs/` directory (e.g., `my-feature.md`)
+2. **Follow the standard structure**:
+   - Feature title and overview
+   - Components list with clickable links to source files
+   - Quick start examples
+   - API reference
+   - Real-world examples
+   - Best practices and troubleshooting
+3. **Add your feature to the list above** with a brief description
+4. **Use relative links** to source files: `[ComponentName.vue](../components/path/to/component.vue)`
+5. **Keep it developer-focused** with practical examples and clear API documentation
 
 ### Documentation Template
 
 ```markdown
 # Feature Name
 
-Brief description of what this feature does and why it's useful.
+Brief description of what this feature does.
 
 ## Overview
 
@@ -80,76 +46,40 @@ Explain the main components and how they work together.
 
 ## Components
 
-- [`ComponentName.vue`](../path/to/component.vue) - Description
-- [`useFeature`](../path/to/composable.ts) - Description
-- [`featureStore`](../path/to/store.ts) - Description
+- [`ComponentName.vue`](../components/path/to/component.vue) - Description
+- [`useFeatureComposable`](../composables/useFeature.ts) - Description
+- [`featureStore`](../store/feature.ts) - Description
 
 ## Quick Start
 
 ### Basic Usage
+
 \`\`\`vue
-<script setup>
-// Basic example here
+<template>
+  <!-- Template example -->
+</template>
+
+<script setup lang="ts">
+// Script example
 </script>
 \`\`\`
 
 ## API Reference
 
-### Composable Methods
-- `method()` - Description
-
-### Store Actions  
-- `action()` - Description
+Detailed API documentation...
 
 ## Real-World Examples
 
-Practical examples with common use cases.
+Practical usage scenarios...
 
 ## Best Practices
 
-Guidelines for optimal usage.
+Guidelines for optimal usage...
 
 ## Troubleshooting
 
-Common issues and solutions.
+Common issues and solutions...
 ```
-
-## Architecture Principles
-
-### Component Design
-- **Single Responsibility**: Each component has one clear purpose
-- **Composition API**: Modern Vue 3 patterns with `<script setup>`
-- **TypeScript First**: Full type safety and IntelliSense support
-- **Accessible**: ARIA labels and keyboard navigation support
-
-### State Management
-- **Pinia Stores**: Centralized state for complex features
-- **Composables**: Reusable logic with reactive state
-- **Type Safety**: Strong typing for all store actions and getters
-
-### Styling Approach
-- **Utility First**: Tailwind CSS for rapid development
-- **Component Styles**: SCSS for complex animations and component-specific styles
-- **Design System**: Consistent spacing, colors, and typography
-- **Responsive**: Mobile-first design principles
-
-## Contributing
-
-When contributing new features:
-
-1. Follow the existing architecture patterns
-2. Add comprehensive TypeScript types
-3. Include unit tests for complex logic
-4. Document all public APIs
-5. Follow the established coding conventions
-6. Ensure accessibility compliance
-
-## Performance Considerations
-
-- **Lazy Loading**: Components are automatically code-split
-- **Tree Shaking**: Unused code is eliminated in production
-- **Optimized Animations**: Hardware-accelerated CSS transitions
-- **Minimal Bundle Size**: Only import what you need
 
 ---
 

@@ -1,6 +1,12 @@
-# Nuxt 3 Minimal Starter
+# WBM Band Website
+
+A modern Nuxt 3 application for the WBM Band with advanced features including API caching, global loading system, and notification management.
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+
+## Documentation
+
+For comprehensive documentation about the application features and components, visit the [docs folder](./docs/README.md).
 
 ## Setup
 
