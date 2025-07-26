@@ -31,6 +31,13 @@
           icon="pi pi-heart"
           @click="showWarn"
         />
+        <Button 
+          label="Test Global Loader" 
+          class="btn-primary"
+          icon="pi pi-spinner"
+          @click="testGlobalLoader"
+          :disabled="isGlobalLoading"
+        />
       </div>
     </section>
 
@@ -146,6 +153,7 @@ useHead({
 
 // Composables
 const snackbar = useSnackbar()
+const { showLoading, hideLoading, setProgress, isLoading: isGlobalLoading } = useGlobalLoading()
 
 // Reactive state
 const isSubmitting = ref(false)
@@ -174,6 +182,24 @@ const showWarn = () => {
   snackbar.warning(
     'Warning!',
     'Outline button clicked - proceed with caution'
+  )
+}
+
+const testGlobalLoader = async () => {
+  showLoading()
+  
+  // Simulate progress updates
+  for (let i = 0; i <= 100; i += 10) {
+    setProgress(i)
+    await new Promise(resolve => setTimeout(resolve, 200))
+  }
+  
+  hideLoading()
+  
+  snackbar.success(
+    'Global Loader Test Complete!',
+    'The top bar loading animation has finished successfully.',
+    4000
   )
 }
 

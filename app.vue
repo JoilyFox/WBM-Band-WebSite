@@ -1,4 +1,7 @@
 <template>
+  <!-- Global Loading Bar -->
+  <GlobalLoadingBar />
+  
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
@@ -8,6 +11,7 @@
 </template>
 
 <script setup>
-// Import the Snackbar component
+// Import global components
 import Snackbar from '~/components/common/Snackbar.vue';
+import GlobalLoadingBar from '~/components/common/GlobalLoadingBar.vue';
 </script>
