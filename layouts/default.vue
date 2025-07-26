@@ -13,9 +13,16 @@
           </div>
           
           <nav class="flex items-center space-x-4">
+            <NuxtLink 
+              to="/" 
+              class="text-surface-300 hover:text-surface-50 transition-colors duration-200 px-3 py-2 rounded-md hover:bg-surface-800"
+              active-class="text-surface-50 bg-surface-800"
+            >
+              Home
+            </NuxtLink>
             <Button 
               label="Get Started" 
-              class="btn-primary"
+              class="btn-primary ml-4"
               @click="showWelcome"
             />
           </nav>

@@ -68,46 +68,85 @@ const props = withDefaults(defineProps<Props>(), {
   buttonIcon: 'pi pi-home'
 })
 
-const router = useRouter()
-const route = useRoute()
+// Use router with proper error handling for SSR
+const router = useState('router', () => {
+  try {
+    return useRouter()
+  } catch {
+    return null
+  }
+})
+
+const route = useState('route', () => {
+  try {
+    return useRoute()
+  } catch {
+    return null
+  }
+})
 
 // Handle query parameters for custom error messages
 const title = computed(() => {
-  return (route.query.title as string) || props.title
+  if (process.client && route.value?.query?.title) {
+    return route.value.query.title as string
+  }
+  return props.title
 })
 
 const message = computed(() => {
-  return (route.query.message as string) || props.message
+  if (process.client && route.value?.query?.message) {
+    return route.value.query.message as string
+  }
+  return props.message
 })
 
 const buttonText = computed(() => {
-  return (route.query.buttonText as string) || props.buttonText
+  if (process.client && route.value?.query?.buttonText) {
+    return route.value.query.buttonText as string
+  }
+  return props.buttonText
 })
 
 const buttonLink = computed(() => {
-  return (route.query.buttonLink as string) || props.buttonLink
+  if (process.client && route.value?.query?.buttonLink) {
+    return route.value.query.buttonLink as string
+  }
+  return props.buttonLink
 })
 
 const buttonIcon = computed(() => {
-  return (route.query.buttonIcon as string) || props.buttonIcon
+  if (process.client && route.value?.query?.buttonIcon) {
+    return route.value.query.buttonIcon as string
+  }
+  return props.buttonIcon
 })
 
 // Determine error code based on title or URL
 const errorCode = computed(() => {
-  if (title.value.toLowerCase().includes('not found') || route.path === '/404') {
+  const titleValue = title.value.toLowerCase()
+  const routePath = process.client && route.value ? route.value.path : ''
+  
+  if (titleValue.includes('not found') || routePath === '/404') {
     return '404'
   }
-  if (title.value.toLowerCase().includes('server error')) {
+  if (titleValue.includes('server error')) {
     return '500'
   }
-  if (title.value.toLowerCase().includes('access denied')) {
+  if (titleValue.includes('access denied')) {
     return '403'
   }
   return 'ERR'
 })
 
 const handleButtonClick = () => {
-  router.push(buttonLink.value)
+  if (process.client && router.value) {
+    router.value.push(buttonLink.value)
+  } else {
+    // Fallback for SSR - use window location
+    if (process.client) {
+      window.location.href = buttonLink.value
+    }
+  }
 }
 </script>
 
