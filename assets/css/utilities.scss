@@ -34,7 +34,7 @@
 
   /* Gradient utilities */
   .gradient-primary {
-    background: linear-gradient(135deg, theme('colors.primary.500'), theme('colors.primary.600'));
+    background: linear-gradient(135deg, theme('colors.primary.50'), theme('colors.primary.100'));
   }
   
   .gradient-secondary {
@@ -42,7 +42,7 @@
   }
   
   .gradient-text {
-    background: linear-gradient(135deg, theme('colors.primary.400'), theme('colors.secondary.400'));
+    background: linear-gradient(135deg, theme('colors.primary.200'), theme('colors.secondary.400'));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

@@ -4,7 +4,7 @@
     @apply bg-surface-800 border border-surface-700 text-surface-50 rounded-lg px-3 py-2 transition-all duration-200;
     
     &:focus {
-      @apply border-primary-500 ring-2 ring-primary-500 ring-opacity-20 outline-none;
+      @apply border-primary-50 ring-2 ring-primary-50 ring-opacity-20 outline-none;
     }
     
     &:disabled {
@@ -20,7 +20,7 @@
     @apply bg-surface-800 border border-surface-700 text-surface-50 rounded-lg px-3 py-2 transition-all duration-200 resize-none;
     
     &:focus {
-      @apply border-primary-500 ring-2 ring-primary-500 ring-opacity-20 outline-none;
+      @apply border-primary-50 ring-2 ring-primary-50 ring-opacity-20 outline-none;
     }
     
     &:disabled {
@@ -44,7 +44,7 @@
     }
     
     &.p-focus {
-      @apply border-primary-500 ring-2 ring-primary-500 ring-opacity-20;
+      @apply border-primary-50 ring-2 ring-primary-50 ring-opacity-20;
     }
   }
 
@@ -56,7 +56,7 @@
         @apply text-surface-50 px-3 py-2 hover:bg-surface-700 transition-colors;
         
         &.p-highlight {
-          @apply bg-primary-500 text-surface-950;
+          @apply bg-primary-50 text-surface-950;
         }
       }
     }

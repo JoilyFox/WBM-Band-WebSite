@@ -2,7 +2,38 @@
 @layer components {
   /* Custom button variants for PrimeVue buttons */
   .btn-primary {
-    @apply bg-primary-500 hover:bg-primary-600 text-surface-950 font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply bg-primary-50 text-surface-950 font-medium px-4 py-2 rounded-lg transition-all duration-200 focus:outline-none;
+    
+    /* Focus ring only on non-touch devices */
+    @media (hover: hover) and (pointer: fine) {
+      &:focus {
+        @apply ring-2 ring-primary-50 ring-offset-2;
+      }
+    }
+    
+    /* Hover only on non-touch devices */
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        @apply bg-primary-200;
+      }
+    }
+    
+    /* Touch-friendly active state */
+    &:active {
+      @apply bg-primary-200 ring-4 ring-primary-100 ring-opacity-50;
+      transform: scale(0.98);
+      transition: all 0.1s ease-in-out;
+    }
+    
+    /* Prevent stuck states on mobile */
+    @media (hover: none) and (pointer: coarse) {
+      &:hover {
+        @apply bg-primary-50; /* Reset to default */
+      }
+      &:focus {
+        @apply ring-0; /* Remove focus ring on touch devices */
+      }
+    }
   }
   
   .btn-primary .p-button-icon {
@@ -10,7 +41,38 @@
   }
   
   .btn-secondary {
-    @apply bg-secondary-800 hover:bg-secondary-700 text-surface-50 font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2;
+    @apply bg-secondary-800 text-surface-50 font-medium px-4 py-2 rounded-lg transition-all duration-200 focus:outline-none;
+    
+    /* Focus ring only on non-touch devices */
+    @media (hover: hover) and (pointer: fine) {
+      &:focus {
+        @apply ring-2 ring-primary-50 ring-offset-2;
+      }
+    }
+    
+    /* Hover only on non-touch devices */
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        @apply bg-secondary-700;
+      }
+    }
+    
+    /* Touch-friendly active state */
+    &:active {
+      @apply bg-secondary-700 ring-4 ring-primary-100 ring-opacity-50;
+      transform: scale(0.98);
+      transition: all 0.1s ease-in-out;
+    }
+    
+    /* Prevent stuck states on mobile */
+    @media (hover: none) and (pointer: coarse) {
+      &:hover {
+        @apply bg-secondary-800; /* Reset to default */
+      }
+      &:focus {
+        @apply ring-0; /* Remove focus ring on touch devices */
+      }
+    }
   }
   
   .btn-secondary .p-button-icon {
@@ -18,7 +80,38 @@
   }
   
   .btn-outline {
-    @apply border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-surface-950 font-medium px-4 py-2 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply border border-primary-50 text-primary-50 font-medium px-4 py-2 rounded-lg transition-all duration-200 focus:outline-none;
+    
+    /* Focus ring only on non-touch devices */
+    @media (hover: hover) and (pointer: fine) {
+      &:focus {
+        @apply ring-2 ring-primary-50 ring-offset-2;
+      }
+    }
+    
+    /* Hover only on non-touch devices */
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        @apply bg-primary-50 text-surface-950;
+      }
+    }
+    
+    /* Touch-friendly active state */
+    &:active {
+      @apply bg-primary-50 text-surface-950;
+      transform: scale(0.98);
+      transition: transform 0.1s ease-in-out;
+    }
+    
+    /* Prevent stuck states on mobile */
+    @media (hover: none) and (pointer: coarse) {
+      &:hover {
+        @apply bg-transparent text-primary-50; /* Reset to default */
+      }
+      &:focus {
+        @apply ring-0; /* Remove focus ring on touch devices */
+      }
+    }
   }
   
   .btn-outline .p-button-icon {
@@ -27,12 +120,28 @@
 
   /* PrimeVue Button override styles */
   .p-button {
+    /* Mobile-friendly sizing */
+    @media (hover: none) and (pointer: coarse) {
+      min-height: 44px; /* Touch-friendly minimum size */
+      min-width: 44px;
+    }
+    
     &.p-button-sm {
       @apply px-3 py-1.5 text-sm;
+      
+      @media (hover: none) and (pointer: coarse) {
+        min-height: 40px;
+        padding: 0.5rem 0.75rem;
+      }
     }
     
     &.p-button-lg {
       @apply px-6 py-3 text-lg;
+      
+      @media (hover: none) and (pointer: coarse) {
+        min-height: 48px;
+        padding: 0.875rem 1.5rem;
+      }
     }
     
     /* Icon spacing for all PrimeVue buttons */
@@ -43,6 +152,16 @@
     /* Remove margin for icon-only buttons */
     &.p-button-icon-only .p-button-icon {
       @apply mr-0;
+    }
+    
+    /* Prevent sticky hover states on mobile */
+    @media (hover: none) and (pointer: coarse) {
+      &:hover {
+        /* Inherit base state to prevent sticky hover */
+        background-color: inherit;
+        color: inherit;
+        border-color: inherit;
+      }
     }
   }
 }

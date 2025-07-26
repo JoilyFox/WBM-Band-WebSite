@@ -19,7 +19,7 @@
 
   /* Input variants */
   .input-primary {
-    @apply w-full px-3 py-2 bg-surface-800 border border-surface-700 text-surface-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+    @apply w-full px-3 py-2 bg-surface-800 border border-surface-700 text-surface-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-50 focus:border-transparent transition-all duration-200;
   }
   
   .input-secondary {
@@ -40,7 +40,7 @@
   }
   
   .text-accent {
-    @apply text-primary-500;
+    @apply text-primary-50;
   }
 
   /* Layout components */

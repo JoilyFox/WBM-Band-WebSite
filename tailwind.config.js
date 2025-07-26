@@ -11,20 +11,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary colors (white)
+        // Primary colors (white to dark gradient)
         primary: {
-          DEFAULT: "#FFFFFF",
-          50: "#FFFFFF",
-          100: "#FFFFFF",
-          200: "#FEFEFE",
-          300: "#FDFDFD",
-          400: "#FBFBFB",
-          500: "#FFFFFF", // Default
-          600: "#F5F5F5",
-          700: "#E5E5E5",
-          800: "#D4D4D4",
-          900: "#A3A3A3",
-          950: "#737373",
+          DEFAULT: "#FFFFFF", // Keep default as white for compatibility
+          50: "#FFFFFF",      // Brightest white
+          100: "#FEFEFE",     // Very light gray
+          200: "#FDFDFD",     // Light gray
+          300: "#FBFBFB",     // Light gray
+          400: "#F8F8F8",     // Light gray
+          500: "#F5F5F5",     // Medium light gray (proper 500 value)
+          600: "#E5E5E5",     // Medium gray
+          700: "#D4D4D4",     // Medium dark gray
+          800: "#A3A3A3",     // Dark gray
+          900: "#737373",     // Darker gray
+          950: "#525252",     // Darkest gray
         },
 
         // Surface colors (dark theme)
