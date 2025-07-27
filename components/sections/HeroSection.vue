@@ -98,7 +98,10 @@
     </div>
     
     <!-- Scroll indicator -->
-    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <div 
+      class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300"
+      @click="handleScrollDown"
+    >
       <i class="pi pi-chevron-down text-white text-2xl"></i>
     </div>
   </section>
@@ -109,6 +112,7 @@ import { watch } from 'vue'
 import Button from 'primevue/button'
 import { useImageLoading } from '~/utils/imageHelpers'
 import { useHeroSlider, type HeroImage } from '~/composables/useHeroSlider'
+import { useScrollTo } from '~/composables/useScrollTo'
 
 // Props
 interface Props {
@@ -193,6 +197,9 @@ const {
   resetImageStates
 } = useImageLoading()
 
+// Scroll functionality
+const { scrollToElement } = useScrollTo()
+
 // Event handlers for button actions
 const handlePrimaryAction = () => {
   emit('primaryAction')
@@ -200,6 +207,11 @@ const handlePrimaryAction = () => {
 
 const handleSecondaryAction = () => {
   emit('secondaryAction')
+}
+
+// Handle scroll down indicator click
+const handleScrollDown = () => {
+  scrollToElement('music')
 }
 
 // Watch for slide changes and emit to parent

@@ -12,21 +12,12 @@
       @release-click="handleReleaseClick"
       @show-more="handleShowAllMusic"
     />
-    
-    <!-- Test Section for Scroll Testing -->
-    <SectionsTestSection />
-    
-    <!-- Additional sections will go here -->
-    <!-- Future sections:
-         - AboutSection
-         - TourSection
-         - ContactSection
-    -->
   </div>
 </template>
 
 <script setup lang="ts">
 import { useSnackbar } from '~/composables/useSnackbar'
+import { useScrollTo } from '~/composables/useScrollTo'
 import { createPageTitle } from '~/constants/app'
 import type { MusicRelease } from '~/data/musicLibrary'
 
@@ -47,15 +38,12 @@ useHead({
 
 // Composables
 const snackbar = useSnackbar()
+const { scrollToElement } = useScrollTo()
 
 // Event handlers for hero section
 const handleListenNow = () => {
-  // TODO: Implement navigation to music/streaming platforms
-  snackbar.show({
-    type: 'info',
-    message: 'Coming Soon',
-    subtitle: 'Music streaming links will be available soon!'
-  })
+  // Scroll to music section
+  scrollToElement('music')
 }
 
 const handleTourDates = () => {

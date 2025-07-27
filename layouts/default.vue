@@ -135,10 +135,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
+import { useScrollTo } from '~/composables/useScrollTo'
 import { createWelcomeMessage } from '~/constants/app'
 
 // Composables
 const snackbar = useSnackbar()
+const { scrollToElement } = useScrollTo()
 
 // Mobile menu state
 const isMobileMenuOpen = ref(false)
@@ -189,7 +191,7 @@ const leftNavLinks = ref<NavLink[]>([
   {
     label: 'Music',
     to: '#music',
-    onClick: () => snackbar.info('Music', 'Music section coming soon!', 3000)
+    onClick: () => scrollToElement('music')
   },
   {
     label: 'Tour',
