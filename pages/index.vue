@@ -1,18 +1,36 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+  <div>
     <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center px-4">
-      <!-- Background overlay -->
-      <div class="absolute inset-0 bg-black/30"></div>
+    <section class="hero-section relative w-full flex items-center justify-center px-4 overflow-hidden">
+      <!-- Background Image with Nuxt optimizations -->
+      <NuxtImg 
+        src="/images/band-hero-bg.jpg"
+        alt="WBM Band performing live on stage"
+        class="hero-background-image"
+        loading="eager"
+        fetchpriority="high"
+        format="webp,jpg"
+        quality="90"
+        @error="handleImageError"
+      />
+      
+      <!-- Fallback background for when image fails to load -->
+      <div 
+        v-if="imageLoadError" 
+        class="absolute inset-0 hero-bg-fallback"
+      ></div>
+      
+      <!-- Background overlay for better text readability -->
+      <div class="absolute inset-0 bg-black/50 z-10"></div>
       
       <!-- Content -->
-      <div class="relative z-10 text-center max-w-4xl mx-auto">
-        <h1 class="text-6xl md:text-8xl font-bold text-white mb-6 animate-fade-in">
-          WBM BAND
+      <div class="relative z-20 text-center max-w-4xl mx-auto">
+        <h1 class="xs:text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
+          Woman Based Mechanics
         </h1>
         
         <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto animate-slide-up">
-          Rock • Metal • Alternative
+          Rock • Alternative • Indie
         </p>
         
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-scale-in">
@@ -34,107 +52,7 @@
         <i class="pi pi-chevron-down text-white text-2xl"></i>
       </div>
     </section>
-
-    <!-- About Section -->
-    <section class="py-20 px-4 bg-black/50">
-      <div class="max-w-6xl mx-auto text-center">
-        <h2 class="text-4xl md:text-5xl font-bold text-white mb-8">About WBM</h2>
-        <p class="text-lg text-gray-300 max-w-3xl mx-auto mb-12">
-          WBM Band brings high-energy rock performances with a modern twist on classic metal sounds. 
-          Our passion for music drives us to create unforgettable experiences for our fans.
-        </p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="text-center">
-            <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i class="pi pi-music-note text-white text-2xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold text-white mb-2">Original Music</h3>
-            <p class="text-gray-400">Creating powerful, original compositions that resonate with our audience</p>
-          </div>
-          
-          <div class="text-center">
-            <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i class="pi pi-users text-white text-2xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold text-white mb-2">Live Shows</h3>
-            <p class="text-gray-400">Electrifying live performances that bring our music to life</p>
-          </div>
-          
-          <div class="text-center">
-            <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i class="pi pi-heart text-white text-2xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold text-white mb-2">Fan Connection</h3>
-            <p class="text-gray-400">Building lasting relationships with our amazing fanbase</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Latest News/Updates -->
-    <section class="py-20 px-4">
-      <div class="max-w-6xl mx-auto">
-        <h2 class="text-4xl md:text-5xl font-bold text-white text-center mb-12">Latest Updates</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-            <h3 class="text-xl font-semibold text-white mb-3">New Album Coming</h3>
-            <p class="text-gray-300 mb-4">We're excited to announce our upcoming album release this fall...</p>
-            <span class="text-purple-400 text-sm">2 days ago</span>
-          </div>
-          
-          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-            <h3 class="text-xl font-semibold text-white mb-3">Summer Tour</h3>
-            <p class="text-gray-300 mb-4">Join us on our summer tour across the country. Tickets available now...</p>
-            <span class="text-purple-400 text-sm">1 week ago</span>
-          </div>
-          
-          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-            <h3 class="text-xl font-semibold text-white mb-3">Studio Sessions</h3>
-            <p class="text-gray-300 mb-4">Behind the scenes look at our recording process for the new tracks...</p>
-            <span class="text-purple-400 text-sm">2 weeks ago</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Contact/Social -->
-    <section class="py-20 px-4 bg-black/50">
-      <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-4xl md:text-5xl font-bold text-white mb-8">Stay Connected</h2>
-        <p class="text-lg text-gray-300 mb-8">Follow us for the latest updates, behind-the-scenes content, and exclusive releases</p>
-        
-        <div class="flex justify-center space-x-6 mb-8">
-          <Button 
-            icon="pi pi-facebook" 
-            class="btn-outline !p-3"
-            aria-label="Facebook"
-          />
-          <Button 
-            icon="pi pi-instagram" 
-            class="btn-outline !p-3"
-            aria-label="Instagram"
-          />
-          <Button 
-            icon="pi pi-twitter" 
-            class="btn-outline !p-3"
-            aria-label="Twitter"
-          />
-          <Button 
-            icon="pi pi-youtube" 
-            class="btn-outline !p-3"
-            aria-label="YouTube"
-          />
-        </div>
-        
-        <Button 
-          label="Contact Us" 
-          class="btn-primary text-lg px-8 py-3"
-          icon="pi pi-envelope"
-        />
-      </div>
-    </section>
+  
   </div>
 </template>
 
@@ -160,6 +78,15 @@ useHead({
 // Composables
 const snackbar = useSnackbar()
 
+// Reactive state for image handling
+const imageLoadError = ref(false)
+
+// Image error handler
+const handleImageError = () => {
+  imageLoadError.value = true
+  console.warn('Hero background image failed to load, using fallback')
+}
+
 // Methods for future functionality
 const handleListenNow = () => {
   snackbar.info('Music Player', 'Music player coming soon!', 3000)
@@ -179,6 +106,39 @@ const handleSocialClick = (platform: string) => {
 </script>
 
 <style scoped>
+/* Hero section specific styles */
+.hero-section {
+  height: 100vh;
+  height: 100dvh; /* Use dynamic viewport height for mobile browsers */
+}
+
+/* Hero background image styling */
+.hero-background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  max-width: none;
+  max-height: none;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Ensure proper aspect ratio and performance on mobile */
+@media (max-width: 768px) {
+  .hero-background-image {
+    object-position: center 30%; /* Adjust focus point for mobile */
+    will-change: transform; /* Optimize for smooth scrolling */
+  }
+}
+
+/* Animation keyframes */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -204,5 +164,34 @@ const handleSocialClick = (platform: string) => {
 
 .animate-scale-in {
   animation: scale-in 1s ease-out 0.6s both;
+}
+
+/* Text shadow for better readability over image */
+h1 {
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+}
+
+p {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Additional responsive text sizing for very small screens */
+@media (max-width: 420px) {
+  h1 {
+    font-size: 2.25rem; /* 36px - smaller than text-4xl */
+    line-height: 2.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  h1 {
+    font-size: 2rem; /* 32px - even smaller for very small screens */
+    line-height: 2.25rem;
+  }
+}
+
+/* Fallback gradient background in case image doesn't load */
+.hero-bg-fallback {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 50%, #1a1a1a 100%);
 }
 </style>

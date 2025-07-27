@@ -7,7 +7,8 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@primevue/nuxt-module',
     '@nuxtjs/google-fonts',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    '@nuxt/image'
   ],
 
   // PrimeVue Configuration
@@ -46,6 +47,33 @@ export default defineNuxtConfig({
   css: [
     '~/assets/css/main.css'
   ],
+
+  // Image optimization configuration
+  image: {
+    quality: 90,
+    format: ['webp', 'jpg'],
+    screens: {
+      xs: 320,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      xxl: 1536,
+    },
+    densities: [1, 2],
+    presets: {
+      hero: {
+        modifiers: {
+          format: 'webp',
+          quality: 95,
+          fit: 'cover'
+        }
+      }
+    },
+    domains: [],
+    alias: {},
+    dir: 'public'
+  },
 
   // TypeScript Configuration
   typescript: {

@@ -128,11 +128,22 @@ const getProgressClasses = (type: string) => {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
+  left: 1.5rem;
   display: flex;
   flex-direction: column;
   pointer-events: none;
   max-width: 420px;
-  width: 100%;
+  width: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 640px) {
+  .snackbar-wrapper {
+    left: auto;
+    right: 1.5rem;
+    width: 100%;
+    max-width: 420px;
+  }
 }
 
 .snackbar-list {
@@ -156,10 +167,19 @@ const getProgressClasses = (type: string) => {
     0 10px 10px -5px rgba(0, 0, 0, 0.04),
     0 0 0 1px rgba(255, 255, 255, 0.05);
   pointer-events: auto;
-  min-width: 320px;
-  max-width: 420px;
+  min-width: 280px;
+  max-width: 100%;
+  width: 100%;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 640px) {
+  .snackbar-item {
+    min-width: 320px;
+    max-width: 420px;
+    width: auto;
+  }
 }
 
 .snackbar-item:hover {
@@ -341,8 +361,27 @@ const getProgressClasses = (type: string) => {
   transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+// Mobile-specific animations
+@media (max-width: 639px) {
+  .snackbar-enter-from {
+    transform: translateY(100%) scale(0.95);
+    opacity: 0;
+  }
+  
+  .snackbar-leave-to {
+    transform: translateY(100%) scale(0.95);
+    opacity: 0;
+  }
+  
+  .snackbar-leave-active {
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
+}
+
 // Responsive design
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .snackbar-wrapper {
     bottom: 1rem;
     right: 1rem;
@@ -353,6 +392,31 @@ const getProgressClasses = (type: string) => {
   .snackbar-item {
     min-width: auto;
     max-width: none;
+    padding: 0.875rem;
+    gap: 0.625rem;
+  }
+  
+  .snackbar-message {
+    font-size: 0.8125rem;
+    line-height: 1.2;
+  }
+  
+  .snackbar-subtitle {
+    font-size: 0.6875rem;
+    margin-top: 0.1875rem;
+  }
+  
+  .snackbar-icon {
+    font-size: 1.125rem;
+  }
+  
+  .snackbar-close {
+    width: 1.25rem;
+    height: 1.25rem;
+    
+    .pi {
+      font-size: 0.75rem;
+    }
   }
 }
 </style>
