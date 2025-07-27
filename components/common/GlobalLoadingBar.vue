@@ -1,15 +1,17 @@
 <template>
-  <Transition name="loading-bar">
-    <div 
-      v-if="isLoading" 
-      class="global-loading-bar"
-    >
+  <ClientOnly>
+    <Transition name="loading-bar">
       <div 
-        class="loading-progress"
-        :style="{ width: `${progress}%` }"
-      ></div>
-    </div>
-  </Transition>
+        v-if="isLoading" 
+        class="global-loading-bar"
+      >
+        <div 
+          class="loading-progress"
+          :style="{ width: `${progress}%` }"
+        ></div>
+      </div>
+    </Transition>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">

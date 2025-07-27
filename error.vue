@@ -14,6 +14,8 @@ definePageMeta({
   layout: false
 })
 
+import { createErrorTitle } from '~/constants/app'
+
 const props = defineProps<{
   error: any
 }>()
@@ -59,7 +61,7 @@ const buttonIcon = computed(() => {
 
 // Handle the error for better SEO and user experience
 useHead({
-  title: `${props.error?.statusCode || 'Error'} - WBM Band Website`,
+  title: createErrorTitle(props.error?.statusCode || 'Error'),
   meta: [
     { name: 'robots', content: 'noindex' }
   ]

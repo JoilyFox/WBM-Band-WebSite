@@ -1,3 +1,5 @@
+import { CACHE_NAME } from '~/constants/app'
+
 /**
  * ApiCache class for browser-based API response caching using Web Cache API
  * Falls back to localStorage when Cache API is not available
@@ -6,7 +8,7 @@ export class ApiCache {
   public readonly cacheName: string
   private _useLocalStorage: boolean = false
 
-  constructor(cacheName = 'wbm-api-cache') {
+  constructor(cacheName = CACHE_NAME) {
     this.cacheName = cacheName
     this.checkCacheSupport()
     this.startAutoCleanup()

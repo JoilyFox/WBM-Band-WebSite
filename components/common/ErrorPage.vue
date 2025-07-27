@@ -77,46 +77,41 @@ const router = useState('router', () => {
   }
 })
 
-const route = useState('route', () => {
-  try {
-    return useRoute()
-  } catch {
-    return null
-  }
-})
+// Get the current route
+const route = useRoute()
 
 // Handle query parameters for custom error messages
 const title = computed(() => {
-  if (process.client && route.value?.query?.title) {
-    return route.value.query.title as string
+  if (route?.query?.title) {
+    return route.query.title as string
   }
   return props.title
 })
 
 const message = computed(() => {
-  if (process.client && route.value?.query?.message) {
-    return route.value.query.message as string
+  if (route?.query?.message) {
+    return route.query.message as string
   }
   return props.message
 })
 
 const buttonText = computed(() => {
-  if (process.client && route.value?.query?.buttonText) {
-    return route.value.query.buttonText as string
+  if (route?.query?.buttonText) {
+    return route.query.buttonText as string
   }
   return props.buttonText
 })
 
 const buttonLink = computed(() => {
-  if (process.client && route.value?.query?.buttonLink) {
-    return route.value.query.buttonLink as string
+  if (route?.query?.buttonLink) {
+    return route.query.buttonLink as string
   }
   return props.buttonLink
 })
 
 const buttonIcon = computed(() => {
-  if (process.client && route.value?.query?.buttonIcon) {
-    return route.value.query.buttonIcon as string
+  if (route?.query?.buttonIcon) {
+    return route.query.buttonIcon as string
   }
   return props.buttonIcon
 })
@@ -124,7 +119,7 @@ const buttonIcon = computed(() => {
 // Determine error code based on title or URL
 const errorCode = computed(() => {
   const titleValue = title.value.toLowerCase()
-  const routePath = process.client && route.value ? route.value.path : ''
+  const routePath = route ? route.path : ''
   
   if (titleValue.includes('not found') || routePath === '/404') {
     return '404'

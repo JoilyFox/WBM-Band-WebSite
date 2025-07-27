@@ -1,33 +1,34 @@
 <template>
-  <div class="snackbar-container">
-    <div class="snackbar-wrapper">
-      <TransitionGroup
-        name="snackbar"
-        tag="div"
-        class="snackbar-list"
-      >
-        <div
-          v-for="snackbar in visibleSnackbars"
-          :key="snackbar.id"
-          class="snackbar-item"
-          :class="getSnackbarClasses(snackbar.type)"
-          @mouseenter="pauseTimer(snackbar.id)"
-          @mouseleave="resumeTimer(snackbar.id)"
+  <ClientOnly>
+    <div class="snackbar-container">
+      <div class="snackbar-wrapper">
+        <TransitionGroup
+          name="snackbar"
+          tag="div"
+          class="snackbar-list"
         >
-          <!-- Icon -->
-          <div class="snackbar-icon">
-            <i :class="getIconClass(snackbar.type)"></i>
-          </div>
+          <div
+            v-for="snackbar in visibleSnackbars"
+            :key="snackbar.id"
+            class="snackbar-item"
+            :class="getSnackbarClasses(snackbar.type)"
+            @mouseenter="pauseTimer(snackbar.id)"
+            @mouseleave="resumeTimer(snackbar.id)"
+          >
+            <!-- Icon -->
+            <div class="snackbar-icon">
+              <i :class="getIconClass(snackbar.type)"></i>
+            </div>
 
-          <!-- Content -->
-          <div class="snackbar-content">
-            <div class="snackbar-message">
-              {{ snackbar.message }}
+            <!-- Content -->
+            <div class="snackbar-content">
+              <div class="snackbar-message">
+                {{ snackbar.message }}
+              </div>
+              <div v-if="snackbar.subtitle" class="snackbar-subtitle">
+                {{ snackbar.subtitle }}
+              </div>
             </div>
-            <div v-if="snackbar.subtitle" class="snackbar-subtitle">
-              {{ snackbar.subtitle }}
-            </div>
-          </div>
 
           <!-- Close Button -->
           <button
@@ -50,6 +51,7 @@
       </TransitionGroup>
     </div>
   </div>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">

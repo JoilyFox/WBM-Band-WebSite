@@ -307,17 +307,19 @@
 import { ref } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
 
+import { WEBSITE_TITLE, APP_DESCRIPTION, createPageTitle } from '~/constants/app'
+
 // Meta
 definePageMeta({
   title: 'Home'
 })
 
 useHead({
-  title: 'WBM Band Website - Modern Nuxt 3 Application',
+  title: createPageTitle('Modern Nuxt 3 Application'),
   meta: [
     {
       name: 'description',
-      content: 'A modern full-stack application built with Nuxt 3, Vue 3, TypeScript, Tailwind CSS, and PrimeVue'
+      content: APP_DESCRIPTION
     }
   ]
 })

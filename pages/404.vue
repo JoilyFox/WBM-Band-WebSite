@@ -14,11 +14,18 @@ definePageMeta({
   layout: false
 })
 
-// Set page meta
+import { createPageTitle } from '~/constants/app'
+
+// Set page meta - don't throw error in 404 page
 useHead({
-  title: '404 - Page Not Found | WBM Band Website',
+  title: createPageTitle('404 - Page Not Found'),
   meta: [
     { name: 'robots', content: 'noindex' }
   ]
 })
+
+// Set response status for SEO
+if (process.server) {
+  setResponseStatus(404)
+}
 </script>

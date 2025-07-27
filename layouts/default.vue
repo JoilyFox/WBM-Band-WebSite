@@ -8,7 +8,7 @@
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
             <h1 class="text-xl font-bold text-surface-50">
-              WBM Band Website
+              {{ WEBSITE_TITLE }}
             </h1>
           </div>
           
@@ -39,6 +39,7 @@
 
 <script setup lang="ts">
 import { useSnackbar } from '~/composables/useSnackbar'
+import { WEBSITE_TITLE, createWelcomeMessage } from '~/constants/app'
 
 // Composables
 const snackbar = useSnackbar()
@@ -46,7 +47,7 @@ const snackbar = useSnackbar()
 // Methods
 const showWelcome = () => {
   snackbar.success(
-    'Welcome to WBM Band!',
+    createWelcomeMessage(),
     'Your modern Nuxt 3 application is ready to rock! 🎸',
     5000
   )
