@@ -2,47 +2,258 @@
   <div class="min-h-screen bg-surface-950">
     <NuxtRouteAnnouncer />
     
-    <!-- Header -->
-    <header class="bg-surface-900 border-b border-surface-800 sticky top-0 z-50">
+    <!-- Header with glassy background -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-black/5 backdrop-blur-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <div class="flex items-center">
-            <h1 class="text-xl font-bold text-surface-50">
-              {{ WEBSITE_TITLE }}
-            </h1>
-          </div>
+        <div class="flex items-start justify-between h-16 relative pt-1">
           
-          <nav class="flex items-center space-x-4">
-            <NuxtLink 
-              to="/" 
-              class="text-surface-300 hover:text-surface-50 transition-colors duration-200 px-3 py-2 rounded-md hover:bg-surface-800"
-              active-class="text-surface-50 bg-surface-800"
-            >
-              Home
+          <!-- Mobile Logo (left aligned) -->
+          <div class="flex items-start md:hidden z-50 top-[20px] absolute left-[4px]">
+            <NuxtLink to="/" class="block">
+              <img 
+                src="/assets/images/icons/wbm logo white.svg" 
+                alt="WBM Band Logo" 
+                class="h-20 w-auto filter drop-shadow-2xl hover:scale-105 transition-transform duration-300 -mt-1"
+              />
             </NuxtLink>
-            <Button 
-              label="Get Started" 
-              class="btn-primary ml-4"
-              @click="showWelcome"
-            />
-          </nav>
+          </div>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:flex items-center justify-between h-full w-full">
+            <!-- Left navigation links -->
+            <div class="flex items-center gap-8 flex-1 justify-end pr-4">
+              <template v-for="(link, index) in leftNavLinks" :key="`left-${index}`">
+                <NuxtLink 
+                  :to="link.to" 
+                  :class="navLinkClass"
+                  @click="handleNavClick(link)"
+                >
+                  {{ link.label }}
+                </NuxtLink>
+              </template>
+            </div>
+
+            <!-- Right navigation links -->
+            <div class="flex items-center gap-8 flex-1 justify-start pl-4">
+              <template v-for="(link, index) in rightNavLinks" :key="`right-${index}`">
+                <NuxtLink 
+                  :to="link.to" 
+                  :class="navLinkClass"
+                  @click="handleNavClick(link)"
+                >
+                  {{ link.label }}
+                </NuxtLink>
+              </template>
+            </div>
+          </div>
+
+          <!-- Mobile Menu Button -->
+          <div class="md:hidden ml-auto flex items-start pt-2">
+            <button
+              @click="toggleMobileMenu"
+              :class="mobileMenuButtonClass"
+              aria-label="Toggle navigation menu"
+            >
+              <i :class="mobileMenuIcon" class="text-xl transition-transform duration-200 ease-out"></i>
+            </button>
+          </div>
         </div>
+      </div>
+      
+      <!-- Desktop Logo (absolute positioned) -->
+      <div class="hidden md:block absolute top-[12px] left-1/2 transform -translate-x-1/2 z-50">
+        <NuxtLink to="/" class="block">
+          <img 
+            src="/assets/images/icons/wbm logo white.svg" 
+            alt="WBM Band Logo" 
+            class="h-20 w-auto filter drop-shadow-2xl hover:scale-105 transition-transform duration-500 ease-out"
+          />
+        </NuxtLink>
       </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Mobile Menu Overlay -->
+    <Transition name="mobile-menu">
+      <div
+        v-if="isMobileMenuOpen"
+        class="fixed inset-0 z-50 md:hidden"
+        @click="closeMobileMenu"
+      >
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md"></div>
+        
+        <!-- Menu Content -->
+        <div 
+          class="relative flex flex-col items-center justify-center h-full"
+          @click.stop
+        >
+          <!-- Close Button -->
+          <button
+            @click="closeMobileMenu"
+            class="absolute top-6 right-6 text-white/90 hover:text-white transition-colors duration-300 p-2"
+            aria-label="Close menu"
+          >
+            <i class="pi pi-times text-2xl"></i>
+          </button>
+
+          <!-- Logo in mobile menu -->
+          <div class="mb-12">
+            <NuxtLink to="/" class="block" @click="closeMobileMenu">
+              <img 
+                src="/assets/images/icons/wbm logo white.svg" 
+                alt="WBM Band Logo" 
+                class="h-16 w-auto filter drop-shadow-2xl"
+              />
+            </NuxtLink>
+          </div>
+
+          <!-- Mobile Navigation Links -->
+          <nav class="flex flex-col items-center space-y-8">
+            <template v-for="(link, index) in allNavLinks" :key="`mobile-${index}`">
+              <NuxtLink 
+                :to="link.to" 
+                :class="mobileNavLinkClass"
+                @click="handleMobileNavClick(link)"
+              >
+                {{ link.label }}
+              </NuxtLink>
+            </template>
+          </nav>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- Main Content with top padding to account for fixed header -->
+    <main class="">
       <slot />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
-import { WEBSITE_TITLE, createWelcomeMessage } from '~/constants/app'
+import { createWelcomeMessage } from '~/constants/app'
 
 // Composables
 const snackbar = useSnackbar()
+
+// Mobile menu state
+const isMobileMenuOpen = ref(false)
+
+// Navigation link type
+interface NavLink {
+  label: string
+  to: string
+  onClick?: () => void
+}
+
+// Navigation links configuration
+const leftNavLinks = ref<NavLink[]>([
+  {
+    label: 'Music',
+    to: '#music',
+    onClick: () => snackbar.info('Music', 'Music section coming soon!', 3000)
+  },
+  {
+    label: 'Tour',
+    to: '#tour', 
+    onClick: () => snackbar.info('Tour', 'Tour dates coming soon!', 3000)
+  }
+])
+
+const rightNavLinks = ref<NavLink[]>([
+  {
+    label: 'About',
+    to: '#about',
+    onClick: () => snackbar.info('About', 'About section coming soon!', 3000)
+  },
+  {
+    label: 'Contact',
+    to: '#contact',
+    onClick: () => snackbar.info('Contact', 'Contact section coming soon!', 3000)
+  }
+])
+
+// Combined nav links for mobile menu
+const allNavLinks = computed(() => [
+  ...leftNavLinks.value,
+  ...rightNavLinks.value
+])
+
+// Dynamic styling for desktop nav links with proper mobile touch handling
+const navLinkClass = 'nav-link-desktop'
+
+// Mobile navigation link styles
+const mobileNavLinkClass = 'nav-link-mobile'
+
+// Mobile menu button styles
+const mobileMenuButtonClass = 'mobile-menu-button'
+
+// Mobile menu icon
+const mobileMenuIcon = computed(() => 
+  isMobileMenuOpen.value ? 'pi pi-times' : 'pi pi-bars'
+)
+
+// Mobile menu methods
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+  
+  // Prevent body scroll when menu is open
+  if (isMobileMenuOpen.value) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+}
+
+const closeMobileMenu = () => {
+  isMobileMenuOpen.value = false
+  document.body.style.overflow = ''
+}
+
+// Handle navigation clicks with proper mobile behavior
+const handleNavClick = (link: NavLink) => {
+  // Remove any stuck hover states by forcing a blur
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur()
+  }
+  
+  // Execute the onClick function if it exists
+  if (link.onClick) {
+    link.onClick()
+  }
+}
+
+const handleMobileNavClick = (link: NavLink) => {
+  // Close mobile menu first
+  closeMobileMenu()
+  
+  // Then handle the navigation with reduced delay for faster UX
+  setTimeout(() => {
+    if (link.onClick) {
+      link.onClick()
+    }
+  }, 200) // Reduced from 300ms to match faster animation
+}
+
+// Handle escape key to close mobile menu
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && isMobileMenuOpen.value) {
+    closeMobileMenu()
+  }
+}
+
+// Lifecycle hooks
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+  // Clean up body overflow on unmount
+  document.body.style.overflow = ''
+})
 
 // Methods
 const showWelcome = () => {
@@ -53,3 +264,298 @@ const showWelcome = () => {
   )
 }
 </script>
+
+<style scoped>
+/* Custom component classes */
+.nav-link-desktop {
+  position: relative;
+  color: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease-out;
+  padding: 0.5rem 0.25rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  outline: none;
+  text-decoration: none;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transform-origin: bottom;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.nav-link-desktop:hover {
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.nav-link-desktop:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.nav-link-desktop::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0.125rem;
+  background-color: white;
+  transition: all 0.3s ease-out;
+}
+
+.nav-link-desktop:hover::after {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .nav-link-desktop:hover {
+    transform: scale(1.05);
+  }
+}
+
+.nav-link-mobile {
+  position: relative;
+  color: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease-out;
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  outline: none;
+  text-decoration: none;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+  display: block;
+  width: 100%;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.nav-link-mobile:active {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(0.95);
+}
+
+.nav-link-mobile:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.nav-link-mobile::after {
+  content: '';
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  width: 0;
+  height: 0.125rem;
+  background-color: white;
+  transition: all 0.3s ease-out;
+  transform: translateX(-50%);
+}
+
+.nav-link-mobile:active::after {
+  width: 75%;
+}
+
+.mobile-menu-button {
+  position: relative;
+  color: rgba(255, 255, 255, 0.9);
+  transition: all 0.2s ease-out;
+  padding: 0.5rem;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 0.5rem;
+}
+
+.mobile-menu-button:hover {
+  color: white;
+}
+
+.mobile-menu-button:active {
+  color: white;
+  transform: scale(0.95);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-menu-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.text-shadow-sm {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.text-shadow-md {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Remove all focus rings and outlines */
+a, button, *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Mobile-specific touch handling */
+.tap-highlight-transparent {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Enhanced underline animation for desktop */
+.group:hover::after {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Mobile menu transitions */
+.mobile-menu-enter-active,
+.mobile-menu-leave-active {
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.mobile-menu-enter-from {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.mobile-menu-leave-to {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+/* Mobile menu content animation - removed conflicting animations */
+.mobile-menu-enter-active .relative {
+  animation: slideInUp 0.25s cubic-bezier(0.4, 0.0, 0.2, 1) both;
+}
+
+.mobile-menu-leave-active .relative {
+  animation: slideOutDown 0.2s cubic-bezier(0.4, 0.0, 0.2, 1) both;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+}
+
+/* Smooth backdrop blur effect for better glass morphism */
+header {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+/* Mobile menu backdrop blur */
+.mobile-menu-enter-active .absolute,
+.mobile-menu-leave-active .absolute {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transition: backdrop-filter 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Ensure navigation links don't get too close to logo area on desktop */
+@media (min-width: 768px) {
+  .flex-1 {
+    max-width: calc(50% - 60px);
+  }
+}
+
+/* Mobile navigation link hover effects */
+@media (max-width: 767px) {
+  .group:active::after {
+    animation: mobileSlideIn 0.2s ease-out forwards;
+  }
+}
+
+@keyframes mobileSlideIn {
+  from {
+    width: 0;
+  }
+  to {
+    width: 75%;
+  }
+}
+
+/* Prevent text selection on navigation elements */
+.select-none {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Enhanced mobile button feedback */
+@media (max-width: 767px) {
+  .cursor-pointer:active {
+    transform: scale(0.95);
+    transition: transform 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  
+  /* Burger menu button specific styles */
+  button:active {
+    transform: scale(0.95);
+    transition: all 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+}
+
+/* Smooth transitions for mobile logo */
+@media (max-width: 767px) {
+  .h-20 {
+    transition: transform 0.3s ease-out;
+  }
+  
+  .h-20:active {
+    transform: scale(0.95);
+  }
+  
+  /* Ensure mobile logo extends properly beyond header */
+  .relative.z-50 {
+    overflow: visible;
+  }
+}
+</style>
