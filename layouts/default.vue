@@ -7,13 +7,14 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-start justify-between h-16 relative pt-1">
           
-          <!-- Mobile Logo (left aligned) -->
-          <div class="flex items-start md:hidden z-50 top-[20px] absolute left-[4px]">
+          <!-- Mobile Logo (centered when big, left when scrolled) -->
+          <div class="flex items-start md:hidden z-50 transition-all duration-300" :class="mobileLogoPositionClass">
             <NuxtLink to="/" class="block">
               <img 
                 src="/assets/images/icons/wbm logo white.svg" 
                 alt="WBM Band Logo" 
-                class="h-20 w-auto filter drop-shadow-2xl hover:scale-105 transition-transform duration-300 -mt-1"
+                class="w-auto filter drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+                :class="mobileLogoSizeClass"
               />
             </NuxtLink>
           </div>
@@ -21,7 +22,7 @@
           <!-- Desktop Navigation -->
           <div class="hidden md:flex items-center justify-between h-full w-full">
             <!-- Left navigation links -->
-            <div class="flex items-center gap-8 flex-1 justify-end pr-4">
+            <div class="flex items-center gap-8 flex-1 justify-end transition-all duration-300" :class="leftNavSpacing">
               <template v-for="(link, index) in leftNavLinks" :key="`left-${index}`">
                 <NuxtLink 
                   :to="link.to" 
@@ -34,7 +35,7 @@
             </div>
 
             <!-- Right navigation links -->
-            <div class="flex items-center gap-8 flex-1 justify-start pl-4">
+            <div class="flex items-center gap-8 flex-1 justify-start transition-all duration-300" :class="rightNavSpacing">
               <template v-for="(link, index) in rightNavLinks" :key="`right-${index}`">
                 <NuxtLink 
                   :to="link.to" 
@@ -61,12 +62,13 @@
       </div>
       
       <!-- Desktop Logo (absolute positioned) -->
-      <div class="hidden md:block absolute top-[14px] left-1/2 transform -translate-x-1/2 z-50">
+      <div class="hidden md:block absolute top-[14px] left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300" :class="logoPositionClass">
         <NuxtLink to="/" class="block">
           <img 
             src="/assets/images/icons/wbm logo white.svg" 
             alt="WBM Band Logo" 
-            class="h-20 w-auto filter drop-shadow-2xl hover:scale-105 transition-transform duration-500 ease-out"
+            class="w-auto filter drop-shadow-2xl hover:scale-105 transition-transform duration-500 ease-out"
+            :class="logoSizeClass"
           />
         </NuxtLink>
       </div>
@@ -140,6 +142,40 @@ const snackbar = useSnackbar()
 
 // Mobile menu state
 const isMobileMenuOpen = ref(false)
+
+// Scroll state for logo animation
+const scrollY = ref(0)
+const isScrolled = computed(() => scrollY.value > 50)
+
+// Dynamic logo sizing based on scroll
+const logoSizeClass = computed(() => 
+  isScrolled.value ? 'h-20' : 'h-40'
+)
+
+// Dynamic logo positioning based on scroll
+const logoPositionClass = computed(() => 
+  isScrolled.value ? 'top-[14px]' : 'top-[14px]'
+)
+
+// Dynamic navigation spacing based on scroll
+const leftNavSpacing = computed(() => 
+  isScrolled.value ? 'pr-0' : 'pr-10'
+)
+
+const rightNavSpacing = computed(() => 
+  isScrolled.value ? 'pl-0' : 'pl-10'
+)
+
+// Mobile logo dynamic sizing and positioning
+const mobileLogoSizeClass = computed(() => 
+  isScrolled.value ? 'h-20' : 'h-34'
+)
+
+const mobileLogoPositionClass = computed(() => 
+  isScrolled.value 
+    ? 'top-[20px] absolute left-[4px]' 
+    : 'top-[30px] absolute left-1/2 transform -translate-x-1/2'
+)
 
 // Navigation link type
 interface NavLink {
@@ -244,13 +280,20 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 }
 
+// Handle scroll for logo animation
+const handleScroll = () => {
+  scrollY.value = window.scrollY
+}
+
 // Lifecycle hooks
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
+  window.addEventListener('scroll', handleScroll, { passive: true })
 })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('scroll', handleScroll)
   // Clean up body overflow on unmount
   document.body.style.overflow = ''
 })
@@ -501,7 +544,7 @@ header {
 /* Ensure navigation links don't get too close to logo area on desktop */
 @media (min-width: 768px) {
   .flex-1 {
-    max-width: calc(50% - 60px);
+    max-width: calc(50% - 80px); /* Increased from 60px to accommodate larger logo */
   }
 }
 
@@ -545,17 +588,44 @@ header {
 
 /* Smooth transitions for mobile logo */
 @media (max-width: 767px) {
-  .h-20 {
-    transition: transform 0.3s ease-out;
+  .h-20, .h-34 {
+    transition: all 0.3s ease-out;
   }
   
-  .h-20:active {
+  .h-20:active, .h-34:active {
     transform: scale(0.95);
   }
   
+  /* Mobile logo container transitions */
+  .md\\:hidden {
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  
   /* Ensure mobile logo extends properly beyond header */
-  .relative.z-50 {
+  .relative.z-50, .absolute.z-50 {
     overflow: visible;
   }
+}
+
+/* Custom logo sizes for scroll animation */
+.h-30 {
+  height: 7.5rem; /* 120px - 1.5x of h-20 (80px) */
+}
+
+.h-34 {
+  height: 8.5rem; /* 136px - 1.7x of h-20 (80px) for mobile */
+}
+
+.h-36 {
+  height: 9rem; /* 144px - 1.8x of h-20 (80px) */
+}
+
+.h-40 {
+  height: 10rem; /* 160px - 2x of h-20 (80px) for desktop */
+}
+
+/* Smooth logo size transitions */
+.h-20, .h-30, .h-34, .h-36, .h-40 {
+  transition: height 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 </style>
