@@ -7,10 +7,12 @@
         src="/images/band-hero-bg.jpg"
         alt="WBM Band performing live on stage"
         class="hero-background-image"
+        :class="{ 'image-loaded': imageLoaded }"
         loading="eager"
         fetchpriority="high"
         format="webp,jpg"
         quality="90"
+        @load="handleImageLoad"
         @error="handleImageError"
       />
       
@@ -59,6 +61,7 @@
 <script setup lang="ts">
 import { useSnackbar } from '~/composables/useSnackbar'
 import { WEBSITE_TITLE, APP_DESCRIPTION, createPageTitle } from '~/constants/app'
+import { useImageLoading } from '~/utils/imageHelpers'
 
 // Meta
 definePageMeta({
@@ -78,31 +81,15 @@ useHead({
 // Composables
 const snackbar = useSnackbar()
 
-// Reactive state for image handling
-const imageLoadError = ref(false)
-
-// Image error handler
-const handleImageError = () => {
-  imageLoadError.value = true
-  console.warn('Hero background image failed to load, using fallback')
-}
-
-// Methods for future functionality
-const handleListenNow = () => {
-  snackbar.info('Music Player', 'Music player coming soon!', 3000)
-}
-
-const handleTourDates = () => {
-  snackbar.info('Tour Dates', 'Tour schedule coming soon!', 3000)
-}
-
-const handleContact = () => {
-  snackbar.info('Contact', 'Contact form coming soon!', 3000)
-}
-
-const handleSocialClick = (platform: string) => {
-  snackbar.info('Social Media', `${platform} link coming soon!`, 3000)
-}
+// Image loading utilities
+const {
+  imageLoadError,
+  imageLoaded,
+  isImageLoading,
+  handleImageLoad,
+  handleImageError,
+  resetImageStates
+} = useImageLoading()
 </script>
 
 <style scoped>
@@ -128,6 +115,14 @@ const handleSocialClick = (platform: string) => {
   image-rendering: crisp-edges;
   backface-visibility: hidden;
   transform: translateZ(0);
+  
+  /* Smooth fade-in animation */
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.hero-background-image.image-loaded {
+  opacity: 1;
 }
 
 /* Ensure proper aspect ratio and performance on mobile */

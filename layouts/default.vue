@@ -61,7 +61,7 @@
       </div>
       
       <!-- Desktop Logo (absolute positioned) -->
-      <div class="hidden md:block absolute top-[12px] left-1/2 transform -translate-x-1/2 z-50">
+      <div class="hidden md:block absolute top-[14px] left-1/2 transform -translate-x-1/2 z-50">
         <NuxtLink to="/" class="block">
           <img 
             src="/assets/images/icons/wbm logo white.svg" 
@@ -270,7 +270,7 @@ const showWelcome = () => {
 .nav-link-desktop {
   position: relative;
   color: rgba(255, 255, 255, 0.9);
-  transition: all 0.3s ease-out;
+  transition: all 0.3s;
   padding: 0.5rem 0.25rem;
   font-weight: 500;
   font-size: 0.875rem;
@@ -304,7 +304,7 @@ const showWelcome = () => {
   width: 0;
   height: 0.125rem;
   background-color: white;
-  transition: all 0.3s ease-out;
+  transition: all 0.3s;
 }
 
 .nav-link-desktop:hover::after {
