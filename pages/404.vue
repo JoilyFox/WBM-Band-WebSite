@@ -23,9 +23,4 @@ useHead({
     { name: 'robots', content: 'noindex' }
   ]
 })
-
-// Set response status for SEO
-if (process.server) {
-  setResponseStatus(404)
-}
 </script>

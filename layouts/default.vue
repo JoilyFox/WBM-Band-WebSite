@@ -183,7 +183,7 @@ const mobileLogoPositionClass = computed(() =>
 interface NavLink {
   label: string
   to: string
-  onClick?: () => void
+  action?: string // Use string instead of function
 }
 
 // Navigation links configuration
@@ -191,12 +191,12 @@ const leftNavLinks = ref<NavLink[]>([
   {
     label: 'Music',
     to: '#music',
-    onClick: () => scrollToElement('music')
+    action: 'scroll-to-music'
   },
   {
     label: 'Tour',
-    to: '#tour', 
-    onClick: () => snackbar.info('Tour', 'Tour dates coming soon!', 3000)
+    to: '#tour',
+    action: 'show-tour-info'
   }
 ])
 
@@ -204,12 +204,12 @@ const rightNavLinks = ref<NavLink[]>([
   {
     label: 'About',
     to: '#about',
-    onClick: () => snackbar.info('About', 'About section coming soon!', 3000)
+    action: 'show-about-info'
   },
   {
     label: 'Contact',
     to: '#contact',
-    onClick: () => snackbar.info('Contact', 'Contact section coming soon!', 3000)
+    action: 'show-contact-info'
   }
 ])
 
@@ -257,10 +257,8 @@ const handleNavClick = (link: NavLink) => {
     document.activeElement.blur()
   }
   
-  // Execute the onClick function if it exists
-  if (link.onClick) {
-    link.onClick()
-  }
+  // Execute the action based on string identifier
+  executeNavAction(link.action)
 }
 
 const handleMobileNavClick = (link: NavLink) => {
@@ -269,10 +267,26 @@ const handleMobileNavClick = (link: NavLink) => {
   
   // Then handle the navigation with reduced delay for faster UX
   setTimeout(() => {
-    if (link.onClick) {
-      link.onClick()
-    }
+    executeNavAction(link.action)
   }, 200) // Reduced from 300ms to match faster animation
+}
+
+// Execute navigation actions
+const executeNavAction = (action?: string) => {
+  switch (action) {
+    case 'scroll-to-music':
+      scrollToElement('music')
+      break
+    case 'show-tour-info':
+      snackbar.info('Tour', 'Tour dates coming soon!', 3000)
+      break
+    case 'show-about-info':
+      snackbar.info('About', 'About section coming soon!', 3000)
+      break
+    case 'show-contact-info':
+      snackbar.info('Contact', 'Contact section coming soon!', 3000)
+      break
+  }
 }
 
 // Handle escape key to close mobile menu

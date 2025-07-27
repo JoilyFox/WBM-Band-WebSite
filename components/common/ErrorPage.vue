@@ -69,13 +69,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // Use router with proper error handling for SSR
-const router = useState('router', () => {
-  try {
-    return useRouter()
-  } catch {
-    return null
-  }
-})
+const router = process.client ? useRouter() : null
 
 // Get the current route
 const route = useRoute()
@@ -134,8 +128,8 @@ const errorCode = computed(() => {
 })
 
 const handleButtonClick = () => {
-  if (process.client && router.value) {
-    router.value.push(buttonLink.value)
+  if (process.client && router) {
+    router.push(buttonLink.value)
   } else {
     // Fallback for SSR - use window location
     if (process.client) {
