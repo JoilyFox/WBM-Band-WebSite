@@ -3,6 +3,19 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: false },
   
+  // GitHub Pages Configuration
+  app: {
+    baseURL: '/WBM-Band-WebSite/', // Replace with your repository name
+    buildAssetsDir: 'assets/', // Don't use "_" prefix for GitHub Pages
+  },
+  
+  // Static Site Generation
+  nitro: {
+    prerender: {
+      routes: ['/'] // Pre-render all routes
+    }
+  },
+  
   modules: [
     '@nuxtjs/tailwindcss',
     '@primevue/nuxt-module',
@@ -34,6 +47,19 @@ export default defineNuxtConfig({
     viewer: true
   },
 
+  // PostCSS Configuration (integrated with Nuxt)
+  css: [
+    '~/assets/css/main.css'
+  ],
+
+  postcss: {
+    plugins: {
+      'tailwindcss/nesting': {},
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
+
   // Google Fonts Configuration
   googleFonts: {
     families: {
@@ -42,11 +68,6 @@ export default defineNuxtConfig({
     display: 'swap',
     preload: true
   },
-
-  // Global CSS
-  css: [
-    '~/assets/css/main.css'
-  ],
 
   // Image optimization configuration
   image: {
