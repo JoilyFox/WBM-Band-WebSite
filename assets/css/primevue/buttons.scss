@@ -98,9 +98,9 @@
     
     /* Touch-friendly active state */
     &:active {
-      @apply bg-primary-50 text-surface-950;
+      @apply bg-primary-50 text-surface-950 ring-4 ring-primary-100 ring-opacity-50;
       transform: scale(0.98);
-      transition: transform 0.1s ease-in-out;
+      transition: all 0.1s ease-in-out;
     }
     
     /* Prevent stuck states on mobile */
