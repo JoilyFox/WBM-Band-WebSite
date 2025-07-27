@@ -102,7 +102,7 @@
               <img 
                 src="/assets/images/icons/wbm logo white.svg" 
                 alt="WBM Band Logo" 
-                class="h-16 w-auto filter drop-shadow-2xl"
+                class="h-24 mt-[-44px] w-auto filter drop-shadow-2xl"
               />
             </NuxtLink>
           </div>

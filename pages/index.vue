@@ -1,22 +1,39 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="hero-section relative w-full flex items-center justify-center px-4 overflow-hidden">
-      <!-- Background Image with Nuxt optimizations -->
-      <NuxtImg 
-        src="/images/band-hero-bg.jpg"
-        alt="WBM Band performing live on stage"
-        class="hero-background-image"
-        :class="{ 'image-loaded': imageLoaded }"
-        loading="eager"
-        fetchpriority="high"
-        format="webp,jpg"
-        quality="90"
-        @load="handleImageLoad"
-        @error="handleImageError"
-      />
+    <section 
+      class="hero-section relative w-full flex items-center justify-center px-4 overflow-hidden"
+      @mouseenter="handleMouseEnter"
+      @mouseleave="handleMouseLeave"
+    >
+      <!-- Background Images Slider -->
+      <div class="hero-slider-container">
+        <div 
+          v-for="(image, index) in heroImages" 
+          :key="image.src"
+          class="hero-slide"
+          :class="{
+            'active': currentIndex === index,
+            'transitioning': isTransitioning,
+            [`transition-${transition}`]: true
+          }"
+        >
+          <NuxtImg 
+            :src="image.src"
+            :alt="image.alt"
+            class="hero-background-image"
+            :class="{ 'image-loaded': imageLoaded }"
+            loading="eager"
+            fetchpriority="high"
+            format="webp,jpg"
+            quality="90"
+            @load="handleImageLoad"
+            @error="handleImageError"
+          />
+        </div>
+      </div>
       
-      <!-- Fallback background for when image fails to load -->
+      <!-- Fallback background for when images fail to load -->
       <div 
         v-if="imageLoadError" 
         class="absolute inset-0 hero-bg-fallback"
@@ -24,6 +41,39 @@
       
       <!-- Background overlay for better text readability -->
       <div class="absolute inset-0 bg-black/50 z-10"></div>
+      
+      <!-- Slider Controls -->
+      <div class="absolute inset-0 z-15 flex items-center justify-between px-4 opacity-0 hover:opacity-100 transition-opacity duration-300">
+        <button 
+          @click="previousSlide"
+          class="slider-control prev-btn"
+          :disabled="!canSlide"
+        >
+          <i class="pi pi-chevron-left text-2xl"></i>
+        </button>
+        
+        <button 
+          @click="nextSlide"
+          class="slider-control next-btn"
+          :disabled="!canSlide"
+        >
+          <i class="pi pi-chevron-right text-2xl"></i>
+        </button>
+      </div>
+      
+      <!-- Progress Bar -->
+      <div class="absolute bottom-0 left-0 w-full z-15">
+        <div class="progress-bar-container">
+          <div 
+            :key="`progress-${progressKey}`"
+            class="progress-bar"
+            :class="{ 
+              'animate': isPlaying
+            }"
+            :style="{ animationDuration: `${interval}ms` }"
+          ></div>
+        </div>
+      </div>
       
       <!-- Content -->
       <div class="relative z-20 text-center max-w-4xl mx-auto">
@@ -62,6 +112,7 @@
 import { useSnackbar } from '~/composables/useSnackbar'
 import { WEBSITE_TITLE, APP_DESCRIPTION, createPageTitle } from '~/constants/app'
 import { useImageLoading } from '~/utils/imageHelpers'
+import { useHeroSlider, type HeroImage } from '~/composables/useHeroSlider'
 
 // Meta
 definePageMeta({
@@ -81,6 +132,50 @@ useHead({
 // Composables
 const snackbar = useSnackbar()
 
+// Hero images configuration
+const heroImages: HeroImage[] = [
+  {
+    src: '/images/hero-images/hero-1.jpg',
+    alt: 'WBM Band performing live on stage',
+    title: 'Woman Based Mechanics',
+    subtitle: 'Live Performance'
+  },
+  {
+    src: '/images/hero-images/hero-2.jpg',
+    alt: 'WBM Band in recording studio',
+    title: 'Woman Based Mechanics',
+    subtitle: 'In Studio'
+  },
+  {
+    src: '/images/hero-images/hero-3.jpg',
+    alt: 'WBM Band concert crowd',
+    title: 'Woman Based Mechanics',
+    subtitle: 'Concert Experience'
+  },
+]
+
+// Hero slider functionality
+const {
+  currentIndex,
+  isPlaying,
+  isPaused,
+  isTransitioning,
+  currentImage,
+  canSlide,
+  goToSlide,
+  nextSlide,
+  previousSlide,
+  transition,
+  interval,
+  progressKey,
+  progressVisible
+} = useHeroSlider(heroImages, {
+  autoPlay: true,
+  interval: 6000,
+  transition: 'fade',
+  pauseOnHover: true
+})
+
 // Image loading utilities
 const {
   imageLoadError,
@@ -97,6 +192,61 @@ const {
 .hero-section {
   height: 100vh;
   height: 100dvh; /* Use dynamic viewport height for mobile browsers */
+}
+
+/* Hero slider container */
+.hero-slider-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Individual hero slide */
+.hero-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: all 0.8s ease-in-out;
+  pointer-events: none;
+}
+
+.hero-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Transition animations */
+.hero-slide.transition-fade {
+  transform: scale(1);
+}
+
+.hero-slide.transition-fade.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero-slide.transition-slide {
+  transform: translateX(100%);
+}
+
+.hero-slide.transition-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.hero-slide.transition-zoom {
+  transform: scale(1.1);
+}
+
+.hero-slide.transition-zoom.active {
+  opacity: 1;
+  transform: scale(1);
 }
 
 /* Hero background image styling */
@@ -123,6 +273,128 @@ const {
 
 .hero-background-image.image-loaded {
   opacity: 1;
+}
+
+/* Slider controls */
+.slider-control {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.slider-control:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+}
+
+.slider-control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.95) 0%, 
+    rgba(255, 255, 255, 0.8) 25%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.8) 75%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  box-shadow: 
+    0 0 20px rgba(255, 255, 255, 0.5),
+    0 -2px 8px rgba(255, 255, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: width 0.1s ease-out;
+  position: relative;
+  border-radius: 0 2px 2px 0;
+}
+
+.progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  box-shadow: 
+    0 0 8px rgba(255, 255, 255, 0.8),
+    2px 0 6px rgba(255, 255, 255, 0.4);
+  border-radius: 0 2px 2px 0;
+}
+
+.progress-bar.animate {
+  animation: progressSlide 6s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  animation-fill-mode: forwards;
+}
+
+.progress-bar:not(.animate) {
+  width: 0%;
+  transition: width 0.2s ease-out;
+}
+
+@keyframes progressSlide {
+  0% { 
+    width: 0%; 
+    opacity: 0.8;
+  }
+  1% {
+    opacity: 1;
+  }
+  99% {
+    opacity: 1;
+  }
+  100% { 
+    width: 100%; 
+    opacity: 0.9;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 /* Ensure proper aspect ratio and performance on mobile */
