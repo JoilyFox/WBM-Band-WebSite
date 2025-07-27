@@ -72,7 +72,7 @@ export default defineNuxtConfig({
   // Image optimization configuration
   image: {
     quality: 90,
-    format: ['webp', 'jpg'],
+    format: ['webp', 'jpg', 'svg'],
     screens: {
       xs: 320,
       sm: 640,
@@ -88,6 +88,11 @@ export default defineNuxtConfig({
           format: 'webp',
           quality: 95,
           fit: 'cover'
+        }
+      },
+      logo: {
+        modifiers: {
+          format: 'svg'
         }
       }
     },

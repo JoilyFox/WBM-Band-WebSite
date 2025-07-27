@@ -11,7 +11,7 @@
           src="/assets/images/icons/spotify-icon.svg" 
           alt="Spotify" 
           class="w-full h-full"
-          format="svg"
+          :modifiers="{ format: 'svg' }"
         />
       </button>
       <button
@@ -24,7 +24,7 @@
           src="/assets/images/icons/apple-music-icon.svg" 
           alt="Apple Music" 
           class="w-full h-full"
-          format="svg"
+          :modifiers="{ format: 'svg' }"
         />
       </button>
       <button
@@ -37,7 +37,7 @@
           src="/assets/images/icons/youtube-music-icon.svg" 
           alt="YouTube" 
           class="w-full h-full"
-          format="svg"
+          :modifiers="{ format: 'svg' }"
         />
       </button>
     </div>
