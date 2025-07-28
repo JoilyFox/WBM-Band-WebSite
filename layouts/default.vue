@@ -10,12 +10,13 @@
           <!-- Mobile Logo (centered when big, left when scrolled) -->
           <div class="flex items-start md:hidden z-50 transition-all duration-300" :class="mobileLogoPositionClass">
             <NuxtLink to="/" class="block">
-              <NuxtImg 
+              <img 
                 src="/images/wbm-logo-white.svg" 
                 alt="WBM Band Logo" 
                 class="w-auto filter drop-shadow-2xl transition-transform duration-300"
                 :class="mobileLogoSizeClass"
-                :modifiers="{ format: 'svg' }"
+                loading="eager"
+                fetchpriority="high"
               />
             </NuxtLink>
           </div>
@@ -65,12 +66,13 @@
       <!-- Desktop Logo (absolute positioned) -->
       <div class="hidden md:block absolute top-[14px] left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300" :class="logoPositionClass">
         <NuxtLink to="/" class="block">
-          <NuxtImg 
+          <img 
             src="/images/wbm-logo-white.svg" 
             alt="WBM Band Logo" 
             class="w-auto filter drop-shadow-2xl transition-transform duration-500 ease-out"
             :class="logoSizeClass"
-            :modifiers="{ format: 'svg' }"
+            loading="eager"
+            fetchpriority="high"
           />
         </NuxtLink>
       </div>
@@ -103,11 +105,11 @@
           <!-- Logo in mobile menu -->
           <div class="mb-12">
             <NuxtLink to="/" class="block" @click="closeMobileMenu">
-              <NuxtImg 
+              <img 
                 src="/images/wbm-logo-white.svg" 
                 alt="WBM Band Logo" 
                 class="h-24 mt-[-44px] w-auto filter drop-shadow-2xl"
-                :modifiers="{ format: 'svg' }"
+                loading="eager"
               />
             </NuxtLink>
           </div>

@@ -17,20 +17,23 @@ export function useImageLoading() {
 
   /**
    * Handler for successful image load
-   * Sets imageLoaded to true and logs success
+   * Sets imageLoaded to true
    */
   const handleImageLoad = () => {
     imageLoaded.value = true
-    console.log('Image loaded successfully')
   }
 
   /**
    * Handler for image load error
    * Sets imageLoadError to true and logs warning
    */
-  const handleImageError = () => {
+  const handleImageError = (event: Event) => {
     imageLoadError.value = true
-    console.warn('Image failed to load, using fallback')
+    const target = event.target as HTMLImageElement
+    console.warn('Image failed to load:', {
+      src: target?.src,
+      error: event
+    })
   }
 
   /**
@@ -58,8 +61,8 @@ export function useImageLoading() {
     if (process.client && 'IntersectionObserver' in window) {
       const observer = new IntersectionObserver(
         ([entry]) => {
-          isIntersecting.value = entry.isIntersecting
           if (entry.isIntersecting) {
+            isIntersecting.value = true
             observer.disconnect()
           }
         },
@@ -70,6 +73,15 @@ export function useImageLoading() {
       )
       
       observer.observe(target)
+      
+      // If already in viewport, trigger immediately
+      const rect = target.getBoundingClientRect()
+      const isInViewport = rect.top < window.innerHeight && rect.bottom > 0
+      
+      if (isInViewport) {
+        isIntersecting.value = true
+        observer.disconnect()
+      }
     } else {
       // Fallback for browsers without IntersectionObserver
       isIntersecting.value = true
@@ -108,36 +120,139 @@ export function preloadImage(src: string): Promise<HTMLImageElement> {
 }
 
 /**
- * Get optimized image URL for different screen sizes with modern formats
+ * Get optimized image URL with format fallbacks for different screen sizes
  * @param src - Original image source
  * @param width - Target width
  * @param height - Target height  
  * @param quality - Image quality (1-100)
- * @param format - Preferred format
- * @returns Optimized image URL
+ * @param preset - Preset name for predefined configurations
+ * @returns Object with optimized image URLs and srcset
  */
 export function getOptimizedImageUrl(
   src: string, 
   width?: number, 
   height?: number,
   quality: number = 80,
-  format: string = 'avif,webp,jpg'
-): string {
-  const params = new URLSearchParams()
+  preset?: string
+): {
+  avif: string
+  webp: string
+  jpg: string
+  srcSet: {
+    avif: string
+    webp: string
+    jpg: string
+  }
+} {
+  // Remove file extension and get base path
+  const basePath = src.replace(/\.[^/.]+$/, '')
+  const isOptimizedPath = src.includes('/optimized/')
   
-  if (width) {
-    params.set('w', width.toString())
+  // If already optimized path, use as is
+  if (isOptimizedPath) {
+    return {
+      avif: basePath + '.avif',
+      webp: basePath + '.webp', 
+      jpg: basePath + '.jpg',
+      srcSet: {
+        avif: basePath + '.avif',
+        webp: basePath + '.webp',
+        jpg: basePath + '.jpg'
+      }
+    }
   }
   
-  if (height) {
-    params.set('h', height.toString())
+  // Apply preset configurations
+  let targetWidth = width
+  let targetHeight = height
+  let targetQuality = quality
+  
+  if (preset) {
+    const presetConfig = getPresetConfig(preset)
+    targetWidth = presetConfig.width || width
+    targetHeight = presetConfig.height || height
+    targetQuality = presetConfig.quality || quality
   }
   
-  params.set('q', quality.toString())
-  params.set('f', format)
-  params.set('fit', 'cover')
+  // Convert original path to optimized path
+  const optimizedBasePath = src.replace('/images/', '/images/optimized/')
+    .replace(/\.[^/.]+$/, '')
   
-  return `${src}?${params.toString()}`
+  return {
+    avif: optimizedBasePath + '.avif',
+    webp: optimizedBasePath + '.webp',
+    jpg: optimizedBasePath + '.jpg',
+    srcSet: {
+      avif: optimizedBasePath + '.avif',
+      webp: optimizedBasePath + '.webp', 
+      jpg: optimizedBasePath + '.jpg'
+    }
+  }
+}
+
+/**
+ * Get preset configuration based on preset name
+ * @param preset - Preset name
+ * @returns Preset configuration object
+ */
+function getPresetConfig(preset: string) {
+  const presets: Record<string, { width?: number; height?: number; quality?: number }> = {
+    hero: { width: 1920, height: 1080, quality: 85 },
+    heroMobile: { width: 768, height: 1024, quality: 80 },
+    album: { width: 400, height: 400, quality: 85 },
+    albumLarge: { width: 800, height: 800, quality: 90 },
+    thumbnail: { width: 200, height: 200, quality: 80 }
+  }
+  
+  return presets[preset] || { quality: 80 }
+}
+
+/**
+ * Generate responsive picture element sources for modern image formats
+ * @param src - Original image source
+ * @param sizes - CSS sizes attribute value
+ * @param preset - Preset name for predefined configurations
+ * @returns Object with source elements for picture tag
+ */
+export function generatePictureSources(
+  src: string,
+  sizes?: string,
+  preset?: string
+) {
+  const optimizedUrls = getOptimizedImageUrl(src, undefined, undefined, 80, preset)
+  
+  return {
+    avifSource: {
+      srcset: optimizedUrls.avif,
+      type: 'image/avif',
+      sizes: sizes || '100vw'
+    },
+    webpSource: {
+      srcset: optimizedUrls.webp,
+      type: 'image/webp', 
+      sizes: sizes || '100vw'
+    },
+    fallbackSrc: optimizedUrls.jpg
+  }
+}
+
+/**
+ * Check if browser supports modern image formats
+ * @returns Object indicating format support
+ */
+export function checkImageFormatSupport() {
+  if (!process.client) {
+    return { avif: false, webp: false }
+  }
+  
+  const canvas = document.createElement('canvas')
+  canvas.width = 1
+  canvas.height = 1
+  
+  return {
+    avif: canvas.toDataURL('image/avif').indexOf('data:image/avif') === 0,
+    webp: canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0
+  }
 }
 
 /**
@@ -153,7 +268,10 @@ export function getResponsiveImageSrcSet(
   quality: number = 80
 ): string {
   return sizes
-    .map(size => `${getOptimizedImageUrl(src, size, undefined, quality)} ${size}w`)
+    .map(size => {
+      const optimizedUrls = getOptimizedImageUrl(src, size, undefined, quality)
+      return `${optimizedUrls.jpg} ${size}w`
+    })
     .join(', ')
 }
 
@@ -221,7 +339,9 @@ export function preloadCriticalImages(
       img.onload = () => resolve(img)
       img.onerror = () => reject(new Error(`Failed to preload image: ${src}`))
       
-      img.src = getOptimizedImageUrl(src, 1920, 1080, 85)
+      // Use AVIF format as primary, with fallback to original src
+      const optimizedUrls = getOptimizedImageUrl(src, 1920, 1080, 85, 'hero')
+      img.src = optimizedUrls.avif || src
     })
   })
 }

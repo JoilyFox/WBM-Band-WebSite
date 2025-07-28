@@ -5,35 +5,50 @@
     :class="containerClass"
   >
     <!-- Simple moving gradient placeholder -->
-    <div
+    <div 
       v-if="showPlaceholder"
       class="absolute inset-0 gradient-placeholder transition-opacity duration-1000 ease-out"
       :class="{ 'opacity-0': imageLoaded }"
     >
     </div>
 
-    <!-- Main optimized image -->
-    <NuxtImg
-      v-if="shouldLoadImage"
-      :src="src"
-      :alt="alt"
-      :class="[
-        'progressive-image',
-        'transition-all duration-1000 ease-out',
-        imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105',
-        imageClass
-      ]"
-      :loading="loading"
-      :fetchpriority="fetchPriority"
-      :preset="preset"
-      :width="width"
-      :height="height"
-      :sizes="sizes"
-      :quality="quality"
-      :format="format"
-      @load="handleImageLoad"
-      @error="handleImageError"
-    />
+    <!-- Main optimized image with picture element for format support -->
+    <picture v-if="shouldLoadImage">
+      <!-- AVIF source for modern browsers -->
+      <source
+        :srcset="pictureSources.avifSource.srcset"
+        :type="pictureSources.avifSource.type"
+        :sizes="pictureSources.avifSource.sizes"
+      />
+      
+      <!-- WebP source for wider browser support -->
+      <source
+        :srcset="pictureSources.webpSource.srcset"
+        :type="pictureSources.webpSource.type"
+        :sizes="pictureSources.webpSource.sizes"
+      />
+      
+      <!-- Fallback JPEG image -->
+      <img
+        :src="pictureSources.fallbackSrc"
+        :alt="alt"
+        :class="[
+          'progressive-image',
+          'transition-all duration-1000 ease-out',
+          // Don't control opacity for hero images - let the hero slider handle it
+          containerClass?.includes('hero-background-image') 
+            ? 'opacity-100 scale-100' 
+            : (imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'),
+          imageClass
+        ]"
+        :loading="loading"
+        :fetchpriority="fetchPriority"
+        :width="width"
+        :height="height"
+        @load="handleImageLoad"
+        @error="handleImageError"
+      />
+    </picture>
 
     <!-- Error fallback -->
     <div
@@ -65,7 +80,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useImageLoading, generateBlurPlaceholder } from '~/utils/imageHelpers'
+import { useImageLoading, generateBlurPlaceholder, generatePictureSources } from '~/utils/imageHelpers'
 
 interface Props {
   src: string
@@ -76,7 +91,6 @@ interface Props {
   fetchPriority?: 'high' | 'low' | 'auto'
   preset?: string
   quality?: number
-  format?: string
   sizes?: string
   containerClass?: string
   imageClass?: string
@@ -90,7 +104,6 @@ const props = withDefaults(defineProps<Props>(), {
   loading: 'lazy',
   fetchPriority: 'auto',
   quality: 80,
-  format: 'avif,webp,jpg',
   showPlaceholder: true,
   showLoadingSpinner: false,
   lazyLoadOffset: '50px'
@@ -114,23 +127,48 @@ const {
 // Generate blur placeholder
 const blurPlaceholder = ref('')
 
+// Generate picture sources for different formats
+const pictureSources = computed(() => {
+  // Get base URL from Nuxt runtime config
+  const config = useRuntimeConfig()
+  
+  // Use different base URLs for development vs production
+  const isDev = process.dev
+  const baseURL = isDev ? '/' : (config.app?.baseURL || '/WBM-Band-WebSite/')
+  
+  const sources = generatePictureSources(props.src, props.sizes, props.preset)
+  
+  // Add base URL to all sources if not already present
+  const addBaseURL = (path: string) => {
+    if (path.startsWith('http') || path.startsWith('//')) return path
+    if (baseURL === '/') return path
+    return path.startsWith(baseURL) ? path : baseURL.replace(/\/$/, '') + path
+  }
+  
+  return {
+    avifSource: {
+      ...sources.avifSource,
+      srcset: addBaseURL(sources.avifSource.srcset)
+    },
+    webpSource: {
+      ...sources.webpSource,
+      srcset: addBaseURL(sources.webpSource.srcset)
+    },
+    fallbackSrc: addBaseURL(sources.fallbackSrc)
+  }
+})
+
 // Control when to actually load the image
 const shouldLoadImage = computed(() => {
   return props.loading === 'eager' || isIntersecting.value
 })
 
+// Component mounted lifecycle
 onMounted(() => {
-  // Set up intersection observer for lazy loading
-  if (containerRef.value && props.loading === 'lazy') {
+  if (!containerRef.value) return
+  
+  if (props.loading === 'lazy') {
     setIntersectionTarget(containerRef.value)
-  }
-
-  // Generate blur placeholder if enabled
-  if (props.showPlaceholder) {
-    blurPlaceholder.value = generateBlurPlaceholder(
-      props.width || 40,
-      props.height || 40
-    )
   }
 })
 
@@ -177,12 +215,10 @@ watch(() => props.src, () => {
       #000000 180deg,
       #1a1a1a 240deg,
       #000000 360deg
-    ),
-    url('/noise.svg');
+    );
   background-size: 
     200% 200%,
-    300% 300%,
-    150px 150px;
+    300% 300%;
   filter: contrast(120%) brightness(400%);
   animation: coolMove 10s ease-in-out infinite;
   isolation: isolate;
@@ -214,8 +250,7 @@ watch(() => props.src, () => {
   .gradient-placeholder {
     animation: none !important;
     background: 
-      linear-gradient(135deg, #000000 0%, #1a1a1a 20%, #333333 40%, #1a1a1a 60%, #000000 100%),
-      url('/noise.svg');
+      linear-gradient(135deg, #000000 0%, #1a1a1a 20%, #333333 40%, #1a1a1a 60%, #000000 100%);
     filter: contrast(120%) brightness(400%);
   }
 }

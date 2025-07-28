@@ -7,11 +7,11 @@
         class="streaming-button bg-black hover:bg-black/80 scale-60"
         title="Listen on Spotify"
       >
-        <NuxtImg 
+        <img 
           src="/assets/images/icons/spotify-icon.svg" 
           alt="Spotify" 
           class="w-full h-full"
-          :modifiers="{ format: 'svg' }"
+          loading="lazy"
         />
       </button>
       <button
@@ -20,11 +20,11 @@
         class="streaming-button bg-surface-800 hover:bg-surface-700"
         title="Listen on Apple Music"
       >
-        <NuxtImg 
+        <img 
           src="/assets/images/icons/apple-music-icon.svg" 
           alt="Apple Music" 
           class="w-full h-full"
-          :modifiers="{ format: 'svg' }"
+          loading="lazy"
         />
       </button>
       <button
@@ -33,11 +33,11 @@
         class="streaming-button bg-red-600 hover:bg-red-500"
         title="Watch on YouTube"
       >
-        <NuxtImg 
+        <img 
           src="/assets/images/icons/youtube-music-icon.svg" 
           alt="YouTube" 
           class="w-full h-full"
-          :modifiers="{ format: 'svg' }"
+          loading="lazy"
         />
       </button>
     </div>
