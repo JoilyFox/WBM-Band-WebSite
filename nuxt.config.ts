@@ -21,7 +21,8 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@nuxtjs/google-fonts',
     '@pinia/nuxt',
-    '@nuxt/image'
+    '@nuxt/image',
+    '@vueuse/nuxt'
   ],
 
   // PrimeVue Configuration
@@ -71,8 +72,9 @@ export default defineNuxtConfig({
 
   // Image optimization configuration
   image: {
-    quality: 90,
-    format: ['webp', 'jpg', 'svg'],
+    provider: 'ipx',
+    quality: 80,
+    format: ['avif', 'webp', 'jpg', 'svg'],
     screens: {
       xs: 320,
       sm: 640,
@@ -85,9 +87,38 @@ export default defineNuxtConfig({
     presets: {
       hero: {
         modifiers: {
-          format: 'webp',
-          quality: 95,
-          fit: 'cover'
+          format: 'avif,webp,jpg',
+          quality: 85,
+          fit: 'cover',
+          width: 1920,
+          height: 1080
+        }
+      },
+      heroMobile: {
+        modifiers: {
+          format: 'avif,webp,jpg',
+          quality: 80,
+          fit: 'cover',
+          width: 768,
+          height: 1024
+        }
+      },
+      album: {
+        modifiers: {
+          format: 'avif,webp,jpg',
+          quality: 85,
+          fit: 'cover',
+          width: 400,
+          height: 400
+        }
+      },
+      albumLarge: {
+        modifiers: {
+          format: 'avif,webp,jpg',
+          quality: 90,
+          fit: 'cover',
+          width: 800,
+          height: 800
         }
       },
       logo: {
@@ -105,5 +136,32 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
     typeCheck: false
+  },
+
+  // Vite configuration for additional optimizations
+  vite: {
+    optimizeDeps: {
+      include: ['@nuxt/image']
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'image-utils': ['@nuxt/image']
+          }
+        }
+      }
+    }
+  },
+
+  // Runtime configuration
+  runtimeConfig: {
+    public: {
+      imageOptimization: {
+        enableLazyLoading: true,
+        enableProgressiveLoading: true,
+        enableBlurPlaceholder: true
+      }
+    }
   }
 })

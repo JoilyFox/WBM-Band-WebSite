@@ -14,15 +14,15 @@
           [`transition-${transition}`]: true
         }"
       >
-        <NuxtImg 
+        <UiProgressiveImage
           :src="image.src"
           :alt="image.alt"
-          class="hero-background-image"
-          :class="{ 'image-loaded': imageLoaded }"
-          loading="eager"
-          fetchpriority="high"
-          format="webp,jpg"
-          quality="90"
+          :loading="index === 0 ? 'eager' : 'lazy'"
+          :fetchPriority="index === 0 ? 'high' : 'auto'"
+          preset="hero"
+          container-class="hero-background-image"
+          image-class="hero-image"
+          :show-placeholder="true"
           @load="handleImageLoad"
           @error="handleImageError"
         />
@@ -140,19 +140,19 @@ const props = withDefaults(defineProps<Props>(), {
   transition: 'fade',
   heroImages: () => [
     {
-      src: '/images/hero-images/hero-1.jpg',
+      src: '/images/optimized/hero-images/hero-1.avif',
       alt: 'WBM Band performing live on stage',
       title: 'Woman Based Mechanics',
       subtitle: 'Live Performance'
     },
     {
-      src: '/images/hero-images/hero-2.jpg',
+      src: '/images/optimized/hero-images/hero-2.avif',
       alt: 'WBM Band in recording studio',
       title: 'Woman Based Mechanics',
       subtitle: 'In Studio'
     },
     {
-      src: '/images/hero-images/hero-3.jpg',
+      src: '/images/optimized/hero-images/hero-3.avif',
       alt: 'WBM Band concert crowd',
       title: 'Woman Based Mechanics',
       subtitle: 'Concert Experience'
@@ -289,23 +289,19 @@ watch(currentIndex, (newIndex) => {
   left: 0;
   width: 100% !important;
   height: 100% !important;
+  z-index: 0;
+}
+
+.hero-image {
   object-fit: cover;
   object-position: center;
-  z-index: 0;
-  max-width: none;
-  max-height: none;
+  width: 100%;
+  height: 100%;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   backface-visibility: hidden;
   transform: translateZ(0);
-  
-  /* Smooth fade-in animation */
-  opacity: 0;
-  transition: opacity 0.8s ease-in-out;
-}
-
-.hero-background-image.image-loaded {
-  opacity: 1;
+  will-change: opacity;
 }
 
 /* Slider controls */

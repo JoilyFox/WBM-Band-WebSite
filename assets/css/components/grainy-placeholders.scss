@@ -1,0 +1,204 @@
+/* Grainy Placeholder Utilities */
+
+/* Base grainy background */
+.grainy-placeholder {
+  background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 30%, #2a2a2a 70%, #1a1a1a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.grainy-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.015) 0%, transparent 50%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 1px,
+      rgba(255, 255, 255, 0.008) 1px,
+      rgba(255, 255, 255, 0.008) 2px
+    );
+  animation: grainShift 8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Animated grainy placeholder */
+.grainy-placeholder-animated {
+  background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.grainy-placeholder-animated::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      transparent 0deg,
+      rgba(255, 255, 255, 0.005) 90deg,
+      transparent 180deg,
+      rgba(255, 255, 255, 0.01) 270deg,
+      transparent 360deg
+    );
+  animation: grainRotate 12s linear infinite;
+  pointer-events: none;
+}
+
+.grainy-placeholder-animated::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.02) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.015) 0%, transparent 40%),
+    radial-gradient(circle at 60% 40%, rgba(255, 255, 255, 0.01) 0%, transparent 30%);
+  animation: grainFloat 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Scanning effect overlay */
+.scanning-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 45%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.03) 55%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: scan-sweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Noise texture overlay */
+.noise-texture {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  animation: noiseShift 3s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Keyframe animations */
+@keyframes grainShift {
+  0% {
+    transform: translateX(0) translateY(0) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateX(2px) translateY(-1px) scale(1.01);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(-1px) translateY(1px) scale(1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes grainRotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.02);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes grainFloat {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateX(3px) translateY(-2px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(-2px) translateY(2px);
+    opacity: 0.5;
+  }
+}
+
+@keyframes scan-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes noiseShift {
+  0% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.05;
+  }
+  100% {
+    transform: scale(1.1) translate(5px, -3px);
+    opacity: 0.08;
+  }
+}
+
+/* Utility classes for different intensities */
+.grain-light {
+  --grain-opacity: 0.02;
+}
+
+.grain-medium {
+  --grain-opacity: 0.05;
+}
+
+.grain-heavy {
+  --grain-opacity: 0.08;
+}
+
+/* Performance optimizations */
+.grainy-placeholder,
+.grainy-placeholder-animated {
+  will-change: transform;
+  contain: layout style paint;
+}
+
+.grainy-placeholder::before,
+.grainy-placeholder::after,
+.grainy-placeholder-animated::before,
+.grainy-placeholder-animated::after {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .grainy-placeholder::before,
+  .grainy-placeholder-animated::before,
+  .grainy-placeholder-animated::after,
+  .scanning-overlay,
+  .noise-texture {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .grainy-placeholder::before,
+  .grainy-placeholder-animated::before,
+  .grainy-placeholder-animated::after {
+    animation-duration: 4s; /* Reduce animation complexity on mobile */
+  }
+}

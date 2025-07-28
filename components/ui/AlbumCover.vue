@@ -3,15 +3,17 @@
     <!-- Hover Overlay (Desktop only) -->
     <div class="absolute inset-0 bg-gradient-to-br from-primary-600/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 hidden md:block"></div>
     
-    <!-- Album Cover Image or Fallback -->
-    <NuxtImg 
+    <!-- Album Cover Image with Progressive Loading -->
+    <UiProgressiveImage
       v-if="!imageError"
       :src="imageUrl" 
       :alt="alt"
-      class="w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-105"
+      container-class="w-full h-full"
+      image-class="transition-transform duration-300 md:group-hover:scale-105"
       loading="lazy"
-      format="webp,jpg"
-      quality="90"
+      preset="album"
+      :show-placeholder="true"
+      error-text="Album cover unavailable"
       @error="handleImageError"
     />
     

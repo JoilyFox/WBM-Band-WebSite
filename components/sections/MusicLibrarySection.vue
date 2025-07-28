@@ -14,12 +14,18 @@
 
       <!-- Music Grid -->
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6 mb-12">
-        <UiMusicCard
-          v-for="release in displayedReleases"
+        <div
+          v-for="(release, index) in displayedReleases"
           :key="release.id"
-          :release="release"
-          @click="handleReleaseClick"
-        />
+          ref="cardRefs"
+          class="music-card-wrapper opacity-0 translate-y-8 transition-all duration-700 ease-out"
+          :style="{ transitionDelay: `${index * 100}ms` }"
+        >
+          <UiMusicCard
+            :release="release"
+            @click="handleReleaseClick"
+          />
+        </div>
       </div>
 
       <!-- Show More Button -->
@@ -38,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import type { MusicRelease } from '~/data/musicLibrary'
 import { getLatestReleases, getAllReleases } from '~/data/musicLibrary'
 
@@ -59,6 +65,12 @@ const emit = defineEmits<{
   showMore: []
 }>()
 
+// Refs
+const cardRefs = ref<HTMLElement[]>([])
+
+// Intersection Observer
+let observer: IntersectionObserver | null = null
+
 // Computed
 const displayedReleases = computed(() => {
   const releases = props.showAll ? getAllReleases() : getLatestReleases(props.maxItems)
@@ -77,9 +89,77 @@ const handleReleaseClick = (release: MusicRelease) => {
 const handleShowMore = () => {
   emit('showMore')
 }
+
+const setupIntersectionObserver = () => {
+  if (!process.client) return
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const target = entry.target as HTMLElement
+          target.classList.add('show')
+          observer?.unobserve(target)
+        }
+      })
+    },
+    {
+      threshold: 0.1,
+      rootMargin: '50px'
+    }
+  )
+
+  cardRefs.value.forEach((card) => {
+    if (card) {
+      observer?.observe(card)
+    }
+  })
+}
+
+const resetAnimations = async () => {
+  // Reset all cards to initial state
+  cardRefs.value.forEach((card) => {
+    if (card) {
+      card.classList.remove('show')
+    }
+  })
+  
+  // Wait for DOM update
+  await nextTick()
+  
+  // Setup observer for new cards
+  setupIntersectionObserver()
+}
+
+// Watch for changes in displayed releases and reset animations
+watch(displayedReleases, resetAnimations)
+
+onMounted(() => {
+  nextTick(() => {
+    setupIntersectionObserver()
+  })
+})
+
+onUnmounted(() => {
+  if (observer) {
+    observer.disconnect()
+  }
+})
 </script>
 
 <style scoped>
+/* Music Card Fade-in Animation */
+.music-card-wrapper {
+  opacity: 0;
+  transform: translateY(32px) scale(0.95);
+  transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.music-card-wrapper.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
 /* Show More Button Animation */
 .show-more-button {
   position: relative;
@@ -103,6 +183,19 @@ const handleShowMore = () => {
   /* Ensure proper spacing on mobile */
   .grid {
     gap: 0.75rem;
+  }
+  
+  /* Faster animations on mobile */
+  .music-card-wrapper {
+    transition-duration: 0.5s;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .music-card-wrapper {
+    transition-duration: 0.3s !important;
+    transform: translateY(8px) !important;
   }
 }
 </style>

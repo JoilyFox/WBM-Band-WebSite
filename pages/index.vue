@@ -16,9 +16,12 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
+import { useImagePreloader } from '~/composables/useImagePreloader'
 import { createPageTitle } from '~/constants/app'
+import { musicLibrary } from '~/data/musicLibrary'
 import type { MusicRelease } from '~/data/musicLibrary'
 
 // Meta
@@ -39,6 +42,36 @@ useHead({
 // Composables
 const snackbar = useSnackbar()
 const { scrollToElement } = useScrollTo()
+const { preloadHeroImages, preloadAlbumCovers } = useImagePreloader()
+
+// Hero images for preloading
+const heroImages = [
+  {
+    src: '/images/optimized/hero-images/hero-1.avif',
+    alt: 'WBM Band performing live on stage'
+  },
+  {
+    src: '/images/optimized/hero-images/hero-2.avif',
+    alt: 'WBM Band in recording studio'
+  },
+  {
+    src: '/images/optimized/hero-images/hero-3.avif',
+    alt: 'WBM Band concert crowd'
+  }
+]
+
+// Preload critical images on mount
+onMounted(async () => {
+  // Preload hero images with high priority
+  await preloadHeroImages(heroImages)
+  
+  // Preload first 6 album covers (above the fold)
+  const albumImageUrls = musicLibrary
+    .slice(0, 6)
+    .map(release => release.imageUrl)
+  
+  preloadAlbumCovers(albumImageUrls, 6)
+})
 
 // Event handlers for hero section
 const handleListenNow = () => {
