@@ -139,48 +139,29 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
+import { useScrollAnimation } from '~/composables/useScrollAnimation'
 import { createWelcomeMessage } from '~/constants/app'
 
 // Composables
 const snackbar = useSnackbar()
 const { scrollToElement } = useScrollTo()
 
+// Optimized scroll animation composable
+const {
+  logoSizeClass,
+  logoPositionClass,
+  leftNavSpacing,
+  rightNavSpacing,
+  mobileLogoSizeClass,
+  mobileLogoPositionClass
+} = useScrollAnimation({
+  threshold: 50, // Same threshold as before
+  throttleMs: 16, // 60fps for smooth animation
+  useRAF: true // Use requestAnimationFrame for better performance
+})
+
 // Mobile menu state
 const isMobileMenuOpen = ref(false)
-
-// Scroll state for logo animation
-const scrollY = ref(0)
-const isScrolled = computed(() => scrollY.value > 50)
-
-// Dynamic logo sizing based on scroll
-const logoSizeClass = computed(() => 
-  isScrolled.value ? 'h-20' : 'h-40'
-)
-
-// Dynamic logo positioning based on scroll
-const logoPositionClass = computed(() => 
-  isScrolled.value ? 'top-[14px]' : 'top-[14px]'
-)
-
-// Dynamic navigation spacing based on scroll
-const leftNavSpacing = computed(() => 
-  isScrolled.value ? 'pr-0' : 'pr-10'
-)
-
-const rightNavSpacing = computed(() => 
-  isScrolled.value ? 'pl-0' : 'pl-10'
-)
-
-// Mobile logo dynamic sizing and positioning
-const mobileLogoSizeClass = computed(() => 
-  isScrolled.value ? 'h-20' : 'h-34'
-)
-
-const mobileLogoPositionClass = computed(() => 
-  isScrolled.value 
-    ? 'top-[20px] absolute left-[4px]' 
-    : 'top-[30px] absolute left-1/2 transform -translate-x-1/2'
-)
 
 // Navigation link type
 interface NavLink {
@@ -299,20 +280,13 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 }
 
-// Handle scroll for logo animation
-const handleScroll = () => {
-  scrollY.value = window.scrollY
-}
-
 // Lifecycle hooks
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
-  window.addEventListener('scroll', handleScroll, { passive: true })
 })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
-  window.removeEventListener('scroll', handleScroll)
   // Clean up body overflow on unmount
   document.body.style.overflow = ''
 })
