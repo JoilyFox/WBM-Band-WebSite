@@ -15,6 +15,11 @@ export default defineNuxtConfig({
       routes: ['/'] // Pre-render all routes
     }
   },
+
+  // Build configuration for module compatibility
+  build: {
+    transpile: ['@nuxt/image']
+  },
   
   modules: [
     '@nuxtjs/tailwindcss',
@@ -72,22 +77,12 @@ export default defineNuxtConfig({
 
   // Image optimization configuration
   image: {
-    provider: 'ipx',
+    provider: 'none', // Use 'none' provider for static generation
     quality: 80,
-    format: ['avif', 'webp', 'jpg', 'svg'],
-    screens: {
-      xs: 320,
-      sm: 640,
-      md: 768,
-      lg: 1024,
-      xl: 1280,
-      xxl: 1536,
-    },
-    densities: [1, 2],
+    formats: ['avif', 'webp', 'jpg', 'svg'],
     presets: {
       hero: {
         modifiers: {
-          format: 'avif,webp,jpg',
           quality: 85,
           fit: 'cover',
           width: 1920,
@@ -96,7 +91,6 @@ export default defineNuxtConfig({
       },
       heroMobile: {
         modifiers: {
-          format: 'avif,webp,jpg',
           quality: 80,
           fit: 'cover',
           width: 768,
@@ -105,7 +99,6 @@ export default defineNuxtConfig({
       },
       album: {
         modifiers: {
-          format: 'avif,webp,jpg',
           quality: 85,
           fit: 'cover',
           width: 400,
@@ -114,7 +107,6 @@ export default defineNuxtConfig({
       },
       albumLarge: {
         modifiers: {
-          format: 'avif,webp,jpg',
           quality: 90,
           fit: 'cover',
           width: 800,
@@ -126,10 +118,7 @@ export default defineNuxtConfig({
           format: 'svg'
         }
       }
-    },
-    domains: [],
-    alias: {},
-    dir: 'public'
+    }
   },
 
   // TypeScript Configuration
@@ -140,17 +129,8 @@ export default defineNuxtConfig({
 
   // Vite configuration for additional optimizations
   vite: {
-    optimizeDeps: {
-      include: ['@nuxt/image']
-    },
-    build: {
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            'image-utils': ['@nuxt/image']
-          }
-        }
-      }
+    define: {
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
     }
   },
 
@@ -161,6 +141,25 @@ export default defineNuxtConfig({
         enableLazyLoading: true,
         enableProgressiveLoading: true,
         enableBlurPlaceholder: true
+      }
+    }
+  },
+
+  // Nuxt hooks to handle module compatibility
+  hooks: {
+    'vite:extendConfig': (config) => {
+      if (config.build?.rollupOptions?.external) {
+        const external = config.build.rollupOptions.external
+        if (typeof external === 'function') {
+          const originalExternal = external
+          config.build.rollupOptions.external = (id, parentId, isResolved) => {
+            // Don't externalize @nuxt/image components we actually need
+            if (id.includes('@nuxt/image') && !id.includes('@nuxt/kit')) {
+              return false
+            }
+            return originalExternal(id, parentId, isResolved)
+          }
+        }
       }
     }
   }
