@@ -13,7 +13,7 @@
               <NuxtImg 
                 src="/images/wbm-logo-white.svg" 
                 alt="WBM Band Logo" 
-                class="w-auto filter drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+                class="w-auto filter drop-shadow-2xl transition-transform duration-300"
                 :class="mobileLogoSizeClass"
                 :modifiers="{ format: 'svg' }"
               />
@@ -68,7 +68,7 @@
           <NuxtImg 
             src="/images/wbm-logo-white.svg" 
             alt="WBM Band Logo" 
-            class="w-auto filter drop-shadow-2xl hover:scale-105 transition-transform duration-500 ease-out"
+            class="w-auto filter drop-shadow-2xl transition-transform duration-500 ease-out"
             :class="logoSizeClass"
             :modifiers="{ format: 'svg' }"
           />
