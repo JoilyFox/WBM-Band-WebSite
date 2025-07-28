@@ -3,7 +3,7 @@
     <NuxtRouteAnnouncer />
     
     <!-- Header with glassy background -->
-    <header class="fixed top-0 left-0 right-0 z-40 bg-black/5 backdrop-blur-lg">
+    <header class="fixed top-0 left-0 right-0 z-40 bg-black/5 backdrop-blur-performance">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-start justify-between h-16 relative pt-1">
           
@@ -146,18 +146,25 @@ import { createWelcomeMessage } from '~/constants/app'
 const snackbar = useSnackbar()
 const { scrollToElement } = useScrollTo()
 
-// Optimized scroll animation composable
+// Optimized scroll animation composable with performance enhancements
 const {
   logoSizeClass,
   logoPositionClass,
   leftNavSpacing,
   rightNavSpacing,
   mobileLogoSizeClass,
-  mobileLogoPositionClass
+  mobileLogoPositionClass,
+  isLowPerformanceDevice,
+  prefersReducedMotion,
+  currentThrottleMs
 } = useScrollAnimation({
   threshold: 50, // Same threshold as before
-  throttleMs: 16, // 60fps for smooth animation
-  useRAF: true // Use requestAnimationFrame for better performance
+  throttleMs: 16, // Base 60fps, will adapt automatically
+  useRAF: true, // Use requestAnimationFrame for better performance
+  enableAdaptiveThrottling: true, // Automatically adjust based on device performance
+  enableIntersectionObserver: true, // Optimize when header is not visible
+  reducedMotionRespect: true, // Respect user's accessibility preferences
+  performanceMode: 'auto' // Let the composable decide the best performance mode
 })
 
 // Mobile menu state

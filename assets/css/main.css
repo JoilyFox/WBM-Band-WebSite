@@ -7,6 +7,9 @@
 /* General components */
 @import './components/general.scss';
 
+/* Scroll animation components */
+@import './components/scroll-animations.scss';
+
 /* PrimeVue component customizations */
 @import './primevue/buttons.scss';
 @import './primevue/dialog.scss';

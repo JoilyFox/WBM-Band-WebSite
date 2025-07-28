@@ -1,0 +1,99 @@
+/* Performance-optimized scroll animations */
+
+/* GPU-accelerated transitions for low-performance devices */
+.transition-transform-gpu {
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform: translateZ(0); /* Force GPU acceleration */
+  will-change: transform;
+}
+
+.transition-spacing {
+  transition: padding 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Reduced motion fallbacks */
+@media (prefers-reduced-motion: reduce) {
+  .transition-transform-gpu,
+  .transition-spacing,
+  .transition-all {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Performance-aware animations */
+@media (prefers-reduced-motion: no-preference) {
+  /* Smooth animations for capable devices */
+  .smooth-scroll-animation {
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  
+  /* Simplified animations for low-performance devices */
+  @media (max-width: 768px) and (max-resolution: 1.5dppx) {
+    .transition-all {
+      transition: transform 0.2s ease-out;
+    }
+  }
+}
+
+/* Hardware acceleration utilities */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Performance-aware backdrop blur */
+.backdrop-blur-performance {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  
+  @media (max-width: 768px) and (max-resolution: 1.5dppx) {
+    /* Reduce blur on low-performance mobile devices */
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* Scroll-based animation states */
+.scroll-animation-enter {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.scroll-animation-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Low-performance device optimizations */
+@media (max-width: 768px) and (max-resolution: 1.5dppx) {
+  .transition-transform-gpu {
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+  }
+  
+  .transition-spacing {
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+  }
+}
+
+/* High-performance device enhancements */
+@media (min-width: 1024px) and (min-resolution: 2dppx) {
+  .transition-transform-gpu {
+    transition-duration: 0.4s;
+    transition-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+}
+
+/* Accessibility-first approach */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-animation-enter {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
