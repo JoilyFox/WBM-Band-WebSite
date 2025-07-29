@@ -24,11 +24,11 @@
             @click="handleNewReleasePreviewClick"
           >
             <div class="new-release-content">
-              <!-- Background Image -->
-              <img 
-                :src="newReleasePreviewData?.imageUrl" 
-                :alt="newReleasePreviewData?.title"
-                class="new-release-image"
+              <!-- Album Cover with Progressive Loading -->
+              <UiAlbumCover
+                :image-url="newReleasePreviewData?.imageUrl || ''"
+                :alt="newReleasePreviewData?.title || 'New Release'"
+                release-type="new release"
               />
               
               <!-- Glassmorphic Overlay -->
@@ -166,13 +166,13 @@ const shouldShowNewReleasePreview = computed(() => {
 })
 
 const newReleasePreviewData = computed(() => {
-  const { nextReleaseDate, nextReleaseTitle } = generalConfig
+  const { nextReleaseDate, nextReleaseTitle, nextReleaseImageUrl } = generalConfig
   if (!nextReleaseDate) return null
   
   return {
     title: nextReleaseTitle || 'New Release',
     releaseDate: formatReleaseDate(nextReleaseDate),
-    imageUrl: '/images/albums-images/IMG_1822.JPG' // Default preview image, you can make this configurable
+    imageUrl: nextReleaseImageUrl || '/images/albums-images/IMG_1822.JPG' // Fallback image
   }
 })
 
@@ -510,17 +510,6 @@ $shimmer-easing: ease-in-out;
   }
 }
 
-.new-release-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform ($hover-duration * 1.5) $hover-easing;
-
-  .new-release-content:hover & {
-    transform: scale(1.05);
-  }
-}
-
 .new-release-overlay {
   @include absolute-overlay;
   display: flex;
@@ -565,7 +554,6 @@ $shimmer-easing: ease-in-out;
 .new-release-icon {
   color: rgba(255, 255, 255, 0.9);
   font-size: 1.875rem;
-  margin-bottom: 0.5rem;
   transition: all $hover-duration $hover-easing;
 
   .new-release-content:hover & {
@@ -579,7 +567,6 @@ $shimmer-easing: ease-in-out;
   color: rgba(255, 255, 255, 0.95);
   font-size: 1.125rem;
   font-weight: 600;
-  margin-bottom: 0.25rem;
   @include text-shadow-medium;
   transition: all $hover-duration $hover-easing;
 
@@ -710,10 +697,6 @@ $shimmer-easing: ease-in-out;
     transform: none !important;
     box-shadow: none !important;
     
-    .new-release-image {
-      transform: none !important;
-    }
-    
     .new-release-overlay {
       background: 
         rgba(0, 0, 0, 0.4),
@@ -753,7 +736,6 @@ $shimmer-easing: ease-in-out;
   .new-release-content:hover {
     transform: none !important;
     
-    .new-release-image,
     .new-release-info,
     .new-release-icon,
     .new-release-title,

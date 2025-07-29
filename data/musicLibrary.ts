@@ -1,7 +1,7 @@
 export interface MusicRelease {
   id: string
   title: string
-  type: 'single' | 'album' | 'ep'
+  type: 'single' | 'album' | 'ep' | 'new release'
   releaseDate: string
   imageUrl: string
   spotifyUrl?: string

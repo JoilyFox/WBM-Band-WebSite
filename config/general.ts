@@ -6,6 +6,7 @@ export interface GeneralConfig {
   // Release information
   nextReleaseDate: string | null // ISO date string or null
   nextReleaseTitle: string | null // Title of the upcoming release
+  nextReleaseImageUrl: string | null // Image URL for the upcoming release
   
   // Band information
   bandName: string
@@ -29,6 +30,7 @@ export const generalConfig: GeneralConfig = {
   // Release information
   nextReleaseDate: '2025-09-15', // Set to ISO date string like "2024-04-15" when you have a planned release
   nextReleaseTitle: 'Mania', // Set to release title like "Electric Dreams EP"
+  nextReleaseImageUrl: '/images/albums-images/IMG_1822.JPG', // Image for the upcoming release preview
   
   // Band information
   bandName: "WBM Band",
