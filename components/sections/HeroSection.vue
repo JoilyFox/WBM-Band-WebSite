@@ -17,7 +17,7 @@
         <UiProgressiveImage
           :src="image.src"
           :alt="image.alt"
-          :loading="index === 0 ? 'eager' : 'lazy'"
+          loading="eager"
           :fetchPriority="index === 0 ? 'high' : 'auto'"
           preset="hero"
           container-class="hero-background-image"
@@ -252,6 +252,11 @@ watch(currentIndex, (newIndex) => {
 .hero-slide.active {
   opacity: 1;
   pointer-events: auto;
+}
+
+/* Ensure hero images can fade in smoothly within active slides */
+.hero-slide.active .progressive-image {
+  transition: opacity 1s ease-out, transform 1s ease-out;
 }
 
 /* Transition animations */

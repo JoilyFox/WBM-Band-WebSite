@@ -26,26 +26,24 @@
             <!-- Left navigation links -->
             <div class="flex items-center gap-8 flex-1 justify-end transition-all duration-300" :class="leftNavSpacing">
               <template v-for="(link, index) in leftNavLinks" :key="`left-${index}`">
-                <NuxtLink 
-                  :to="link.to" 
+                <button 
                   :class="navLinkClass"
-                  @click="handleNavClick(link)"
+                  @click="() => handleNavClick(link)"
                 >
                   {{ link.label }}
-                </NuxtLink>
+                </button>
               </template>
             </div>
 
             <!-- Right navigation links -->
             <div class="flex items-center gap-8 flex-1 justify-start transition-all duration-300" :class="rightNavSpacing">
               <template v-for="(link, index) in rightNavLinks" :key="`right-${index}`">
-                <NuxtLink 
-                  :to="link.to" 
+                <button 
                   :class="navLinkClass"
-                  @click="handleNavClick(link)"
+                  @click="() => handleNavClick(link)"
                 >
                   {{ link.label }}
-                </NuxtLink>
+                </button>
               </template>
             </div>
           </div>
@@ -117,13 +115,12 @@
           <!-- Mobile Navigation Links -->
           <nav class="flex flex-col items-center space-y-8">
             <template v-for="(link, index) in allNavLinks" :key="`mobile-${index}`">
-              <NuxtLink 
-                :to="link.to" 
+              <button 
                 :class="mobileNavLinkClass"
-                @click="handleMobileNavClick(link)"
+                @click="() => handleMobileNavClick(link)"
               >
                 {{ link.label }}
-              </NuxtLink>
+              </button>
             </template>
           </nav>
         </div>
@@ -175,7 +172,6 @@ const isMobileMenuOpen = ref(false)
 // Navigation link type
 interface NavLink {
   label: string
-  to: string
   action?: string // Use string instead of function
 }
 
@@ -183,12 +179,10 @@ interface NavLink {
 const leftNavLinks = ref<NavLink[]>([
   {
     label: 'Music',
-    to: '#music',
     action: 'scroll-to-music'
   },
   {
     label: 'Tour',
-    to: '#tour',
     action: 'show-tour-info'
   }
 ])
@@ -196,12 +190,10 @@ const leftNavLinks = ref<NavLink[]>([
 const rightNavLinks = ref<NavLink[]>([
   {
     label: 'About',
-    to: '#about',
     action: 'show-about-info'
   },
   {
     label: 'Contact',
-    to: '#contact',
     action: 'show-contact-info'
   }
 ])
@@ -279,6 +271,8 @@ const executeNavAction = (action?: string) => {
     case 'show-contact-info':
       snackbar.info('Contact', 'Contact section coming soon!', 3000)
       break
+    default:
+      console.warn('Unknown navigation action:', action)
   }
 }
 
@@ -329,6 +323,9 @@ const showWelcome = () => {
   -webkit-tap-highlight-color: transparent;
   transform-origin: bottom;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  background: none;
+  border: none;
+  font-family: inherit;
 }
 
 .nav-link-desktop:hover {
@@ -344,7 +341,7 @@ const showWelcome = () => {
 .nav-link-desktop::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: 4px;
   left: 0;
   width: 0;
   height: 0.125rem;
@@ -381,6 +378,9 @@ const showWelcome = () => {
   display: block;
   width: 100%;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  background: none;
+  border: none;
+  font-family: inherit;
 }
 
 .nav-link-mobile:active {
