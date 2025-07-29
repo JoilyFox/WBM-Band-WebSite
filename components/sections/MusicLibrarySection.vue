@@ -689,6 +689,22 @@ $shimmer-easing: ease-in-out;
     gap: 0.75rem;
   }
   
+  // Disable hover effects on mobile for coming soon card
+  .coming-soon-content:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    transform: none !important;
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  // Mobile active state for coming soon card touch feedback
+  .coming-soon-content:active {
+    transform: scale(0.96) !important;
+    transition-duration: ($hover-duration * 0.5) !important;
+  }
+  
   // Disable hover effects on mobile for new release preview
   .new-release-content:hover {
     transform: none !important;

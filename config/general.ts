@@ -27,8 +27,8 @@ export interface GeneralConfig {
 
 export const generalConfig: GeneralConfig = {
   // Release information
-  nextReleaseDate: null, // Set to ISO date string like "2024-04-15" when you have a planned release
-  nextReleaseTitle: null, // Set to release title like "Electric Dreams EP"
+  nextReleaseDate: '2025-09-15', // Set to ISO date string like "2024-04-15" when you have a planned release
+  nextReleaseTitle: 'Mania', // Set to release title like "Electric Dreams EP"
   
   // Band information
   bandName: "WBM Band",

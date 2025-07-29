@@ -18,7 +18,7 @@
       <p class="text-white/60 text-xs">
         {{ formattedDate }}
       </p>
-      <p v-if="release.description" class="text-white/50 text-xs line-clamp-2 leading-relaxed hidden sm:block">
+      <p v-if="release.description" class="text-white/50 text-xs line-clamp-2 leading-tight hidden sm:block">
         {{ release.description }}
       </p>
     </div>
