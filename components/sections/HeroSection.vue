@@ -223,8 +223,8 @@ watch(currentIndex, (newIndex) => {
 <style scoped>
 /* Hero section specific styles */
 .hero-section {
-  height: 100vh;
-  height: 100dvh; /* Use dynamic viewport height for mobile browsers */
+  height: 100vh; /* Fallback for older browsers */
+  height: 100svh; /* Small viewport height - excludes browser UI */
 }
 
 /* Hero slider container */
