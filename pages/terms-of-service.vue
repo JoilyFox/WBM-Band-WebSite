@@ -565,11 +565,14 @@ onUnmounted(() => {
   transition: all 0.3s ease;
 }
 
-.content-card:hover {
-  background: var(--glassmorphic-hover);
-  border-color: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+/* Only apply hover effects on devices that support hovering (not touch devices) */
+@media (hover: hover) {
+  .content-card:hover {
+    background: var(--glassmorphic-hover);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  }
 }
 
 .card-header {
@@ -666,10 +669,12 @@ onUnmounted(() => {
   transition: all 0.3s ease;
 }
 
-.rights-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .rights-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
 }
 
 .rights-icon {
@@ -813,9 +818,11 @@ onUnmounted(() => {
   transition: color 0.3s ease;
 }
 
-.contact-link:hover {
-  color: rgba(120, 119, 198, 1);
-  text-decoration: underline;
+@media (hover: hover) {
+  .contact-link:hover {
+    color: rgba(120, 119, 198, 1);
+    text-decoration: underline;
+  }
 }
 
 .response-time {
@@ -868,11 +875,13 @@ onUnmounted(() => {
   transform: translateY(0);
 }
 
-.back-to-top:hover {
-  background: var(--glassmorphic-hover);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+@media (hover: hover) {
+  .back-to-top:hover {
+    background: var(--glassmorphic-hover);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
 }
 
 /* Mobile Responsive */
@@ -946,10 +955,13 @@ onUnmounted(() => {
     transition: none;
   }
   
-  .content-card:hover,
-  .rights-item:hover,
-  .back-to-top:hover {
-    transform: none;
+  /* Disable transforms even on hover for reduced motion */
+  @media (hover: hover) {
+    .content-card:hover,
+    .rights-item:hover,
+    .back-to-top:hover {
+      transform: none;
+    }
   }
 }
 
