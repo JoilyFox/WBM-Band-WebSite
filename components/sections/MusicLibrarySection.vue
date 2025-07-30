@@ -75,7 +75,9 @@
             </div>
           </div>
         </div>
-      </div>      <!-- Show More Button -->
+      </div>
+
+      <!-- Show More Button -->
       <div v-if="hasMoreReleases" class="text-center">
         <button
           @click="handleShowMore"
@@ -496,17 +498,35 @@ $shimmer-easing: ease-in-out;
   width: 100%;
   transition: all $hover-duration $hover-easing;
   transform-origin: center;
+}
 
-  &:hover {
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .new-release-content:hover {
     transform: translateY(-0.125rem) scale(1.01);
     box-shadow: 
       0 12px 40px rgba(0, 0, 0, 0.4),
       0 0 0 1px rgba(255, 255, 255, 0.1);
   }
+}
 
-  &:active {
+/* Mobile and touch device specific styles */
+@media (hover: none) and (pointer: coarse) {
+  .new-release-content:active {
     transform: translateY(-0.0625rem) scale(0.98);
-    transition-duration: 0.1s;
+    transition-duration: 0.15s;
+  }
+}
+
+/* Fallback for devices that support both hover and touch */
+@media (hover: hover) and (pointer: coarse) {
+  .new-release-content:hover {
+    transform: none; /* Disable hover on touch-capable devices */
+  }
+  
+  .new-release-content:active {
+    transform: translateY(-0.0625rem) scale(0.98);
+    transition-duration: 0.15s;
   }
 }
 
@@ -523,13 +543,6 @@ $shimmer-easing: ease-in-out;
   -webkit-backdrop-filter: blur(15px) saturate(180%);
   transition: background $hover-duration $hover-easing;
 
-  .new-release-content:hover & {
-    background: 
-      rgba(0, 0, 0, 0.3),
-      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 60%),
-      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 60%);
-  }
-
   &::before {
     content: '';
     @include absolute-overlay;
@@ -539,14 +552,27 @@ $shimmer-easing: ease-in-out;
   }
 }
 
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .new-release-content:hover .new-release-overlay {
+    background: 
+      rgba(0, 0, 0, 0.3),
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 60%),
+      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 60%);
+  }
+}
+
 .new-release-info {
   position: relative;
   z-index: 2;
   text-align: center;
   padding: 1.5rem;
   transition: all $hover-duration $hover-easing;
+}
 
-  .new-release-content:hover & {
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .new-release-content:hover .new-release-info {
     transform: translateY(-0.0625rem);
   }
 }
@@ -555,8 +581,11 @@ $shimmer-easing: ease-in-out;
   color: rgba(255, 255, 255, 0.9);
   font-size: 1.875rem;
   transition: all $hover-duration $hover-easing;
+}
 
-  .new-release-content:hover & {
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .new-release-content:hover .new-release-icon {
     color: rgba(255, 255, 255, 1);
     font-size: 2.1rem;
     text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
@@ -569,8 +598,11 @@ $shimmer-easing: ease-in-out;
   font-weight: 600;
   @include text-shadow-medium;
   transition: all $hover-duration $hover-easing;
+}
 
-  .new-release-content:hover & {
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .new-release-content:hover .new-release-title {
     color: rgba(255, 255, 255, 1);
     text-shadow: 
       0 2px 4px rgba(0, 0, 0, 0.7),
@@ -584,8 +616,11 @@ $shimmer-easing: ease-in-out;
   margin-bottom: 0.5rem;
   @include text-shadow-light;
   transition: all $hover-duration $hover-easing;
+}
 
-  .new-release-content:hover & {
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .new-release-content:hover .new-release-date {
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 
       0 1px 2px rgba(0, 0, 0, 0.5),
@@ -608,8 +643,11 @@ $shimmer-easing: ease-in-out;
   -webkit-backdrop-filter: blur(10px);
   @include text-shadow-light;
   transition: all $hover-duration $hover-easing;
+}
 
-  .new-release-content:hover & {
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .new-release-content:hover .new-release-label {
     background: rgba(255, 255, 255, 0.22);
     border-color: rgba(255, 255, 255, 0.35);
     color: rgba(255, 255, 255, 1);
@@ -688,34 +726,6 @@ $shimmer-easing: ease-in-out;
   
   // Mobile active state for coming soon card touch feedback
   .coming-soon-content:active {
-    transform: scale(0.96) !important;
-    transition-duration: ($hover-duration * 0.5) !important;
-  }
-  
-  // Disable hover effects on mobile for new release preview
-  .new-release-content:hover {
-    transform: none !important;
-    box-shadow: none !important;
-    
-    .new-release-overlay {
-      background: 
-        rgba(0, 0, 0, 0.4),
-        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.2) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%) !important;
-    }
-    
-    .new-release-info,
-    .new-release-icon,
-    .new-release-title,
-    .new-release-date,
-    .new-release-label {
-      transform: none !important;
-      color: inherit !important;
-      text-shadow: none !important;
-    }
-  }
-  
-  .new-release-content:active {
     transform: scale(0.96) !important;
     transition-duration: ($hover-duration * 0.5) !important;
   }
