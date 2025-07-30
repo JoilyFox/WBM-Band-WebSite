@@ -17,11 +17,6 @@
 
 /* Utilities */
 @import './utilities.scss';
-
-/* CSS Custom Properties for viewport height management */
-:root {
-  --vh: 1vh; /* Fallback value, will be updated by JavaScript */
-}
   
 /* Tailwind CSS */
 @tailwind base;
