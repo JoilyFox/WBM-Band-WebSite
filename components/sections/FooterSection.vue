@@ -130,6 +130,16 @@ import { getConfig } from '~/utils/configHelpers'
 const snackbar = useSnackbar()
 const { scrollToElementWithNavigation } = useScrollTo()
 
+// Helper function to resolve asset paths correctly for GitHub Pages
+const resolveAssetPath = (path: string) => {
+  // In development, use the path as-is
+  if (process.dev) return path
+  
+  // For production GitHub Pages, use the base URL from nuxt config
+  // The baseURL is '/WBM-Band-WebSite/' for this deployment
+  return `/WBM-Band-WebSite${path}`
+}
+
 // Computed properties for config values
 const bandName = computed(() => getConfig('general.bandName'))
 const fullBandName = computed(() => getConfig('general.fullBandName'))
@@ -169,21 +179,21 @@ const socialLinks = ref([
   }
 ])
 
-// Streaming platforms
-const streamingPlatforms = ref([
+// Streaming platforms - using computed to ensure proper path resolution
+const streamingPlatforms = computed(() => [
   {
     name: 'Spotify',
-    icon: '/assets/images/icons/spotify-icon.svg',
+    icon: resolveAssetPath('/assets/images/icons/spotify-icon.svg'),
     url: 'https://open.spotify.com/artist/wbmband'
   },
   {
     name: 'Apple Music',
-    icon: '/assets/images/icons/apple-music-icon.svg',
+    icon: resolveAssetPath('/assets/images/icons/apple-music-icon.svg'),
     url: 'https://music.apple.com/artist/wbmband'
   },
   {
     name: 'YouTube Music',
-    icon: '/assets/images/icons/youtube-music-icon.svg',
+    icon: resolveAssetPath('/assets/images/icons/youtube-music-icon.svg'),
     url: 'https://music.youtube.com/channel/wbmband'
   }
 ])
