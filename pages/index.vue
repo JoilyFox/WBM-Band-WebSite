@@ -16,10 +16,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { useImagePreloader } from '~/composables/useImagePreloader'
+import { useViewportHeight } from '~/composables/useViewportHeight'
 import { createPageTitle } from '~/constants/app'
 import { musicLibrary } from '~/data/musicLibrary'
 import type { MusicRelease } from '~/data/musicLibrary'
@@ -43,6 +44,7 @@ useHead({
 const snackbar = useSnackbar()
 const { scrollToElement } = useScrollTo()
 const { preloadHeroImages, preloadAlbumCovers } = useImagePreloader()
+const { initializeViewportHeight } = useViewportHeight()
 
 // Hero images for preloading
 const heroImages = [
@@ -60,8 +62,16 @@ const heroImages = [
   }
 ]
 
-// Preload critical images on mount
+// Preload critical images on mount and initialize viewport height
 onMounted(async () => {
+  // Initialize viewport height management globally for the page
+  const cleanupViewportHeight = initializeViewportHeight()
+  
+  // Store cleanup function for unmount
+  onUnmounted(() => {
+    cleanupViewportHeight?.()
+  })
+  
   // Preload hero images with high priority
   await preloadHeroImages(heroImages)
   
