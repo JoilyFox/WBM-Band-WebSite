@@ -8,6 +8,8 @@ This directory contains documentation for all the main features of the WBM Band 
 - [Global Loading System](./global-loading-system.md) - Top bar progress indicator for async operations
 - [Snackbar Notifications](./snackbar-notifications.md) - Custom notification system with modern animations and multiple types
 - [Error Page System](./error-page-system.md) - Comprehensive error handling with custom messages and glassmorphism design
+- [Image Optimization Guide](./image-optimization-guide.md) - Comprehensive image optimization implementation with static site generation support
+- [Image Utilities](./image-utilities.md) - Composables and helper functions for image loading states and optimization
 
 ## Tech Stack
 
