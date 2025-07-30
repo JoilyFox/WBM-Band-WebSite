@@ -225,6 +225,14 @@ watch(currentIndex, (newIndex) => {
 .hero-section {
   height: 100vh;
   height: 100dvh; /* Use dynamic viewport height for mobile browsers */
+  
+  /* Smooth transitions for height changes */
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Performance optimizations for low-end devices */
+  will-change: height;
+  contain: layout;
+  transform: translateZ(0); /* Force hardware acceleration */
 }
 
 /* Hero slider container */
@@ -436,6 +444,30 @@ watch(currentIndex, (newIndex) => {
   .hero-background-image {
     object-position: center 30%; /* Adjust focus point for mobile */
     will-change: transform; /* Optimize for smooth scrolling */
+  }
+  
+  .hero-section {
+    /* Faster transitions on mobile for better responsiveness */
+    transition: height 0.2s ease-out;
+    
+    /* Enhanced mobile performance */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-section {
+      transition: none;
+    }
+  }
+  
+  /* Additional optimization for very low-end devices */
+  @media (max-width: 480px) and (max-resolution: 150dpi) {
+    .hero-section {
+      /* Even faster transitions for low-end devices */
+      transition: height 0.15s linear;
+    }
   }
 }
 
