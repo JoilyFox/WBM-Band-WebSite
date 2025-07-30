@@ -203,7 +203,7 @@ const handleLegalLink = (action: string) => {
       navigateTo('/privacy-policy')
       break
     case 'terms':
-      snackbar.info('Terms of Service', 'Terms of service page coming soon!', 3000)
+      navigateTo('/terms-of-service')
       break
     case 'cookies':
       snackbar.info('Cookie Policy', 'Cookie policy page coming soon!', 3000)

@@ -16,6 +16,10 @@ export const getContactPhone = () => generalConfig.contact.phone
 export const getContactPhoneNumber = () => generalConfig.contact.phoneNumber
 export const getLocation = () => generalConfig.contact.location
 export const getSocialMedia = () => generalConfig.socialMedia
+export const getLegalInfo = () => generalConfig.legal
+export const getPrivacyPolicyLastUpdated = () => generalConfig.legal.privacyPolicyLastUpdated
+export const getTermsOfServiceLastUpdated = () => generalConfig.legal.termsOfServiceLastUpdated
+export const getDataResponseTime = () => generalConfig.legal.dataResponseTime
 
 /**
  * Helper function to format release date

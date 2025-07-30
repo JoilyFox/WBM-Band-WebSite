@@ -40,6 +40,7 @@ export interface GeneralConfig {
   // Legal and policy information
   legal: {
     privacyPolicyLastUpdated: string // ISO date string
+    termsOfServiceLastUpdated: string // ISO date string
     dataResponseTime: string // e.g., "30 days"
   }
   
@@ -86,6 +87,7 @@ export const generalConfig: GeneralConfig = {
   // Legal and policy information
   legal: {
     privacyPolicyLastUpdated: "2025-07-31", // ISO date string
+    termsOfServiceLastUpdated: "2025-07-31", // ISO date string
     dataResponseTime: "30 days"
   },
   
