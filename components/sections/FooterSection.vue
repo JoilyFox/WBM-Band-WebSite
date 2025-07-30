@@ -111,7 +111,15 @@
               </button>
             </div>
             <div class="text-white/50 sm:text-white/30 text-xs !mt-[26px] sm:!mt-0">
-                Made with ❤️ and 🎸
+                Made with ❤️ and 🎸 by 
+                <a 
+                  href="https://www.instagram.com/feat.her_" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="developer-link"
+                >
+                  @feat.her_
+                </a>
             </div>
           </div>
         </div>
@@ -461,6 +469,37 @@ const scrollToHero = () => {
   }
 }
 
+/* Developer link styles */
+.developer-link {
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .developer-link:hover {
+    color: rgba(255, 255, 255, 0.668);
+    text-decoration: underline;
+  }
+}
+
+/* Mobile and touch device specific styles */
+@media (hover: none) and (pointer: coarse) {
+  .developer-link:active {
+    color: rgba(255, 255, 255, 0.668);
+    transform: scale(0.98);
+    transition-duration: 0.15s;
+  }
+}
+
+/* Focus state for accessibility */
+.developer-link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.3);
+  outline-offset: 1px;
+    color: rgba(255, 255, 255, 0.668);
+}
+
 /* Streaming platform icon links */
 .streaming-icon-link {
   display: inline-block;
@@ -539,7 +578,8 @@ const scrollToHero = () => {
 .social-link:focus-visible,
 .streaming-icon-link:focus-visible,
 .legal-link:focus-visible,
-.footer-logo-button:focus-visible {
+.footer-logo-button:focus-visible,
+.developer-link:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.3);
   outline-offset: 2px;
 }
@@ -549,7 +589,8 @@ const scrollToHero = () => {
 .social-link:focus:not(:focus-visible),
 .streaming-icon-link:focus:not(:focus-visible),
 .legal-link:focus:not(:focus-visible),
-.footer-logo-button:focus:not(:focus-visible) {
+.footer-logo-button:focus:not(:focus-visible),
+.developer-link:focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -607,7 +648,8 @@ const scrollToHero = () => {
   .social-link,
   .streaming-icon-link,
   .legal-link,
-  .footer-logo-button {
+  .footer-logo-button,
+  .developer-link {
     transition: none;
   }
   
@@ -619,7 +661,8 @@ const scrollToHero = () => {
   .social-link:hover,
   .streaming-icon-link:hover,
   .legal-link:hover,
-  .footer-logo-button:hover {
+  .footer-logo-button:hover,
+  .developer-link:hover {
     transform: none;
   }
   
@@ -636,7 +679,8 @@ const scrollToHero = () => {
   .social-link:active,
   .streaming-icon-link:active,
   .legal-link:active,
-  .footer-logo-button:active {
+  .footer-logo-button:active,
+  .developer-link:active {
     transform: none;
   }
 }
@@ -650,7 +694,8 @@ const scrollToHero = () => {
   
   .footer-link,
   .social-link,
-  .legal-link {
+  .legal-link,
+  .developer-link {
     color: #ffffff;
     border-color: #ffffff;
   }
@@ -660,7 +705,9 @@ const scrollToHero = () => {
   .social-link:hover,
   .social-link:focus,
   .legal-link:hover,
-  .legal-link:focus {
+  .legal-link:focus,
+  .developer-link:hover,
+  .developer-link:focus {
     background: #ffffff;
     color: #000000;
   }
