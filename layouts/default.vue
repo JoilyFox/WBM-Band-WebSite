@@ -9,7 +9,7 @@
           
           <!-- Mobile Logo (centered when big, left when scrolled) -->
           <div class="flex items-start md:hidden z-50 transition-all duration-300" :class="mobileLogoPositionClass">
-            <NuxtLink to="/" class="block">
+            <button @click="scrollToHero" class="logo-button block">
               <img 
                 src="/images/wbm-logo-white.svg" 
                 alt="WBM Band Logo" 
@@ -18,7 +18,7 @@
                 loading="eager"
                 fetchpriority="high"
               />
-            </NuxtLink>
+            </button>
           </div>
 
           <!-- Desktop Navigation -->
@@ -63,7 +63,7 @@
       
       <!-- Desktop Logo (absolute positioned) -->
       <div class="hidden md:block absolute top-[14px] left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300" :class="logoPositionClass">
-        <NuxtLink to="/" class="block">
+        <button @click="scrollToHero" class="logo-button block">
           <img 
             src="/images/wbm-logo-white.svg" 
             alt="WBM Band Logo" 
@@ -72,7 +72,7 @@
             loading="eager"
             fetchpriority="high"
           />
-        </NuxtLink>
+        </button>
       </div>
     </header>
 
@@ -102,14 +102,14 @@
 
           <!-- Logo in mobile menu -->
           <div class="mb-12">
-            <NuxtLink to="/" class="block" @click="closeMobileMenu">
+            <button @click="scrollToHeroAndCloseMenu" class="logo-button block">
               <img 
                 src="/images/wbm-logo-white.svg" 
                 alt="WBM Band Logo" 
                 class="h-24 mt-[-44px] w-auto filter drop-shadow-2xl"
                 loading="eager"
               />
-            </NuxtLink>
+            </button>
           </div>
 
           <!-- Mobile Navigation Links -->
@@ -250,10 +250,8 @@ const handleMobileNavClick = (link: NavLink) => {
   // Close mobile menu first
   closeMobileMenu()
   
-  // Then handle the navigation with reduced delay for faster UX
-  setTimeout(() => {
-    executeNavAction(link.action)
-  }, 200) // Reduced from 300ms to match faster animation
+  // Then handle the navigation
+  executeNavAction(link.action)
 }
 
 // Execute navigation actions
@@ -274,6 +272,19 @@ const executeNavAction = (action?: string) => {
     default:
       console.warn('Unknown navigation action:', action)
   }
+}
+
+// Logo click handlers for smooth scrolling to hero section
+const scrollToHero = () => {
+  scrollToElement('hero')
+}
+
+const scrollToHeroAndCloseMenu = () => {
+  // Close mobile menu first
+  closeMobileMenu()
+  
+  // Then scroll to hero immediately
+  scrollToElement('hero')
 }
 
 // Handle escape key to close mobile menu
@@ -326,6 +337,32 @@ const showWelcome = () => {
   background: none;
   border: none;
   font-family: inherit;
+}
+
+/* Logo button styles */
+.logo-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: transform 0.3s ease-out;
+}
+
+.logo-button:hover {
+  transform: scale(1.05);
+}
+
+.logo-button:active {
+  transform: scale(0.95);
+}
+
+.logo-button:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 .nav-link-desktop:hover {
