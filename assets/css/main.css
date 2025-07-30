@@ -22,45 +22,6 @@
 :root {
   --vh: 1vh; /* Fallback value, will be updated by JavaScript */
 }
-
-/* Mobile browser optimizations */
-html {
-  /* Prevent zoom on inputs */
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-  
-  /* Improve touch scrolling */
-  -webkit-overflow-scrolling: touch;
-  
-  /* Prevent horizontal scrolling */
-  overflow-x: hidden;
-}
-
-body {
-  /* Prevent bouncing on mobile */
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
-  
-  /* Ensure full height */
-  min-height: 100vh;
-  min-height: calc(var(--vh) * 100);
-}
-
-/* Prevent address bar hiding/showing from affecting layout */
-@supports (height: 100dvh) {
-  body {
-    min-height: 100dvh;
-  }
-}
-
-/* iOS Safari specific optimizations */
-@supports (-webkit-touch-callout: none) {
-  body {
-    /* Force minimal-ui on iOS */
-    min-height: calc(var(--vh) * 100);
-  }
-}
   
 /* Tailwind CSS */
 @tailwind base;

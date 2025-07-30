@@ -36,22 +36,6 @@ useHead({
     {
       name: 'description',
       content: 'WBM Band - High-energy rock performances with a modern twist on classic metal sounds. Official website for tour dates, music, and updates.'
-    },
-    {
-      name: 'viewport',
-      content: 'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no'
-    },
-    {
-      name: 'mobile-web-app-capable',
-      content: 'yes'
-    },
-    {
-      name: 'apple-mobile-web-app-capable',
-      content: 'yes'
-    },
-    {
-      name: 'apple-mobile-web-app-status-bar-style',
-      content: 'black-translucent'
     }
   ]
 })
