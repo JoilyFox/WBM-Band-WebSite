@@ -131,6 +131,9 @@
     <main class="">
       <slot />
     </main>
+    
+    <!-- Footer -->
+    <SectionsFooterSection />
   </div>
 </template>
 
