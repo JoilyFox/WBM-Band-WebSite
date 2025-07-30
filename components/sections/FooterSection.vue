@@ -224,7 +224,7 @@ const handleLegalLink = (action: string) => {
       navigateTo('/terms-of-service')
       break
     case 'cookies':
-      snackbar.info('Cookie Policy', 'Cookie policy page coming soon!', 3000)
+      navigateTo('/cookies-policy')
       break
     default:
       console.warn('Unknown legal link action:', action)
