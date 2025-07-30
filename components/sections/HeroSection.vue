@@ -1,6 +1,8 @@
 <template>
   <section 
+    ref="heroSection"
     class="hero-section relative w-full flex items-center justify-center px-4 overflow-hidden"
+    :style="{ height: viewportState.height }"
   >
     <!-- Background Images Slider -->
     <div class="hero-slider-container">
@@ -108,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
+import { watch, reactive, ref, onMounted, onUnmounted } from 'vue'
 import Button from 'primevue/button'
 import { useImageLoading } from '~/utils/imageHelpers'
 import { useHeroSlider, type HeroImage } from '~/composables/useHeroSlider'
@@ -200,6 +202,171 @@ const {
 // Scroll functionality
 const { scrollToElement } = useScrollTo()
 
+// Advanced Viewport Height Management with Intersection Observer
+const heroSection = ref<HTMLElement>()
+const viewportState = reactive({
+  isVisible: true,
+  isFullyVisible: false,
+  height: '100vh',
+  lastUpdate: 0,
+  isStable: true,
+  initialHeight: 0,
+  hasOrientationChanged: false
+})
+
+// Debounced height update function for performance
+const updateHeight = (() => {
+  let timeoutId: ReturnType<typeof setTimeout>
+  return (immediate = false) => {
+    if (timeoutId) clearTimeout(timeoutId)
+    
+    const doUpdate = () => {
+      const now = Date.now()
+      const newHeight = window.innerHeight
+      
+      // Only update if conditions are met
+      const timePassed = now - viewportState.lastUpdate > 300
+      const significantChange = Math.abs(viewportState.initialHeight - newHeight) > 50
+      const shouldUpdate = immediate || (timePassed && significantChange)
+      
+      if (shouldUpdate && (viewportState.isVisible || viewportState.hasOrientationChanged)) {
+        viewportState.height = `${newHeight}px`
+        viewportState.lastUpdate = now
+        viewportState.hasOrientationChanged = false
+        
+        // Update initial height reference for future comparisons
+        if (significantChange) {
+          viewportState.initialHeight = newHeight
+        }
+      }
+    }
+    
+    if (immediate) {
+      doUpdate()
+    } else {
+      timeoutId = setTimeout(doUpdate, 100)
+    }
+  }
+})()
+
+// Intersection Observer for smart viewport management
+const setupViewportObserver = () => {
+  if (!heroSection.value || typeof IntersectionObserver === 'undefined') return
+  
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const { isIntersecting, intersectionRatio } = entry
+        
+        // Update visibility states
+        viewportState.isVisible = isIntersecting
+        viewportState.isFullyVisible = intersectionRatio > 0.8
+        
+        // Smart height updates based on visibility and user behavior
+        if (isIntersecting && intersectionRatio > 0.5) {
+          // User is actively viewing the hero section
+          viewportState.isStable = true
+          
+          // Only update height if there's been a significant change
+          if (viewportState.hasOrientationChanged) {
+            updateHeight(false)
+          }
+        } else if (intersectionRatio === 0) {
+          // Hero is completely out of view - lock the height for stability
+          viewportState.isStable = false
+        } else if (intersectionRatio < 0.3) {
+          // Partially visible - maintain current height
+          viewportState.isStable = false
+        }
+      })
+    },
+    { 
+      threshold: [0, 0.1, 0.3, 0.5, 0.8, 1],
+      rootMargin: '0px 0px -5% 0px' // Trigger slightly before fully out of view
+    }
+  )
+  
+  observer.observe(heroSection.value)
+  
+  return observer
+}
+
+// Handle resize events intelligently
+const handleResize = (() => {
+  let resizeTimeoutId: ReturnType<typeof setTimeout>
+  return () => {
+    if (resizeTimeoutId) clearTimeout(resizeTimeoutId)
+    
+    resizeTimeoutId = setTimeout(() => {
+      // Only update if hero is visible and stable
+      if (viewportState.isVisible && viewportState.isStable) {
+        updateHeight(false)
+      }
+    }, 200)
+  }
+})()
+
+// Handle orientation changes with smart detection
+const handleOrientationChange = () => {
+  viewportState.hasOrientationChanged = true
+  
+  // Wait for orientation change to complete
+  setTimeout(() => {
+    if (viewportState.isVisible) {
+      updateHeight(true) // Immediate update for orientation changes
+    }
+  }, 150)
+}
+
+// Performance-optimized event listeners
+const setupEventListeners = () => {
+  // Use passive listeners for better performance
+  window.addEventListener('resize', handleResize, { passive: true })
+  window.addEventListener('orientationchange', handleOrientationChange, { passive: true })
+  
+  // Handle visibility change for better mobile experience
+  const handleVisibilityChange = () => {
+    if (!document.hidden && viewportState.isVisible) {
+      // Page became visible again - check if height needs updating
+      setTimeout(() => updateHeight(false), 100)
+    }
+  }
+  
+  document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true })
+  
+  return () => {
+    window.removeEventListener('resize', handleResize)
+    window.removeEventListener('orientationchange', handleOrientationChange)
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }
+}
+
+// Initialize viewport management
+onMounted(() => {
+  // Set initial height immediately to prevent flash
+  const initialHeight = window.innerHeight
+  viewportState.height = `${initialHeight}px`
+  viewportState.initialHeight = initialHeight
+  viewportState.lastUpdate = Date.now()
+  
+  // Setup observers and listeners
+  const observer = setupViewportObserver()
+  const cleanupListeners = setupEventListeners()
+  
+  // Enhanced mobile detection and optimization
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  if (isMobile) {
+    // Additional mobile-specific optimizations
+    document.documentElement.style.setProperty('--initial-vh', `${initialHeight * 0.01}px`)
+  }
+  
+  // Cleanup on unmount
+  onUnmounted(() => {
+    observer?.disconnect()
+    cleanupListeners()
+  })
+})
+
 // Event handlers for button actions
 const handlePrimaryAction = () => {
   emit('primaryAction')
@@ -223,8 +390,17 @@ watch(currentIndex, (newIndex) => {
 <style scoped>
 /* Hero section specific styles */
 .hero-section {
-  height: 100vh;
-  height: 100dvh; /* Use dynamic viewport height for mobile browsers */
+  /* Height is now dynamically managed by JavaScript */
+  min-height: 100vh; /* Fallback for older browsers */
+  min-height: 100dvh; /* Fallback with dynamic viewport height */
+  
+  /* Performance optimizations */
+  will-change: height;
+  contain: layout style;
+  transform: translateZ(0); /* Force hardware acceleration */
+  
+  /* Smooth height transitions only when needed */
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Hero slider container */
@@ -436,6 +612,44 @@ watch(currentIndex, (newIndex) => {
   .hero-background-image {
     object-position: center 30%; /* Adjust focus point for mobile */
     will-change: transform; /* Optimize for smooth scrolling */
+  }
+  
+  .hero-section {
+    /* Enhanced mobile performance */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+    
+    /* Prevent layout shifts on mobile browsers */
+    contain: layout style paint;
+  }
+  
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-section {
+      transition: none;
+    }
+    
+    .hero-slide {
+      transition: opacity 0.3s ease;
+    }
+  }
+}
+
+/* CSS Custom Properties for mobile viewport handling */
+:root {
+  --initial-vh: 1vh;
+}
+
+/* Advanced mobile browser compatibility */
+@supports (height: 100svh) {
+  .hero-section {
+    min-height: 100svh; /* Small viewport height - most stable */
+  }
+}
+
+@supports (height: 100lvh) {
+  .hero-section {
+    min-height: 100lvh; /* Large viewport height */
   }
 }
 
