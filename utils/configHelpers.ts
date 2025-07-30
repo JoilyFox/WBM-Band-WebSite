@@ -2,6 +2,21 @@
  * Helper functions for configuration management
  */
 
+import { generalConfig } from '~/config/general'
+
+/**
+ * Convenience functions to access config values
+ */
+export const getBandName = () => generalConfig.bandName
+export const getFullBandName = () => generalConfig.fullBandName
+export const getBandTagline = () => generalConfig.tagline
+export const getContactEmail = () => generalConfig.contact.email
+export const getPrivacyEmail = () => generalConfig.contact.privacyEmail
+export const getContactPhone = () => generalConfig.contact.phone
+export const getContactPhoneNumber = () => generalConfig.contact.phoneNumber
+export const getLocation = () => generalConfig.contact.location
+export const getSocialMedia = () => generalConfig.socialMedia
+
 /**
  * Helper function to format release date
  */

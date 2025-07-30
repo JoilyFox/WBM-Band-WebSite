@@ -8,7 +8,7 @@
         </h2>
         <p class="text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
           Dive into our sonic universe. From atmospheric albums to high-energy singles, 
-          discover the sounds that define WBM Band. Stream our latest releases on your favorite platform.
+          discover the sounds that define {{ generalConfig.bandName }}. Stream our latest releases on your favorite platform.
         </p>
       </div>
 

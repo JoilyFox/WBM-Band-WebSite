@@ -12,7 +12,7 @@
             <button @click="scrollToHero" class="logo-button block">
               <img 
                 src="/images/wbm-logo-white.svg" 
-                alt="WBM Band Logo" 
+                :alt="`${generalConfig.bandName} Logo`" 
                 class="w-auto filter drop-shadow-2xl transition-transform duration-300"
                 :class="mobileLogoSizeClass"
                 loading="eager"
@@ -66,7 +66,7 @@
         <button @click="scrollToHero" class="logo-button block">
           <img 
             src="/images/wbm-logo-white.svg" 
-            alt="WBM Band Logo" 
+            :alt="`${generalConfig.bandName} Logo`" 
             class="w-auto filter drop-shadow-2xl transition-transform duration-500 ease-out"
             :class="logoSizeClass"
             loading="eager"
@@ -105,7 +105,7 @@
             <button @click="scrollToHeroAndCloseMenu" class="logo-button block">
               <img 
                 src="/images/wbm-logo-white.svg" 
-                alt="WBM Band Logo" 
+                :alt="`${generalConfig.bandName} Logo`" 
                 class="h-24 mt-[-44px] w-auto filter drop-shadow-2xl"
                 loading="eager"
               />
@@ -143,10 +143,11 @@ import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { useScrollAnimation } from '~/composables/useScrollAnimation'
 import { createWelcomeMessage } from '~/constants/app'
+import { generalConfig } from '~/config/general'
 
 // Composables
 const snackbar = useSnackbar()
-const { scrollToElement } = useScrollTo()
+const { scrollToElementWithNavigation } = useScrollTo()
 
 // Optimized scroll animation composable with performance enhancements
 const {
@@ -261,7 +262,7 @@ const handleMobileNavClick = (link: NavLink) => {
 const executeNavAction = (action?: string) => {
   switch (action) {
     case 'scroll-to-music':
-      scrollToElement('music')
+      scrollToElementWithNavigation('music')
       break
     case 'show-tour-info':
       snackbar.info('Tour', 'Tour dates coming soon!', 3000)
@@ -279,7 +280,7 @@ const executeNavAction = (action?: string) => {
 
 // Logo click handlers for smooth scrolling to hero section
 const scrollToHero = () => {
-  scrollToElement('hero')
+  scrollToElementWithNavigation('hero')
 }
 
 const scrollToHeroAndCloseMenu = () => {
@@ -287,7 +288,7 @@ const scrollToHeroAndCloseMenu = () => {
   closeMobileMenu()
   
   // Then scroll to hero immediately
-  scrollToElement('hero')
+  scrollToElementWithNavigation('hero')
 }
 
 // Handle escape key to close mobile menu

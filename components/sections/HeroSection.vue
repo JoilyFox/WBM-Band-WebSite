@@ -114,6 +114,7 @@ import Button from 'primevue/button'
 import { useImageLoading } from '~/utils/imageHelpers'
 import { useHeroSlider, type HeroImage } from '~/composables/useHeroSlider'
 import { useScrollTo } from '~/composables/useScrollTo'
+import { generalConfig } from '~/config/general'
 
 // Props
 interface Props {
@@ -130,8 +131,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Woman Based Mechanics',
-  subtitle: 'Rock • Alternative • Indie',
+  title: generalConfig.fullBandName,
+  subtitle: generalConfig.tagline,
   primaryButtonLabel: 'Listen Now',
   primaryButtonIcon: 'pi pi-play',
   secondaryButtonLabel: 'Tour Dates',
@@ -142,20 +143,20 @@ const props = withDefaults(defineProps<Props>(), {
   heroImages: () => [
     {
       src: '/images/optimized/hero-images/hero-1.avif',
-      alt: 'WBM Band performing live on stage',
-      title: 'Woman Based Mechanics',
+      alt: `${generalConfig.bandName} performing live on stage`,
+      title: generalConfig.fullBandName,
       subtitle: 'Live Performance'
     },
     {
       src: '/images/optimized/hero-images/hero-2.avif',
-      alt: 'WBM Band in recording studio',
-      title: 'Woman Based Mechanics',
+      alt: `${generalConfig.bandName} in recording studio`,
+      title: generalConfig.fullBandName,
       subtitle: 'In Studio'
     },
     {
       src: '/images/optimized/hero-images/hero-3.avif',
-      alt: 'WBM Band concert crowd',
-      title: 'Woman Based Mechanics',
+      alt: `${generalConfig.bandName} concert crowd`,
+      title: generalConfig.fullBandName,
       subtitle: 'Concert Experience'
     },
   ]

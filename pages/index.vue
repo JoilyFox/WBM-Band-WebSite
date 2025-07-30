@@ -22,6 +22,7 @@ import { useScrollTo } from '~/composables/useScrollTo'
 import { useImagePreloader } from '~/composables/useImagePreloader'
 import { createPageTitle } from '~/constants/app'
 import { musicLibrary } from '~/data/musicLibrary'
+import { generalConfig } from '~/config/general'
 import type { MusicRelease } from '~/data/musicLibrary'
 
 // Meta
@@ -30,11 +31,11 @@ definePageMeta({
 })
 
 useHead({
-  title: createPageTitle('WBM Band - Rock • Metal • Alternative'),
+  title: createPageTitle(`${generalConfig.bandName} - ${generalConfig.tagline}`),
   meta: [
     {
       name: 'description',
-      content: 'WBM Band - High-energy rock performances with a modern twist on classic metal sounds. Official website for tour dates, music, and updates.'
+      content: `${generalConfig.bandName} - High-energy rock performances with a modern twist on classic metal sounds. Official website for tour dates, music, and updates.`
     }
   ]
 })
@@ -48,15 +49,15 @@ const { preloadHeroImages, preloadAlbumCovers } = useImagePreloader()
 const heroImages = [
   {
     src: '/images/optimized/hero-images/hero-1.avif',
-    alt: 'WBM Band performing live on stage'
+    alt: `${generalConfig.bandName} performing live on stage`
   },
   {
     src: '/images/optimized/hero-images/hero-2.avif',
-    alt: 'WBM Band in recording studio'
+    alt: `${generalConfig.bandName} in recording studio`
   },
   {
     src: '/images/optimized/hero-images/hero-3.avif',
-    alt: 'WBM Band concert crowd'
+    alt: `${generalConfig.bandName} concert crowd`
   }
 ]
 

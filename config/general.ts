@@ -10,7 +10,23 @@ export interface GeneralConfig {
   
   // Band information
   bandName: string
+  fullBandName: string
   tagline: string
+  
+  // Contact information
+  contact: {
+    email: string
+    privacyEmail: string
+    phone: string
+    phoneNumber: string // For tel: links (without formatting)
+    location: {
+      city: string
+      state: string
+      country: string
+      full: string
+      short: string // For footer
+    }
+  }
   
   // Social media
   socialMedia: {
@@ -19,6 +35,12 @@ export interface GeneralConfig {
     youtube?: string
     instagram?: string
     twitter?: string
+  }
+  
+  // Legal and policy information
+  legal: {
+    privacyPolicyLastUpdated: string // ISO date string
+    dataResponseTime: string // e.g., "30 days"
   }
   
   // Website settings
@@ -34,7 +56,23 @@ export const generalConfig: GeneralConfig = {
   
   // Band information
   bandName: "WBM Band",
+  fullBandName: "Woman Based Mechanics",
   tagline: "Rock • Metal • Alternative",
+  
+  // Contact information
+  contact: {
+    email: "contact@wbmband.com",
+    privacyEmail: "privacy@wbmband.com",
+    phone: "+1 (234) 567-8900",
+    phoneNumber: "+1234567890", // For tel: links
+    location: {
+      city: "Los Angeles",
+      state: "CA",
+      country: "United States",
+      full: "Los Angeles, CA, United States",
+      short: "Los Angeles, CA"
+    }
+  },
   
   // Social media links
   socialMedia: {
@@ -43,6 +81,12 @@ export const generalConfig: GeneralConfig = {
     youtube: "https://youtube.com/@wbmband",
     // instagram: "https://instagram.com/wbmband",
     // twitter: "https://twitter.com/wbmband"
+  },
+  
+  // Legal and policy information
+  legal: {
+    privacyPolicyLastUpdated: "2025-07-31", // ISO date string
+    dataResponseTime: "30 days"
   },
   
   // Website settings

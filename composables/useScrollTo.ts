@@ -26,6 +26,38 @@ export const useScrollTo = () => {
       behavior: 'smooth'
     })
   }
+
+  /**
+   * Navigates to index page and then scrolls to element
+   * If already on index page, scrolls directly
+   * @param elementId - The ID of the element to scroll to (without #)
+   * @param customOffset - Optional custom offset from the top in pixels
+   */
+  const scrollToElementWithNavigation = async (elementId: string, customOffset?: number) => {
+    const route = useRoute()
+    const router = useRouter()
+    
+    // Check if we're not on the index page
+    if (route.path !== '/') {
+      try {
+        // Navigate to index page first
+        await router.push('/')
+        
+        // Wait for the navigation to complete and DOM to update
+        await nextTick()
+        
+        // Add a small delay to ensure the page is fully loaded
+        setTimeout(() => {
+          scrollToElement(elementId, customOffset)
+        }, 100)
+      } catch (error) {
+        console.error('Navigation failed:', error)
+      }
+    } else {
+      // Already on index page, scroll directly
+      scrollToElement(elementId, customOffset)
+    }
+  }
   
   /**
    * Scrolls to a specific position
@@ -47,6 +79,7 @@ export const useScrollTo = () => {
   
   return {
     scrollToElement,
+    scrollToElementWithNavigation,
     scrollToPosition,
     scrollToTop
   }

@@ -11,14 +11,14 @@
               <button @click="scrollToHero" class="footer-logo-button">
                 <img 
                   src="/images/wbm-logo-white.svg" 
-                  alt="WBM Band Logo" 
+                  :alt="`${generalConfig.bandName} Logo`" 
                   class="h-12 w-auto filter drop-shadow-lg"
                   loading="lazy"
                 />
               </button>
             </div>
             <p class="text-white/70 text-sm leading-relaxed mb-6 max-w-md mx-auto md:mx-0">
-              Woman Based Mechanics - Pushing the boundaries of rock, alternative, and indie music. 
+              {{ generalConfig.fullBandName }} - Pushing the boundaries of rock, alternative, and indie music. 
               Join us on our musical journey and stay connected for the latest releases and tour updates.
             </p>
             
@@ -44,20 +44,20 @@
             <ul class="space-y-3">
               <li class="footer-contact-item justify-center md:justify-start">
                 <i class="pi pi-envelope text-white/60"></i>
-                <a href="mailto:contact@wbmband.com" class="footer-link">
-                  contact@wbmband.com
+                <a :href="`mailto:${generalConfig.contact.email}`" class="footer-link">
+                  {{ generalConfig.contact.email }}
                 </a>
               </li>
               <li class="footer-contact-item justify-center md:justify-start">
                 <i class="pi pi-map-marker text-white/60"></i>
                 <span class="text-white/70 text-sm">
-                  Los Angeles, CA
+                  {{ generalConfig.contact.location.short }}
                 </span>
               </li>
               <li class="footer-contact-item justify-center md:justify-start">
                 <i class="pi pi-phone text-white/60"></i>
-                <a href="tel:+1234567890" class="footer-link">
-                  +1 (234) 567-8900
+                <a :href="`tel:${generalConfig.contact.phoneNumber}`" class="footer-link">
+                  {{ generalConfig.contact.phone }}
                 </a>
               </li>
             </ul>
@@ -95,7 +95,7 @@
         <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <div class="text-center md:text-left">
             <p class="text-white/50 text-xs">
-              © {{ currentYear }} Woman Based Mechanics. All rights reserved.
+              © {{ currentYear }} {{ generalConfig.fullBandName }}. All rights reserved.
             </p>
           </div>
           
@@ -110,7 +110,7 @@
                 {{ legal.label }}
               </button>
             </div>
-            <div class="text-white/50 sm:text-white/30 text-xs !mt-[26px] sm:mt-0">
+            <div class="text-white/50 sm:text-white/30 text-xs !mt-[26px] sm:!mt-0">
                 Made with ❤️ and 🎸
             </div>
           </div>
@@ -124,10 +124,11 @@
 import { computed } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
+import { generalConfig } from '~/config/general'
 
 // Composables
 const snackbar = useSnackbar()
-const { scrollToElement } = useScrollTo()
+const { scrollToElementWithNavigation } = useScrollTo()
 
 // Current year for copyright
 const currentYear = computed(() => new Date().getFullYear())
@@ -199,7 +200,7 @@ const legalLinks = ref([
 const handleLegalLink = (action: string) => {
   switch (action) {
     case 'privacy':
-      snackbar.info('Privacy Policy', 'Privacy policy page coming soon!', 3000)
+      navigateTo('/privacy-policy')
       break
     case 'terms':
       snackbar.info('Terms of Service', 'Terms of service page coming soon!', 3000)
@@ -214,7 +215,7 @@ const handleLegalLink = (action: string) => {
 
 // Logo click handler for smooth scrolling to hero section
 const scrollToHero = () => {
-  scrollToElement('hero')
+  scrollToElementWithNavigation('hero')
 }
 </script>
 
@@ -227,6 +228,20 @@ const scrollToHero = () => {
     radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.05) 0%, transparent 50%);
   position: relative;
   overflow: hidden;
+}
+
+/* Remove default focus rings for all interactive elements */
+.footer-section button,
+.footer-section a {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Only show focus outline for keyboard navigation */
+.footer-section button:focus-visible,
+.footer-section a:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.3);
+  outline-offset: 2px;
 }
 
 .footer-section::before {
@@ -502,24 +517,33 @@ const scrollToHero = () => {
 }
 
 /* Focus states for accessibility */
-.footer-link:focus,
-.social-link:focus,
-.streaming-icon-link:focus,
-.legal-link:focus,
-.footer-logo-button:focus {
+.footer-link:focus-visible,
+.social-link:focus-visible,
+.streaming-icon-link:focus-visible,
+.legal-link:focus-visible,
+.footer-logo-button:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.3);
   outline-offset: 2px;
 }
 
-.streaming-icon-link:focus .streaming-icon {
+/* Remove default focus outlines on click */
+.footer-link:focus:not(:focus-visible),
+.social-link:focus:not(:focus-visible),
+.streaming-icon-link:focus:not(:focus-visible),
+.legal-link:focus:not(:focus-visible),
+.footer-logo-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.streaming-icon-link:focus-visible .streaming-icon {
   filter: brightness(1.2) saturate(1.3);
 }
 
-.legal-link:focus {
+.legal-link:focus-visible {
   color: rgba(255, 255, 255, 0.7);
 }
 
-.footer-logo-button:focus img {
+.footer-logo-button:focus-visible img {
   filter: brightness(1.1) drop-shadow(0 4px 15px rgba(255, 255, 255, 0.2));
 }
 
