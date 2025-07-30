@@ -2,6 +2,7 @@
   <section 
     ref="heroSection"
     class="hero-section relative w-full flex items-center justify-center px-4 overflow-hidden"
+    :class="{ 'transitioning': viewportState.isTransitioning }"
     :style="{ height: viewportState.height }"
   >
     <!-- Background Images Slider -->
@@ -211,7 +212,8 @@ const viewportState = reactive({
   lastUpdate: 0,
   isStable: true,
   initialHeight: 0,
-  hasOrientationChanged: false
+  hasOrientationChanged: false,
+  isTransitioning: false
 })
 
 // Debounced height update function for performance
@@ -222,20 +224,31 @@ const updateHeight = (() => {
     
     const doUpdate = () => {
       const now = Date.now()
-      const newHeight = window.innerHeight
+      // Get the visible viewport height (excluding browser UI)
+      const availableHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight
+      const documentHeight = document.documentElement.clientHeight
+      const newHeight = Math.min(availableHeight, documentHeight, window.innerHeight)
       
       // Only update if conditions are met
-      const timePassed = now - viewportState.lastUpdate > 300
-      const significantChange = Math.abs(viewportState.initialHeight - newHeight) > 50
-      const shouldUpdate = immediate || (timePassed && significantChange)
+      const timePassed = now - viewportState.lastUpdate > 200
+      const significantChange = Math.abs(viewportState.initialHeight - newHeight) > 30
+      const shouldUpdate = immediate || (timePassed && (significantChange || viewportState.hasOrientationChanged))
       
-      if (shouldUpdate && (viewportState.isVisible || viewportState.hasOrientationChanged)) {
+      if (shouldUpdate) {
+        // Add smooth transition flag
+        if (!immediate && Math.abs(parseInt(viewportState.height) - newHeight) > 10) {
+          viewportState.isTransitioning = true
+          setTimeout(() => {
+            viewportState.isTransitioning = false
+          }, 300)
+        }
+        
         viewportState.height = `${newHeight}px`
         viewportState.lastUpdate = now
         viewportState.hasOrientationChanged = false
         
         // Update initial height reference for future comparisons
-        if (significantChange) {
+        if (significantChange || immediate) {
           viewportState.initialHeight = newHeight
         }
       }
@@ -244,7 +257,7 @@ const updateHeight = (() => {
     if (immediate) {
       doUpdate()
     } else {
-      timeoutId = setTimeout(doUpdate, 100)
+      timeoutId = setTimeout(doUpdate, 50)
     }
   }
 })()
@@ -263,26 +276,19 @@ const setupViewportObserver = () => {
         viewportState.isFullyVisible = intersectionRatio > 0.8
         
         // Smart height updates based on visibility and user behavior
-        if (isIntersecting && intersectionRatio > 0.5) {
-          // User is actively viewing the hero section
+        if (isIntersecting && intersectionRatio > 0.3) {
+          // User is viewing the hero section - allow smooth updates
           viewportState.isStable = true
-          
-          // Only update height if there's been a significant change
-          if (viewportState.hasOrientationChanged) {
-            updateHeight(false)
-          }
+          updateHeight(false)
         } else if (intersectionRatio === 0) {
-          // Hero is completely out of view - lock the height for stability
-          viewportState.isStable = false
-        } else if (intersectionRatio < 0.3) {
-          // Partially visible - maintain current height
+          // Hero is completely out of view - keep current height stable
           viewportState.isStable = false
         }
       })
     },
     { 
       threshold: [0, 0.1, 0.3, 0.5, 0.8, 1],
-      rootMargin: '0px 0px -5% 0px' // Trigger slightly before fully out of view
+      rootMargin: '0px' // No margin to get accurate viewport detection
     }
   )
   
@@ -298,11 +304,9 @@ const handleResize = (() => {
     if (resizeTimeoutId) clearTimeout(resizeTimeoutId)
     
     resizeTimeoutId = setTimeout(() => {
-      // Only update if hero is visible and stable
-      if (viewportState.isVisible && viewportState.isStable) {
-        updateHeight(false)
-      }
-    }, 200)
+      // Always update when resizing, but use smooth transition
+      updateHeight(false)
+    }, 100)
   }
 })()
 
@@ -326,25 +330,47 @@ const setupEventListeners = () => {
   
   // Handle visibility change for better mobile experience
   const handleVisibilityChange = () => {
-    if (!document.hidden && viewportState.isVisible) {
-      // Page became visible again - check if height needs updating
+    if (!document.hidden) {
+      // Page became visible again - smoothly update height
       setTimeout(() => updateHeight(false), 100)
+    }
+  }
+  
+  // Listen for visual viewport changes (mobile browser UI)
+  const handleVisualViewportChange = () => {
+    if (window.visualViewport && viewportState.isVisible) {
+      updateHeight(false)
     }
   }
   
   document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true })
   
+  // Enhanced mobile browser UI detection
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleVisualViewportChange, { passive: true })
+  }
+  
   return () => {
     window.removeEventListener('resize', handleResize)
     window.removeEventListener('orientationchange', handleOrientationChange)
     document.removeEventListener('visibilitychange', handleVisibilityChange)
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', handleVisualViewportChange)
+    }
   }
 }
 
 // Initialize viewport management
 onMounted(() => {
-  // Set initial height immediately to prevent flash
-  const initialHeight = window.innerHeight
+  // Set initial height using visual viewport if available (better mobile support)
+  const getInitialHeight = () => {
+    if (window.visualViewport) {
+      return window.visualViewport.height
+    }
+    return window.innerHeight
+  }
+  
+  const initialHeight = getInitialHeight()
   viewportState.height = `${initialHeight}px`
   viewportState.initialHeight = initialHeight
   viewportState.lastUpdate = Date.now()
@@ -358,6 +384,11 @@ onMounted(() => {
   if (isMobile) {
     // Additional mobile-specific optimizations
     document.documentElement.style.setProperty('--initial-vh', `${initialHeight * 0.01}px`)
+    
+    // Start with smooth height adjustment after a brief delay
+    setTimeout(() => {
+      updateHeight(false)
+    }, 100)
   }
   
   // Cleanup on unmount
@@ -399,8 +430,13 @@ watch(currentIndex, (newIndex) => {
   contain: layout style;
   transform: translateZ(0); /* Force hardware acceleration */
   
-  /* Smooth height transitions only when needed */
-  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Smooth height transitions - more responsive */
+  transition: height 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smoother transitions when actively changing */
+.hero-section.transitioning {
+  transition: height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* Hero slider container */
