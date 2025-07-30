@@ -11,14 +11,14 @@
               <button @click="scrollToHero" class="footer-logo-button">
                 <img 
                   src="/images/wbm-logo-white.svg" 
-                  :alt="`${generalConfig.bandName} Logo`" 
+                  :alt="`${bandName} Logo`" 
                   class="h-12 w-auto filter drop-shadow-lg"
                   loading="lazy"
                 />
               </button>
             </div>
             <p class="text-white/70 text-sm leading-relaxed mb-6 max-w-md mx-auto md:mx-0">
-              {{ generalConfig.fullBandName }} - Pushing the boundaries of rock, alternative, and indie music. 
+              {{ fullBandName }} - Pushing the boundaries of rock, alternative, and indie music. 
               Join us on our musical journey and stay connected for the latest releases and tour updates.
             </p>
             
@@ -44,20 +44,20 @@
             <ul class="space-y-3">
               <li class="footer-contact-item justify-center md:justify-start">
                 <i class="pi pi-envelope text-white/60"></i>
-                <a :href="`mailto:${generalConfig.contact.email}`" class="footer-link">
-                  {{ generalConfig.contact.email }}
+                <a :href="`mailto:${contactEmail}`" class="footer-link">
+                  {{ contactEmail }}
                 </a>
               </li>
               <li class="footer-contact-item justify-center md:justify-start">
                 <i class="pi pi-map-marker text-white/60"></i>
                 <span class="text-white/70 text-sm">
-                  {{ generalConfig.contact.location.short }}
+                  {{ contactLocationShort }}
                 </span>
               </li>
               <li class="footer-contact-item justify-center md:justify-start">
                 <i class="pi pi-phone text-white/60"></i>
-                <a :href="`tel:${generalConfig.contact.phoneNumber}`" class="footer-link">
-                  {{ generalConfig.contact.phone }}
+                <a :href="`tel:${contactPhoneNumber}`" class="footer-link">
+                  {{ contactPhone }}
                 </a>
               </li>
             </ul>
@@ -95,7 +95,7 @@
         <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <div class="text-center md:text-left">
             <p class="text-white/50 text-xs">
-              © {{ currentYear }} {{ generalConfig.fullBandName }}. All rights reserved.
+              © {{ currentYear }} {{ fullBandName }}. All rights reserved.
             </p>
           </div>
           
@@ -124,11 +124,19 @@
 import { computed } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
-import { generalConfig } from '~/config/general'
+import { getConfig } from '~/utils/configHelpers'
 
 // Composables
 const snackbar = useSnackbar()
 const { scrollToElementWithNavigation } = useScrollTo()
+
+// Computed properties for config values
+const bandName = computed(() => getConfig('general.bandName'))
+const fullBandName = computed(() => getConfig('general.fullBandName'))
+const contactEmail = computed(() => getConfig('general.contact.email'))
+const contactLocationShort = computed(() => getConfig('general.contact.location.short'))
+const contactPhone = computed(() => getConfig('general.contact.phone'))
+const contactPhoneNumber = computed(() => getConfig('general.contact.phoneNumber'))
 
 // Current year for copyright
 const currentYear = computed(() => new Date().getFullYear())

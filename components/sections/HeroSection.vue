@@ -75,11 +75,11 @@
     <!-- Content -->
     <div class="relative z-20 text-center max-w-4xl mx-auto">
       <h1 class="xs:text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-        {{ title }}
+        {{ displayTitle }}
       </h1>
       
       <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto animate-slide-up">
-        {{ subtitle }}
+        {{ displaySubtitle }}
       </p>
       
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-scale-in">
@@ -114,7 +114,12 @@ import Button from 'primevue/button'
 import { useImageLoading } from '~/utils/imageHelpers'
 import { useHeroSlider, type HeroImage } from '~/composables/useHeroSlider'
 import { useScrollTo } from '~/composables/useScrollTo'
-import { generalConfig } from '~/config/general'
+import { getConfig } from '~/utils/configHelpers'
+
+// Computed properties for config values
+const bandName = computed(() => getConfig('general.bandName'))
+const fullBandName = computed(() => getConfig('general.fullBandName'))
+const tagline = computed(() => getConfig('general.tagline'))
 
 // Props
 interface Props {
@@ -131,8 +136,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: generalConfig.fullBandName,
-  subtitle: generalConfig.tagline,
+  title: '',
+  subtitle: '',
   primaryButtonLabel: 'Listen Now',
   primaryButtonIcon: 'pi pi-play',
   secondaryButtonLabel: 'Tour Dates',
@@ -143,24 +148,28 @@ const props = withDefaults(defineProps<Props>(), {
   heroImages: () => [
     {
       src: '/images/optimized/hero-images/hero-1.avif',
-      alt: `${generalConfig.bandName} performing live on stage`,
-      title: generalConfig.fullBandName,
+      alt: 'WBM performing live on stage',
+      title: 'WBM',
       subtitle: 'Live Performance'
     },
     {
       src: '/images/optimized/hero-images/hero-2.avif',
-      alt: `${generalConfig.bandName} in recording studio`,
-      title: generalConfig.fullBandName,
+      alt: 'WBM in recording studio',
+      title: 'WBM',
       subtitle: 'In Studio'
     },
     {
       src: '/images/optimized/hero-images/hero-3.avif',
-      alt: `${generalConfig.bandName} concert crowd`,
-      title: generalConfig.fullBandName,
+      alt: 'WBM concert crowd',
+      title: 'WBM',
       subtitle: 'Concert Experience'
     },
   ]
 })
+
+// Computed properties that use config values with fallbacks
+const displayTitle = computed(() => props.title || fullBandName.value)
+const displaySubtitle = computed(() => props.subtitle || tagline.value)
 
 // Emits
 const emit = defineEmits<{

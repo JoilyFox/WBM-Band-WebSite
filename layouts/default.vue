@@ -12,7 +12,7 @@
             <button @click="scrollToHero" class="logo-button block">
               <img 
                 src="/images/wbm-logo-white.svg" 
-                :alt="`${generalConfig.bandName} Logo`" 
+                :alt="`${bandName} Logo`" 
                 class="w-auto filter drop-shadow-2xl transition-transform duration-300"
                 :class="mobileLogoSizeClass"
                 loading="eager"
@@ -66,7 +66,7 @@
         <button @click="scrollToHero" class="logo-button block">
           <img 
             src="/images/wbm-logo-white.svg" 
-            :alt="`${generalConfig.bandName} Logo`" 
+            :alt="`${bandName} Logo`" 
             class="w-auto filter drop-shadow-2xl transition-transform duration-500 ease-out"
             :class="logoSizeClass"
             loading="eager"
@@ -105,7 +105,7 @@
             <button @click="scrollToHeroAndCloseMenu" class="logo-button block">
               <img 
                 src="/images/wbm-logo-white.svg" 
-                :alt="`${generalConfig.bandName} Logo`" 
+                :alt="`${bandName} Logo`" 
                 class="h-24 mt-[-44px] w-auto filter drop-shadow-2xl"
                 loading="eager"
               />
@@ -143,7 +143,10 @@ import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { useScrollAnimation } from '~/composables/useScrollAnimation'
 import { createWelcomeMessage } from '~/constants/app'
-import { generalConfig } from '~/config/general'
+import { getConfig } from '~/utils/configHelpers'
+
+// Computed properties for config values
+const bandName = computed(() => getConfig('general.bandName'))
 
 // Composables
 const snackbar = useSnackbar()

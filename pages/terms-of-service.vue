@@ -29,7 +29,7 @@
           </div>
           <div class="card-content">
             <p class="text-content">
-              These Terms of Service ("Terms") govern your use of the {{ generalConfig.fullBandName }} ({{ generalConfig.bandName }}) website, 
+              These Terms of Service ("Terms") govern your use of the {{ fullBandName }} ({{ bandName }}) website, 
               music, services, and any related content. By accessing or using our services, you agree to be bound by these Terms.
             </p>
             <p class="text-content">
@@ -63,7 +63,7 @@
                 <li>Commercial use of our content without explicit written permission</li>
                 <li>Attempting to reverse engineer, hack, or exploit our website</li>
                 <li>Using our services for illegal or harmful activities</li>
-                <li>Impersonating {{ generalConfig.bandName }} or its members</li>
+                <li>Impersonating {{ bandName }} or its members</li>
                 <li>Uploading malicious code, viruses, or harmful content</li>
               </ul>
             </div>
@@ -83,7 +83,7 @@
                 </div>
                 <h4 class="rights-title">Music & Recordings</h4>
                 <p class="rights-description">
-                  All music, recordings, and compositions are owned by {{ generalConfig.bandName }} and protected by copyright law.
+                  All music, recordings, and compositions are owned by {{ bandName }} and protected by copyright law.
                 </p>
               </div>
               
@@ -103,7 +103,7 @@
                 </div>
                 <h4 class="rights-title">Website & Brand</h4>
                 <p class="rights-description">
-                  Website design, logos, and band name are trademarks of {{ generalConfig.fullBandName }}.
+                  Website design, logos, and band name are trademarks of {{ fullBandName }}.
                 </p>
               </div>
               
@@ -226,7 +226,7 @@
               <div class="disclaimer-type">
                 <h4 class="disclaimer-title">Limitation of Liability</h4>
                 <p class="disclaimer-description">
-                  {{ generalConfig.bandName }} shall not be liable for any indirect, incidental, or consequential damages arising from your use of our services.
+                  {{ bandName }} shall not be liable for any indirect, incidental, or consequential damages arising from your use of our services.
                 </p>
               </div>
             </div>
@@ -277,12 +277,12 @@
           </div>
           <div class="card-content">
             <p class="text-content">
-              These Terms shall be interpreted and governed by the laws of {{ generalConfig.contact.location.state }}, {{ generalConfig.contact.location.country }}, 
+              These Terms shall be interpreted and governed by the laws of {{ contactState }}, {{ contactCountry }}, 
               without regard to its conflict of law provisions.
             </p>
             <p class="text-content">
               Any disputes arising from these Terms or your use of our services will be resolved through binding arbitration 
-              in {{ generalConfig.contact.location.city }}, {{ generalConfig.contact.location.state }}, rather than in court, 
+              in {{ contactCity }}, {{ contactState }}, rather than in court, 
               except that you may assert claims in small claims court if your claims qualify.
             </p>
           </div>
@@ -296,7 +296,7 @@
           <div class="card-content">
             <p class="text-content">
               We reserve the right to modify or replace these Terms at any time. If a revision is material, 
-              we will try to provide at least {{ generalConfig.legal.dataResponseTime }} notice prior to any new terms taking effect.
+              we will try to provide at least {{ dataResponseTime }} notice prior to any new terms taking effect.
             </p>
             <p class="text-content">
               What constitutes a material change will be determined at our sole discretion. 
@@ -319,22 +319,22 @@
             <div class="contact-info">
               <div class="contact-item">
                 <i class="pi pi-envelope"></i>
-                <a :href="`mailto:${generalConfig.contact.email}`" class="contact-link">{{ generalConfig.contact.email }}</a>
+                <a :href="`mailto:${contactEmail}`" class="contact-link">{{ contactEmail }}</a>
               </div>
               <div class="contact-item">
                 <i class="pi pi-map-marker"></i>
-                <span>{{ generalConfig.contact.location.full }}</span>
+                <span>{{ contactLocation }}</span>
               </div>
               <div class="contact-item">
                 <i class="pi pi-phone"></i>
-                <a :href="`tel:${generalConfig.contact.phoneNumber}`" class="contact-link">{{ generalConfig.contact.phone }}</a>
+                <a :href="`tel:${contactPhoneNumber}`" class="contact-link">{{ contactPhone }}</a>
               </div>
             </div>
             
             <div class="response-time">
               <p class="response-text">
                 <i class="pi pi-clock"></i>
-                We will respond to your inquiries within {{ generalConfig.legal.dataResponseTime }}.
+                We will respond to your inquiries within {{ dataResponseTime }}.
               </p>
             </div>
           </div>
@@ -357,16 +357,16 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { generalConfig } from '~/config/general'
+import { getConfig } from '~/utils/configHelpers'
 
 // Meta tags for SEO
 useHead({
-  title: `Terms of Service - ${generalConfig.bandName}`,
+  title: `Terms of Service - ${getConfig('general.bandName')}`,
   meta: [
-    { name: 'description', content: `Terms of Service for ${generalConfig.fullBandName} (${generalConfig.bandName}). Please read our terms carefully before using our website and services.` },
-    { name: 'keywords', content: `terms of service, ${generalConfig.bandName}, ${generalConfig.fullBandName}, user agreement, legal terms` },
-    { property: 'og:title', content: `Terms of Service - ${generalConfig.bandName}` },
-    { property: 'og:description', content: `Terms of Service for ${generalConfig.fullBandName} (${generalConfig.bandName}). Please read our terms carefully before using our website and services.` },
+    { name: 'description', content: `Terms of Service for ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}). Please read our terms carefully before using our website and services.` },
+    { name: 'keywords', content: `terms of service, ${getConfig('general.bandName')}, ${getConfig('general.fullBandName')}, user agreement, legal terms` },
+    { property: 'og:title', content: `Terms of Service - ${getConfig('general.bandName')}` },
+    { property: 'og:description', content: `Terms of Service for ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}). Please read our terms carefully before using our website and services.` },
     { property: 'og:type', content: 'website' }
   ]
 })
@@ -374,9 +374,21 @@ useHead({
 // Reactive data
 const showBackToTop = ref(false)
 
+// Computed properties for config values
+const bandName = computed(() => getConfig('general.bandName'))
+const fullBandName = computed(() => getConfig('general.fullBandName'))
+const contactEmail = computed(() => getConfig('general.contact.email'))
+const contactLocation = computed(() => getConfig('general.contact.location.full'))
+const contactPhone = computed(() => getConfig('general.contact.phone'))
+const contactPhoneNumber = computed(() => getConfig('general.contact.phoneNumber'))
+const contactState = computed(() => getConfig('general.contact.location.state'))
+const contactCountry = computed(() => getConfig('general.contact.location.country'))
+const contactCity = computed(() => getConfig('general.contact.location.city'))
+const dataResponseTime = computed(() => getConfig('general.legal.dataResponseTime'))
+
 // Computed
 const lastUpdated = computed(() => {
-  return new Date(generalConfig.legal.termsOfServiceLastUpdated).toLocaleDateString('en-US', {
+  return new Date(getConfig('general.legal.termsOfServiceLastUpdated')).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'

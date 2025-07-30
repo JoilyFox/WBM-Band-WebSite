@@ -16,13 +16,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { useImagePreloader } from '~/composables/useImagePreloader'
 import { createPageTitle } from '~/constants/app'
 import { musicLibrary } from '~/data/musicLibrary'
-import { generalConfig } from '~/config/general'
+import { getConfig } from '~/utils/configHelpers'
 import type { MusicRelease } from '~/data/musicLibrary'
 
 // Meta
@@ -30,12 +30,20 @@ definePageMeta({
   title: 'Home'
 })
 
+// Computed properties for config values
+const bandName = computed(() => getConfig('general.bandName'))
+const tagline = computed(() => getConfig('general.tagline'))
+
+// Computed properties for page title and description
+const pageTitle = computed(() => createPageTitle(`${bandName.value} - ${tagline.value}`))
+const pageDescription = computed(() => `${bandName.value} - High-energy rock performances with a modern twist on classic metal sounds. Official website for tour dates, music, and updates.`)
+
 useHead({
-  title: createPageTitle(`${generalConfig.bandName} - ${generalConfig.tagline}`),
+  title: pageTitle,
   meta: [
     {
       name: 'description',
-      content: `${generalConfig.bandName} - High-energy rock performances with a modern twist on classic metal sounds. Official website for tour dates, music, and updates.`
+      content: pageDescription
     }
   ]
 })
@@ -45,26 +53,26 @@ const snackbar = useSnackbar()
 const { scrollToElement } = useScrollTo()
 const { preloadHeroImages, preloadAlbumCovers } = useImagePreloader()
 
-// Hero images for preloading
-const heroImages = [
+// Hero images for preloading - using computed to properly reference config values
+const heroImages = computed(() => [
   {
     src: '/images/optimized/hero-images/hero-1.avif',
-    alt: `${generalConfig.bandName} performing live on stage`
+    alt: `${bandName.value} performing live on stage`
   },
   {
     src: '/images/optimized/hero-images/hero-2.avif',
-    alt: `${generalConfig.bandName} in recording studio`
+    alt: `${bandName.value} in recording studio`
   },
   {
     src: '/images/optimized/hero-images/hero-3.avif',
-    alt: `${generalConfig.bandName} concert crowd`
+    alt: `${bandName.value} concert crowd`
   }
-]
+])
 
 // Preload critical images on mount
 onMounted(async () => {
   // Preload hero images with high priority
-  await preloadHeroImages(heroImages)
+  await preloadHeroImages(heroImages.value)
   
   // Preload first 6 album covers (above the fold)
   const albumImageUrls = musicLibrary

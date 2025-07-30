@@ -29,7 +29,7 @@
           </div>
           <div class="card-content">
             <p class="text-content">
-              Welcome to {{ generalConfig.fullBandName }} ({{ generalConfig.bandName }}). We respect your privacy and are committed to protecting your personal data. 
+              Welcome to {{ fullBandName }} ({{ bandName }}). We respect your privacy and are committed to protecting your personal data. 
               This privacy policy explains how we collect, use, and safeguard your information when you visit our website, 
               interact with our music, or engage with our services.
             </p>
@@ -152,7 +152,7 @@
                 <h4 class="sharing-title">Legal Requirements</h4>
                 <p class="sharing-description">
                   When required by law, court order, or government regulation, or to protect the rights, 
-                  property, and safety of {{ generalConfig.bandName }}, our users, or others.
+                  property, and safety of {{ bandName }}, our users, or others.
                 </p>
               </div>
               
@@ -310,22 +310,22 @@
             <div class="contact-info">
               <div class="contact-item">
                 <i class="pi pi-envelope"></i>
-                <a :href="`mailto:${generalConfig.contact.privacyEmail}`" class="contact-link">{{ generalConfig.contact.privacyEmail }}</a>
+                <a :href="`mailto:${privacyEmail}`" class="contact-link">{{ privacyEmail }}</a>
               </div>
               <div class="contact-item">
                 <i class="pi pi-map-marker"></i>
-                <span>{{ generalConfig.contact.location.full }}</span>
+                <span>{{ contactLocation }}</span>
               </div>
               <div class="contact-item">
                 <i class="pi pi-phone"></i>
-                <a :href="`tel:${generalConfig.contact.phoneNumber}`" class="contact-link">{{ generalConfig.contact.phone }}</a>
+                <a :href="`tel:${contactPhoneNumber}`" class="contact-link">{{ contactPhone }}</a>
               </div>
             </div>
             
             <div class="response-time">
               <p class="response-text">
                 <i class="pi pi-clock"></i>
-                We will respond to your privacy-related inquiries within {{ generalConfig.legal.dataResponseTime }}.
+                We will respond to your privacy-related inquiries within {{ dataResponseTime }}.
               </p>
             </div>
           </div>
@@ -365,16 +365,16 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { generalConfig } from '~/config/general'
+import { getConfig } from '~/utils/configHelpers'
 
 // Meta tags for SEO
 useHead({
-  title: `Privacy Policy - ${generalConfig.bandName}`,
+  title: `Privacy Policy - ${getConfig('general.bandName')}`,
   meta: [
-    { name: 'description', content: `Privacy Policy for ${generalConfig.fullBandName} (${generalConfig.bandName}). Learn how we protect and handle your personal information.` },
-    { name: 'keywords', content: `privacy policy, ${generalConfig.bandName}, ${generalConfig.fullBandName}, data protection, privacy rights` },
-    { property: 'og:title', content: `Privacy Policy - ${generalConfig.bandName}` },
-    { property: 'og:description', content: `Privacy Policy for ${generalConfig.fullBandName} (${generalConfig.bandName}). Learn how we protect and handle your personal information.` },
+    { name: 'description', content: `Privacy Policy for ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}). Learn how we protect and handle your personal information.` },
+    { name: 'keywords', content: `privacy policy, ${getConfig('general.bandName')}, ${getConfig('general.fullBandName')}, data protection, privacy rights` },
+    { property: 'og:title', content: `Privacy Policy - ${getConfig('general.bandName')}` },
+    { property: 'og:description', content: `Privacy Policy for ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}). Learn how we protect and handle your personal information.` },
     { property: 'og:type', content: 'website' }
   ]
 })
@@ -382,9 +382,18 @@ useHead({
 // Reactive data
 const showBackToTop = ref(false)
 
+// Computed properties for config values
+const bandName = computed(() => getConfig('general.bandName'))
+const fullBandName = computed(() => getConfig('general.fullBandName'))
+const privacyEmail = computed(() => getConfig('general.contact.privacyEmail'))
+const contactLocation = computed(() => getConfig('general.contact.location.full'))
+const contactPhone = computed(() => getConfig('general.contact.phone'))
+const contactPhoneNumber = computed(() => getConfig('general.contact.phoneNumber'))
+const dataResponseTime = computed(() => getConfig('general.legal.dataResponseTime'))
+
 // Computed
 const lastUpdated = computed(() => {
-  return new Date(generalConfig.legal.privacyPolicyLastUpdated).toLocaleDateString('en-US', {
+  return new Date(getConfig('general.legal.privacyPolicyLastUpdated')).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'

@@ -8,7 +8,7 @@
         </h2>
         <p class="text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
           Dive into our sonic universe. From atmospheric albums to high-energy singles, 
-          discover the sounds that define {{ generalConfig.bandName }}. Stream our latest releases on your favorite platform.
+          discover the sounds that define {{ bandName }}. Stream our latest releases on your favorite platform.
         </p>
       </div>
 
@@ -96,9 +96,16 @@
 import { computed, ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import type { MusicRelease } from '~/data/musicLibrary'
 import { getLatestReleases, getAllReleases } from '~/data/musicLibrary'
-import { generalConfig } from '~/config/general'
-import { formatReleaseDate, isUpcomingRelease } from '~/utils/configHelpers'
+import { getConfig, formatReleaseDate, isUpcomingRelease } from '~/utils/configHelpers'
 import { useSnackbar } from '~/composables/useSnackbar'
+
+// Computed properties for config values
+const bandName = computed(() => getConfig('general.bandName'))
+const enableComingSoonCard = computed(() => getConfig('general.enableComingSoonCard'))
+const maxReleasesBeforeHideComingSoon = computed(() => getConfig('general.maxReleasesBeforeHideComingSoon'))
+const nextReleaseDate = computed(() => getConfig('general.nextReleaseDate'))
+const nextReleaseTitle = computed(() => getConfig('general.nextReleaseTitle'))
+const nextReleaseImageUrl = computed(() => getConfig('general.nextReleaseImageUrl'))
 
 // Props
 interface Props {
@@ -139,11 +146,11 @@ const hasMoreReleases = computed(() => {
 })
 
 const shouldShowComingSoon = computed(() => {
-  if (!generalConfig.enableComingSoonCard) return false
+  if (!enableComingSoonCard.value) return false
   // Don't show if new release preview is active
   if (shouldShowNewReleasePreview.value) return false
   const totalReleases = getAllReleases().length
-  return totalReleases < generalConfig.maxReleasesBeforeHideComingSoon
+  return totalReleases < maxReleasesBeforeHideComingSoon.value
 })
 
 const comingSoonTitle = computed(() => {
@@ -163,18 +170,18 @@ const comingSoonText = computed(() => {
 
 // New Release Preview functionality
 const shouldShowNewReleasePreview = computed(() => {
-  const { nextReleaseDate } = generalConfig
-  return nextReleaseDate && isUpcomingRelease(nextReleaseDate)
+  const dateValue = nextReleaseDate.value
+  return dateValue && isUpcomingRelease(dateValue)
 })
 
 const newReleasePreviewData = computed(() => {
-  const { nextReleaseDate, nextReleaseTitle, nextReleaseImageUrl } = generalConfig
-  if (!nextReleaseDate) return null
+  const dateValue = nextReleaseDate.value
+  if (!dateValue) return null
   
   return {
-    title: nextReleaseTitle || 'New Release',
-    releaseDate: formatReleaseDate(nextReleaseDate),
-    imageUrl: nextReleaseImageUrl || '/images/albums-images/IMG_1822.JPG' // Fallback image
+    title: nextReleaseTitle.value || 'New Release',
+    releaseDate: formatReleaseDate(dateValue),
+    imageUrl: nextReleaseImageUrl.value || '/images/albums-images/IMG_1822.JPG' // Fallback image
   }
 })
 

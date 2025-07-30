@@ -5,21 +5,66 @@
 import { generalConfig } from '~/config/general'
 
 /**
- * Convenience functions to access config values
+ * Registry of available configuration files
  */
-export const getBandName = () => generalConfig.bandName
-export const getFullBandName = () => generalConfig.fullBandName
-export const getBandTagline = () => generalConfig.tagline
-export const getContactEmail = () => generalConfig.contact.email
-export const getPrivacyEmail = () => generalConfig.contact.privacyEmail
-export const getContactPhone = () => generalConfig.contact.phone
-export const getContactPhoneNumber = () => generalConfig.contact.phoneNumber
-export const getLocation = () => generalConfig.contact.location
-export const getSocialMedia = () => generalConfig.socialMedia
-export const getLegalInfo = () => generalConfig.legal
-export const getPrivacyPolicyLastUpdated = () => generalConfig.legal.privacyPolicyLastUpdated
-export const getTermsOfServiceLastUpdated = () => generalConfig.legal.termsOfServiceLastUpdated
-export const getDataResponseTime = () => generalConfig.legal.dataResponseTime
+const configRegistry = {
+  general: generalConfig,
+  // Add more config files here as needed
+  // example: () => import('~/config/example')
+}
+
+/**
+ * Options for the getConfig helper function
+ */
+interface GetConfigOptions {
+  fallback?: any
+  errorLogging?: boolean
+}
+
+/**
+ * Get a nested configuration value using dot notation path
+ * @param path - Dot notation path to the config value (e.g., 'general.contact.email', 'general.legal.privacyPolicyLastUpdated')
+ * @param options - Optional configuration with fallback value and error logging
+ * @returns The config value or fallback if not found
+ */
+export const getConfig = (path: string, options: GetConfigOptions = {}): any => {
+  const { fallback = null, errorLogging = true } = options
+  
+  try {
+    const pathParts = path.split('.')
+    const configName = pathParts[0]
+    const propertyPath = pathParts.slice(1)
+    
+    // Get the config object from registry
+    const config = configRegistry[configName as keyof typeof configRegistry]
+    if (!config) {
+      if (errorLogging) {
+        console.warn(`Config file '${configName}' not found in registry. Available configs: ${Object.keys(configRegistry).join(', ')}`)
+      }
+      return fallback
+    }
+    
+    // Navigate through the property path
+    let current: any = config
+    for (const key of propertyPath) {
+      if (current && typeof current === 'object' && key in current) {
+        current = current[key]
+      } else {
+        if (errorLogging) {
+          console.warn(`Config path '${path}' not found. Key '${key}' does not exist.`)
+        }
+        return fallback
+      }
+    }
+    
+    return current
+  } catch (error) {
+    if (errorLogging) {
+      console.error(`Error accessing config path '${path}':`, error)
+    }
+    return fallback
+  }
+}
 
 /**
  * Helper function to format release date
