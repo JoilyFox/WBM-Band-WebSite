@@ -144,6 +144,7 @@ import { useScrollTo } from '~/composables/useScrollTo'
 import { useScrollAnimation } from '~/composables/useScrollAnimation'
 import { createWelcomeMessage } from '~/constants/app'
 import { getConfig } from '~/utils/configHelpers'
+import { leftNavigation, rightNavigation, type NavigationItem } from '~/config/navigation'
 
 // Computed properties for config values
 const bandName = computed(() => getConfig('general.bandName'))
@@ -176,39 +177,14 @@ const {
 // Mobile menu state
 const isMobileMenuOpen = ref(false)
 
-// Navigation link type
-interface NavLink {
-  label: string
-  action?: string // Use string instead of function
-}
-
-// Navigation links configuration
-const leftNavLinks = ref<NavLink[]>([
-  {
-    label: 'Music',
-    action: 'scroll-to-music'
-  },
-  {
-    label: 'Tour',
-    action: 'show-tour-info'
-  }
-])
-
-const rightNavLinks = ref<NavLink[]>([
-  {
-    label: 'About',
-    action: 'show-about-info'
-  },
-  {
-    label: 'Contact',
-    action: 'show-contact-info'
-  }
-])
+// Navigation links from centralized config
+const leftNavLinks = leftNavigation
+const rightNavLinks = rightNavigation
 
 // Combined nav links for mobile menu
 const allNavLinks = computed(() => [
-  ...leftNavLinks.value,
-  ...rightNavLinks.value
+  ...leftNavLinks,
+  ...rightNavLinks
 ])
 
 // Dynamic styling for desktop nav links with proper mobile touch handling
@@ -243,42 +219,22 @@ const closeMobileMenu = () => {
 }
 
 // Handle navigation clicks with proper mobile behavior
-const handleNavClick = (link: NavLink) => {
+const handleNavClick = (item: NavigationItem) => {
   // Remove any stuck hover states by forcing a blur
   if (document.activeElement instanceof HTMLElement) {
     document.activeElement.blur()
   }
   
-  // Execute the action based on string identifier
-  executeNavAction(link.action)
+  // Scroll to element using the elementId
+  scrollToElementWithNavigation(item.elementId)
 }
 
-const handleMobileNavClick = (link: NavLink) => {
+const handleMobileNavClick = (item: NavigationItem) => {
   // Close mobile menu first
   closeMobileMenu()
   
   // Then handle the navigation
-  executeNavAction(link.action)
-}
-
-// Execute navigation actions
-const executeNavAction = (action?: string) => {
-  switch (action) {
-    case 'scroll-to-music':
-      scrollToElementWithNavigation('music')
-      break
-    case 'show-tour-info':
-      snackbar.info('Tour', 'Tour dates coming soon!', 3000)
-      break
-    case 'show-about-info':
-      snackbar.info('About', 'About section coming soon!', 3000)
-      break
-    case 'show-contact-info':
-      snackbar.info('Contact', 'Contact section coming soon!', 3000)
-      break
-    default:
-      console.warn('Unknown navigation action:', action)
-  }
+  scrollToElementWithNavigation(item.elementId)
 }
 
 // Logo click handlers for smooth scrolling to hero section

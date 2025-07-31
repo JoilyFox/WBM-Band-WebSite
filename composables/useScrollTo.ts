@@ -1,3 +1,5 @@
+import { nextTick } from 'vue'
+
 /**
  * Composable for smooth scrolling functionality
  */

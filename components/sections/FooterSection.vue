@@ -3,7 +3,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Main Footer Content -->
       <div class="pb-12 pt-0 sm:pt-12 lg:py-16">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           
           <!-- Brand Section -->
           <div class="lg:col-span-2 text-center md:text-left">
@@ -36,6 +36,21 @@
                 <i :class="social.icon" class="text-xl"></i>
               </a>
             </div>
+          </div>
+
+          <!-- Navigation Section (Desktop Only) -->
+          <div class="hidden lg:block text-center md:text-left">
+            <h3 class="footer-heading">Navigation</h3>
+            <ul class="space-y-3">
+              <li v-for="item in navigationItems" :key="item.elementId">
+                <button 
+                  @click="handleNavClick(item.elementId)"
+                  class="footer-link"
+                >
+                  {{ item.label }}
+                </button>
+              </li>
+            </ul>
           </div>
 
           <!-- Contact Info -->
@@ -133,10 +148,19 @@ import { computed } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { getConfig } from '~/utils/configHelpers'
+import { footerNavigation } from '~/config/navigation'
 
 // Composables
 const snackbar = useSnackbar()
 const { scrollToElementWithNavigation } = useScrollTo()
+
+// Navigation items from config
+const navigationItems = footerNavigation
+
+// Navigation handler
+const handleNavClick = (elementId: string) => {
+  scrollToElementWithNavigation(elementId)
+}
 
 // Helper function to resolve asset paths correctly for GitHub Pages
 const resolveAssetPath = (path: string) => {
@@ -729,6 +753,25 @@ const scrollToHero = () => {
   .streaming-icon-link:focus .streaming-icon {
     outline: 2px solid #ffffff;
     outline-offset: 2px;
+  }
+
+  .footer-nav-link {
+    color: theme('colors.gray.300');
+    text-decoration: none;
+    transition: color 0.3s ease;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    font-size: 0.875rem;
+    
+    @media (hover: hover) {
+      &:hover {
+        color: white;
+      }
+    }
   }
 }
 </style>
