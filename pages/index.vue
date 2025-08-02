@@ -12,6 +12,14 @@
       @release-click="handleReleaseClick"
       @show-more="handleShowAllMusic"
     />
+
+    <!-- Music Detail Modal -->
+    <MusicDetailModal
+      v-if="selectedRelease"
+      :release="selectedRelease"
+      :is-visible="isModalOpen"
+      @close="closeModal"
+    />
   </div>
 </template>
 
@@ -20,6 +28,7 @@ import { onMounted, computed } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { useImagePreloader } from '~/composables/useImagePreloader'
+import { useMusicNavigation } from '~/composables/useMusicNavigation'
 import { createPageTitle } from '~/constants/app'
 import { musicLibrary } from '~/data/musicLibrary'
 import { getConfig } from '~/utils/configHelpers'
@@ -50,8 +59,9 @@ useHead({
 
 // Composables
 const snackbar = useSnackbar()
-const { scrollToElement } = useScrollTo()
+const { scrollToElement, scrollToElementWithNavigation } = useScrollTo()
 const { preloadHeroImages, preloadAlbumCovers } = useImagePreloader()
+const { selectedRelease, isModalOpen, handleMusicClick, closeModal } = useMusicNavigation()
 
 // Hero images for preloading - using computed to properly reference config values
 const heroImages = computed(() => [
@@ -99,12 +109,7 @@ const handleTourDates = () => {
 
 // Event handlers for music library section
 const handleReleaseClick = (release: MusicRelease) => {
-  // TODO: Implement release detail view or redirect to streaming platform
-  snackbar.show({
-    type: 'info',
-    message: `${release.title}`,
-    subtitle: `Listen to our ${release.type} on your favorite platform!`
-  })
+  handleMusicClick(release)
 }
 
 const handleShowAllMusic = () => {

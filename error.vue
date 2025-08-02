@@ -32,6 +32,11 @@ const errorTitle = computed(() => {
 })
 
 const errorMessage = computed(() => {
+  // Handle music track specific errors
+  if (props.error?.statusCode === 404 && props.error?.statusMessage?.includes('Music track')) {
+    return 'The music track you\'re looking for doesn\'t exist or has been moved. You can browse our full music collection instead.'
+  }
+  
   if (props.error?.statusCode === 404) {
     return 'Sorry, the page you are looking for does not exist. It might have been moved, deleted, or you entered the wrong URL.'
   }
@@ -42,6 +47,11 @@ const errorMessage = computed(() => {
 })
 
 const buttonText = computed(() => {
+  // Handle music track specific errors
+  if (props.error?.statusCode === 404 && props.error?.statusMessage?.includes('Music track')) {
+    return 'Back to Music'
+  }
+  
   if (props.error?.statusCode === 404) {
     return 'Go to Home'
   }
@@ -49,10 +59,20 @@ const buttonText = computed(() => {
 })
 
 const buttonLink = computed(() => {
+  // Handle music track specific errors - redirect to home with music section anchor
+  if (props.error?.statusCode === 404 && props.error?.statusMessage?.includes('Music track')) {
+    return '/#music'
+  }
+  
   return '/'
 })
 
 const buttonIcon = computed(() => {
+  // Handle music track specific errors
+  if (props.error?.statusCode === 404 && props.error?.statusMessage?.includes('Music track')) {
+    return 'pi pi-arrow-left'
+  }
+  
   if (props.error?.statusCode === 404) {
     return 'pi pi-home'
   }

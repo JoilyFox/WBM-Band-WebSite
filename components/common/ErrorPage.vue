@@ -129,7 +129,26 @@ const errorCode = computed(() => {
 
 const handleButtonClick = () => {
   if (process.client && router) {
-    router.push(buttonLink.value)
+    const link = buttonLink.value
+    
+    // Handle special case for music section scrolling
+    if (link === '/#music') {
+      // Navigate to home page and then scroll to music section
+      router.push('/').then(() => {
+        // Use a small delay to ensure the page has loaded
+        setTimeout(() => {
+          const musicElement = document.getElementById('music')
+          if (musicElement) {
+            musicElement.scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'start'
+            })
+          }
+        }, 100)
+      })
+    } else {
+      router.push(link)
+    }
   } else {
     // Fallback for SSR - use window location
     if (process.client) {
