@@ -9,6 +9,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "compress-images": "node scripts/compress-images.js",
+    "generate-favicons": "node scripts/generate-favicons.js",
     "analyze": "nuxt build --analyze",
     "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html"
   },

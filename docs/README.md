@@ -10,6 +10,7 @@ This directory contains documentation for all the main features of the WBM Band 
 - [Error Page System](./error-page-system.md) - Comprehensive error handling with custom messages and glassmorphism design
 - [Image Optimization Guide](./image-optimization-guide.md) - Comprehensive image optimization implementation with static site generation support
 - [Image Utilities](./image-utilities.md) - Composables and helper functions for image loading states and optimization
+- [Favicon Setup](./favicon-setup.md) - Complete favicon generation system with multi-platform support and PWA compatibility
 
 ## Tech Stack
 
