@@ -88,7 +88,6 @@ export default defineNuxtPlugin(() => {
     style.textContent = `
       .progressive-image-container {
         background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
-        min-height: 200px;
         position: relative;
       }
       

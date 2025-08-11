@@ -1,7 +1,103 @@
 <template>
-  <footer class="footer-section bg-surface-950 border-t border-white/10">
+  <footer :class="['footer-section bg-surface-950 border-t border-white/10', { 'footer-minimized': minimized }]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Main Footer Content -->
+      
+      <!-- Minimized Footer Layout -->
+      <div v-if="minimized" class="py-4">
+        <!-- Mobile Layout (Row) -->
+        <div class="flex flex-col space-y-3 md:hidden">
+          <!-- Logo and Text Row -->
+          <div class="flex items-center gap-3 px-2 max-sm:mb-3">
+            <NuxtLink to="/" class="footer-logo-link-minimal flex-shrink-0">
+              <img 
+                src="/images/wbm-logo-white.svg" 
+                :alt="`${bandName} Logo`" 
+                class="h-7 w-auto filter drop-shadow-lg"
+                loading="lazy"
+              />
+            </NuxtLink>
+            <p class="text-white/70 text-xs leading-relaxed flex-1 min-w-0">
+              {{ bandName }} - Modern rock with classic soul.
+            </p>
+          </div>
+          
+          <!-- Socials and Legal Row -->
+          <div class="flex items-center justify-between px-2">
+            <div class="flex space-x-2">
+              <a 
+                v-for="social in socialLinks.slice(0, 3)" 
+                :key="social.name"
+                :href="social.url" 
+                :aria-label="social.label"
+                class="social-link-minimal"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <i :class="social.icon" class="text-sm"></i>
+              </a>
+            </div>
+            <div class="flex space-x-3 text-xs">
+              <button 
+                v-for="legal in legalLinks.slice(0, 2)" 
+                :key="legal.label"
+                @click="handleLegalLink(legal.action)"
+                class="legal-link-minimal"
+              >
+                {{ legal.label }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop Layout (More Spread Out) -->
+        <div class="hidden md:flex md:items-center md:justify-between">
+          <!-- Left: Logo and Text -->
+          <div class="flex items-center gap-6">
+            <NuxtLink to="/" class="footer-logo-link-minimal">
+              <img 
+                src="/images/wbm-logo-white.svg" 
+                :alt="`${bandName} Logo`" 
+                class="h-10 w-auto filter drop-shadow-lg"
+                loading="lazy"
+              />
+            </NuxtLink>
+            <p class="text-white/70 text-sm">
+              {{ bandName }} - Modern rock with classic soul. Pushing boundaries in alternative music.
+            </p>
+          </div>
+          
+          <!-- Right: Socials and Legal -->
+          <div class="flex items-center gap-8">
+            <div class="flex space-x-4">
+              <a 
+                v-for="social in socialLinks" 
+                :key="social.name"
+                :href="social.url" 
+                :aria-label="social.label"
+                class="social-link-minimal"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <i :class="social.icon" class="text-lg"></i>
+              </a>
+            </div>
+            <div class="flex space-x-6 text-sm">
+              <button 
+                v-for="legal in legalLinks" 
+                :key="legal.label"
+                @click="handleLegalLink(legal.action)"
+                class="legal-link-minimal"
+              >
+                {{ legal.label }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Footer Layout (existing) -->
+      <div v-else>
+        <!-- Main Footer Content -->
       <div class="pb-12 pt-0 sm:pt-12 lg:py-16">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           
@@ -139,6 +235,7 @@
           </div>
         </div>
       </div>
+      </div>
     </div>
   </footer>
 </template>
@@ -149,6 +246,15 @@ import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { getConfig } from '~/utils/configHelpers'
 import { footerNavigation } from '~/config/navigation'
+
+// Props
+interface Props {
+  minimized?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  minimized: false
+})
 
 // Composables
 const snackbar = useSnackbar()
@@ -633,7 +739,7 @@ const scrollToHero = () => {
 /* Mobile responsive adjustments */
 @media (max-width: 767px) {
   .footer-section {
-    padding-top: 2rem;
+    padding-top: 0.2rem;
   }
   
   .footer-heading {
@@ -709,6 +815,172 @@ const scrollToHero = () => {
   }
 }
 
+/* Minimized Footer Styles */
+.footer-minimized {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-logo-link-minimal {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 0.5rem;
+}
+
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .footer-logo-link-minimal:hover {
+    transform: translateY(-1px) scale(1.03);
+    filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+  }
+  
+  .footer-logo-link-minimal:hover img {
+    filter: brightness(1.1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2));
+  }
+}
+
+/* Mobile and touch device specific styles */
+@media (hover: none) and (pointer: coarse) {
+  .footer-logo-link-minimal:active {
+    transform: scale(0.97);
+    transition-duration: 0.15s;
+  }
+  
+  .footer-logo-link-minimal:active img {
+    filter: brightness(1.1);
+    transition-duration: 0.15s;
+  }
+}
+
+/* Focus state for accessibility */
+.footer-logo-link-minimal:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.3);
+  outline-offset: 2px;
+}
+
+.footer-logo-link-minimal:focus-visible img {
+  filter: brightness(1.1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2));
+}
+
+.social-link-minimal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  text-decoration: none;
+}
+
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .social-link-minimal:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 
+      0 4px 15px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Mobile and touch device specific styles */
+@media (hover: none) and (pointer: coarse) {
+  .social-link-minimal:active {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+    transform: scale(0.95);
+    transition-duration: 0.15s;
+  }
+}
+
+/* Focus state for accessibility */
+.social-link-minimal:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.3);
+  outline-offset: 2px;
+}
+
+.legal-link-minimal {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.75rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .legal-link-minimal:hover {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* Mobile and touch device specific styles */
+@media (hover: none) and (pointer: coarse) {
+  .legal-link-minimal:active {
+    color: rgba(255, 255, 255, 0.7);
+    transform: scale(0.98);
+    transition-duration: 0.15s;
+  }
+}
+
+/* Fallback for devices that support both hover and touch */
+@media (hover: hover) and (pointer: coarse) {
+  .legal-link-minimal:hover {
+    color: rgba(255, 255, 255, 0.3); /* Disable hover */
+  }
+  
+  .legal-link-minimal:active {
+    color: rgba(255, 255, 255, 0.7);
+    transform: scale(0.98);
+    transition-duration: 0.15s;
+  }
+}
+
+/* Focus state for accessibility */
+.legal-link-minimal:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.3);
+  outline-offset: 1px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Reduced motion support for minimized footer */
+@media (prefers-reduced-motion: reduce) {
+  .footer-logo-link-minimal,
+  .social-link-minimal,
+  .legal-link-minimal {
+    transition: none;
+  }
+  
+  .footer-logo-link-minimal:hover,
+  .social-link-minimal:hover,
+  .legal-link-minimal:hover {
+    transform: none;
+  }
+  
+  .footer-logo-link-minimal:active,
+  .social-link-minimal:active,
+  .legal-link-minimal:active {
+    transform: none;
+  }
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .footer-section {
@@ -772,6 +1044,24 @@ const scrollToHero = () => {
         color: white;
       }
     }
+  }
+
+  /* High contrast overrides for minimized footer */
+  .footer-minimized .footer-logo-link-minimal,
+  .footer-minimized .social-link-minimal,
+  .footer-minimized .legal-link-minimal {
+    color: #ffffff;
+    border-color: #ffffff;
+  }
+  
+  .footer-minimized .footer-logo-link-minimal:hover,
+  .footer-minimized .footer-logo-link-minimal:focus,
+  .footer-minimized .social-link-minimal:hover,
+  .footer-minimized .social-link-minimal:focus,
+  .footer-minimized .legal-link-minimal:hover,
+  .footer-minimized .legal-link-minimal:focus {
+    background: #ffffff;
+    color: #000000;
   }
 }
 </style>

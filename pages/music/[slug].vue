@@ -4,6 +4,8 @@
       :release="release"
       :is-modal="false"
     />
+    <!-- Minimized Footer -->
+    <SectionsFooterSection :minimized="true" />
   </div>
   <div v-else>
     <!-- Loading state or error will be handled by the error handling below -->

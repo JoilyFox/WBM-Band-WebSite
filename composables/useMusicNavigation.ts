@@ -15,13 +15,13 @@ export const useMusicNavigation = () => {
 
   /**
    * Handle music card click
-   * On mobile: navigate to page
+   * On mobile: navigate to page with music origin parameter
    * On desktop: open modal
    */
   const handleMusicClick = async (release: MusicRelease) => {
     if (isMobile.value) {
-      // Navigate to the music page on mobile
-      await navigateTo(`/music/${release.slug}`)
+      // Navigate to the music page on mobile with 'from=music' parameter
+      await navigateTo(`/music/${release.slug}?from=music`)
     } else {
       // Open modal on desktop
       selectedRelease.value = release
@@ -42,7 +42,7 @@ export const useMusicNavigation = () => {
    */
   const goToFullPage = async (release: MusicRelease) => {
     closeModal()
-    await navigateTo(`/music/${release.slug}`)
+    await navigateTo(`/music/${release.slug}?from=music`)
   }
 
   /**

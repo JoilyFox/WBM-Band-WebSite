@@ -4,9 +4,9 @@
     class="music-detail-content min-h-screen text-primary-50 font-space-grotesk bg-surface-950 relative"
     :style="accentVars"
   >
-    <!-- Back Button (only on page, not modal) -->
+    <!-- Back Button (only on page, not modal, and with proper URL param) -->
     <button
-      v-if="!isModal"
+      v-if="!isModal && shouldShowBackButton"
       @click="handleBack"
       :class="['back-glass-btn', { 'back-glass-btn--transparent': backBtnTransparent }]"
       aria-label="Back to music section"
@@ -14,11 +14,61 @@
       <i class="pi pi-arrow-left text-xl"></i>
     </button>
     <!-- Hero Section with Album Cover -->
-    <section class="music-hero flex items-center justify-center py-16 px-4 md:px-8 relative overflow-hidden">
+    <section :class="['music-hero flex items-center justify-center relative overflow-hidden', {
+      'py-4 px-4 md:py-16 md:px-8': !isHeroExpanded && !isDesktop,
+      'py-16 px-4 md:px-8': isHeroExpanded || isDesktop
+    }]">
       <div class="music-hero-background absolute inset-0 z-0">
         <div class="music-hero-overlay"></div>
       </div>
-      <div class="music-hero-content flex flex-col md:flex-row items-center gap-8 md:gap-12 max-w-5xl w-full z-10">
+      
+      <!-- Mobile Compact Hero (default state on mobile) -->
+      <div 
+        v-if="!isHeroExpanded" 
+        class="md:hidden w-full max-w-5xl z-10 cursor-pointer transform transition-all duration-400 ease-out hover:scale-[1.02] animate-slideInCompact"
+        @click="toggleHeroExpansion"
+      >
+        <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md transition-all duration-400 ease-out hover:bg-white/8 hover:border-white/15 hover:shadow-lg">
+          <!-- Small Album Cover -->
+          <div class="relative w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-white/5 border border-white/10 shadow-lg">
+            <UiProgressiveImage
+              :src="release.imageUrl"
+              :alt="release.title"
+              container-class="w-full h-full"
+              image-class="w-full h-full object-cover object-center"
+              loading="eager"
+              preset="album"
+              :show-placeholder="true"
+            />
+            <!-- Small Badge -->
+            <div class="absolute top-1 left-1 z-10">
+              <span :class="badgeClass" class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border border-white/25 shadow-sm">
+                {{ release.type }}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Compact Info -->
+          <div class="flex-1 min-w-0">
+            <h1 class="text-lg font-bold text-primary-50 mb-1 truncate">{{ release.title }}</h1>
+            <p class="text-sm text-primary-200 font-medium">{{ formatDate(release.releaseDate) }}</p>
+          </div>
+          
+          <!-- Expand Icon -->
+          <div class="flex-shrink-0">
+            <i class="pi pi-chevron-down text-primary-200 text-lg transition-all duration-300 ease-out"></i>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Full Hero (desktop always, mobile when expanded) -->
+      <div 
+        v-show="isDesktop || isHeroExpanded"
+        :class="['music-hero-content flex flex-col md:flex-row items-center gap-8 md:gap-12 max-w-5xl w-full z-10 transition-all duration-500 ease-out transform', {
+          'animate-fadeInUpSmooth': isHeroExpanded && !isDesktop,
+          'animate-fadeOutDown': !isHeroExpanded && !isDesktop
+        }]"
+      >
         <div class="music-album-cover relative w-44 h-44 md:w-72 md:h-72 flex-shrink-0 rounded-2xl overflow-hidden bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
           <UiProgressiveImage
             :src="release.imageUrl"
@@ -37,6 +87,17 @@
           </div>
         </div>
         <div class="music-info flex-1 min-w-0 text-center md:text-left">
+          <!-- Mobile Collapse Button -->
+          <div class="md:hidden mb-3 flex justify-center">
+            <button 
+              @click="toggleHeroExpansion"
+              class="flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-primary-200 text-sm font-medium transition-all duration-300 hover:scale-105"
+            >
+              <i class="pi pi-chevron-up text-sm"></i>
+              <span>Collapse</span>
+            </button>
+          </div>
+          
           <h1 class="music-title text-4xl md:text-6xl font-extrabold leading-tight mb-3 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-lg animate-titleGlow">
             {{ release.title }}
           </h1>
@@ -48,7 +109,7 @@
       </div>
     </section>
     <!-- Music Platform Links -->
-    <section class="music-platforms relative py-8 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/95">
+    <section class="music-platforms relative py-8 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/95">
       <div class="platforms-container max-w-3xl mx-auto rounded-xl">
         <h2 class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-4 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md">Listen Now</h2>
         <div class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -65,8 +126,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useScrollTo } from '~/composables/useScrollTo'
 import type { MusicRelease } from '~/data/musicLibrary'
 
@@ -75,20 +136,49 @@ interface Props {
   isModal?: boolean
 }
 
-import { ref, onMounted, onBeforeUnmount } from 'vue'
 const props = defineProps<Props>()
 const router = useRouter()
+const route = useRoute()
+
+// Check if back button should be visible based on URL parameters
+const shouldShowBackButton = computed(() => {
+  return route.query.from === 'music'
+})
+
+// Responsive breakpoint detection
+const isDesktop = ref(false)
+const updateBreakpoint = () => {
+  isDesktop.value = window.innerWidth >= 768 // md breakpoint
+}
+
+// Mobile hero expansion state (default collapsed on mobile)
+const isHeroExpanded = ref(false)
+const toggleHeroExpansion = () => {
+  isHeroExpanded.value = !isHeroExpanded.value
+}
+
 // Glassmorphic back button opacity on scroll
 const backBtnTransparent = ref(false)
 let scrollHandler: (() => void) | null = null
+let resizeHandler: (() => void) | null = null
 onMounted(() => {
+  // Initialize breakpoint
+  updateBreakpoint()
+  
+  // Scroll handler for back button
   scrollHandler = () => {
     backBtnTransparent.value = window.scrollY > 60
   }
+  
+  // Resize handler for responsive breakpoint
+  resizeHandler = updateBreakpoint
+  
   window.addEventListener('scroll', scrollHandler, { passive: true })
+  window.addEventListener('resize', resizeHandler, { passive: true })
 })
 onBeforeUnmount(() => {
   if (scrollHandler) window.removeEventListener('scroll', scrollHandler)
+  if (resizeHandler) window.removeEventListener('resize', resizeHandler)
 })
 
 // Derive per-release accent colors from slug
@@ -361,6 +451,58 @@ const handleBack = async () => {
 @keyframes titleGlow {
   0% { filter: drop-shadow(0 0 10px rgba(255,255,255,.28)); }
   100% { filter: drop-shadow(0 0 22px rgba(255,255,255,.5)); }
+}
+
+/* Mobile hero expand animation */
+.animate-fadeInUpSmooth {
+  animation: fadeInUpSmooth 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fadeOutDown {
+  animation: fadeOutDown 0.3s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
+}
+
+.animate-slideInCompact {
+  animation: slideInCompact 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes fadeInUpSmooth {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeOutDown {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    filter: blur(2px);
+  }
+}
+
+@keyframes slideInCompact {
+  0% {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.95);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(2px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Platforms Section background/animation remains in CSS for unique effects */
