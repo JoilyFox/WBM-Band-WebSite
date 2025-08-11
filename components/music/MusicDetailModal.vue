@@ -21,7 +21,7 @@
             </button>
 
             <!-- Music Detail Content -->
-            <MusicMusicDetailContent 
+            <MusicDetailContent 
               :release="release"
               :is-modal="true"
             />

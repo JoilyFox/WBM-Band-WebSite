@@ -52,6 +52,8 @@ export function useScrollAnimation(options: ScrollAnimationOptions = {}) {
   let frameCount = 0
   let performanceStartTime = 0
   let lastDirectionChangeTime = 0
+  // Keep reference to sentinel to clean it up properly
+  let sentinelEl: HTMLDivElement | null = null
   
   // Adaptive performance tracking
   const performanceMetrics = {
@@ -217,15 +219,19 @@ export function useScrollAnimation(options: ScrollAnimationOptions = {}) {
   const setupIntersectionObserver = () => {
     if (!enableIntersectionObserver || typeof window === 'undefined') return
     
-    // Create a dummy element to observe (represents the header area)
+    // Create a tiny sentinel at the top of the page to detect when we've scrolled away
+    // Keep it 1px tall so it does not contribute to page height/scroll area
     const sentinel = document.createElement('div')
     sentinel.style.position = 'absolute'
     sentinel.style.top = '0'
-    sentinel.style.height = '200vh' // Cover more than viewport
+    sentinel.style.left = '0'
+    sentinel.style.height = '1px'
     sentinel.style.width = '1px'
     sentinel.style.opacity = '0'
     sentinel.style.pointerEvents = 'none'
+    sentinel.style.overflow = 'hidden'
     document.body.appendChild(sentinel)
+    sentinelEl = sentinel
     
     intersectionObserver = new IntersectionObserver(
       (entries) => {
@@ -269,10 +275,14 @@ export function useScrollAnimation(options: ScrollAnimationOptions = {}) {
       rafId = null
     }
     
-    // Cleanup intersection observer
+    // Cleanup intersection observer and sentinel
     if (intersectionObserver) {
       intersectionObserver.disconnect()
       intersectionObserver = null
+    }
+    if (sentinelEl && sentinelEl.parentNode) {
+      try { sentinelEl.parentNode.removeChild(sentinelEl) } catch {}
+      sentinelEl = null
     }
   }
 

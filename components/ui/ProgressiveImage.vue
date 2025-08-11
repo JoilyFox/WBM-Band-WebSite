@@ -132,9 +132,8 @@ const pictureSources = computed(() => {
   // Get base URL from Nuxt runtime config
   const config = useRuntimeConfig()
   
-  // Use different base URLs for development vs production
-  const isDev = process.dev
-  const baseURL = isDev ? '/' : (config.app?.baseURL || '/WBM-Band-WebSite/')
+  // Always use configured baseURL (works in dev and prod)
+  const baseURL = (config.app?.baseURL || '/')
   
   const sources = generatePictureSources(props.src, props.sizes, props.preset)
   
@@ -182,7 +181,16 @@ watch(() => props.src, () => {
 .progressive-image-container {
   position: relative;
   overflow: hidden;
-  background-color: #0a0a0a;
+  background-color: transparent;
+}
+
+/* Ensure hero background containers have no background */
+.progressive-image-container.hero-background-image {
+  background: transparent !important;
+}
+
+.progressive-image-container.hero-background-image .gradient-placeholder {
+  display: none !important;
 }
 
 .progressive-image {
