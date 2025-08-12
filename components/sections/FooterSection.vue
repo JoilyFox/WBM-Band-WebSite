@@ -98,7 +98,7 @@
       <!-- Full Footer Layout (existing) -->
       <div v-else>
         <!-- Main Footer Content -->
-      <div class="pb-12 pt-0 sm:pt-12 lg:py-16">
+      <div class="pb-12 pt-0 sm:pt-8 lg:py-16 lg:pt-12">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           
           <!-- Brand Section -->
@@ -739,7 +739,11 @@ const scrollToHero = () => {
 /* Mobile responsive adjustments */
 @media (max-width: 767px) {
   .footer-section {
-    padding-top: 0.2rem;
+    padding-top: 1.5rem;
+
+    &.footer-minimized {
+      padding-top: 0;
+    }
   }
   
   .footer-heading {

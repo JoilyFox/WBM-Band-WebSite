@@ -2,13 +2,12 @@
   <section id="music" class="pt-16 pb-4 lg:pb-16 lg:pt-24 px-4 sm:px-6 lg:px-8 bg-surface-950">
     <div class="max-w-7xl mx-auto">
       <!-- Section Header -->
-      <div class="text-center mb-16">
+      <div class="text-center mb-10">
         <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
           Our Music
         </h2>
         <p class="text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
-          Dive into our sonic universe. From atmospheric albums to high-energy singles, 
-          discover the sounds that define {{ bandName }}. Stream our latest releases on your favorite platform.
+            Explore the music of {{ bandName }}. Stream our latest releases now.
         </p>
       </div>
 
