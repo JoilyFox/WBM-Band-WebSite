@@ -3,95 +3,65 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <!-- Minimized Footer Layout -->
-      <div v-if="minimized" class="py-4">
-        <!-- Mobile Layout (Row) -->
-        <div class="flex flex-col space-y-3 md:hidden">
-          <!-- Logo and Text Row -->
-          <div class="flex items-center gap-3 px-2 max-sm:mb-3">
-            <NuxtLink to="/" class="footer-logo-link-minimal flex-shrink-0">
-              <img 
-                src="/images/wbm-logo-white.svg" 
-                :alt="`${bandName} Logo`" 
-                class="h-7 w-auto filter drop-shadow-lg"
-                loading="lazy"
-              />
-            </NuxtLink>
-            <p class="text-white/70 text-xs leading-relaxed flex-1 min-w-0">
-              {{ bandName }} - Modern rock with classic soul.
-            </p>
+      <div v-if="minimized" class="py-6">
+        <!-- Centered Column Layout for All Devices -->
+        <div class="flex flex-col items-center space-y-4 text-center">
+          
+          <!-- Logo -->
+          <NuxtLink to="/" class="footer-logo-link-minimal">
+            <img 
+              src="/images/wbm-logo-white.svg" 
+              :alt="`${bandName} Logo`" 
+              class="h-10 w-auto filter drop-shadow-lg"
+              loading="lazy"
+            />
+          </NuxtLink>
+          
+          <!-- Description Text -->
+          <p class="text-white/70 text-sm leading-relaxed max-w-md">
+            {{ bandName }} - Modern rock with classic soul. Pushing boundaries in alternative music.
+          </p>
+          
+          <!-- Social Media Links Row -->
+          <div class="flex space-x-4">
+            <a 
+              v-for="social in socialLinks" 
+              :key="social.name"
+              :href="social.url" 
+              :aria-label="social.label"
+              class="social-link-minimal"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <i :class="social.icon" class="text-lg"></i>
+            </a>
           </div>
           
-          <!-- Socials and Legal Row -->
-          <div class="flex items-center justify-between px-2">
-            <div class="flex space-x-2">
-              <a 
-                v-for="social in socialLinks.slice(0, 3)" 
-                :key="social.name"
-                :href="social.url" 
-                :aria-label="social.label"
-                class="social-link-minimal"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i :class="social.icon" class="text-sm"></i>
-              </a>
-            </div>
-            <div class="flex space-x-3 text-xs">
-              <button 
-                v-for="legal in legalLinks.slice(0, 2)" 
-                :key="legal.label"
-                @click="handleLegalLink(legal.action)"
-                class="legal-link-minimal"
-              >
-                {{ legal.label }}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Desktop Layout (More Spread Out) -->
-        <div class="hidden md:flex md:items-center md:justify-between">
-          <!-- Left: Logo and Text -->
-          <div class="flex items-center gap-6">
-            <NuxtLink to="/" class="footer-logo-link-minimal">
-              <img 
-                src="/images/wbm-logo-white.svg" 
-                :alt="`${bandName} Logo`" 
-                class="h-10 w-auto filter drop-shadow-lg"
-                loading="lazy"
-              />
-            </NuxtLink>
-            <p class="text-white/70 text-sm">
-              {{ bandName }} - Modern rock with classic soul. Pushing boundaries in alternative music.
-            </p>
+          <!-- Privacy Policy Links Row -->
+          <div class="flex space-x-6 text-sm">
+            <button 
+              v-for="legal in legalLinks" 
+              :key="legal.label"
+              @click="handleLegalLink(legal.action)"
+              class="legal-link-minimal"
+            >
+              {{ legal.label }}
+            </button>
           </div>
           
-          <!-- Right: Socials and Legal -->
-          <div class="flex items-center gap-8">
-            <div class="flex space-x-4">
-              <a 
-                v-for="social in socialLinks" 
-                :key="social.name"
-                :href="social.url" 
-                :aria-label="social.label"
-                class="social-link-minimal"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i :class="social.icon" class="text-lg"></i>
-              </a>
-            </div>
-            <div class="flex space-x-6 text-sm">
-              <button 
-                v-for="legal in legalLinks" 
-                :key="legal.label"
-                @click="handleLegalLink(legal.action)"
-                class="legal-link-minimal"
-              >
-                {{ legal.label }}
-              </button>
-            </div>
+          <!-- Developer Credit -->
+          <div class="text-white/50 text-xs pt-2">
+            Made with ❤️ and 🎸 by 
+            <a 
+              href="https://www.instagram.com/feat.her_" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="developer-link"
+            >
+              @feat.her_
+            </a>
           </div>
+          
         </div>
       </div>
 

@@ -262,4 +262,10 @@ watch(() => props.src, () => {
     filter: contrast(120%) brightness(400%);
   }
 }
+
+.progressive-image-container:where(.modal-mode *) .progressive-image,
+:global(.modal-mode) .progressive-image-container .progressive-image {
+  transition: opacity 180ms ease-out !important;
+  transform: none !important;
+}
 </style>
