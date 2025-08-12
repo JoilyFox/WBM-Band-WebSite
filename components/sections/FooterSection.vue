@@ -4,18 +4,18 @@
       
       <!-- Minimized Footer Layout -->
       <div v-if="minimized" class="py-6">
-        <!-- Centered Column Layout for All Devices -->
-        <div class="flex flex-col items-center space-y-4 text-center">
+        <!-- Mobile: Centered Column Layout -->
+        <div class="flex flex-col items-center space-y-4 text-center md:hidden">
           
           <!-- Logo -->
-          <NuxtLink to="/" class="footer-logo-link-minimal">
+          <button @click="scrollToHero" class="footer-logo-button">
             <img 
               src="/images/wbm-logo-white.svg" 
               :alt="`${bandName} Logo`" 
               class="h-10 w-auto filter drop-shadow-lg"
               loading="lazy"
             />
-          </NuxtLink>
+          </button>
           
           <!-- Description Text -->
           <p class="text-white/70 text-sm leading-relaxed max-w-md">
@@ -60,6 +60,65 @@
             >
               @feat.her_
             </a>
+          </div>
+        </div>
+
+        <!-- Desktop: Traditional Horizontal Layout -->
+        <div class="hidden md:flex gap-8 md:items-center md:justify-between">
+          
+          <!-- Left Section: Logo and Description -->
+          <div class="flex items-center space-x-6">
+            <button @click="scrollToHero" class="footer-logo-button">
+              <img 
+                src="/images/wbm-logo-white.svg" 
+                :alt="`${bandName} Logo`" 
+                class="h-10 w-auto filter drop-shadow-lg"
+                loading="lazy"
+              />
+            </button>
+            <p class="text-white/70 text-sm leading-relaxed max-w-md">
+              {{ bandName }} - Modern rock with classic soul. Pushing boundaries in alternative music.
+            </p>
+          </div>
+          
+          <!-- Center Section: Social Media Links -->
+          <div class="flex space-x-4">
+            <a 
+              v-for="social in socialLinks" 
+              :key="social.name"
+              :href="social.url" 
+              :aria-label="social.label"
+              class="social-link-minimal"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <i :class="social.icon" class="text-lg"></i>
+            </a>
+          </div>
+          
+          <!-- Right Section: Legal Links and Developer Credit -->
+          <div class="flex flex-col items-end space-y-2">
+            <div class="flex space-x-6 text-sm">
+              <button 
+                v-for="legal in legalLinks" 
+                :key="legal.label"
+                @click="handleLegalLink(legal.action)"
+                class="legal-link-minimal"
+              >
+                {{ legal.label }}
+              </button>
+            </div>
+            <div class="text-white/50 text-xs">
+              Made with ❤️ and 🎸 by 
+              <a 
+                href="https://www.instagram.com/feat.her_" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="developer-link"
+              >
+                @feat.her_
+              </a>
+            </div>
           </div>
           
         </div>
