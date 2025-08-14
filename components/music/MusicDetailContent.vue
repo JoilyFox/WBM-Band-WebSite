@@ -170,13 +170,18 @@
     <section class="music-platforms relative py-8 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/95">
       <div class="platforms-container max-w-3xl mx-auto rounded-xl">
         <h2 class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-4 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md">Listen Now</h2>
-        <div class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <MusicPlatformButton
+        <div class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch">
+          <div 
             v-for="(url, platform) in availablePlatforms"
             :key="platform"
-            :platform="platform"
-            :url="url"
-          />
+            class="platform-button-wrapper w-full h-full min-h-[110px] flex"
+          >
+            <MusicPlatformButton
+              :platform="platform"
+              :url="url"
+              class="w-full h-full flex-1"
+            />
+          </div>
         </div>
       </div>
     </section>
@@ -1098,5 +1103,63 @@ const handleShare = async () => {
 }
 .modal-mode .progressive-image-container .gradient-placeholder { 
   display: none !important; 
+}
+
+/* Platform buttons uniform sizing */
+.platforms-grid {
+  /* Ensure grid items stretch to fill available space */
+  align-items: stretch;
+}
+
+.platform-button-wrapper {
+  /* Ensure consistent button container dimensions */
+  display: flex;
+  align-items: stretch;
+}
+
+/* Make sure the platform buttons fill their containers uniformly */
+.platform-button-wrapper :deep(.platform-button) {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 80px !important;
+  flex: 1 !important;
+}
+
+/* Ensure consistent content layout within buttons */
+.platform-button-wrapper :deep(.platform-content) {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+}
+
+/* Center platform icons within their containers */
+.platform-button-wrapper :deep(.platform-icon) {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Center platform arrow icons */
+.platform-button-wrapper :deep(.platform-arrow) {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Responsive adjustments for mobile devices */
+@media (max-width: 640px) {
+  .platform-button-wrapper {
+    min-height: 70px;
+  }
+  
+  .platform-button-wrapper :deep(.platform-button) {
+    min-height: 70px !important;
+  }
 }
 </style>
