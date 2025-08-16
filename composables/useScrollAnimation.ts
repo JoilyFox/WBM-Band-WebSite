@@ -317,27 +317,39 @@ export function useScrollAnimation(options: ScrollAnimationOptions = {}) {
     return `${baseClass} ${transitionClass}`.trim()
   })
 
-  // Mobile logo animation classes with enhanced performance
-  const mobileLogoSizeClass = computed(() => {
-    const baseClass = isScrolled.value ? 'h-20' : 'h-34'
-    const transitionClass = prefersReducedMotion.value 
-      ? 'transition-none' 
-      : isLowPerformanceDevice.value 
-        ? 'transition-transform-gpu' 
-        : 'transition-all gpu-accelerated'
-    return `${baseClass} ${transitionClass}`
+  // Mobile logo fade animation classes with enhanced performance
+  const mobileLogoCenteredClass = computed(() => {
+    if (prefersReducedMotion.value) {
+      return isScrolled.value ? 'opacity-0' : 'opacity-100'
+    }
+    
+    const baseClasses = 'absolute left-1/2 top-[30px] -translate-x-1/2 z-10'
+    const transitionClasses = 'transition-all duration-300 ease-in-out'
+    
+    if (isScrolled.value) {
+      // Hidden state: fade out and move up
+      return `${baseClasses} ${transitionClasses} opacity-0 -translate-y-3 pointer-events-none`
+    } else {
+      // Visible state: fully visible at normal position
+      return `${baseClasses} ${transitionClasses} opacity-100 translate-y-0 pointer-events-auto`
+    }
   })
 
-  const mobileLogoPositionClass = computed(() => {
-    const baseClass = isScrolled.value 
-      ? 'top-[20px] absolute left-[4px]' 
-      : 'top-[30px] absolute left-1/2 transform -translate-x-1/2'
-    const transitionClass = prefersReducedMotion.value 
-      ? '' 
-      : isLowPerformanceDevice.value 
-        ? 'transition-transform-gpu' 
-        : 'transition-all gpu-accelerated'
-    return `${baseClass} ${transitionClass}`.trim()
+  const mobileLogoLeftClass = computed(() => {
+    if (prefersReducedMotion.value) {
+      return isScrolled.value ? 'opacity-100' : 'opacity-0'
+    }
+    
+    const baseClasses = '!absolute left-[4px] top-[20px] z-10'
+    const transitionClasses = 'transition-all duration-300 ease-in-out'
+    
+    if (isScrolled.value) {
+      // Visible state: fully visible at normal position
+      return `${baseClasses} ${transitionClasses} opacity-100 translate-y-0 pointer-events-auto`
+    } else {
+      // Hidden state: fade out and move down
+      return `${baseClasses} ${transitionClasses} opacity-0 -translate-y-3 pointer-events-none`
+    }
   })
 
   // Initialize scroll position and performance detection
@@ -384,8 +396,8 @@ export function useScrollAnimation(options: ScrollAnimationOptions = {}) {
     rightNavSpacing,
     
     // Mobile classes
-    mobileLogoSizeClass,
-    mobileLogoPositionClass,
+    mobileLogoCenteredClass,
+    mobileLogoLeftClass,
     
     // Control methods
     addScrollListener,

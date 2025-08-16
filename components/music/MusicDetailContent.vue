@@ -22,15 +22,15 @@
         
         <!-- Logo in the center (always visible) -->
         <div class="floating-logo">
-          <button @click="scrollToHero" class="logo-button">
-            <img 
-              src="/images/wbm-logo-white.svg" 
-              alt="WBM Logo" 
-              :class="['floating-logo-img', { 'floating-logo-img--small': backBtnTransparent }]"
-              loading="eager"
-              fetchpriority="high"
-            />
-          </button>
+          <Logo
+            :clickable="true"
+            :on-click="scrollToHero"
+            :image-class="`floating-logo-img ${backBtnTransparent ? 'floating-logo-img--small' : ''}`"
+            loading="eager"
+            class="floating-logo-img"
+            fetchpriority="high"
+            :blend-mode="'exclusion'"
+          />
         </div>
         
         <button
@@ -193,6 +193,7 @@ import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useScrollTo } from '~/composables/useScrollTo'
 import type { MusicRelease } from '~/data/musicLibrary'
+import Logo from '~/components/ui/Logo.vue'
 
 interface Props {
   release: MusicRelease
@@ -438,12 +439,20 @@ const handleShare = async () => {
 
 /* Floating logo image with scroll-responsive sizing */
 .floating-logo-img {
-  height: 56px;
-  margin-top: 6px;
-  width: auto;
+  width: 45px;
+  margin-top: 12px;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
   transition: height 0.25s cubic-bezier(.4,0,.2,1), margin-top 0.25s cubic-bezier(.4,0,.2,1);
+  cursor: pointer;
 }
+
+/* Alternative blend modes (comment out difference above and uncomment one below to try different effects)
+.floating-logo-img {
+  mix-blend-mode: exclusion; // Softer inversion effect
+  mix-blend-mode: overlay; // High contrast overlay  
+  mix-blend-mode: screen; // Brightening effect
+}
+*/
 
 /* Glassmorphic action buttons styles */
 .back-glass-btn,

@@ -7,19 +7,29 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-start justify-between h-16 relative pt-1">
           
-          <!-- Mobile Logo (centered when big, left when scrolled) -->
-          <div class="flex items-start md:hidden z-50 transition-all duration-300" :class="mobileLogoPositionClass">
-            <button @click="scrollToHero" class="logo-button block">
-              <img 
-                src="/images/wbm-logo-white.svg" 
-                :alt="`${bandName} Logo`" 
-                class="w-auto filter drop-shadow-2xl transition-transform duration-300"
-                :class="mobileLogoSizeClass"
-                loading="eager"
-                fetchpriority="high"
-              />
-            </button>
-          </div>
+          <!-- Mobile Logo Fade System (dual logos for smooth transition) -->
+          <!-- Centered logo (visible when not scrolled) -->
+          <Logo
+            size="custom"
+            :clickable="true"
+            :on-click="scrollToHero"
+            :container-class="`md:hidden ${mobileLogoCenteredClass}`"
+            image-class="h-32 w-auto filter drop-shadow-2xl"
+            class="!pointer-events-none"
+            loading="eager"
+            fetchpriority="high"
+          />
+          
+          <!-- Left logo (visible when scrolled) -->
+          <Logo
+            size="custom"
+            :clickable="true"
+            :on-click="scrollToHero"
+            :container-class="`md:hidden ${mobileLogoLeftClass}`"
+            image-class="h-20 w-auto filter drop-shadow-2xl"
+            loading="eager"
+            fetchpriority="high"
+          />
 
           <!-- Desktop Navigation -->
           <div class="hidden md:flex items-center justify-between h-full w-full">
@@ -62,17 +72,15 @@
       </div>
       
       <!-- Desktop Logo (absolute positioned) -->
-      <div class="hidden md:block absolute top-[14px] left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300" :class="logoPositionClass">
-        <button @click="scrollToHero" class="logo-button block">
-          <img 
-            src="/images/wbm-logo-white.svg" 
-            :alt="`${bandName} Logo`" 
-            class="w-auto filter drop-shadow-2xl transition-transform duration-500 ease-out"
-            :class="logoSizeClass"
-            loading="eager"
-            fetchpriority="high"
-          />
-        </button>
+      <div class="hidden md:block absolute top-[14px] left-1/2 transform -translate-x-1/2 z-50 transition-top duration-300" :class="logoPositionClass">
+        <Logo
+          size="custom"
+          :clickable="true"
+          :on-click="scrollToHero"
+          :image-class="`${logoSizeClass} w-auto filter drop-shadow-2xl transition-height duration-300 ease-in-out`"
+          loading="eager"
+          fetchpriority="high"
+        />
       </div>
     </header>
 
@@ -102,14 +110,14 @@
 
           <!-- Logo in mobile menu -->
           <div class="mb-12">
-            <button @click="scrollToHeroAndCloseMenu" class="logo-button block">
-              <img 
-                src="/images/wbm-logo-white.svg" 
-                :alt="`${bandName} Logo`" 
-                class="h-24 mt-[-44px] w-auto filter drop-shadow-2xl"
-                loading="eager"
-              />
-            </button>
+            <Logo
+              size="custom"
+              :clickable="true"
+              :on-click="scrollToHeroAndCloseMenu"
+              container-class="mt-[-44px]"
+              image-class="h-24 w-auto filter drop-shadow-2xl"
+              loading="eager"
+            />
           </div>
 
           <!-- Mobile Navigation Links -->
@@ -145,6 +153,7 @@ import { useScrollAnimation } from '~/composables/useScrollAnimation'
 import { createWelcomeMessage } from '~/constants/app'
 import { getConfig } from '~/utils/configHelpers'
 import { leftNavigation, rightNavigation, type NavigationItem } from '~/config/navigation'
+import Logo from '~/components/ui/Logo.vue'
 
 // Computed properties for config values
 const bandName = computed(() => getConfig('general.bandName'))
@@ -159,8 +168,8 @@ const {
   logoPositionClass,
   leftNavSpacing,
   rightNavSpacing,
-  mobileLogoSizeClass,
-  mobileLogoPositionClass,
+  mobileLogoCenteredClass,
+  mobileLogoLeftClass,
   isLowPerformanceDevice,
   prefersReducedMotion,
   currentThrottleMs

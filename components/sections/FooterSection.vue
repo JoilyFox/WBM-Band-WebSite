@@ -8,14 +8,13 @@
         <div class="flex flex-col items-center space-y-4 text-center md:hidden">
           
           <!-- Logo -->
-          <button @click="scrollToHero" class="footer-logo-button">
-            <img 
-              src="/images/wbm-logo-white.svg" 
-              :alt="`${bandName} Logo`" 
-              class="h-10 w-auto filter drop-shadow-lg"
-              loading="lazy"
-            />
-          </button>
+          <Logo
+            size="custom"
+            :clickable="true"
+            :on-click="scrollToHero"
+            image-class="h-10 w-auto filter drop-shadow-lg"
+            loading="lazy"
+          />
           
           <!-- Description Text -->
           <p class="text-white/70 text-sm leading-relaxed max-w-md">
@@ -68,14 +67,13 @@
           
           <!-- Left Section: Logo and Description -->
           <div class="flex items-center space-x-6">
-            <button @click="scrollToHero" class="footer-logo-button">
-              <img 
-                src="/images/wbm-logo-white.svg" 
-                :alt="`${bandName} Logo`" 
-                class="h-10 w-auto filter drop-shadow-lg"
-                loading="lazy"
-              />
-            </button>
+            <Logo
+              size="custom"
+              :clickable="true"
+              :on-click="scrollToHero"
+              image-class="h-10 w-auto filter drop-shadow-lg"
+              loading="lazy"
+            />
             <p class="text-white/70 text-sm leading-relaxed max-w-md">
               {{ bandName }} - Modern rock with classic soul. Pushing boundaries in alternative music.
             </p>
@@ -133,14 +131,13 @@
           <!-- Brand Section -->
           <div class="lg:col-span-2 text-center md:text-left">
             <div class="flex items-center justify-center md:justify-start mb-6">
-              <button @click="scrollToHero" class="footer-logo-button">
-                <img 
-                  src="/images/wbm-logo-white.svg" 
-                  :alt="`${bandName} Logo`" 
-                  class="h-12 w-auto filter drop-shadow-lg"
-                  loading="lazy"
-                />
-              </button>
+              <Logo
+                size="custom"
+                :clickable="true"
+                :on-click="scrollToHero"
+                image-class="h-12 w-auto filter drop-shadow-lg"
+                loading="lazy"
+              />
             </div>
             <p class="text-white/70 text-sm leading-relaxed mb-6 max-w-md mx-auto md:mx-0">
               {{ fullBandName }} - Pushing the boundaries of rock, alternative, and indie music. 
@@ -275,6 +272,7 @@ import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { getConfig } from '~/utils/configHelpers'
 import { footerNavigation } from '~/config/navigation'
+import Logo from '~/components/ui/Logo.vue'
 
 // Props
 interface Props {
