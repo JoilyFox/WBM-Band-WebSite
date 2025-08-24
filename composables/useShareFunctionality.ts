@@ -37,14 +37,22 @@ export const useShareFunctionality = () => {
   // Mobile share using Web Share API
   const shareViaMobile = async (data: ShareData) => {
     try {
-      const shareContent = getShareContent(data)
+      const cleanUrl = data.url || getCleanUrl()
+      const title = data.title
+      const text = `Check out "${title}"${data.description ? ` - ${data.description}` : ''}`
       
       if (navigator.share) {
-        await navigator.share(shareContent)
+        // For Web Share API, don't include URL in text since it's provided separately
+        await navigator.share({
+          title,
+          text,
+          url: cleanUrl
+        })
         return true
       } else {
-        // Fallback to clipboard
-        await copyToClipboard(shareContent.url)
+        // Fallback to clipboard with full share message including URL
+        const shareMessage = `${text}\n\n${cleanUrl}`
+        await copyToClipboard(shareMessage)
         return true
       }
     } catch (error) {
