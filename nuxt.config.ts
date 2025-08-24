@@ -40,7 +40,10 @@ export default defineNuxtConfig({
         { rel: 'manifest', href: '/WBM-Band-WebSite/site.webmanifest' },
         
         // Preload critical resources
-        { rel: 'preload', as: 'image', href: '/WBM-Band-WebSite/favicon-32x32.png' }
+        { rel: 'preload', as: 'image', href: '/WBM-Band-WebSite/favicon-32x32.png' },
+        
+        // Font Awesome CSS
+        { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' }
       ],
       meta: [
         // Standard meta tags

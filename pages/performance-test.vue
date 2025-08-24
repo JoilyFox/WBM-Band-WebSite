@@ -88,7 +88,7 @@
           </button>
           
           <NuxtLink 
-            to="/music/single-release-1?from=music"
+            to="/music/midnight-echoes?from=music"
             class="px-4 py-2 bg-secondary-600 hover:bg-secondary-700 rounded-lg transition-colors"
           >
             Test Music Page

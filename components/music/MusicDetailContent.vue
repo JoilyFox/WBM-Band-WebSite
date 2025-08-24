@@ -12,41 +12,45 @@
     <!-- Back/Share Buttons (only on page, not modal) -->
     <!-- Teleport to body to avoid ancestor transforms/containment breaking fixed positioning -->
     <Teleport to="body">
-      <div v-if="!isModal && shouldShowBackButton" class="floating-controls">
+      <div v-if="!isModal" class="floating-controls">
         <button
           @click="handleBack"
           :class="['back-glass-btn', { 
             'back-glass-btn--transparent': backBtnTransparent,
             'back-glass-btn--optimized': isLowPerformanceDevice 
           }]"
-          aria-label="Back to music section"
+          :aria-label="shouldShowBackArrow ? 'Back to music section' : 'Go to music library'"
         >
-          <i class="pi pi-arrow-left text-xl"></i>
+          <i v-if="shouldShowBackArrow" class="pi pi-arrow-left text-xl"></i>
+          <i v-else class="fa-solid fa-home text-lg"></i>
         </button>
         
-        <!-- Logo in the center (always visible) -->
-        <div class="floating-logo" :class="{ 'floating-logo--transparent': backBtnTransparent }">
-          <Logo
-            :clickable="true"
-            :on-click="scrollToHero"
-            :image-class="`floating-logo-img ${backBtnTransparent ? 'floating-logo-img--small' : ''}`"
-            loading="eager"
-            class="floating-logo-img"
-            fetchpriority="high"
-            :blend-mode="'exclusion'"
-          />
-        </div>
-        
-        <button
-          @click="handleShare"
-          :class="['share-glass-btn', { 
-            'share-glass-btn--transparent': backBtnTransparent,
-            'share-glass-btn--optimized': isLowPerformanceDevice
-          }]"
-          aria-label="Share release"
-        >
-          <i class="pi pi-share-alt text-xl"></i>
-        </button>
+        <!-- Logo and Share button only on mobile -->
+        <template v-if="!isDesktop">
+          <!-- Logo in the center (mobile only) -->
+          <div class="floating-logo" :class="{ 'floating-logo--transparent': backBtnTransparent }">
+            <Logo
+              :clickable="true"
+              :on-click="scrollToHero"
+              :image-class="`floating-logo-img ${backBtnTransparent ? 'floating-logo-img--small' : ''}`"
+              loading="eager"
+              class="floating-logo-img"
+              fetchpriority="high"
+              :blend-mode="'exclusion'"
+            />
+          </div>
+          
+          <button
+            @click="handleShare"
+            :class="['share-glass-btn', { 
+              'share-glass-btn--transparent': backBtnTransparent,
+              'share-glass-btn--optimized': isLowPerformanceDevice
+            }]"
+            aria-label="Share release"
+          >
+            <i class="pi pi-share-alt text-xl"></i>
+          </button>
+        </template>
       </div>
     </Teleport>
 
@@ -228,8 +232,8 @@ const performanceClass = computed(() => getPerformanceClass())
 // Optimized scroll handling
 const { isScrolled } = useOptimizedScroll({ threshold: 60 })
 
-// Check if back button should be visible based on URL parameters
-const shouldShowBackButton = computed(() => {
+// Check if back button should show back arrow or music library icon
+const shouldShowBackArrow = computed(() => {
   return route.query.from === 'music'
 })
 
@@ -335,13 +339,22 @@ const bgCoverUrl = computed(() => {
   return finalUrl
 })
 
-// Back button handler: go to / and scroll to music section
+// Back button handler: go to / and scroll to music section, or just go to music library
 const { scrollToElementWithNavigation } = useScrollTo()
 const handleBack = async () => {
-  await router.push('/')
-  setTimeout(() => {
-    scrollToElementWithNavigation('music')
-  }, 100)
+  if (shouldShowBackArrow.value) {
+    // If came from music section, go back to home and scroll to music
+    await router.push('/')
+    setTimeout(() => {
+      scrollToElementWithNavigation('music')
+    }, 100)
+  } else {
+    // If no specific origin, go to music library/home
+    await router.push('/')
+    setTimeout(() => {
+      scrollToElementWithNavigation('music')
+    }, 100)
+  }
 }
 
 // Logo click handler: scroll to hero section
@@ -381,6 +394,14 @@ const handleShare = async () => {
   padding: 0 1rem; /* matches left/right offsets of individual buttons */
   pointer-events: none; /* let children handle interactions */
 }
+
+/* On desktop, only show back button on left */
+@media (min-width: 768px) {
+  .floating-controls {
+    justify-content: flex-start; /* Align back button to left only */
+  }
+}
+
 .floating-controls .back-glass-btn,
 .floating-controls .share-glass-btn {
   pointer-events: auto;
