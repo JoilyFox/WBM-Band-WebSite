@@ -1,12 +1,13 @@
 <template>
   <div
-    class="music-detail-content min-h-screen text-primary-50 font-space-grotesk bg-surface-950 relative"
-    :class="{
-      'performance-optimized': isLowPerformanceDevice,
-      'reduced-animations': shouldReduceAnimations,
-      'modal-mode': isModal
-    }"
-    :style="accentVars"
+    class="music-detail-content flex flex-col min-h-screen text-primary-50 font-space-grotesk bg-surface-950 relative"
+    :class="[
+      performanceClass,
+      {
+        'modal-mode': isModal
+      }
+    ]"
+    :style="{ ...accentVars, ...performanceCSSVars }"
   >
     <!-- Back/Share Buttons (only on page, not modal) -->
     <!-- Teleport to body to avoid ancestor transforms/containment breaking fixed positioning -->
@@ -14,14 +15,17 @@
       <div v-if="!isModal && shouldShowBackButton" class="floating-controls">
         <button
           @click="handleBack"
-          :class="['back-glass-btn', { 'back-glass-btn--transparent': backBtnTransparent }]"
+          :class="['back-glass-btn', { 
+            'back-glass-btn--transparent': backBtnTransparent,
+            'back-glass-btn--optimized': isLowPerformanceDevice 
+          }]"
           aria-label="Back to music section"
         >
           <i class="pi pi-arrow-left text-xl"></i>
         </button>
         
         <!-- Logo in the center (always visible) -->
-        <div class="floating-logo">
+        <div class="floating-logo" :class="{ 'floating-logo--transparent': backBtnTransparent }">
           <Logo
             :clickable="true"
             :on-click="scrollToHero"
@@ -35,7 +39,10 @@
         
         <button
           @click="handleShare"
-          :class="['share-glass-btn', { 'share-glass-btn--transparent': backBtnTransparent }]"
+          :class="['share-glass-btn', { 
+            'share-glass-btn--transparent': backBtnTransparent,
+            'share-glass-btn--optimized': isLowPerformanceDevice
+          }]"
           aria-label="Share release"
         >
           <i class="pi pi-share-alt text-xl"></i>
@@ -48,17 +55,20 @@
       'pt-20 pb-4 px-4 md:py-16 md:px-8': !isHeroExpanded && !isDesktop && !isModal,
       'py-4 px-4': !isHeroExpanded && !isDesktop && isModal,
       'py-16 px-4 md:px-8': isHeroExpanded || isDesktop,
-      'performance-hero': isLowPerformanceDevice,
       'modal-hero': isModal
     }]">
-      <div class="music-hero-background absolute inset-0 z-0" :class="{ 
-        'static-bg': shouldReduceAnimations || isModal,
-        'modal-bg': isModal 
-      }">
-        <div class="music-hero-overlay" :class="{ 
-          'static-overlay': shouldReduceAnimations || isModal,
-          'modal-overlay': isModal 
-        }"></div>
+      <div 
+        class="music-hero-background absolute inset-0 z-0" 
+        :class="{ 
+          'modal-bg': isModal 
+        }"
+      >
+        <div 
+          class="music-hero-overlay"
+          :class="{ 
+            'modal-overlay': isModal 
+          }"
+        ></div>
       </div>
       
       <!-- Mobile Compact Hero (default state on mobile) -->
@@ -69,7 +79,7 @@
       >
         <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md transition-all duration-400 ease-out hover:bg-white/8 hover:border-white/15 hover:shadow-lg md:hover:bg-white/8 md:hover:border-white/15 md:hover:shadow-lg">
           <!-- Small Album Cover -->
-          <div class="relative w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-white/5 border border-white/10 shadow-lg">
+          <div class="relative w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-white/5 border border-white/10 shadow-lg" style="min-width: 64px; min-height: 64px; aspect-ratio: 1;">
             <UiProgressiveImage
               :src="release.imageUrl"
               :alt="release.title"
@@ -82,6 +92,7 @@
               :width="64"
               :height="64"
               sizes="64px"
+              style="aspect-ratio: 1; object-fit: cover;"
             />
             <!-- Small Badge -->
             <div class="absolute top-1 left-1 z-10">
@@ -106,17 +117,17 @@
       
       <!-- Full Hero (desktop always, mobile when expanded) -->
       <div 
-        v-show="isDesktop || isHeroExpanded"
         :class="['music-hero-content flex flex-col md:flex-row items-center gap-8 md:gap-12 max-w-5xl w-full z-10 transition-all duration-500 ease-out transform', {
-          'animate-fadeInUpSmooth': isHeroExpanded && !isDesktop,
-          'animate-fadeOutDown': !isHeroExpanded && !isDesktop
+          'animate-fadeInUpSmooth': isHeroExpanded && !isDesktop && isClient,
+          'animate-fadeOutDown': !isHeroExpanded && !isDesktop && isClient,
+          'mobile-expanded': isHeroExpanded && !isDesktop
         }]"
+        :style="{
+          display: (!isDesktop && !isHeroExpanded && isClient) ? 'none' : ''
+        }"
       >
         <div class="music-album-cover relative w-44 h-44 md:w-72 md:h-72 flex-shrink-0 rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl"
              :class="{ 
-               'backdrop-blur-xl': !isLowPerformanceDevice && !isModal,
-               'backdrop-blur-sm': isLowPerformanceDevice || isModal,
-               'static-cover': shouldReduceAnimations || isModal,
                'modal-cover': isModal
              }">
           <UiProgressiveImage
@@ -127,18 +138,14 @@
             loading="eager"
             fetch-priority="high"
             :show-placeholder="!isModal"
-            :width="512"
-            :height="512"
+            :width="isDesktop ? 288 : 176"
+            :height="isDesktop ? 288 : 176"
             sizes="(min-width: 768px) 288px, 176px"
             preset="album"
           />
           <!-- Release Type Badge -->
           <div class="music-badge absolute top-4 left-4 z-10">
-            <span :class="badgeClass" class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md"
-                  :style="{ 
-                    backdropFilter: (isLowPerformanceDevice || isModal) ? 'blur(4px)' : 'blur(12px)',
-                    WebkitBackdropFilter: (isLowPerformanceDevice || isModal) ? 'blur(4px)' : 'blur(12px)'
-                  }">
+            <span :class="badgeClass" class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md">
               {{ release.type }}
             </span>
           </div>
@@ -156,7 +163,7 @@
           </div>
           
           <h1 class="music-title text-4xl md:text-6xl font-extrabold leading-tight mb-3 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-lg"
-              :class="{ 'animate-titleGlow': !shouldReduceAnimations }">
+              :class="{ 'animate-titleGlow': isHighPerformanceDevice }">
             {{ release.title }}
           </h1>
           <p class="music-date text-primary-200 text-base md:text-lg font-medium mb-2">{{ formatDate(release.releaseDate) }}</p>
@@ -167,7 +174,7 @@
       </div>
     </section>
     <!-- Music Platform Links -->
-    <section class="music-platforms relative py-8 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/95">
+    <section class="music-platforms flex-1 relative py-8 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/95">
       <div class="platforms-container max-w-3xl mx-auto rounded-xl">
         <h2 class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-4 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md">Listen Now</h2>
         <div class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch">
@@ -192,6 +199,8 @@
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useScrollTo } from '~/composables/useScrollTo'
+import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
+import { useOptimizedScroll } from '~/composables/useOptimizedScroll'
 import type { MusicRelease } from '~/data/musicLibrary'
 import Logo from '~/components/ui/Logo.vue'
 
@@ -204,44 +213,35 @@ const props = defineProps<Props>()
 const router = useRouter()
 const route = useRoute()
 
-// Performance detection
-const isLowPerformanceDevice = ref(false)
-const shouldReduceAnimations = ref(false)
+// Performance optimization system
+const {
+  isLowPerformanceDevice,
+  isMediumPerformanceDevice,
+  isHighPerformanceDevice,
+  shouldReduceAnimations,
+  performanceCSSVars,
+  getPerformanceClass
+} = usePerformanceOptimization()
+
+const performanceClass = computed(() => getPerformanceClass())
+
+// Optimized scroll handling
+const { isScrolled } = useOptimizedScroll({ threshold: 60 })
 
 // Check if back button should be visible based on URL parameters
 const shouldShowBackButton = computed(() => {
   return route.query.from === 'music'
 })
 
-// Responsive breakpoint detection
-const isDesktop = ref(false)
-const updateBreakpoint = () => {
-  isDesktop.value = window.innerWidth >= 768 // md breakpoint
-}
+// Track if we're on client side to avoid SSR hydration issues
+const isClient = ref(false)
 
-// Performance detection function
-const detectPerformance = () => {
-  if (typeof window === 'undefined') return
-  
-  // Check for low-end device indicators
-  const deviceMemory = (navigator as any).deviceMemory || 4
-  const hardwareConcurrency = navigator.hardwareConcurrency || 4
-  const isMobile = window.innerWidth < 768
-  const pixelRatio = window.devicePixelRatio || 1
-  
-  // Detect if user prefers reduced motion
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  
-  // Performance scoring
-  const memoryScore = deviceMemory >= 4 ? 1 : 0
-  const cpuScore = hardwareConcurrency >= 4 ? 1 : 0
-  const displayScore = pixelRatio <= 2 ? 1 : 0
-  const mobileScore = isMobile ? 0 : 1
-  
-  const performanceScore = memoryScore + cpuScore + displayScore + mobileScore
-  
-  isLowPerformanceDevice.value = performanceScore < 2
-  shouldReduceAnimations.value = prefersReducedMotion || isLowPerformanceDevice.value
+// Responsive breakpoint detection - use CSS classes for initial state
+const isDesktop = ref(false) // Start as false to prevent mobile flash
+const updateBreakpoint = () => {
+  if (typeof window !== 'undefined') {
+    isDesktop.value = window.innerWidth >= 768 // md breakpoint
+  }
 }
 
 // Mobile hero expansion state (default collapsed on mobile)
@@ -250,45 +250,31 @@ const toggleHeroExpansion = () => {
   isHeroExpanded.value = !isHeroExpanded.value
 }
 
-// Glassmorphic back button opacity on scroll
-const backBtnTransparent = ref(false)
-let scrollHandler: (() => void) | null = null
-let resizeHandler: (() => void) | null = null
+// Optimized back button transparency based on scroll
+const backBtnTransparent = computed(() => isScrolled.value)
 onMounted(() => {
-  // Initialize performance detection
-  detectPerformance()
+  // Mark as client-side
+  isClient.value = true
   
-  // Initialize breakpoint
+  // Initialize breakpoint detection immediately
   updateBreakpoint()
-  
-  // Scroll handler for back button (throttled for performance)
-  let ticking = false
-  scrollHandler = () => {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        backBtnTransparent.value = window.scrollY > 60
-        ticking = false
-      })
-      ticking = true
-    }
-  }
   
   // Resize handler for responsive breakpoint (debounced)
   let resizeTimeout: NodeJS.Timeout
-  resizeHandler = () => {
+  const resizeHandler = () => {
     clearTimeout(resizeTimeout)
     resizeTimeout = setTimeout(() => {
       updateBreakpoint()
-      detectPerformance() // Re-detect on resize
     }, 150)
   }
   
-  window.addEventListener('scroll', scrollHandler, { passive: true })
   window.addEventListener('resize', resizeHandler, { passive: true })
-})
-onBeforeUnmount(() => {
-  if (scrollHandler) window.removeEventListener('scroll', scrollHandler)
-  if (resizeHandler) window.removeEventListener('resize', resizeHandler)
+  
+  // Cleanup function
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', resizeHandler)
+    if (resizeTimeout) clearTimeout(resizeTimeout)
+  })
 })
 
 // Derive per-release accent colors from slug
@@ -409,6 +395,13 @@ const handleShare = async () => {
   transform: translateX(-50%);
   pointer-events: auto;
   z-index: 10;
+  transition: opacity 0.45s cubic-bezier(.4,0,.2,1);
+  opacity: 1;
+}
+
+.floating-logo--transparent { 
+  opacity: .2; 
+  pointer-events: none; 
 }
 
 /* Logo button styles (similar to header layout) */
@@ -470,8 +463,8 @@ const handleShare = async () => {
   background: rgba(30, 30, 40, 0.32);
   box-shadow: 0 4px 24px 0 rgba(0,0,0,0.18), 0 1.5px 6px 0 rgba(0,0,0,0.10);
   border: 1.5px solid rgba(255,255,255,0.13);
-  backdrop-filter: blur(12px) saturate(120%);
-  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  backdrop-filter: blur(var(--perf-blur-strength, 12px));
+  -webkit-backdrop-filter: blur(var(--perf-blur-strength, 12px));
   color: #fff;
   transition: background 0.25s, box-shadow 0.25s, opacity 0.45s cubic-bezier(.4,0,.2,1);
   opacity: 1;
@@ -479,6 +472,16 @@ const handleShare = async () => {
   /* Ensure it creates its own stacking context */
   isolation: isolate;
 }
+
+/* Optimized version for low-performance devices */
+.back-glass-btn--optimized,
+.share-glass-btn--optimized {
+  background: rgba(30, 30, 40, 0.85);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1.5px solid rgba(255,255,255,0.2);
+}
+
 /* When not in container, keep back on left and share on right */
 .share-glass-btn { left: auto; right: 1rem; }
 
@@ -486,6 +489,13 @@ const handleShare = async () => {
 .share-glass-btn:hover {
   background: rgba(60, 60, 80, 0.44);
   box-shadow: 0 8px 32px 0 rgba(0,0,0,0.22), 0 2px 8px 0 rgba(0,0,0,0.13);
+}
+
+/* Optimized hover for low-performance devices */
+.back-glass-btn--optimized:hover,
+.share-glass-btn--optimized:hover {
+  background: rgba(60, 60, 80, 0.9);
+  transform: none;
 }
 
 /* Disable hover effects on mobile/touch devices */
@@ -498,8 +508,8 @@ const handleShare = async () => {
   }
 }
 
-.back-glass-btn--transparent { opacity: 0; pointer-events: none; }
-.share-glass-btn--transparent { opacity: 0; pointer-events: none; }
+.back-glass-btn--transparent { opacity: .2; pointer-events: none; }
+.share-glass-btn--transparent { opacity: .2; pointer-events: none; }
 
 /* Preserve transitions for buttons even while modal performance classes are active */
 :global(body.modal-open) .back-glass-btn,
@@ -514,58 +524,88 @@ const handleShare = async () => {
 /* Performance optimizations */
 .music-detail-content {
   position: relative;
-  min-height: 100vh;
+  min-height: 600px;
   color: white;
-  /* GPU acceleration */
+  /* GPU acceleration for better performance */
   transform: translateZ(0);
   will-change: auto;
-  /* Optimized background for normal devices */
+  
+  /* Default background for high-performance devices */
   background:
-    radial-gradient(1200px 600px at 10% 110%, rgba(120,119,198,0.10), transparent 60%),
-    radial-gradient(900px 500px at 110% -10%, rgba(255,119,198,0.10), transparent 60%),
+    radial-gradient(1200px 600px at 10% 110%, rgba(120,119,198,var(--perf-opacity, 0.10)), transparent 60%),
+    radial-gradient(900px 500px at 110% -10%, rgba(255,119,198,var(--perf-opacity, 0.10)), transparent 60%),
     linear-gradient(#020202, #030303);
   background-size: 150% 150%, 120% 120%, 100% 100%;
+  background-attachment: fixed;
+}
+
+/* When used in a page context with flexbox, ensure it grows to fill space */
+.music-detail-content {
+  flex: 1; /* This will make it expand to fill available space in flex container */
+}
+
+/* High performance devices get subtle animation */
+.music-detail-content.perf-high {
   animation: gradientFlow 25s ease-in-out infinite alternate;
 }
 
-/* Performance-optimized version for low-end devices */
-.music-detail-content.performance-optimized {
-  /* Simplified background without complex gradients */
-  background: linear-gradient(180deg, #020202 0%, #1a1a1a 50%, #020202 100%);
+/* Medium performance devices get static gradient */
+.music-detail-content.perf-medium {
+  background-size: 100% 100%, 100% 100%, 100% 100%;
   animation: none;
 }
 
-/* Reduced animations for accessibility and low-performance devices */
-.music-detail-content.reduced-animations {
+/* Low performance devices get simplified background */
+.music-detail-content.perf-low,
+.music-detail-content.simple-gradients {
+  background: linear-gradient(180deg, #020202 0%, #1a1a1a 40%, #030303 100%);
+  animation: none;
+  background-attachment: initial;
+}
+
+/* Reduced animations override */
+.music-detail-content.reduce-animations {
   animation: none !important;
 }
 
-.music-detail-content.reduced-animations *,
-.music-detail-content.reduced-animations *::before,
-.music-detail-content.reduced-animations *::after {
+.music-detail-content.reduce-animations *,
+.music-detail-content.reduce-animations *::before,
+.music-detail-content.reduce-animations *::after {
   animation: none !important;
   transition: opacity 0.2s ease !important;
 }
 
-/* Simplified grain overlay for better performance */
-.music-detail-content::after {
+/* Simplified grain overlay for better performance (only on high-performance devices) */
+.perf-high .music-detail-content::after {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: .04;
+  opacity: 0.04;
   mix-blend-mode: overlay;
   background: 
     radial-gradient(circle at 25% 25%, rgba(255,255,255,.08) 1px, transparent 1px),
     radial-gradient(circle at 75% 75%, rgba(255,255,255,.05) 1px, transparent 1px);
   background-size: 100px 100px, 150px 150px;
-  z-index: 0; /* Lower z-index to ensure it doesn't interfere with fixed buttons */
+  z-index: 0;
+}
+
+/* Disable grain overlay on medium and low performance */
+.perf-medium .music-detail-content::after,
+.perf-low .music-detail-content::after {
+  display: none;
+}
+
+/* Container optimization for better scrolling performance */
+.music-detail-content {
+  content-visibility: auto;
+  contain: layout style;
 }
 
 /* Modal-specific optimizations for smooth animations */
 .music-detail-content.modal-mode {
   /* Simplified background for modals to reduce rendering load */
-  background: linear-gradient(180deg, #020202 0%, #1a1a1a 50%, #020202 100%);
+  background: linear-gradient(180deg, #020202 0%, #1a1a1a 50%, #020202 100%) !important;
   animation: none !important;
   /* Force compositing layer for smoother animations */
   transform: translateZ(0);
@@ -579,28 +619,18 @@ const handleShare = async () => {
   display: none;
 }
 
-/* Modal hero optimizations */
-.modal-hero .music-hero::before {
-  /* Simplified background without expensive animations */
-  background: radial-gradient(60% 80% at 50% 50%, var(--accent1), transparent 70%);
-  filter: blur(15px);
-  animation: none !important;
-  will-change: auto;
-}
-
+/* Modal hero and background optimizations */
+.modal-hero .music-hero::before,
 .modal-hero .music-hero::after {
-  /* Simplified vignette */
-  background: radial-gradient(100% 100% at 50% 50%, rgba(0,0,0,.5), transparent 70%);
   animation: none !important;
-  will-change: auto;
+  transform: none !important;
+  filter: blur(15px) !important;
 }
 
-/* Modal background and overlay optimizations */
 .modal-bg .music-hero::before,
 .modal-bg .music-hero::after {
   animation: none !important;
   transform: none !important;
-  filter: blur(10px) !important;
 }
 
 .modal-overlay {
@@ -614,22 +644,18 @@ const handleShare = async () => {
 
 /* Modal album cover optimizations */
 .modal-cover {
-  /* Remove floating animation in modal */
   animation: none !important;
-  /* Optimize backdrop blur for modal performance */
   backdrop-filter: blur(6px) !important;
   -webkit-backdrop-filter: blur(6px) !important;
   will-change: auto;
 }
 
 .modal-cover::before {
-  /* Reduce glow effect in modal */
   filter: blur(10px) !important;
   opacity: 0.3 !important;
 }
 
 .modal-cover::after {
-  /* Disable shine effect in modal */
   display: none !important;
 }
 
@@ -651,6 +677,18 @@ const handleShare = async () => {
 
 /* Hero Section and background animation remain in CSS for unique effects */
 
+.music-hero {
+  /* Prevent layout shift by reserving minimum space */
+  min-height: 200px;
+}
+
+/* Desktop hero section gets fixed height to prevent content shift */
+@media (min-width: 768px) {
+  .music-hero {
+    min-height: 400px;
+  }
+}
+
 /* Performance-aware hero background */
 .music-hero::before {
   content: '';
@@ -662,27 +700,33 @@ const handleShare = async () => {
     conic-gradient(from 180deg at 50% 50%, rgba(255,255,255,.05), rgba(0,0,0,0) 20% 80%, rgba(255,255,255,.05));
   filter: blur(40px) saturate(110%);
   background-size: 200% 200%, 180% 180%, 150% 150%;
+  z-index: 1;
+  will-change: auto;
+  backface-visibility: hidden;
+}
+
+/* High performance gets full animations */
+.perf-high .music-hero::before {
   animation: 
     auroraShift 16s ease-in-out infinite alternate,
     auroraFloat 20s ease-in-out infinite alternate,
     auroraPulse 12s ease-in-out infinite alternate;
-  z-index: 1;
   will-change: transform, filter;
-  backface-visibility: hidden;
 }
 
-/* Simplified version for low-performance devices */
-.performance-hero .music-hero::before {
+/* Medium performance gets simplified animations */
+.perf-medium .music-hero::before {
+  animation: auroraShift 20s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* Low performance gets static background */
+.perf-low .music-hero::before,
+.simple-gradients .music-hero::before {
   background: radial-gradient(60% 80% at 50% 50%, var(--accent1), transparent 70%);
   filter: blur(20px);
   animation: none;
   will-change: auto;
-}
-
-/* Static background for reduced motion */
-.static-bg .music-hero::before {
-  animation: none !important;
-  transform: none !important;
 }
 
 .music-hero::after {
@@ -694,20 +738,20 @@ const handleShare = async () => {
     radial-gradient(80% 50% at 50% -10%, rgba(0,0,0,.6), transparent 60%);
   pointer-events: none;
   background-size: 140% 140%, 160% 160%;
-  animation: vignetteWave 18s ease-in-out infinite alternate;
   z-index: 2;
-  will-change: transform;
-}
-
-/* Simplified vignette for low-performance */
-.performance-hero .music-hero::after {
-  background: radial-gradient(100% 100% at 50% 50%, rgba(0,0,0,.6), transparent 70%);
-  animation: none;
   will-change: auto;
 }
 
-.static-bg .music-hero::after {
-  animation: none !important;
+/* Performance-aware vignette animations */
+.perf-high .music-hero::after {
+  animation: vignetteWave 18s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.perf-medium .music-hero::after,
+.perf-low .music-hero::after {
+  background: radial-gradient(100% 100% at 50% 50%, rgba(0,0,0,.6), transparent 70%);
+  animation: none;
 }
 
 .music-hero-overlay {
@@ -718,17 +762,23 @@ const handleShare = async () => {
     radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
     linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%);
   background-size: 130% 130%, 120% 120%, 100% 100%;
+  will-change: auto;
+}
+
+/* High performance gets overlay animation */
+.perf-high .music-hero-overlay {
   animation: overlayDrift 22s ease-in-out infinite alternate;
   will-change: transform;
 }
 
-/* Static overlay */
-.static-overlay {
-  animation: none !important;
+/* Medium and low performance get static overlay */
+.perf-medium .music-hero-overlay,
+.perf-low .music-hero-overlay {
   background:
     radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
     radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
-    linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%) !important;
+    linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%);
+  animation: none;
 }
 
 .music-hero-content {
@@ -739,6 +789,43 @@ const handleShare = async () => {
   gap: 3rem;
   max-width: 1100px;
   width: 100%;
+  /* Prevent layout shift by reserving space */
+  min-height: 320px;
+}
+
+/* Mobile: hidden by default, shown only when expanded */
+@media (max-width: 767px) {
+  .music-hero-content {
+    min-height: auto;
+    display: none; /* Hidden by default on mobile */
+  }
+  
+  /* Show when mobile expanded class is applied */
+  .music-hero-content.mobile-expanded {
+    display: flex !important;
+  }
+}
+
+/* Desktop: always visible with proper sizing */
+@media (min-width: 768px) {
+  .music-hero-content {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: 320px;
+  }
+  
+  .music-hero {
+    min-height: 400px;
+  }
+  
+  /* Disable mobile animations on desktop */
+  .music-hero-content.animate-fadeInUpSmooth,
+  .music-hero-content.animate-fadeOutDown {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* Optimized album cover with performance considerations */
@@ -757,24 +844,45 @@ const handleShare = async () => {
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   /* GPU acceleration for better performance */
   transform: translateZ(0);
-  will-change: transform;
+  will-change: auto;
   backface-visibility: hidden;
+  /* Prevent layout shift */
+  aspect-ratio: 1;
+  contain: layout size;
 }
 
-/* Floating animation for normal performance */
-.music-album-cover:not(.static-cover) {
+/* Responsive sizing with fixed dimensions to prevent layout shift */
+/* Use Tailwind's sizing but add stability */
+@media (max-width: 767px) {
+  .music-album-cover {
+    /* w-44 = 176px, h-44 = 176px - keep Tailwind classes working */
+    min-width: 176px;
+    min-height: 176px;
+    aspect-ratio: 1;
+  }
+}
+
+@media (min-width: 768px) {
+  .music-album-cover {
+    /* md:w-72 = 288px, md:h-72 = 288px */
+    width: 288px !important;
+    height: 288px !important;
+    min-width: 288px !important;
+    min-height: 288px !important;
+    aspect-ratio: 1;
+  }
+}
+
+/* Floating animation only for high-performance devices */
+.perf-high .music-album-cover:not(.modal-cover) {
   animation: float 6s ease-in-out infinite;
+  will-change: transform;
 }
 
-/* Performance-optimized backdrop blur */
-.music-album-cover.backdrop-blur-xl {
-  backdrop-filter: blur(22px) saturate(120%);
-  -webkit-backdrop-filter: blur(22px) saturate(120%);
-}
-
-.music-album-cover.backdrop-blur-sm {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+/* Performance-based backdrop blur via CSS variables */
+.music-album-cover {
+  backdrop-filter: blur(var(--perf-blur-strength, 0px));
+  -webkit-backdrop-filter: blur(var(--perf-blur-strength, 0px));
 }
 
 .music-album-cover::before {
@@ -784,12 +892,12 @@ const handleShare = async () => {
   border-radius: 50%;
   background: radial-gradient(closest-side, rgba(255,255,255,.15), rgba(255,255,255,0) 60%);
   filter: blur(30px);
-  opacity: .6;
-  will-change: opacity;
+  opacity: var(--perf-opacity, 0.6);
+  will-change: auto;
 }
 
-/* Optimized shine effect */
-.music-album-cover::after {
+/* Shine effect only for high-performance devices */
+.perf-high .music-album-cover::after {
   content: '';
   position: absolute;
   top: -100%;
@@ -803,16 +911,17 @@ const handleShare = async () => {
   will-change: opacity, transform;
 }
 
-/* Only enable hover effects on capable devices */
-@media (hover: hover) and (pointer: fine) and (min-resolution: 1.5dppx) {
-  .music-album-cover:not(.static-cover):hover::after {
+/* Only enable hover effects on high-performance devices with hover capability */
+@media (hover: hover) and (pointer: fine) {
+  .perf-high .music-album-cover:not(.modal-cover):hover::after {
     opacity: .7;
     transform: rotate(8deg) translateY(10%);
   }
 }
 
-/* Disable shine effect on low-performance devices */
-.performance-optimized .music-album-cover::after {
+/* Disable shine effect on low/medium-performance devices */
+.perf-medium .music-album-cover::after,
+.perf-low .music-album-cover::after {
   display: none;
 }
 
@@ -830,12 +939,19 @@ const handleShare = async () => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--perf-blur-strength, 0px));
+  -webkit-backdrop-filter: blur(var(--perf-blur-strength, 0px));
   border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Enhanced background for low-performance devices without blur */
+.no-backdrop-blur .music-badge span {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /* Title + text animation only */
@@ -996,7 +1112,7 @@ const handleShare = async () => {
   }
 }
 
-/* Performance optimizations for reduced motion and low-end devices */
+/* Performance optimizations based on device capability detection */
 @media (prefers-reduced-motion: reduce) {
   .music-detail-content,
   .music-hero::before,
@@ -1004,7 +1120,7 @@ const handleShare = async () => {
   .music-hero-overlay,
   .music-album-cover {
     animation: none !important;
-    transition: opacity 0.2s ease !important;
+    transition: opacity calc(var(--perf-animation-duration, 0.2) * 1s) ease !important;
   }
   
   .animate-titleGlow {
@@ -1012,50 +1128,18 @@ const handleShare = async () => {
   }
 }
 
-/* Mobile optimizations for better performance */
-@media (max-width: 768px) {
-  .music-detail-content {
-    /* Reduce background complexity on mobile */
-    background-size: 100% 100%, 100% 100%, 100% 100%;
-  }
-  
-  .music-hero::before {
-    /* Reduce blur intensity on mobile */
-    filter: blur(20px) saturate(100%);
-    animation-duration: 20s, 25s, 15s;
-  }
-  
-  .music-album-cover::before {
-    /* Reduce glow effect on mobile */
-    filter: blur(15px);
-    opacity: 0.4;
-  }
+/* Mobile device optimizations */
+.mobile-device .music-detail-content {
+  background-size: 100% 100%, 100% 100%, 100% 100%;
 }
 
-/* Low-performance device optimizations */
-@media (max-width: 768px) and (max-resolution: 1.5dppx) {
-  .music-detail-content {
-    background: linear-gradient(180deg, #020202 0%, #1a1a1a 50%, #020202 100%);
-    animation: none;
-  }
-  
-  .music-hero::before,
-  .music-hero::after,
-  .music-hero-overlay {
-    animation: none !important;
-    filter: blur(10px) !important;
-  }
-  
-  .music-album-cover {
-    animation: none !important;
-    backdrop-filter: blur(4px) !important;
-    -webkit-backdrop-filter: blur(4px) !important;
-  }
-  
-  .music-album-cover::before,
-  .music-album-cover::after {
-    display: none !important;
-  }
+.mobile-device .music-hero::before {
+  filter: blur(20px) saturate(100%);
+}
+
+.mobile-device .music-album-cover::before {
+  filter: blur(15px);
+  opacity: 0.4;
 }
 
 /* Modal specific optimizations */
@@ -1063,13 +1147,7 @@ const handleShare = async () => {
   min-height: auto; 
 }
 
-/* Container optimization for better scrolling performance */
-.music-detail-content {
-  /* Removed 'contain: layout style paint' as it breaks fixed positioning for child elements */
-  content-visibility: auto;
-}
-
-/* While modal is animating, kill inner animations and filters for max FPS */
+/* Performance-aware modal animations */
 :global(body.modal-open) .music-detail-content.modal-mode,
 :global(body.modal-open) .music-detail-content.modal-mode *,
 :global(body.modal-open) .music-detail-content.modal-mode *::before,
@@ -1082,7 +1160,8 @@ const handleShare = async () => {
 }
 
 /* Exception: Keep back button transitions working */
-:global(body.modal-open) .back-glass-btn {
+:global(body.modal-open) .back-glass-btn,
+:global(body.modal-open) .share-glass-btn {
   transition: background 0.25s, box-shadow 0.25s, opacity 0.45s cubic-bezier(.4,0,.2,1) !important;
 }
 
@@ -1099,17 +1178,17 @@ const handleShare = async () => {
 }
 
 /* Exception: Keep back button transitions working during animation */
-:global(body.modal-animating) .back-glass-btn {
+:global(body.modal-animating) .back-glass-btn,
+:global(body.modal-animating) .share-glass-btn {
   transition: background 0.25s, box-shadow 0.25s, opacity 0.45s cubic-bezier(.4,0,.2,1) !important;
 }
 
-/* Restore normal optimized modal styles after animation ends (handled automatically once body class is removed) */
-
-/* In modal mode, make image reveal extremely light */
+/* Lightweight image transitions in modal */
 .modal-mode .progressive-image {
   transition: opacity 0.18s ease-out !important;
-  transform: none !important; /* avoid scale jank */
+  transform: none !important;
 }
+
 .modal-mode .progressive-image-container .gradient-placeholder { 
   display: none !important; 
 }

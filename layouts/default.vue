@@ -102,7 +102,7 @@
           <!-- Close Button -->
           <button
             @click="closeMobileMenu"
-            class="absolute top-6 right-6 text-white/90 hover:text-white transition-colors duration-300 p-2"
+            class="absolute top-3 right-4 text-white/90 hover:text-white transition-colors duration-300 p-2"
             aria-label="Close menu"
           >
             <i class="pi pi-times text-2xl"></i>

@@ -84,5 +84,13 @@ useSeoMeta({
     linear-gradient(to bottom, #0f0f0f, #000000);
   position: relative;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure the main content takes available space and footer sticks to bottom */
+.music-page :deep(.music-detail-content) {
+  flex: 1;
+  min-height: 0; /* Override the min-height: 100vh from the component */
 }
 </style>

@@ -121,8 +121,3 @@ const handleShowAllMusic = () => {
   })
 }
 </script>
-
-<style scoped>
-/* Index page specific styles */
-/* Most styles are now in section components */
-</style>

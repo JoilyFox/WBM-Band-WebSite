@@ -4,6 +4,7 @@ This directory contains documentation for all the main features of the WBM Band 
 
 ## Features Documentation
 
+- [Performance Optimization](./performance-optimization.md) - Automatic device performance detection and adaptive optimizations for smooth 60 FPS on all devices
 - [API Caching](./api-caching.md) - Browser-based API response caching system with localStorage fallback
 - [Global Loading System](./global-loading-system.md) - Top bar progress indicator for async operations
 - [Snackbar Notifications](./snackbar-notifications.md) - Custom notification system with modern animations and multiple types
