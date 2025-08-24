@@ -121,7 +121,7 @@ const getProgressClasses = (type: string) => {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 1200;
+  z-index: 10003;
 }
 
 .snackbar-wrapper {
@@ -156,7 +156,7 @@ const getProgressClasses = (type: string) => {
 .snackbar-item {
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.75rem;
   padding: 1rem;
   border-radius: 0.75rem;

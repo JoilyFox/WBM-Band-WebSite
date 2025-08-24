@@ -117,6 +117,143 @@
   .btn-outline .p-button-icon {
     @apply mr-2;
   }
+  
+  /* Glassmorphic Button Variant */
+  .btn-glassmorphic {
+    @apply font-medium transition-all duration-300 focus:outline-none;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.1) 0%, 
+      rgba(255, 255, 255, 0.05) 100%) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 0.75rem !important;
+    padding: 0.75rem 1.5rem !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    outline: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+    
+    /* Disable ripple effect completely */
+    .p-ink {
+      display: none !important;
+    }
+    
+    /* Prevent layout shifts from ripple */
+    &::before,
+    &::after {
+      display: none !important;
+    }
+    
+    /* Remove PrimeVue default focus styles */
+    &:focus {
+      outline: none !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    /* Focus ring only on non-touch devices */
+    @media (hover: hover) and (pointer: fine) {
+      &:focus-visible {
+        @apply ring-2 ring-primary-200 ring-offset-2 ring-offset-transparent;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      }
+    }
+    
+    /* Hover only on non-touch devices */
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background: linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.15) 0%, 
+          rgba(255, 255, 255, 0.08) 100%) !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+      }
+    }
+    
+    /* Active state - remove weird borders */
+    &:active {
+      background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.15) 0%, 
+        rgba(255, 255, 255, 0.08) 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      color: white !important;
+      transform: scale(0.98) !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+      outline: none !important;
+    }
+    
+    /* Prevent stuck states on mobile */
+    @media (hover: none) and (pointer: coarse) {
+      &:hover {
+        background: linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.1) 0%, 
+          rgba(255, 255, 255, 0.05) 100%) !important;
+        color: rgba(255, 255, 255, 0.9) !important;
+        transform: none !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      }
+      
+      &:focus {
+        @apply ring-0;
+        outline: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+      }
+    }
+    
+    /* Performance optimizations for low-end devices */
+    &.btn-glassmorphic--optimized {
+      backdrop-filter: blur(4px) !important;
+      -webkit-backdrop-filter: blur(4px) !important;
+      transition: background-color 0.2s ease, border-color 0.2s ease !important;
+    }
+    
+    &.btn-glassmorphic--optimized:hover {
+      transform: none !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    }
+  }
+  
+  /* Icon spacing - ensure proper gap */
+  .btn-glassmorphic .p-button-icon {
+    margin: 0 !important;
+    font-size: 1rem !important;
+  }
+  
+  .btn-glassmorphic .p-button-label {
+    margin: 0 !important;
+  }
+  
+  /* Remove margin for icon-only glassmorphic buttons */
+  .btn-glassmorphic.p-button-icon-only {
+    gap: 0 !important;
+  }
+  
+  .btn-glassmorphic.p-button-icon-only .p-button-icon {
+    margin: 0 !important;
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .btn-glassmorphic {
+      transition: none !important;
+    }
+    
+    .btn-glassmorphic:hover {
+      transform: none !important;
+    }
+  }
 
   /* PrimeVue Button override styles */
   .p-button {
@@ -162,6 +299,106 @@
         color: inherit;
         border-color: inherit;
       }
+    }
+  }
+}
+
+/* Global ripple disabling for glassmorphic buttons */
+:deep(.btn-glassmorphic .p-ink) {
+  display: none !important;
+}
+
+:deep(.btn-glassmorphic span[data-p-ink="true"]) {
+  display: none !important;
+}
+
+:deep(.btn-glassmorphic [data-pc-name="ripple"]) {
+  display: none !important;
+}
+
+/* Prevent glassmorphic button size changes from ripple */
+.btn-glassmorphic {
+  min-width: fit-content !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Mobile Performance Optimizations */
+@media screen and (max-width: 768px) {
+  /* Default: Conservative mobile mode - disable expensive effects */
+  .btn-glassmorphic {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: background-color 0.2s ease !important;
+    
+    &:hover, &:focus, &:active {
+      background: rgba(255, 255, 255, 0.12) !important;
+      transform: none !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+  }
+  
+  .share-glass-btn,
+  .back-glass-btn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: background-color 0.2s ease !important;
+    
+    &:hover, &:focus, &:active {
+      background: rgba(255, 255, 255, 0.12) !important;
+      transform: none !important;
+    }
+  }
+  
+  /* Override for flagship mobile devices */
+  .mobile-flagship {
+    .btn-glassmorphic {
+      background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        rgba(255, 255, 255, 0.05) 100%) !important;
+      backdrop-filter: blur(6px) !important;
+      -webkit-backdrop-filter: blur(6px) !important;
+      transition: all 0.3s ease !important;
+    }
+    
+    .share-glass-btn,
+    .back-glass-btn {
+      backdrop-filter: blur(6px) !important;
+      -webkit-backdrop-filter: blur(6px) !important;
+      background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        rgba(255, 255, 255, 0.05) 100%) !important;
+    }
+  }
+  
+  /* Standard mobile devices - limited effects */
+  .mobile-standard {
+    .btn-glassmorphic {
+      backdrop-filter: blur(4px) !important;
+      -webkit-backdrop-filter: blur(4px) !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      transition: all 0.2s ease !important;
+    }
+    
+    .share-glass-btn,
+    .back-glass-btn {
+      backdrop-filter: blur(4px) !important;
+      -webkit-backdrop-filter: blur(4px) !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+  
+  /* Reduced motion respect on mobile */
+  @media (prefers-reduced-motion: reduce) {
+    .btn-glassmorphic,
+    .share-glass-btn,
+    .back-glass-btn {
+      transition: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: rgba(255, 255, 255, 0.08) !important;
     }
   }
 }

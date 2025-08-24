@@ -68,3 +68,157 @@
     @apply ring-2 ring-primary-50 ring-offset-2 ring-offset-surface-950;
   }
 }
+
+/* Mobile-First Performance Optimizations */
+@layer utilities {
+  /* Conservative mobile performance - disable all expensive effects */
+  .mobile-conservative {
+    * {
+      transform: none !important;
+      transition: none !important;
+      animation: none !important;
+      backdrop-filter: none !important;
+      filter: none !important;
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px !important;
+    }
+    
+    /* Simplify glassmorphic effects */
+    .glassmorphic, 
+    .glass-effect,
+    .btn-glassmorphic {
+      background: rgba(255, 255, 255, 0.05) !important;
+      backdrop-filter: none !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Disable hover effects on mobile */
+    * {
+      &:hover, &:focus, &:active {
+        transform: none !important;
+        box-shadow: none !important;
+      }
+    }
+  }
+  
+  /* Standard mobile performance - limited effects */
+  .mobile-standard {
+    * {
+      animation-duration: 0.2s !important;
+      transition-duration: 0.2s !important;
+    }
+    
+    .glassmorphic, 
+    .glass-effect,
+    .btn-glassmorphic {
+      backdrop-filter: blur(4px) !important;
+    }
+    
+    /* Reduce particle effects */
+    .floating-particles,
+    .parallax-element {
+      display: none !important;
+    }
+  }
+  
+  /* Flagship mobile performance - full effects but optimized */
+  .mobile-flagship {
+    * {
+      animation-duration: 0.6s !important;
+      transition-duration: 0.3s !important;
+    }
+    
+    /* Enable limited glassmorphic effects */
+    .glassmorphic, 
+    .glass-effect,
+    .btn-glassmorphic {
+      backdrop-filter: blur(8px) !important;
+    }
+    
+    /* Still disable parallax for battery life */
+    .parallax-element {
+      transform: none !important;
+    }
+  }
+  
+  /* Performance level classes */
+  .perf-low {
+    * {
+      will-change: auto !important;
+      animation-duration: 0.2s !important;
+      transition-duration: 0.2s !important;
+    }
+    
+    .glassmorphic, 
+    .glass-effect,
+    .btn-glassmorphic {
+      backdrop-filter: none !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+    }
+  }
+  
+  .perf-medium {
+    .glassmorphic, 
+    .glass-effect,
+    .btn-glassmorphic {
+      backdrop-filter: blur(6px) !important;
+    }
+  }
+  
+  .perf-high {
+    /* Full effects enabled - no restrictions */
+    .glassmorphic, 
+    .glass-effect,
+    .btn-glassmorphic {
+      backdrop-filter: var(--perf-blur-strength, blur(12px)) !important;
+    }
+    
+    .complex-animation {
+      animation-duration: var(--perf-animation-duration, 1s) !important;
+    }
+  }
+  
+  /* Device-specific optimizations */
+  .flagship-device {
+    /* Flagship devices can handle more effects */
+    .complex-animation {
+      animation-duration: var(--perf-animation-duration, 1s) !important;
+    }
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-conservative,
+    .mobile-standard,
+    .mobile-flagship {
+      * {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+      }
+    }
+  }
+  
+  /* Battery optimization for mobile */
+  @media screen and (max-width: 768px) {
+    /* Force conservative mode for all mobile by default */
+    .share-glass-btn,
+    .btn-glassmorphic {
+      backdrop-filter: none !important;
+      background: rgba(255, 255, 255, 0.05) !important;
+      transition: background-color 0.2s ease !important;
+    }
+    
+    /* Override only for flagship devices */
+    .mobile-flagship .share-glass-btn,
+    .mobile-flagship .btn-glassmorphic {
+      backdrop-filter: blur(6px) !important;
+    }
+    
+    /* Disable floating animations on mobile */
+    .floating-animation,
+    .hover-float {
+      animation: none !important;
+      transform: none !important;
+    }
+  }
+}

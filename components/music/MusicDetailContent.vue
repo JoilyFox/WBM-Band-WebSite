@@ -17,7 +17,7 @@
           @click="handleBack"
           :class="['back-glass-btn', { 
             'back-glass-btn--transparent': backBtnTransparent,
-            'back-glass-btn--optimized': isLowPerformanceDevice 
+            'back-glass-btn--optimized': shouldUseMobileFallback 
           }]"
           :aria-label="shouldShowBackArrow ? 'Back to music section' : 'Go to music library'"
         >
@@ -26,7 +26,7 @@
         </button>
         
         <!-- Logo and Share button only on mobile -->
-        <template v-if="!isDesktop">
+        <template v-if="!isDesktop && isClient">
           <!-- Logo in the center (mobile only) -->
           <div class="floating-logo" :class="{ 'floating-logo--transparent': backBtnTransparent }">
             <Logo
@@ -44,7 +44,7 @@
             @click="handleShare"
             :class="['share-glass-btn', { 
               'share-glass-btn--transparent': backBtnTransparent,
-              'share-glass-btn--optimized': isLowPerformanceDevice
+              'share-glass-btn--optimized': shouldUseMobileFallback
             }]"
             aria-label="Share release"
           >
@@ -171,14 +171,40 @@
             {{ release.title }}
           </h1>
           <p class="music-date text-primary-200 text-base md:text-lg font-medium mb-2">{{ formatDate(release.releaseDate) }}</p>
-          <p v-if="release.description" class="music-description text-primary-100 text-base md:text-lg max-w-xl mx-auto md:mx-0">
+          <p v-if="release.description" class="music-description text-primary-100 text-base md:text-lg max-w-xl mx-auto md:mx-0 mb-4">
             {{ release.description }}
           </p>
+          
+          <!-- Desktop Share Button -->
+          <div v-if="isDesktop && isClient" class="desktop-share-button mt-6">
+            <Button
+              id="desktop-share-button"
+              @click="showDesktopSharePopup"
+              class="btn-glassmorphic"
+              :class="{ 'btn-glassmorphic--optimized': shouldUseMobileFallback }"
+              aria-label="Share release"
+              unstyled
+              :pt="{ ripple: { style: 'display: none !important' } }"
+            >
+              <i class="pi pi-share-alt"></i>
+              <span>Share</span>
+            </Button>
+          </div>
         </div>
       </div>
     </section>
+    
+    <!-- Custom Share Popup for Desktop -->
+    <CustomSharePopup
+      :visible="showSharePopup"
+      :share-text="shareContent.displayText"
+      :share-url="shareContent.url"
+      :target-element="shareButtonElement"
+      @close="hideSharePopup"
+    />
+    
     <!-- Music Platform Links -->
-    <section class="music-platforms flex-1 relative py-8 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/95">
+    <section class="music-platforms flex-1 relative py-8 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/70">
       <div class="platforms-container max-w-3xl mx-auto rounded-xl">
         <h2 class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-4 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md">Listen Now</h2>
         <div class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch">
@@ -200,13 +226,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import Button from 'primevue/button'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
 import { useOptimizedScroll } from '~/composables/useOptimizedScroll'
+import { useShareFunctionality } from '~/composables/useShareFunctionality'
 import type { MusicRelease } from '~/data/musicLibrary'
 import Logo from '~/components/ui/Logo.vue'
+import CustomSharePopup from '~/components/common/CustomSharePopup.vue'
 
 interface Props {
   release: MusicRelease
@@ -223,6 +252,8 @@ const {
   isMediumPerformanceDevice,
   isHighPerformanceDevice,
   shouldReduceAnimations,
+  isMobileFlagship,
+  shouldUseMobileFallback,
   performanceCSSVars,
   getPerformanceClass
 } = usePerformanceOptimization()
@@ -232,6 +263,24 @@ const performanceClass = computed(() => getPerformanceClass())
 // Optimized scroll handling
 const { isScrolled } = useOptimizedScroll({ threshold: 60 })
 
+// Share functionality
+const { getShareContent, shareViaMobile, copyToClipboard } = useShareFunctionality()
+
+// Custom share popup state
+const showSharePopup = ref(false)
+const shareButtonElement = ref<HTMLElement>()
+const shareUrlInput = ref<HTMLInputElement>()
+const justCopied = ref(false)
+const isCopying = ref(false)
+
+// Computed share content
+const shareContent = computed(() => {
+  return getShareContent({
+    title: props.release.title,
+    description: props.release.description
+  })
+})
+
 // Check if back button should show back arrow or music library icon
 const shouldShowBackArrow = computed(() => {
   return route.query.from === 'music'
@@ -240,12 +289,17 @@ const shouldShowBackArrow = computed(() => {
 // Track if we're on client side to avoid SSR hydration issues
 const isClient = ref(false)
 
-// Responsive breakpoint detection - use CSS classes for initial state
-const isDesktop = ref(false) // Start as false to prevent mobile flash
+// Responsive breakpoint detection - start with a safe default
+const isDesktop = ref(false)
 const updateBreakpoint = () => {
   if (typeof window !== 'undefined') {
     isDesktop.value = window.innerWidth >= 768 // md breakpoint
   }
+}
+
+// Initialize desktop detection immediately if possible
+if (typeof window !== 'undefined') {
+  isDesktop.value = window.innerWidth >= 768
 }
 
 // Mobile hero expansion state (default collapsed on mobile)
@@ -257,10 +311,8 @@ const toggleHeroExpansion = () => {
 // Optimized back button transparency based on scroll
 const backBtnTransparent = computed(() => isScrolled.value)
 onMounted(() => {
-  // Mark as client-side
+  // Mark as client-side and update breakpoint immediately
   isClient.value = true
-  
-  // Initialize breakpoint detection immediately
   updateBreakpoint()
   
   // Resize handler for responsive breakpoint (debounced)
@@ -362,21 +414,46 @@ const scrollToHero = () => {
   scrollToElementWithNavigation('hero')
 }
 
-// Share button handler: Web Share API with clipboard fallback
+// Share functionality - Mobile share handler (uses Web Share API)
 const handleShare = async () => {
-  try {
-    const url = window.location.href
-    const title = props.release.title
-    const text = `Check out: ${props.release.title}`
-    if (navigator.share) {
-      await navigator.share({ title, text, url })
-    } else if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(url)
-      // Optional: integrate snackbar here if desired
-    }
-  } catch (e) {
-    // no-op on cancel or failure
+  await shareViaMobile({
+    title: props.release.title,
+    description: props.release.description
+  })
+}
+
+// Desktop share popup functions
+const showDesktopSharePopup = (event: Event) => {
+  const targetElement = event.currentTarget as HTMLElement
+  shareButtonElement.value = targetElement
+  showSharePopup.value = true
+}
+
+const hideSharePopup = () => {
+  showSharePopup.value = false
+}
+
+const selectAllShareText = async () => {
+  await nextTick()
+  if (shareUrlInput.value) {
+    shareUrlInput.value.select()
   }
+}
+
+const handleCopyToClipboard = async () => {
+  if (isCopying.value) return
+  
+  isCopying.value = true
+  const success = await copyToClipboard(shareContent.value.url)
+  
+  if (success) {
+    justCopied.value = true
+    setTimeout(() => {
+      justCopied.value = false
+    }, 2000)
+  }
+  
+  isCopying.value = false
 }
 </script>
 
@@ -418,6 +495,13 @@ const handleShare = async () => {
   z-index: 10;
   transition: opacity 0.45s cubic-bezier(.4,0,.2,1);
   opacity: 1;
+}
+
+/* Hide mobile elements on desktop as CSS safeguard */
+@media (min-width: 768px) {
+  .floating-logo {
+    display: none !important;
+  }
 }
 
 .floating-logo--transparent { 
@@ -505,6 +589,13 @@ const handleShare = async () => {
 
 /* When not in container, keep back on left and share on right */
 .share-glass-btn { left: auto; right: 1rem; }
+
+/* Hide mobile share button on desktop as CSS safeguard */
+@media (min-width: 768px) {
+  .share-glass-btn {
+    display: none !important;
+  }
+}
 
 .back-glass-btn:hover,
 .share-glass-btn:hover {
@@ -1269,6 +1360,176 @@ const handleShare = async () => {
   
   .platform-button-wrapper :deep(.platform-button) {
     min-height: 70px !important;
+  }
+}
+
+/* Desktop Share Button Container */
+.desktop-share-button {
+  display: flex;
+  justify-content: center;
+  position: relative; /* Ensure proper positioning context */
+}
+
+/* Hide desktop share button on mobile as CSS safeguard */
+@media (max-width: 767px) {
+  .desktop-share-button {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .desktop-share-button {
+    justify-content: flex-start;
+  }
+}
+
+
+
+.share-glassmorphic-popup {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  width: 400px;
+  max-width: 90vw;
+  color: white;
+  overflow: hidden;
+}
+
+.share-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.share-popup-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.share-popup-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.share-popup-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  transform: scale(1.05);
+}
+
+.share-popup-content {
+  padding: 1.5rem;
+}
+
+.share-popup-description {
+  margin: 0 0 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.share-popup-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.share-popup-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.share-popup-input:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.share-popup-copy-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem 1.25rem !important;
+  color: white !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  white-space: nowrap !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+.share-popup-copy-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+}
+
+.share-popup-copy-btn:disabled {
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+}
+
+/* Performance optimizations for low-end devices */
+@media (prefers-reduced-motion: reduce) {
+  .share-glassmorphic-popup {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  
+  .share-popup-close:hover,
+  .share-popup-copy-btn:hover {
+    transform: none !important;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .share-glassmorphic-popup {
+    width: 95vw;
+    margin: 1rem;
+  }
+  
+  .share-popup-header,
+  .share-popup-content {
+    padding: 1.25rem;
+  }
+  
+  .share-popup-input-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .share-popup-copy-btn {
+    justify-content: center !important;
   }
 }
 </style>
