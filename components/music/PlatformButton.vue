@@ -4,7 +4,8 @@
     target="_blank"
     rel="noopener noreferrer"
     class="platform-button"
-    :class="platformClass"
+    :class="[platformClass, performanceClass]"
+    :style="performanceCSSVars"
     @click="handleClick"
   >
     <div class="platform-icon">
@@ -22,6 +23,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
 
 interface Props {
   platform: string
@@ -29,6 +31,15 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+// Performance optimization
+const {
+  shouldUseMobileFallback,
+  performanceCSSVars,
+  getPerformanceClass
+} = usePerformanceOptimization()
+
+const performanceClass = computed(() => getPerformanceClass())
 
 const platformConfig = {
   spotify: {
@@ -126,7 +137,37 @@ const handleClick = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+/* SCSS Variables for Performance System */
+$perf-blur-strength: 18px;
+$perf-animation-duration: 0.15s;
+$perf-icon-blur: 10px;
+$perf-glow-blur: 8px;
+$button-border-radius: 18px;
+$icon-border-radius: 14px;
+$glow-border-radius: 16px;
+
+// Performance optimization variables
+$perf-low-duration: 0.2s;
+$perf-medium-blur: 6px;
+$perf-medium-icon-blur: 4px;
+$perf-medium-glow-blur: 4px;
+
+// Mobile optimization variables
+$mobile-blur: 6px;
+$mobile-icon-blur: 4px;
+$mobile-glow-blur: 4px;
+$mobile-duration: 0.2s;
+$mobile-flagship-blur: 12px;
+$mobile-flagship-icon-blur: 8px;
+$mobile-flagship-glow-blur: 6px;
+$mobile-flagship-duration: 0.3s;
+
+$mobile-flagship-blur: 12px;
+$mobile-flagship-icon-blur: 8px;
+$mobile-flagship-glow-blur: 6px;
+$mobile-flagship-duration: 0.3s;
+
 .platform-button {
   display: flex;
   align-items: center;
@@ -134,51 +175,51 @@ const handleClick = () => {
   padding: 1.1rem 1.6rem;
   position: relative;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: $button-border-radius;
 
   background: rgba(8, 8, 8, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(18px) saturate(120%);
-  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur($perf-blur-strength) saturate(120%);
+  -webkit-backdrop-filter: blur($perf-blur-strength) saturate(120%);
   color: white;
   text-decoration: none;
   box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.35),
     0 0 0 1px rgba(255, 255, 255, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow .4s cubic-bezier(0.4, 0, 0.2, 1), 
-              border-color .4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 }
 
-/* Gradient aurora edge */
+/* Performance-aware gradient aurora edge */
 .platform-button::before {
   content: '';
   position: absolute; inset: -1px;
-  border-radius: 18px;
+  border-radius: $button-border-radius;
   padding: 1px;
   background: v-bind('config.gradient');
-  opacity: .25;
-  transition: opacity .4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.25;
+  transition: opacity $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
   pointer-events: none;
 }
 
-/* Soft inner glow */
+/* Performance-aware soft inner glow */
 .platform-button::after {
   content: '';
   position: absolute; inset: 0;
   background: radial-gradient(120% 150% at -10% -20%, rgba(255,255,255,.06), transparent 60%),
               radial-gradient(120% 150% at 110% 120%, rgba(255,255,255,.04), transparent 60%);
-  opacity: .6;
+  opacity: 0.6;
   pointer-events: none;
-  transition: opacity .4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Desktop hover effects only */
+/* Desktop hover effects only - performance aware */
 @media (hover: hover) and (pointer: fine) {
   .platform-button:hover {
     transform: translateY(-3px) scale(1.02);
@@ -189,11 +230,11 @@ const handleClick = () => {
   }
 
   .platform-button:hover::before {
-    opacity: .6;
+    opacity: 0.6;
   }
 
   .platform-button:hover::after {
-    opacity: .9;
+    opacity: 0.9;
   }
 
   .platform-button:hover .platform-icon {
@@ -203,7 +244,7 @@ const handleClick = () => {
   }
 
   .platform-button:hover .platform-icon::before {
-    opacity: .6;
+    opacity: 0.6;
     filter: blur(12px);
   }
 
@@ -220,36 +261,36 @@ const handleClick = () => {
 .platform-icon {
   position: relative;
   width: 2.6rem; height: 2.6rem;
-  border-radius: 14px;
+  border-radius: $icon-border-radius;
   display: grid; place-items: center;
   font-size: 1.25rem;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.16);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: transform .4s cubic-bezier(0.4, 0, 0.2, 1), 
-              background .4s cubic-bezier(0.4, 0, 0.2, 1), 
-              border-color .4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur($perf-icon-blur);
+  -webkit-backdrop-filter: blur($perf-icon-blur);
+  transition: transform $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1), 
+              background $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 }
 
-/* Icon glow ring */
+/* Performance-aware icon glow ring */
 .platform-icon::before {
   content: '';
   position: absolute; inset: -3px;
-  border-radius: 16px;
+  border-radius: $glow-border-radius;
   background: v-bind('config.gradient');
-  opacity: .35;
-  filter: blur(8px);
+  opacity: 0.35;
+  filter: blur($perf-glow-blur);
   z-index: -1;
-  transition: opacity .4s cubic-bezier(0.4, 0, 0.2, 1), 
-              filter .4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1), 
+              filter $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .platform-content { 
   flex: 1; 
   min-width: 0; 
-  transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .platform-name { 
@@ -259,7 +300,7 @@ const handleClick = () => {
   line-height: 1.3; 
   margin-bottom: .2rem; 
   text-shadow: 0 2px 4px rgba(0,0,0,.35);
-  transition: text-shadow .4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: text-shadow $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .platform-action { 
@@ -269,13 +310,13 @@ const handleClick = () => {
   font-weight: 600; 
   text-shadow: 0 1px 2px rgba(0,0,0,.3); 
   letter-spacing: .02em;
-  transition: color .3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: color $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .platform-arrow { 
   opacity: .8; 
-  transition: transform .4s cubic-bezier(0.4, 0, 0.2, 1), 
-              opacity .3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 }
 
@@ -283,17 +324,17 @@ const handleClick = () => {
 @media (hover: none) and (pointer: coarse) {
   .platform-button:active {
     transform: translateY(-1px) scale(0.98);
-    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .platform-button:active .platform-icon {
     transform: scale(0.95);
-    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .platform-button:active .platform-arrow {
     transform: translateX(2px);
-    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
@@ -305,14 +346,14 @@ const handleClick = () => {
   
   .platform-button:active {
     transform: translateY(-1px) scale(0.98);
-    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
 /* Active state for all devices */
 .platform-button:active { 
   transform: translateY(-1px) scale(1.005); 
-  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* High-contrast focus style without browser outlines */
@@ -320,5 +361,151 @@ const handleClick = () => {
   outline: none; 
   box-shadow: 0 0 0 3px rgba(255,255,255,.2), 
               0 10px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* Performance Optimizations */
+.perf-low .platform-button {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: transparent !important;
+  transition: transform $perf-low-duration ease, background-color $perf-low-duration ease !important;
+}
+
+.perf-low .platform-button::before {
+  opacity: 0.15 !important;
+  transition: opacity $perf-low-duration ease !important;
+}
+
+.perf-low .platform-button::after {
+  display: none !important;
+}
+
+.perf-low .platform-icon {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  /* Use platform color from JS config for background */
+  background: v-bind('config.color + "30"') !important;
+  border-radius: $glow-border-radius;
+  /* Add clear colored box-shadow for performance-friendly glow */
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    0 0 8px v-bind('config.color + "40"'),
+    0 0 12px v-bind('config.color + "30"'),
+    inset 0 1px 0 v-bind('config.color + "20"') !important;
+}
+
+.perf-low .platform-icon::before {
+  /* Remove blur for performance, keep color from config */
+  filter: none !important;
+  opacity: 0.4 !important;
+  background: v-bind('config.gradient') !important;
+}
+
+.perf-medium .platform-button {
+  backdrop-filter: blur($perf-medium-blur) !important;
+  -webkit-backdrop-filter: blur($perf-medium-blur) !important;
+}
+
+.perf-medium .platform-icon {
+  backdrop-filter: blur($perf-medium-icon-blur) !important;
+  -webkit-backdrop-filter: blur($perf-medium-icon-blur) !important;
+}
+
+.perf-medium .platform-icon::before {
+  filter: blur($perf-medium-glow-blur) !important;
+}
+
+/* Mobile Performance Modes */
+.mobile-conservative .platform-button {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: transparent !important;
+  transition: transform 0.15s ease, background-color 0.15s ease !important;
+}
+
+.mobile-conservative .platform-button::before,
+.mobile-conservative .platform-button::after {
+  display: none !important;
+}
+
+.mobile-conservative .platform-icon {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition: transform 0.15s ease, background-color 0.15s ease !important;
+}
+
+.mobile-conservative .platform-icon::before {
+  display: none !important;
+}
+
+.mobile-standard .platform-button {
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  transition: transform 0.2s ease !important;
+}
+
+.mobile-standard .platform-icon {
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+.mobile-standard .platform-icon::before {
+  filter: blur(4px) !important;
+  opacity: 0.25 !important;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .platform-button,
+  .platform-icon,
+  .platform-content,
+  .platform-arrow {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .platform-button:hover {
+    transform: none !important;
+  }
+  
+  .platform-icon::before {
+    filter: none !important;
+  }
+}
+
+/* Mobile-first optimizations */
+@media screen and (max-width: 768px) {
+  .platform-button {
+    backdrop-filter: blur($mobile-blur) !important;
+    -webkit-backdrop-filter: blur($mobile-blur) !important;
+    transition: transform $mobile-duration ease, background-color $mobile-duration ease !important;
+  }
+  
+  .platform-icon {
+    backdrop-filter: blur($mobile-icon-blur) !important;
+    -webkit-backdrop-filter: blur($mobile-icon-blur) !important;
+  }
+  
+  .platform-icon::before {
+    filter: blur($mobile-glow-blur) !important;
+    opacity: 0.25 !important;
+  }
+  
+  /* Override for flagship devices */
+  .mobile-flagship .platform-button {
+    backdrop-filter: blur($mobile-flagship-blur) !important;
+    -webkit-backdrop-filter: blur($mobile-flagship-blur) !important;
+    transition: transform $mobile-flagship-duration ease !important;
+  }
+  
+  .mobile-flagship .platform-icon {
+    backdrop-filter: blur($mobile-flagship-icon-blur) !important;
+    -webkit-backdrop-filter: blur($mobile-flagship-icon-blur) !important;
+  }
+  
+  .mobile-flagship .platform-icon::before {
+    filter: blur($mobile-flagship-glow-blur) !important;
+    opacity: 0.35 !important;
+  }
 }
 </style>
