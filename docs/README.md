@@ -10,6 +10,7 @@ This directory contains documentation for all the main features of the WBM Band 
 - [Snackbar Notifications](./snackbar-notifications.md) - Custom notification system with modern animations and multiple types
 - [Error Page System](./error-page-system.md) - Comprehensive error handling with custom messages and glassmorphism design
 - [Image Optimization Guide](./image-optimization-guide.md) - Comprehensive image optimization implementation with static site generation support
+- [Pre‑Blurred Images](./pre-blurred-images.md) - Build-time blur/tint generation to replace runtime overlay blur
 - [Image Utilities](./image-utilities.md) - Composables and helper functions for image loading states and optimization
 - [Favicon Setup](./favicon-setup.md) - Complete favicon generation system with multi-platform support and PWA compatibility
 

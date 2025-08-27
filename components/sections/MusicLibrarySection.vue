@@ -25,7 +25,7 @@
             <div class="new-release-content">
               <!-- Album Cover with Progressive Loading -->
               <UiAlbumCover
-                :image-url="newReleasePreviewData?.imageUrl || ''"
+                :image-url="blurredNewReleaseImageUrl"
                 :alt="newReleasePreviewData?.title || 'New Release'"
                 release-type="new release"
               />
@@ -38,7 +38,6 @@
                   </div>
                   <h3 class="new-release-title">{{ newReleasePreviewData?.title }}</h3>
                   <p class="new-release-date">Coming {{ newReleasePreviewData?.releaseDate }}</p>
-                  
                 </div>
               </div>
             </div>
@@ -182,6 +181,18 @@ const newReleasePreviewData = computed(() => {
     releaseDate: formatReleaseDate(dateValue),
     imageUrl: nextReleaseImageUrl.value || '/images/albums-images/IMG_1822.JPG' // Fallback image
   }
+})
+
+// Use a pre-blurred variant of the new release image to avoid runtime backdrop blur
+const blurredNewReleaseImageUrl = computed(() => {
+  const src = newReleasePreviewData.value?.imageUrl || ''
+  if (!src) return ''
+  // Insert "-blurred" before extension: cover.jpg -> cover-blurred.jpg
+  const idx = src.lastIndexOf('.')
+  if (idx === -1) return `${src}-blurred`
+  const base = src.slice(0, idx)
+  const ext = src.slice(idx)
+  return `${base}-blurred${ext}`
 })
 
 // Methods
@@ -541,30 +552,26 @@ $shimmer-easing: ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: 
-    rgba(0, 0, 0, 0.4),
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%);
-  backdrop-filter: blur(15px) saturate(180%);
-  -webkit-backdrop-filter: blur(15px) saturate(180%);
-  transition: background $hover-duration $hover-easing;
+  // Heavy blur and tints are baked into the preprocessed image now
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: opacity $hover-duration $hover-easing;
 
   &::before {
     content: '';
     @include absolute-overlay;
+    // Keep ultra-subtle noise only
     @include noise-texture;
     mix-blend-mode: overlay;
-    opacity: 0.05;
+    opacity: 0.025;
   }
 }
 
 /* Desktop hover effects only */
 @media (hover: hover) and (pointer: fine) {
   .new-release-content:hover .new-release-overlay {
-    background: 
-      rgba(0, 0, 0, 0.3),
-      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 60%),
-      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 60%);
+    opacity: 1; // keep interaction effect without changing background
   }
 }
 
