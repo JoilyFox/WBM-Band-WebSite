@@ -29,16 +29,17 @@
                 :alt="newReleasePreviewData?.title || 'New Release'"
                 release-type="new release"
               />
-              
-              <!-- Glassmorphic Overlay -->
-              <div class="new-release-overlay">
-                <div class="new-release-info">
-                  <div class="new-release-icon">
-                    <i class="pi pi-calendar"></i>
-                  </div>
-                  <h3 class="new-release-title">{{ newReleasePreviewData?.title }}</h3>
-                  <p class="new-release-date">Coming {{ newReleasePreviewData?.releaseDate }}</p>
+            
+              <!-- Background Overlay under text (no play button) -->
+              <div class="new-release-overlay"></div>
+
+              <!-- Text content layered above overlay -->
+              <div class="new-release-info">
+                <div class="new-release-icon">
+                  <i class="pi pi-calendar"></i>
                 </div>
+                <h3 class="new-release-title">{{ newReleasePreviewData?.title }}</h3>
+                <p class="new-release-date">Coming {{ newReleasePreviewData?.releaseDate }}</p>
               </div>
             </div>
           </div>
@@ -513,50 +514,42 @@ $shimmer-easing: ease-in-out;
   border-radius: 16px;
   overflow: hidden;
   width: 100%;
-  transition: all $hover-duration $hover-easing;
+  /* Match UiMusicCard transition */
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
   transform-origin: center;
 }
 
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .new-release-content:hover {
-    transform: translateY(-0.125rem) scale(1.01);
-    box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(255, 255, 255, 0.1);
-  }
+/* Desktop-like hover/active effects to match UiMusicCard */
+.new-release-content:hover {
+  transform: translateY(-8px);
+}
+.new-release-content:active {
+  transform: translateY(-4px) scale(0.98);
 }
 
-/* Mobile and touch device specific styles */
-@media (hover: none) and (pointer: coarse) {
-  .new-release-content:active {
-    transform: translateY(-0.0625rem) scale(0.98);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Fallback for devices that support both hover and touch */
-@media (hover: hover) and (pointer: coarse) {
+/* Mobile and touch device specific styles (mirror UiMusicCard) */
+@media (max-width: 767px) {
   .new-release-content:hover {
-    transform: none; /* Disable hover on touch-capable devices */
+    transform: none;
   }
-  
   .new-release-content:active {
-    transform: translateY(-0.0625rem) scale(0.98);
-    transition-duration: 0.15s;
+    transform: scale(0.95);
+    transition: transform 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
 }
 
 .new-release-overlay {
   @include absolute-overlay;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* Background layer under text */
   // Heavy blur and tints are baked into the preprocessed image now
-  background: transparent;
+  background:
+    radial-gradient(60% 60% at 50% 50%, rgba(0,0,0,0.25), transparent 70%),
+    linear-gradient(135deg, rgba(59, 130, 246, 0.18) 0%, rgba(147, 51, 234, 0.18) 100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  transition: opacity $hover-duration $hover-easing;
+  transition: opacity $hover-duration $hover-easing, transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  opacity: 0; /* hidden by default, shown on hover-capable devices */
+  z-index: 1; /* stay under text */
 
   &::before {
     content: '';
@@ -569,11 +562,7 @@ $shimmer-easing: ease-in-out;
 }
 
 /* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .new-release-content:hover .new-release-overlay {
-    opacity: 1; // keep interaction effect without changing background
-  }
-}
+/* Keep overlay static to match other items (no extra hover-only changes) */
 
 .new-release-info {
   position: relative;
@@ -581,12 +570,41 @@ $shimmer-easing: ease-in-out;
   text-align: center;
   padding: 1.5rem;
   transition: all $hover-duration $hover-easing;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  @include absolute-overlay;
 }
 
-/* Desktop hover effects only */
+/* Remove extra internal hover motion for consistency */
+
+/* Hover-capable fine pointers: animate unique elements (overlay, icon, title, date) */
 @media (hover: hover) and (pointer: fine) {
-  .new-release-content:hover .new-release-info {
-    transform: translateY(-0.0625rem);
+  /* Overlay breathes slightly */
+  .new-release-content:hover .new-release-overlay {
+    transform: scale(1.03);
+  opacity: 0.98;
+  }
+  /* Scale underlying image without relying on group */
+  .new-release-content:hover :deep(img) {
+    transform: scale(1.05);
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  /* Icon lifts a bit more for emphasis */
+  .new-release-content:hover .new-release-icon {
+    transform: translateY(-2px) scale(1.1);
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
+  }
+  /* Title gets tiny emphasis */
+  .new-release-content:hover .new-release-title {
+    transform: translateY(-1px) scale(1.07);
+    letter-spacing: 0.2px;
+  }
+  /* Date gently lifts and brightens */
+  .new-release-content:hover .new-release-date {
+    transform: translateY(-1px) scale(1.07);
+    opacity: 0.92;
   }
 }
 
@@ -596,14 +614,7 @@ $shimmer-easing: ease-in-out;
   transition: all $hover-duration $hover-easing;
 }
 
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .new-release-content:hover .new-release-icon {
-    color: rgba(255, 255, 255, 1);
-    font-size: 2.1rem;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-  }
-}
+/* No icon size/color change on hover to match other items */
 
 .new-release-title {
   color: rgba(255, 255, 255, 0.95);
@@ -613,15 +624,7 @@ $shimmer-easing: ease-in-out;
   transition: all $hover-duration $hover-easing;
 }
 
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .new-release-content:hover .new-release-title {
-    color: rgba(255, 255, 255, 1);
-    text-shadow: 
-      0 2px 4px rgba(0, 0, 0, 0.7),
-      0 0 15px rgba(255, 255, 255, 0.15);
-  }
-}
+/* Keep title static on hover */
 
 .new-release-date {
   color: rgba(255, 255, 255, 0.8);
@@ -631,15 +634,7 @@ $shimmer-easing: ease-in-out;
   transition: all $hover-duration $hover-easing;
 }
 
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .new-release-content:hover .new-release-date {
-    color: rgba(255, 255, 255, 0.9);
-    text-shadow: 
-      0 1px 2px rgba(0, 0, 0, 0.5),
-      0 0 10px rgba(255, 255, 255, 0.08);
-  }
-}
+/* Keep date static on hover */
 
 .new-release-label {
   display: inline-block;
@@ -658,18 +653,7 @@ $shimmer-easing: ease-in-out;
   transition: all $hover-duration $hover-easing;
 }
 
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .new-release-content:hover .new-release-label {
-    background: rgba(255, 255, 255, 0.22);
-    border-color: rgba(255, 255, 255, 0.35);
-    color: rgba(255, 255, 255, 1);
-    transform: translateY(-0.0625rem);
-    box-shadow: 
-      0 3px 15px rgba(0, 0, 0, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  }
-}
+/* Keep label static on hover */
 
 @keyframes shimmer {
   0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
