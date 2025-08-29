@@ -291,9 +291,8 @@ const shareContent = computed(() => {
 })
 
 // Check if back button should show back arrow or music library icon
-const shouldShowBackArrow = computed(() => {
-  return route.query.from === 'music'
-})
+// Lock decision on first render to avoid flicker when query params change
+const shouldShowBackArrow = ref(route.query.from === 'music')
 
 // Track if we're on client side to avoid SSR hydration issues
 const isClient = ref(false)
