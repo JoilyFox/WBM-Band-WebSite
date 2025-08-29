@@ -98,18 +98,16 @@
               sizes="64px"
               style="aspect-ratio: 1; object-fit: cover;"
             />
-            <!-- Small Badge -->
-            <div class="absolute top-1 left-1 z-10">
-              <span :class="badgeClass" class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border border-white/25 shadow-sm">
-                {{ release.type }}
-              </span>
-            </div>
           </div>
           
           <!-- Compact Info -->
           <div class="flex-1 min-w-0">
-            <h1 class="text-lg font-bold text-primary-50 mb-1 truncate">{{ release.title }}</h1>
-            <p class="text-sm text-primary-200 font-medium">{{ formatDate(release.releaseDate) }}</p>
+            <h1 class="text-lg font-bold text-primary-50 mb-[2px] truncate">{{ release.title }}</h1>
+            <p class="text-sm text-primary-200 opacity-70 font-base">
+              <span>{{ release.type.charAt(0).toUpperCase() + release.type.slice(1) }}</span>
+              <span aria-hidden="true" class="mx-1.5">·</span>
+              <span>{{ formatDate(release.releaseDate) }}</span>
+            </p>
           </div>
           
           <!-- Expand Icon -->
@@ -972,6 +970,30 @@ const handleCopyToClipboard = async () => {
   /* Prevent layout shift */
   aspect-ratio: 1;
   contain: layout size;
+}
+
+/* Keep shadow visible on click/focus states */
+.music-album-cover:active,
+.music-album-cover:focus,
+.music-album-cover:focus-visible {
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Also keep shadow identical on hover and when children receive focus */
+.music-album-cover:hover,
+.music-album-cover:focus-within {
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Remove default tap highlight that can appear as a flicker on click */
+.music-album-cover {
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
 /* Responsive sizing with fixed dimensions to prevent layout shift */
