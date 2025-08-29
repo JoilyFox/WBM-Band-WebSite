@@ -1,7 +1,7 @@
 <template>
   <section 
     id="hero"
-    class="hero-section relative w-full flex items-center justify-center px-4 overflow-hidden"
+  class="hero-section relative w-full flex items-center justify-center px-4 overflow-hidden"
     ref="heroEl"
   >
     <!-- Background Images Slider -->
@@ -232,12 +232,13 @@ watch(currentIndex, (newIndex) => {
 })
 
 // Fix dynamic mobile browser chrome (top bar) causing vh jumps
-// Measure initial small viewport height and freeze it for this hero
+// Measure initial small viewport height and use it for background layers only (no initial layout shift)
 const heroEl = ref<HTMLElement | null>(null)
 const setFixedSVH = () => {
   if (typeof window === 'undefined') return
   const vh = Math.round(window.visualViewport?.height ?? window.innerHeight)
   heroEl.value?.style.setProperty('--hero-fixed-svh', `${vh}px`)
+  heroEl.value?.classList.add('hero-ready')
 }
 
 onMounted(() => {
@@ -257,11 +258,18 @@ onMounted(() => {
 <style scoped>
 /* Hero section specific styles */
 .hero-section {
-  /* Use fixed measured svh to avoid dynamic top bar resizing */
-  height: var(--hero-fixed-svh, 100svh);
-  min-height: var(--hero-fixed-svh, 100svh);
-  /* Fallback for older browsers without svh support */
-  height: var(--hero-fixed-svh, 100vh);
+  /* Pure CSS initial sizing to avoid layout shift */
+  height: 100svh;
+  min-height: 100svh;
+  /* Fallback to vh for older browsers */
+  height: 100vh;
+}
+
+/* After plugin measures viewport, lock background layers without changing container layout */
+:root[data-svh-ready="1"] .hero-section .hero-slider-container,
+:root[data-svh-ready="1"] .hero-section .hero-slide,
+:root[data-svh-ready="1"] .hero-section .hero-background-image {
+  height: var(--app-svh) !important;
 }
 
 /* Hero slider container */

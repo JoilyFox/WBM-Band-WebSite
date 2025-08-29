@@ -79,6 +79,15 @@ export default defineNuxtConfig({
         { name: 'twitter:card', content: 'summary' },
         { name: 'twitter:image', content: '/WBM-Band-WebSite/android-chrome-512x512.png' }
       ]
+      ,
+      script: [
+        {
+          key: 'fix-svh-early',
+          // Use a data URL to run as early as possible without innerHTML
+          src: 'data:text/javascript;charset=utf-8,' + encodeURIComponent("(function(){try{var h=Math.round((window.visualViewport&&window.visualViewport.height)||window.innerHeight);document.documentElement.style.setProperty('--app-svh',h+'px');document.documentElement.setAttribute('data-svh-ready','1');}catch(e){}})();"),
+          defer: false
+        }
+      ]
     }
   },
   
