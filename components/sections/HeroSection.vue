@@ -2,6 +2,7 @@
   <section 
     id="hero"
     class="hero-section relative w-full flex items-center justify-center px-4 overflow-hidden"
+    ref="heroEl"
   >
     <!-- Background Images Slider -->
     <div class="hero-slider-container">
@@ -229,13 +230,38 @@ const handleScrollDown = () => {
 watch(currentIndex, (newIndex) => {
   emit('slideChange', newIndex)
 })
+
+// Fix dynamic mobile browser chrome (top bar) causing vh jumps
+// Measure initial small viewport height and freeze it for this hero
+const heroEl = ref<HTMLElement | null>(null)
+const setFixedSVH = () => {
+  if (typeof window === 'undefined') return
+  const vh = Math.round(window.visualViewport?.height ?? window.innerHeight)
+  heroEl.value?.style.setProperty('--hero-fixed-svh', `${vh}px`)
+}
+
+onMounted(() => {
+  setFixedSVH()
+  // Recalculate on orientation change only (not on scroll) to avoid jank
+  const handleOrientation = () => {
+    // Wait a tick for viewport to settle
+    setTimeout(setFixedSVH, 300)
+  }
+  window.addEventListener('orientationchange', handleOrientation)
+  onBeforeUnmount(() => {
+    window.removeEventListener('orientationchange', handleOrientation)
+  })
+})
 </script>
 
 <style scoped>
 /* Hero section specific styles */
 .hero-section {
-  height: 100vh; /* Fallback for older browsers */
-  height: 100svh; /* Small viewport height - excludes browser UI */
+  /* Use fixed measured svh to avoid dynamic top bar resizing */
+  height: var(--hero-fixed-svh, 100svh);
+  min-height: var(--hero-fixed-svh, 100svh);
+  /* Fallback for older browsers without svh support */
+  height: var(--hero-fixed-svh, 100vh);
 }
 
 /* Hero slider container */
