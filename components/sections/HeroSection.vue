@@ -258,11 +258,10 @@ onMounted(() => {
 <style scoped>
 /* Hero section specific styles */
 .hero-section {
-  /* Pure CSS initial sizing to avoid layout shift */
-  height: 100svh;
+  /* Fallback first, then svh overrides to exclude browser UI */
+  height: 100vh; /* fallback */
+  height: 100svh; /* preferred */
   min-height: 100svh;
-  /* Fallback to vh for older browsers */
-  height: 100vh;
 }
 
 /* After plugin measures viewport, lock background layers without changing container layout */
@@ -270,6 +269,12 @@ onMounted(() => {
 :root[data-svh-ready="1"] .hero-section .hero-slide,
 :root[data-svh-ready="1"] .hero-section .hero-background-image {
   height: var(--app-svh) !important;
+}
+
+/* Align container with measured height when ready to avoid any bottom gap */
+:root[data-svh-ready="1"] .hero-section {
+  height: var(--app-svh) !important;
+  min-height: var(--app-svh) !important;
 }
 
 /* Hero slider container */

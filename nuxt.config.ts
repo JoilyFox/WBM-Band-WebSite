@@ -84,7 +84,7 @@ export default defineNuxtConfig({
         {
           key: 'fix-svh-early',
           // Use a data URL to run as early as possible without innerHTML
-          src: 'data:text/javascript;charset=utf-8,' + encodeURIComponent("(function(){try{var h=Math.round((window.visualViewport&&window.visualViewport.height)||window.innerHeight);document.documentElement.style.setProperty('--app-svh',h+'px');document.documentElement.setAttribute('data-svh-ready','1');}catch(e){}})();"),
+          src: 'data:text/javascript;charset=utf-8,' + encodeURIComponent("(function(){try{var h=Math.floor((window.visualViewport&&window.visualViewport.height)||window.innerHeight);document.documentElement.style.setProperty('--app-svh',h+'px');document.documentElement.setAttribute('data-svh-ready','1');}catch(e){}})();"),
           defer: false
         }
       ]
