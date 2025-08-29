@@ -273,11 +273,22 @@ const shareUrlInput = ref<HTMLInputElement>()
 const justCopied = ref(false)
 const isCopying = ref(false)
 
-// Computed share content
+// Build absolute deep link to this release (works on GitHub Pages baseURL)
+const shareUrlForRelease = computed(() => {
+  const config = useRuntimeConfig()
+  const base = (config.app?.baseURL || '/').replace(/\/$/, '')
+  const relative = `${base}/music/${props.release.slug}`
+  if (typeof window !== 'undefined') {
+    return new URL(relative, window.location.origin).toString()
+  }
+  return relative
+})
+
+// Computed share content – always use the deep link, even in desktop modal
 const shareContent = computed(() => {
   return getShareContent({
     title: props.release.title,
-    description: props.release.description
+    url: shareUrlForRelease.value
   })
 })
 
@@ -418,7 +429,7 @@ const scrollToHero = () => {
 const handleShare = async () => {
   await shareViaMobile({
     title: props.release.title,
-    description: props.release.description
+    url: shareUrlForRelease.value
   })
 }
 
