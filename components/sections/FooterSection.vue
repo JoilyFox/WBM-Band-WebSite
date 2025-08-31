@@ -1,6 +1,6 @@
 <template>
   <footer :class="['footer-section bg-surface-950 border-t border-white/10', { 'footer-minimized': minimized }]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 md2:mb-0">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4 md2:mb-0">
       
       <!-- Minimized Footer Layout -->
       <div v-if="minimized" class="py-6">
@@ -239,7 +239,7 @@
       </div>
 
       <!-- Bottom Bar -->
-      <div class="py-6 border-t border-white/10 mb-8 md2:mb-0">
+      <div class="py-6 border-t border-white/10 mb-4 md2:mb-0">
         <div class="flex flex-col md2:flex-row justify-between items-center space-y-4 md2:space-y-0 gap-x-8">
           <div class="text-center md2:text-left">
             <p class="text-white/50 text-xs">
