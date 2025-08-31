@@ -111,7 +111,7 @@ export default defineNuxtConfig({
     '@nuxtjs/google-fonts',
     '@pinia/nuxt',
     ['@nuxtjs/i18n', {
-        vueI18n: './plugins/i18n.config.ts',
+        vueI18n: './i18n/i18n.config.ts',
         lazy: true,
         langDir: 'locales',
         defaultLocale: 'ua',
