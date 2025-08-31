@@ -13,7 +13,7 @@
             size="custom"
             :clickable="true"
             :on-click="scrollToHero"
-            :container-class="`md:hidden ${mobileLogoCenteredClass}`"
+            :container-class="`md2:hidden ${mobileLogoCenteredClass}`"
             image-class="h-32 w-auto filter drop-shadow-2xl"
             class="!pointer-events-none"
             loading="eager"
@@ -25,14 +25,14 @@
             size="custom"
             :clickable="true"
             :on-click="scrollToHero"
-            :container-class="`md:hidden ${mobileLogoLeftClass}`"
+            :container-class="`md2:hidden ${mobileLogoLeftClass}`"
             image-class="h-20 w-auto filter drop-shadow-2xl"
             loading="eager"
             fetchpriority="high"
           />
 
           <!-- Desktop Navigation -->
-          <div class="hidden md:flex items-center justify-between h-full w-full">
+          <div class="hidden md2:flex items-center justify-between h-full w-full">
             <!-- Left navigation links -->
             <div class="flex items-center gap-8 flex-1 justify-end transition-all duration-300" :class="leftNavSpacing">
               <template v-for="(link, index) in leftNavLinks" :key="`left-${index}`">
@@ -40,7 +40,7 @@
                   :class="navLinkClass"
                   @click="() => handleNavClick(link)"
                 >
-                  {{ link.label }}
+                  {{ t(link.label) }}
                 </button>
               </template>
             </div>
@@ -52,18 +52,23 @@
                   :class="navLinkClass"
                   @click="() => handleNavClick(link)"
                 >
-                  {{ link.label }}
+                  {{ t(link.label) }}
                 </button>
               </template>
+            </div>
+
+            <!-- Language Switcher (desktop) -->
+            <div class="absolute right-0 flex items-center">
+              <CommonLanguageSwitcher />
             </div>
           </div>
 
           <!-- Mobile Menu Button -->
-          <div class="md:hidden ml-auto flex items-start pt-2">
+          <div class="md2:hidden ml-auto flex items-start pt-2">
             <button
               @click="toggleMobileMenu"
               :class="mobileMenuButtonClass"
-              aria-label="Toggle navigation menu"
+              :aria-label="t('a11y.toggle_menu')"
             >
               <i :class="mobileMenuIcon" class="text-xl transition-transform duration-200 ease-out"></i>
             </button>
@@ -72,7 +77,7 @@
       </div>
       
       <!-- Desktop Logo (absolute positioned) -->
-      <div class="hidden md:block absolute top-[14px] left-1/2 transform -translate-x-1/2 z-50 transition-top duration-300" :class="logoPositionClass">
+      <div class="hidden md2:block absolute top-[14px] left-1/2 transform -translate-x-1/2 z-50 transition-top duration-300" :class="logoPositionClass">
         <Logo
           size="custom"
           :clickable="true"
@@ -88,7 +93,7 @@
     <Transition name="mobile-menu">
       <div
         v-if="isMobileMenuOpen"
-        class="fixed inset-0 z-50 md:hidden"
+        class="fixed inset-0 z-50 md2:hidden"
         @click="closeMobileMenu"
       >
         <!-- Backdrop -->
@@ -99,38 +104,43 @@
           class="relative flex flex-col items-center justify-center h-full"
           @click.stop
         >
-          <!-- Close Button -->
-          <button
-            @click="closeMobileMenu"
-            class="absolute top-3 right-4 text-white/90 hover:text-white transition-colors duration-300 p-2"
-            aria-label="Close menu"
-          >
-            <i class="pi pi-times text-2xl"></i>
-          </button>
-
-          <!-- Logo in mobile menu -->
-          <div class="mb-12">
-            <Logo
-              size="custom"
-              :clickable="true"
-              :on-click="scrollToHeroAndCloseMenu"
-              container-class="mt-[-44px]"
-              image-class="h-24 w-auto filter drop-shadow-2xl"
-              loading="eager"
-            />
+          <!-- Top controls: language switcher + close button -->
+          <div class="absolute top-3 left-4 right-4 flex items-center justify-between">
+            <CommonLanguageSwitcher size="big" />
+            <button
+              @click="closeMobileMenu"
+              class="text-white/90 hover:text-white transition-colors duration-300 p-2"
+              :aria-label="t('a11y.close_menu')"
+            >
+              <i class="pi pi-times text-2xl"></i>
+            </button>
           </div>
 
-          <!-- Mobile Navigation Links -->
-          <nav class="flex flex-col items-center space-y-8">
-            <template v-for="(link, index) in allNavLinks" :key="`mobile-${index}`">
-              <button 
-                :class="mobileNavLinkClass"
-                @click="() => handleMobileNavClick(link)"
-              >
-                {{ link.label }}
-              </button>
-            </template>
-          </nav>
+          <div class="flex flex-col items-center mt-10">
+            <!-- Logo in mobile menu -->
+            <div class="mb-8">
+              <Logo
+                size="custom"
+                :clickable="true"
+                :on-click="scrollToHeroAndCloseMenu"
+                container-class="mt-[-44px]"
+                image-class="h-24 w-auto filter drop-shadow-2xl"
+                loading="eager"
+              />
+            </div>
+
+            <!-- Mobile Navigation Links -->
+            <nav class="flex flex-col items-center space-y-8">
+              <template v-for="(link, index) in allNavLinks" :key="`mobile-${index}`">
+                <button 
+                  :class="mobileNavLinkClass"
+                  @click="() => handleMobileNavClick(link)"
+                >
+                  {{ t(link.label) }}
+                </button>
+              </template>
+            </nav>
+          </div>
         </div>
       </div>
     </Transition>
@@ -147,6 +157,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { useScrollAnimation } from '~/composables/useScrollAnimation'
@@ -154,6 +165,7 @@ import { createWelcomeMessage } from '~/constants/app'
 import { getConfig } from '~/utils/configHelpers'
 import { leftNavigation, rightNavigation, type NavigationItem } from '~/config/navigation'
 import Logo from '~/components/ui/Logo.vue'
+import CommonLanguageSwitcher from '~/components/common/LanguageSwitcher.vue'
 
 // Computed properties for config values
 const bandName = computed(() => getConfig('general.bandName'))
@@ -161,6 +173,7 @@ const bandName = computed(() => getConfig('general.bandName'))
 // Composables
 const snackbar = useSnackbar()
 const { scrollToElementWithNavigation } = useScrollTo()
+const { t } = useI18n()
 
 // Optimized scroll animation composable with performance enhancements
 const {
@@ -280,8 +293,8 @@ onUnmounted(() => {
 // Methods
 const showWelcome = () => {
   snackbar.success(
-    createWelcomeMessage(),
-    'Your modern Nuxt 3 application is ready to rock! 🎸',
+    t('app.welcome', { name: bandName.value }),
+    t('app.ready'),
     5000
   )
 }

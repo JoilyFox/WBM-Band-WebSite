@@ -40,7 +40,7 @@
         <div class="error-info">
           <p class="info-text">
             <i class="pi pi-info-circle"></i>
-            If this problem persists, please contact support
+            {{ t('errors.support_hint') }}
           </p>
         </div>
       </div>
@@ -52,6 +52,8 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 interface Props {
   title?: string
   message?: string
@@ -60,10 +62,11 @@ interface Props {
   buttonIcon?: string
 }
 
+const { t } = useI18n()
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Oops! Something went wrong',
-  message: 'We encountered an unexpected error. Please try again or return to the homepage.',
-  buttonText: 'Go to Home',
+  title: undefined,
+  message: undefined,
+  buttonText: undefined,
   buttonLink: '/',
   buttonIcon: 'pi pi-home'
 })
@@ -79,21 +82,21 @@ const title = computed(() => {
   if (route?.query?.title) {
     return route.query.title as string
   }
-  return props.title
+  return props.title || t('errors.default_title')
 })
 
 const message = computed(() => {
   if (route?.query?.message) {
     return route.query.message as string
   }
-  return props.message
+  return props.message || t('errors.default_message')
 })
 
 const buttonText = computed(() => {
   if (route?.query?.buttonText) {
     return route.query.buttonText as string
   }
-  return props.buttonText
+  return props.buttonText || t('errors.go_home')
 })
 
 const buttonLink = computed(() => {

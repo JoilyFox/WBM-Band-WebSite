@@ -5,42 +5,39 @@ export default defineNuxtConfig({
   
   // GitHub Pages Configuration
   app: {
-    baseURL: '/WBM-Band-WebSite/', // Replace with your repository name
-    buildAssetsDir: 'assets/', // Don't use "_" prefix for GitHub Pages
+    baseURL: process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite/' : '/',
+    buildAssetsDir: process.env.NODE_ENV === 'production' ? 'assets/' : '_nuxt/',
     head: {
       // Favicon and App Icon Configuration
       link: [
         // Standard favicon
-        { rel: 'icon', type: 'image/x-icon', href: '/WBM-Band-WebSite/favicon.ico' },
-        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/WBM-Band-WebSite/favicon-16x16.png' },
-        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/WBM-Band-WebSite/favicon-32x32.png' },
-        { rel: 'icon', type: 'image/png', sizes: '48x48', href: '/WBM-Band-WebSite/favicon-48x48.png' },
+        { rel: 'icon', type: 'image/x-icon', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/favicon.ico' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/favicon-16x16.png' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/favicon-32x32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '48x48', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/favicon-48x48.png' },
         
         // Apple Touch Icons
-        { rel: 'apple-touch-icon', href: '/WBM-Band-WebSite/apple-touch-icon.png' },
-        { rel: 'apple-touch-icon', sizes: '57x57', href: '/WBM-Band-WebSite/apple-touch-icon-57x57.png' },
-        { rel: 'apple-touch-icon', sizes: '60x60', href: '/WBM-Band-WebSite/apple-touch-icon-60x60.png' },
-        { rel: 'apple-touch-icon', sizes: '72x72', href: '/WBM-Band-WebSite/apple-touch-icon-72x72.png' },
-        { rel: 'apple-touch-icon', sizes: '76x76', href: '/WBM-Band-WebSite/apple-touch-icon-76x76.png' },
-        { rel: 'apple-touch-icon', sizes: '114x114', href: '/WBM-Band-WebSite/apple-touch-icon-114x114.png' },
-        { rel: 'apple-touch-icon', sizes: '120x120', href: '/WBM-Band-WebSite/apple-touch-icon-120x120.png' },
-        { rel: 'apple-touch-icon', sizes: '144x144', href: '/WBM-Band-WebSite/apple-touch-icon-144x144.png' },
-        { rel: 'apple-touch-icon', sizes: '152x152', href: '/WBM-Band-WebSite/apple-touch-icon-152x152.png' },
-        { rel: 'apple-touch-icon', sizes: '167x167', href: '/WBM-Band-WebSite/apple-touch-icon-167x167.png' },
-        { rel: 'apple-touch-icon', sizes: '180x180', href: '/WBM-Band-WebSite/apple-touch-icon-180x180.png' },
+        { rel: 'apple-touch-icon', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/apple-touch-icon.png' },
+        { rel: 'apple-touch-icon', sizes: '57x57', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/apple-touch-icon-57x57.png' },
+        { rel: 'apple-touch-icon', sizes: '60x60', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/apple-touch-icon-60x60.png' },
+        { rel: 'apple-touch-icon', sizes: '72x72', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/apple-touch-icon-72x72.png' },
+        { rel: 'apple-touch-icon', sizes: '76x76', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/apple-touch-icon-76x76.png' },
+        { rel: 'apple-touch-icon', sizes: '114x114', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/apple-touch-icon-114x114.png' },
+        { rel: 'apple-touch-icon', sizes: '120x120', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/apple-touch-icon-120x120.png' },
+        { rel: 'apple-touch-icon', sizes: '144x144', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/apple-touch-icon-144x144.png' },
+        { rel: 'apple-touch-icon', sizes: '152x152', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/apple-touch-icon-152x152.png' },
+        { rel: 'apple-touch-icon', sizes: '167x167', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/apple-touch-icon-167x167.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/apple-touch-icon-180x180.png' },
         
         // Android Chrome Icons
-        { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/WBM-Band-WebSite/android-chrome-192x192.png' },
-        { rel: 'icon', type: 'image/png', sizes: '512x512', href: '/WBM-Band-WebSite/android-chrome-512x512.png' },
+        { rel: 'icon', type: 'image/png', sizes: '192x192', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/android-chrome-192x192.png' },
+        { rel: 'icon', type: 'image/png', sizes: '512x512', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/android-chrome-512x512.png' },
         
         // Safari Pinned Tab
-        { rel: 'mask-icon', href: '/WBM-Band-WebSite/safari-pinned-tab.svg', color: '#000000' },
+        { rel: 'mask-icon', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/safari-pinned-tab.svg', color: '#000000' },
         
         // Web App Manifest
-        { rel: 'manifest', href: '/WBM-Band-WebSite/site.webmanifest' },
-        
-        // Preload critical resources
-        { rel: 'preload', as: 'image', href: '/WBM-Band-WebSite/favicon-32x32.png' },
+        { rel: 'manifest', href: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/site.webmanifest' },
         
         // Font Awesome CSS
         { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' }
@@ -61,7 +58,7 @@ export default defineNuxtConfig({
         // Theme colors
         { name: 'theme-color', content: '#000000' },
         { name: 'msapplication-TileColor', content: '#000000' },
-        { name: 'msapplication-config', content: '/WBM-Band-WebSite/browserconfig.xml' },
+  { name: 'msapplication-config', content: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/browserconfig.xml' },
         
         // SEO and Social Media
         { name: 'description', content: 'Official website of WBM Band - Discover our music, latest releases, and upcoming shows.' },
@@ -71,13 +68,13 @@ export default defineNuxtConfig({
         // Open Graph
         { property: 'og:type', content: 'website' },
         { property: 'og:site_name', content: 'WBM Band' },
-        { property: 'og:image', content: '/WBM-Band-WebSite/android-chrome-512x512.png' },
+  { property: 'og:image', content: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/android-chrome-512x512.png' },
         { property: 'og:image:width', content: '512' },
         { property: 'og:image:height', content: '512' },
         
         // Twitter Card
         { name: 'twitter:card', content: 'summary' },
-        { name: 'twitter:image', content: '/WBM-Band-WebSite/android-chrome-512x512.png' }
+  { name: 'twitter:image', content: (process.env.NODE_ENV === 'production' ? '/WBM-Band-WebSite' : '') + '/android-chrome-512x512.png' }
       ]
       ,
       script: [
@@ -94,7 +91,17 @@ export default defineNuxtConfig({
   // Static Site Generation
   nitro: {
     prerender: {
-      routes: ['/'] // Pre-render all routes
+      routes: [
+        '/',
+        '/ua',
+        '/en',
+        '/ua/privacy-policy',
+        '/en/privacy-policy',
+        '/ua/terms-of-service',
+        '/en/terms-of-service',
+        '/ua/cookies-policy',
+        '/en/cookies-policy'
+      ]
     }
   },
 
@@ -103,7 +110,24 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@nuxtjs/google-fonts',
     '@pinia/nuxt',
-    '@vueuse/nuxt'
+    ['@nuxtjs/i18n', {
+        vueI18n: './plugins/i18n.config.ts',
+        lazy: true,
+        langDir: 'locales',
+        defaultLocale: 'ua',
+        strategy: 'prefix',
+        detectBrowserLanguage: {
+          useCookie: true,
+          cookieKey: 'i18n_redirected',
+          redirectOn: 'root',
+          alwaysRedirect: false
+        },
+        locales: [
+      { code: 'en', language: 'en-US', name: 'English', file: 'en.json' },
+      { code: 'ua', language: 'uk-UA', name: 'Українська', file: 'uk.json' }
+        ]
+      }], 
+      '@vueuse/nuxt'
   ],
 
   // PrimeVue Configuration
@@ -145,10 +169,18 @@ export default defineNuxtConfig({
   // Google Fonts Configuration
   googleFonts: {
     families: {
-      'Space Grotesk': [300, 400, 500, 600, 700]
+      'Space Grotesk': [300, 400, 500, 600, 700],
+      // Primary UI font with Cyrillic support
+      Inter: [300, 400, 500, 600, 700],
+      // Cyrillic-friendly grotesks close to Space Grotesk
+      Manrope: [300, 400, 500, 600, 700],
+      'Golos Text': [400, 500, 600, 700],
+      // Add a Cyrillic-capable fallback
+      'Noto Sans': [400, 500, 600, 700]
     },
     display: 'swap',
-    preload: true
+    preload: true,
+    subsets: ['latin', 'latin-ext', 'cyrillic']
   },
 
   // TypeScript Configuration

@@ -234,6 +234,7 @@ import { useShareFunctionality } from '~/composables/useShareFunctionality'
 import type { MusicRelease } from '~/data/musicLibrary'
 import Logo from '~/components/ui/Logo.vue'
 import CustomSharePopup from '~/components/common/CustomSharePopup.vue'
+import { useLocalePath } from '#i18n'
 
 interface Props {
   release: MusicRelease
@@ -243,6 +244,7 @@ interface Props {
 const props = defineProps<Props>()
 const router = useRouter()
 const route = useRoute()
+const localePath = useLocalePath()
 
 // Performance optimization system
 const {
@@ -275,7 +277,9 @@ const isCopying = ref(false)
 const shareUrlForRelease = computed(() => {
   const config = useRuntimeConfig()
   const base = (config.app?.baseURL || '/').replace(/\/$/, '')
-  const relative = `${base}/music/${props.release.slug}`
+  // Use locale-aware path for the music detail route
+  const localizedPath = localePath({ path: `/music/${props.release.slug}` })
+  const relative = `${base}${localizedPath}`
   if (typeof window !== 'undefined') {
     return new URL(relative, window.location.origin).toString()
   }

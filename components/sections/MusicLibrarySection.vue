@@ -4,10 +4,10 @@
       <!-- Section Header -->
       <div class="text-center mb-10">
         <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-          Our Music
+          {{ t('music.section_title') }}
         </h2>
         <p class="text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
-            Explore the music of {{ bandName }}. Stream our latest releases now.
+          {{ t('music.section_subtitle', { name: bandName }) }}
         </p>
       </div>
 
@@ -82,7 +82,7 @@
           @click="handleShowMore"
           class="show-more-button group relative px-8 py-4 bg-gradient-to-r from-primary-600 to-purple-600 text-white font-semibold rounded-full hover:from-primary-500 hover:to-purple-500 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
         >
-          <span class="relative z-10">Show All Music</span>
+          <span class="relative z-10">{{ t('music.show_all') }}</span>
           <div class="absolute inset-0 bg-gradient-to-r from-primary-500 to-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <i class="pi pi-arrow-right ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
         </button>
@@ -93,6 +93,7 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { MusicRelease } from '~/data/musicLibrary'
 import { getLatestReleases, getAllReleases } from '~/data/musicLibrary'
 import { getConfig, formatReleaseDate, isUpcomingRelease } from '~/utils/configHelpers'
@@ -105,6 +106,9 @@ const maxReleasesBeforeHideComingSoon = computed(() => getConfig('general.maxRel
 const nextReleaseDate = computed(() => getConfig('general.nextReleaseDate'))
 const nextReleaseTitle = computed(() => getConfig('general.nextReleaseTitle'))
 const nextReleaseImageUrl = computed(() => getConfig('general.nextReleaseImageUrl'))
+
+// i18n
+const { t } = useI18n()
 
 // Props
 interface Props {

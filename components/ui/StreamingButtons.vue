@@ -5,7 +5,7 @@
         v-if="spotifyUrl"
         @click.stop="openLink(spotifyUrl)"
         class="streaming-button bg-black hover:bg-black/80 scale-60"
-        title="Listen on Spotify"
+        :title="t('music.streaming.spotify_title')"
       >
         <img 
           src="/assets/images/icons/spotify-icon.svg" 
@@ -18,7 +18,7 @@
         v-if="appleMusicUrl"
         @click.stop="openLink(appleMusicUrl)"
         class="streaming-button bg-surface-800 hover:bg-surface-700"
-        title="Listen on Apple Music"
+        :title="t('music.streaming.apple_title')"
       >
         <img 
           src="/assets/images/icons/apple-music-icon.svg" 
@@ -31,7 +31,7 @@
         v-if="youtubeUrl"
         @click.stop="openLink(youtubeUrl)"
         class="streaming-button bg-red-600 hover:bg-red-500"
-        title="Watch on YouTube"
+        :title="t('music.streaming.youtube_title')"
       >
         <img 
           src="/assets/images/icons/youtube-music-icon.svg" 
@@ -52,6 +52,9 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const openLink = (url: string) => {
   window.open(url, '_blank', 'noopener,noreferrer')

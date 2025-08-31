@@ -1,9 +1,9 @@
 <template>
   <CommonErrorPage
-    title="Page Not Found"
-    message="Sorry, the page you are looking for does not exist. It might have been moved, deleted, or you entered the wrong URL."
-    button-text="Go to Home"
-    button-link="/"
+    :title="t('errors.page_not_found.title')"
+    :message="t('errors.page_not_found.message')"
+    :button-text="t('errors.go_home')"
+    :button-link="localePath('/')"
     button-icon="pi pi-home"
   />
 </template>
@@ -15,10 +15,15 @@ definePageMeta({
 })
 
 import { createPageTitle } from '~/constants/app'
+import { useI18n } from 'vue-i18n'
+import { useLocalePath } from '#i18n'
+
+const { t } = useI18n()
+const localePath = useLocalePath()
 
 // Set page meta - don't throw error in 404 page
 useHead({
-  title: createPageTitle('404 - Page Not Found'),
+  title: createPageTitle('404'),
   meta: [
     { name: 'robots', content: 'noindex' }
   ]

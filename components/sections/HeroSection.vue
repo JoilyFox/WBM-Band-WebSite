@@ -85,13 +85,13 @@
       
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-scale-in">
         <Button 
-          :label="primaryButtonLabel" 
+          :label="t(primaryButtonLabel)" 
           class="btn-primary text-lg px-8 py-3"
           :icon="primaryButtonIcon"
           @click="handlePrimaryAction"
         />
         <Button 
-          :label="secondaryButtonLabel" 
+          :label="t(secondaryButtonLabel)" 
           class="btn-outline text-lg px-8 py-3"
           :icon="secondaryButtonIcon"
           @click="handleSecondaryAction"
@@ -111,6 +111,8 @@
 
 <script setup lang="ts">
 import { watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import Button from 'primevue/button'
 import { useImageLoading } from '~/utils/imageHelpers'
 import { useHeroSlider, type HeroImage } from '~/composables/useHeroSlider'
@@ -139,9 +141,9 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   title: '',
   subtitle: '',
-  primaryButtonLabel: 'Listen Now',
+  primaryButtonLabel: 'hero.listen_now',
   primaryButtonIcon: 'pi pi-play',
-  secondaryButtonLabel: 'Tour Dates',
+  secondaryButtonLabel: 'hero.tour_dates',
   secondaryButtonIcon: 'pi pi-calendar',
   autoPlay: true,
   interval: 6000,

@@ -1,0 +1,100 @@
+{
+  "app": {
+    "name": "WBM Band",
+    "tagline": "Modern rock with classic soul",
+		"welcome": "Welcome to {name}!",
+		"ready": "Your modern Nuxt 3 application is ready to rock! 🎸",
+		"all_rights": "All rights reserved."
+  },
+  "nav": {
+    "music": "Music",
+    "tour": "Tour",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "hero": {
+    "listen_now": "Listen Now",
+    "tour_dates": "Tour Dates",
+    "scroll_down": "Scroll down"
+  },
+  "footer": {
+		"navigation": "Navigation",
+		"contact": "Contact",
+		"listen_on": "Listen on your favorite platform",
+		"listen_on_platform": "Listen on {name}",
+		"platform_icon_alt": "{name} icon",
+		"privacy": "Privacy Policy",
+		"terms": "Terms of Service",
+		"cookies": "Cookies",
+		"developer": "Made with ❤️ and 🎸 by",
+		"developer_prefix": "Made with ❤️ and 🎸 by",
+		"follow_instagram": "Follow us on Instagram",
+		"follow_twitter": "Follow us on Twitter",
+		"subscribe_youtube": "Subscribe to our YouTube channel",
+		"like_facebook": "Like us on Facebook",
+		"tagline_short": "{name} - Modern rock with classic soul. Pushing boundaries in alternative music.",
+		"tagline_long": "{name} - Pushing the boundaries of rock, alternative, and indie music. Join us on our musical journey and stay connected for the latest releases and tour updates."
+  },
+  "snackbar": {
+    "upload_complete": {
+      "title": "Upload Complete!",
+      "subtitle": "File uploaded successfully"
+    },
+    "upload_failed": {
+      "title": "Upload Failed",
+      "subtitle": "Please try again"
+    },
+    "tour": {
+      "title": "Tour Dates",
+      "subtitle": "Check out our upcoming tour dates!"
+    },
+    "music_library": {
+      "title": "Music Library",
+      "subtitle": "Full music library page coming soon!"
+    }
+  },
+  "errors": {
+    "default_title": "Oops! Something went wrong",
+    "default_message": "We encountered an unexpected error. Please try again or return to the homepage.",
+    "go_home": "Go to Home",
+    "page_not_found": {
+      "title": "Page Not Found",
+      "message": "Sorry, the page you are looking for does not exist. It might have been moved, deleted, or you entered the wrong URL."
+    },
+    "support_hint": "If this problem persists, please contact support"
+  },
+  "pages": {
+    "home": "Home",
+    "privacy": {
+      "title": "Privacy Policy",
+      "subtitle": "Your privacy is important to us. Learn how we protect and handle your personal information.",
+      "last_updated": "Last updated: {date}",
+      "back_to_top": "Back to top"
+    },
+    "terms": {
+      "title": "Terms of Service"
+    },
+    "cookies": {
+      "title": "Cookies Policy"
+    }
+  },
+  "a11y": {
+    "toggle_menu": "Toggle navigation menu",
+    "close_menu": "Close menu"
+  },
+  "music": {
+    "section_title": "Our Music",
+    "section_subtitle": "Explore the music of {name}. Stream our latest releases now.",
+    "show_all": "Show All Music",
+    "streaming": {
+      "spotify_title": "Listen on Spotify",
+      "apple_title": "Listen on Apple Music",
+      "youtube_title": "Watch on YouTube"
+    }
+  },
+  "lang": {
+    "english": "English",
+    "ukrainian": "Українська",
+    "switch_label": "Language"
+  }
+}

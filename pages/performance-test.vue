@@ -88,7 +88,7 @@
           </button>
           
           <NuxtLink 
-            to="/music/midnight-echoes?from=music"
+            :to="localePath({ path: '/music/midnight-echoes', query: { from: 'music' } })"
             class="px-4 py-2 bg-secondary-600 hover:bg-secondary-700 rounded-lg transition-colors"
           >
             Test Music Page
@@ -100,6 +100,8 @@
 </template>
 
 <script setup lang="ts">
+import { useLocalePath } from '#i18n'
+const localePath = useLocalePath()
 import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
 
 // Page meta

@@ -6,12 +6,12 @@
       <div class="hero-content">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div class="hero-glassmorphic-card">
-            <h1 class="hero-title">Privacy Policy</h1>
+            <h1 class="hero-title">{{ t('pages.privacy.title') }}</h1>
             <p class="hero-subtitle">
-              Your privacy is important to us. Learn how we protect and handle your personal information.
+              {{ t('pages.privacy.subtitle') }}
             </p>
             <div class="hero-meta">
-              <span class="last-updated">Last updated: {{ lastUpdated }}</span>
+              <span class="last-updated">{{ t('pages.privacy.last_updated', { date: lastUpdated }) }}</span>
             </div>
           </div>
         </div>
@@ -356,7 +356,7 @@
       @click="scrollToTop" 
       class="back-to-top"
       :class="{ 'visible': showBackToTop }"
-      aria-label="Back to top"
+  :aria-label="t('pages.privacy.back_to_top')"
     >
       <i class="pi pi-chevron-up"></i>
     </button>
@@ -366,15 +366,18 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { getConfig } from '~/utils/configHelpers'
+import { useI18n } from 'vue-i18n'
+import { useLocaleHead } from '#i18n'
+const { t } = useI18n()
 
 // Meta tags for SEO
 useHead({
-  title: `Privacy Policy - ${getConfig('general.bandName')}`,
+  title: `${t('pages.privacy.title')} - ${getConfig('general.bandName')}`,
   meta: [
-    { name: 'description', content: `Privacy Policy for ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}). Learn how we protect and handle your personal information.` },
+    { name: 'description', content: `${t('pages.privacy.subtitle')} ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).` },
     { name: 'keywords', content: `privacy policy, ${getConfig('general.bandName')}, ${getConfig('general.fullBandName')}, data protection, privacy rights` },
-    { property: 'og:title', content: `Privacy Policy - ${getConfig('general.bandName')}` },
-    { property: 'og:description', content: `Privacy Policy for ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}). Learn how we protect and handle your personal information.` },
+    { property: 'og:title', content: `${t('pages.privacy.title')} - ${getConfig('general.bandName')}` },
+    { property: 'og:description', content: `${t('pages.privacy.subtitle')} ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).` },
     { property: 'og:type', content: 'website' }
   ]
 })

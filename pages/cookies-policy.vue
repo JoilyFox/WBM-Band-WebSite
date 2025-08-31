@@ -437,7 +437,7 @@
       @click="scrollToTop" 
       class="back-to-top"
       :class="{ 'visible': showBackToTop }"
-      aria-label="Back to top"
+      :aria-label="t('pages.privacy.back_to_top')"
     >
       <i class="pi pi-chevron-up"></i>
     </button>
@@ -447,15 +447,17 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { getConfig } from '~/utils/configHelpers'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 // Meta tags for SEO
 useHead({
-  title: `Cookies Policy - ${getConfig('general.bandName')}`,
+  title: `${t('pages.cookies.title')} - ${getConfig('general.bandName')}`,
   meta: [
-    { name: 'description', content: `Cookies Policy for ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}). Learn how we use cookies and similar technologies on our website.` },
+    { name: 'description', content: `${t('pages.cookies.title')} - ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).` },
     { name: 'keywords', content: `cookies policy, ${getConfig('general.bandName')}, ${getConfig('general.fullBandName')}, website cookies, tracking, privacy` },
-    { property: 'og:title', content: `Cookies Policy - ${getConfig('general.bandName')}` },
-    { property: 'og:description', content: `Cookies Policy for ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}). Learn how we use cookies and similar technologies on our website.` },
+    { property: 'og:title', content: `${t('pages.cookies.title')} - ${getConfig('general.bandName')}` },
+    { property: 'og:description', content: `${t('pages.cookies.title')} - ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).` },
     { property: 'og:type', content: 'website' }
   ]
 })

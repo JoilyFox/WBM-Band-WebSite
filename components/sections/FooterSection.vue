@@ -5,7 +5,7 @@
       <!-- Minimized Footer Layout -->
       <div v-if="minimized" class="py-6">
         <!-- Mobile: Centered Column Layout -->
-        <div class="flex flex-col items-center space-y-4 text-center md:hidden">
+        <div class="flex flex-col items-center space-y-4 text-center md2:hidden">
           
           <!-- Logo -->
           <Logo
@@ -18,7 +18,7 @@
           
           <!-- Description Text -->
           <p class="text-white/70 text-sm leading-relaxed max-w-md">
-            {{ bandName }} - Modern rock with classic soul. Pushing boundaries in alternative music.
+            {{ t('footer.tagline_short', { name: bandName }) }}
           </p>
           
           <!-- Social Media Links Row -->
@@ -37,20 +37,20 @@
           </div>
           
           <!-- Privacy Policy Links Row -->
-          <div class="flex space-x-6 text-sm">
+          <div class="flex space-x-6 text-sm white !mt-6 justify-center gap-y-3 flex-wrap">
             <button 
               v-for="legal in legalLinks" 
-              :key="legal.label"
+              :key="legal.action"
               @click="handleLegalLink(legal.action)"
-              class="legal-link-minimal"
+              class="legal-link-minimal whitespace-nowrap"
             >
-              {{ legal.label }}
+              {{ t(legal.label) }}
             </button>
           </div>
           
           <!-- Developer Credit -->
           <div class="text-white/50 text-xs pt-2">
-            Made with ❤️ and 🎸 by 
+            {{ t('footer.developer_prefix') }} 
             <a 
               href="https://www.instagram.com/feat.her_" 
               target="_blank" 
@@ -60,10 +60,15 @@
               @feat.her_
             </a>
           </div>
+          
+          <!-- Language Switcher (mobile minimized footer) -->
+          <div class="flex items-center justify-center md:justify-start !mt-6">
+            <CommonLanguageSwitcher />
+          </div>
         </div>
 
         <!-- Desktop: Traditional Horizontal Layout -->
-        <div class="hidden md:flex gap-8 md:items-center md:justify-between">
+        <div class="hidden md2:flex gap-8 md:items-center md:justify-between">
           
           <!-- Left Section: Logo and Description -->
           <div class="flex items-center space-x-6">
@@ -75,7 +80,7 @@
               loading="lazy"
             />
             <p class="text-white/70 text-sm leading-relaxed max-w-md">
-              {{ bandName }} - Modern rock with classic soul. Pushing boundaries in alternative music.
+              {{ t('footer.tagline_short', { name: bandName }) }}
             </p>
           </div>
           
@@ -96,29 +101,36 @@
           
           <!-- Right Section: Legal Links and Developer Credit -->
           <div class="flex flex-col items-end space-y-2">
-            <div class="flex space-x-6 text-sm">
+            <div class="flex space-x-6 text-sm items-center">
               <button 
                 v-for="legal in legalLinks" 
-                :key="legal.label"
+                :key="legal.action"
                 @click="handleLegalLink(legal.action)"
-                class="legal-link-minimal"
+                class="legal-link-minimal whitespace-nowrap"
               >
                 {{ legal.label }}
               </button>
             </div>
-            <div class="text-white/50 text-xs">
-              Made with ❤️ and 🎸 by 
-              <a 
-                href="https://www.instagram.com/feat.her_" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                class="developer-link"
-              >
-                @feat.her_
-              </a>
+            <div class="flex items-center justify-between w-full gap-8">
+              <!-- Developer Credit -->
+              <div class="text-white/50 text-xs">
+                {{ t('footer.developer_prefix') }} 
+                <a 
+                  href="https://www.instagram.com/feat.her_" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="developer-link"
+                >
+                  @feat.her_
+                </a>
+              </div>
+
+              <!-- Language Switcher -->
+              <div class="flex items-center">
+                <CommonLanguageSwitcher />
+              </div>
             </div>
           </div>
-          
         </div>
       </div>
 
@@ -130,7 +142,7 @@
           
           <!-- Brand Section -->
           <div class="lg:col-span-2 text-center md:text-left">
-            <div class="flex items-center justify-center md:justify-start mb-6">
+            <div class="flex items-center justify-center lg:justify-start mb-6">
               <Logo
                 size="custom"
                 :clickable="true"
@@ -139,13 +151,12 @@
                 loading="lazy"
               />
             </div>
-            <p class="text-white/70 text-sm leading-relaxed mb-6 max-w-md mx-auto md:mx-0">
-              {{ fullBandName }} - Pushing the boundaries of rock, alternative, and indie music. 
-              Join us on our musical journey and stay connected for the latest releases and tour updates.
+            <p class="text-white/70 text-sm leading-relaxed mb-6 max-lg:text-center max-w-md mx-auto md:mx-0">
+              {{ t('footer.tagline_long', { name: fullBandName }) }}
             </p>
             
             <!-- Social Media Links -->
-            <div class="flex space-x-4 justify-center md:justify-start">
+            <div class="flex space-x-4 justify-center lg:justify-start">
               <a 
                 v-for="social in socialLinks" 
                 :key="social.name"
@@ -162,36 +173,36 @@
 
           <!-- Navigation Section (Desktop Only) -->
           <div class="hidden lg:block text-center md:text-left">
-            <h3 class="footer-heading">Navigation</h3>
+            <h3 class="footer-heading">{{ t('footer.navigation') }}</h3>
             <ul class="space-y-3">
               <li v-for="item in navigationItems" :key="item.elementId">
                 <button 
                   @click="handleNavClick(item.elementId)"
                   class="footer-link"
                 >
-                  {{ item.label }}
+                  {{ t(item.label) }}
                 </button>
               </li>
             </ul>
           </div>
 
           <!-- Contact Info -->
-          <div class="text-center md:text-left">
-            <h3 class="footer-heading">Contact</h3>
+          <div class="text-center lg:text-left">
+            <h3 class="footer-heading">{{ t('footer.contact') }}</h3>
             <ul class="space-y-3">
-              <li class="footer-contact-item justify-center md:justify-start">
+              <li class="footer-contact-item justify-center lg:justify-start">
                 <i class="pi pi-envelope text-white/60"></i>
                 <a :href="`mailto:${contactEmail}`" class="footer-link">
                   {{ contactEmail }}
                 </a>
               </li>
-              <li class="footer-contact-item justify-center md:justify-start">
+              <li class="footer-contact-item justify-center lg:justify-start">
                 <i class="pi pi-map-marker text-white/60"></i>
                 <span class="text-white/70 text-sm">
                   {{ contactLocationShort }}
                 </span>
               </li>
-              <li class="footer-contact-item justify-center md:justify-start">
+              <li class="footer-contact-item justify-center lg:justify-start">
                 <i class="pi pi-phone text-white/60"></i>
                 <a :href="`tel:${contactPhoneNumber}`" class="footer-link">
                   {{ contactPhone }}
@@ -205,7 +216,7 @@
       <!-- Streaming Platforms -->
       <div class="py-8 border-t border-white/10">
         <div class="text-center">
-          <h4 class="text-white/80 text-sm font-medium mb-4">Listen on your favorite platform</h4>
+              <h4 class="text-white/80 text-sm font-medium mb-4">{{ t('footer.listen_on') }}</h4>
           <div class="flex justify-center items-center space-x-8 flex-wrap gap-y-6">
             <a 
               v-for="platform in streamingPlatforms" 
@@ -218,7 +229,7 @@
             >
               <img 
                 :src="platform.icon" 
-                :alt="`${platform.name} icon`"
+                :alt="t('footer.platform_icon_alt', { name: platform.name })"
                 class="streaming-icon"
                 loading="lazy"
               />
@@ -229,35 +240,40 @@
 
       <!-- Bottom Bar -->
       <div class="py-6 border-t border-white/10">
-        <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <div class="text-center md:text-left">
+        <div class="flex flex-col md2:flex-row justify-between items-center space-y-4 md2:space-y-0 gap-x-8">
+          <div class="text-center md2:text-left">
             <p class="text-white/50 text-xs">
-              © {{ currentYear }} {{ fullBandName }}. All rights reserved.
+              © {{ currentYear }} {{ fullBandName }}. {{ t('app.all_rights') }}
             </p>
           </div>
-          
-          <div class="flex flex-col sm:flex-row items-center sm:space-x-6 space-y-3 sm:space-y-0">
+
+          <div class="flex flex-col md2:flex-row items-center md2:space-x-6 space-y-3 md2:space-y-0">
             <div class="flex items-center space-x-6">
               <button 
                 v-for="legal in legalLinks" 
                 :key="legal.label"
                 @click="handleLegalLink(legal.action)"
-                class="legal-link"
+                class="legal-link whitespace-nowrap"
               >
                 {{ legal.label }}
               </button>
             </div>
-            <div class="text-white/50 sm:text-white/30 text-xs !mt-[26px] sm:!mt-0">
-                Made with ❤️ and 🎸 by 
-                <a 
-                  href="https://www.instagram.com/feat.her_" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  class="developer-link"
-                >
-                  @feat.her_
-                </a>
+            <div class="text-white/50 md2:text-white/30 text-xs !mt-[26px] min-w-[150px] md2:!mt-0 two-line-clamp">
+              {{ t('footer.developer_prefix') }} 
+              <a 
+                href="https://www.instagram.com/feat.her_" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="developer-link"
+              >
+                @feat.her_
+              </a>
             </div>
+          </div>
+          
+          <!-- Language Switcher (desktop full footer) -->
+          <div class="flex items-center justify-center md2:justify-start">
+            <CommonLanguageSwitcher />
           </div>
         </div>
       </div>
@@ -273,6 +289,7 @@ import { useScrollTo } from '~/composables/useScrollTo'
 import { getConfig } from '~/utils/configHelpers'
 import { footerNavigation } from '~/config/navigation'
 import Logo from '~/components/ui/Logo.vue'
+import CommonLanguageSwitcher from '~/components/common/LanguageSwitcher.vue'
 
 // Props
 interface Props {
@@ -284,7 +301,11 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // Composables
+import { useI18n } from 'vue-i18n'
+import { useLocalePath } from '#i18n'
 const snackbar = useSnackbar()
+const { t } = useI18n()
+const localePath = useLocalePath()
 const { scrollToElementWithNavigation } = useScrollTo()
 
 // Navigation items from config
@@ -316,33 +337,33 @@ const contactPhoneNumber = computed(() => getConfig('general.contact.phoneNumber
 // Current year for copyright
 const currentYear = computed(() => new Date().getFullYear())
 
-// Social media links
-const socialLinks = ref([
+// Social media links (labels reactive to locale changes)
+const socialLinks = computed(() => ([
   {
     name: 'instagram',
     icon: 'pi pi-instagram',
     url: 'https://instagram.com/wbmband',
-    label: 'Follow us on Instagram'
+    label: t('footer.follow_instagram')
   },
   {
     name: 'twitter',
     icon: 'pi pi-twitter',
     url: 'https://twitter.com/wbmband',
-    label: 'Follow us on Twitter'
+    label: t('footer.follow_twitter')
   },
   {
     name: 'youtube',
     icon: 'pi pi-youtube',
     url: 'https://youtube.com/@wbmband',
-    label: 'Subscribe to our YouTube channel'
+    label: t('footer.subscribe_youtube')
   },
   {
     name: 'facebook',
     icon: 'pi pi-facebook',
     url: 'https://facebook.com/wbmband',
-    label: 'Like us on Facebook'
+    label: t('footer.like_facebook')
   }
-])
+]))
 
 // Streaming platforms - using computed to ensure proper path resolution
 const streamingPlatforms = computed(() => [
@@ -363,33 +384,24 @@ const streamingPlatforms = computed(() => [
   }
 ])
 
-// Legal links
-const legalLinks = ref([
-  {
-    label: 'Privacy Policy',
-    action: 'privacy'
-  },
-  {
-    label: 'Terms of Service',
-    action: 'terms'
-  },
-  {
-    label: 'Cookies',
-    action: 'cookies'
-  }
-])
+// Legal links (labels reactive to locale changes)
+const legalLinks = computed(() => ([
+  { label: t('footer.privacy'), action: 'privacy' },
+  { label: t('footer.terms'), action: 'terms' },
+  { label: t('footer.cookies'), action: 'cookies' }
+]))
 
 // Legal link handler
 const handleLegalLink = (action: string) => {
   switch (action) {
     case 'privacy':
-      navigateTo('/privacy-policy')
+      navigateTo(localePath('/privacy-policy'))
       break
     case 'terms':
-      navigateTo('/terms-of-service')
+      navigateTo(localePath('/terms-of-service'))
       break
     case 'cookies':
-      navigateTo('/cookies-policy')
+      navigateTo(localePath('/cookies-policy'))
       break
     default:
       console.warn('Unknown legal link action:', action)
@@ -655,6 +667,15 @@ const scrollToHero = () => {
   outline: 2px solid rgba(255, 255, 255, 0.3);
   outline-offset: 1px;
     color: rgba(255, 255, 255, 0.668);
+}
+
+/* Clamp long text to 2 lines */
+.two-line-clamp {
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* Streaming platform icon links */

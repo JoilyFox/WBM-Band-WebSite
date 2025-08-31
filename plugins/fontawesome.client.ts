@@ -1,2 +1,4 @@
-// Import Font Awesome CSS
-import '@fortawesome/fontawesome-free/css/all.css'
+export default defineNuxtPlugin(() => {
+	// Import Font Awesome CSS once on client
+	import('@fortawesome/fontawesome-free/css/all.css')
+})

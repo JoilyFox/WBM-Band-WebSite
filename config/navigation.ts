@@ -11,11 +11,11 @@ export interface NavigationItem {
 // Left navigation items for header
 export const leftNavigation: NavigationItem[] = [
   {
-    label: 'Music',
+    label: 'nav.music',
     elementId: 'music'
   },
   {
-    label: 'Tour',
+    label: 'nav.tour',
     elementId: 'tour'
   }
 ]
@@ -23,11 +23,11 @@ export const leftNavigation: NavigationItem[] = [
 // Right navigation items for header
 export const rightNavigation: NavigationItem[] = [
   {
-    label: 'About',
+    label: 'nav.about',
     elementId: 'about'
   },
   {
-    label: 'Contact',
+    label: 'nav.contact',
     elementId: 'contact'
   }
 ]

@@ -1,7 +1,7 @@
 /* Base Styles and Global Typography */
 @layer base {
   html {
-    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Inter', 'Manrope', 'Golos Text', 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   }
   
   body {
@@ -28,6 +28,7 @@
   /* Typography improvements */
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold leading-tight;
+    font-family: 'Space Grotesk', 'Manrope', 'Golos Text', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   }
   
   h1 {

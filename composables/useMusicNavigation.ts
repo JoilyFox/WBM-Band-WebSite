@@ -1,9 +1,11 @@
 import { ref, computed, readonly } from 'vue'
+import { useLocalePath } from '#i18n'
 import type { MusicRelease } from '~/data/musicLibrary'
 
 export const useMusicNavigation = () => {
   const selectedRelease = ref<MusicRelease | null>(null)
   const isModalOpen = ref(false)
+  const localePath = useLocalePath()
 
   // Detect if user is on mobile device
   const isMobile = computed(() => {
@@ -20,8 +22,9 @@ export const useMusicNavigation = () => {
    */
   const handleMusicClick = async (release: MusicRelease) => {
     if (isMobile.value) {
-      // Navigate to the music page on mobile with 'from=music' parameter
-      await navigateTo(`/music/${release.slug}?from=music`)
+    // Navigate to the locale-aware music page on mobile with 'from=music' parameter
+    const path = localePath({ path: `/music/${release.slug}`, query: { from: 'music' } })
+    await navigateTo(path)
     } else {
       // Open modal on desktop
       selectedRelease.value = release
@@ -42,7 +45,8 @@ export const useMusicNavigation = () => {
    */
   const goToFullPage = async (release: MusicRelease) => {
     closeModal()
-    await navigateTo(`/music/${release.slug}?from=music`)
+    const path = localePath({ path: `/music/${release.slug}`, query: { from: 'music' } })
+    await navigateTo(path)
   }
 
   /**

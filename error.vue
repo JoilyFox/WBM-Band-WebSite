@@ -15,6 +15,11 @@ definePageMeta({
 })
 
 import { createErrorTitle } from '~/constants/app'
+import { useI18n } from 'vue-i18n'
+import { useLocalePath } from '#i18n'
+
+const { t } = useI18n()
+const localePath = useLocalePath()
 
 const props = defineProps<{
   error: any
@@ -23,48 +28,48 @@ const props = defineProps<{
 // Handle different error types
 const errorTitle = computed(() => {
   if (props.error?.statusCode === 404) {
-    return 'Page Not Found'
+    return t('errors.page_not_found.title') as string
   }
   if (props.error?.statusCode === 500) {
-    return 'Server Error'
+    return '500'
   }
-  return 'Oops! Something went wrong'
+  return t('errors.default_title') as string
 })
 
 const errorMessage = computed(() => {
   // Handle music track specific errors
   if (props.error?.statusCode === 404 && props.error?.statusMessage?.includes('Music track')) {
-    return 'The music track you\'re looking for doesn\'t exist or has been moved. You can browse our full music collection instead.'
+    return t('errors.page_not_found.message') as string
   }
   
   if (props.error?.statusCode === 404) {
-    return 'Sorry, the page you are looking for does not exist. It might have been moved, deleted, or you entered the wrong URL.'
+    return t('errors.page_not_found.message') as string
   }
   if (props.error?.statusCode === 500) {
-    return 'We encountered an internal server error. Our team has been notified and is working on fixing this issue.'
+    return t('errors.default_message') as string
   }
-  return 'We encountered an unexpected error. Please try again or return to the homepage.'
+  return t('errors.default_message') as string
 })
 
 const buttonText = computed(() => {
   // Handle music track specific errors
   if (props.error?.statusCode === 404 && props.error?.statusMessage?.includes('Music track')) {
-    return 'Back to Music'
+    return t('errors.go_home') as string
   }
   
   if (props.error?.statusCode === 404) {
-    return 'Go to Home'
+    return t('errors.go_home') as string
   }
-  return 'Try Again'
+  return t('errors.go_home') as string
 })
 
 const buttonLink = computed(() => {
   // Handle music track specific errors - redirect to home with music section anchor
   if (props.error?.statusCode === 404 && props.error?.statusMessage?.includes('Music track')) {
-    return '/#music'
+    return localePath('/') + '#music'
   }
   
-  return '/'
+  return localePath('/')
 })
 
 const buttonIcon = computed(() => {

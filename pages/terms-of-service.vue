@@ -6,7 +6,7 @@
       <div class="hero-content">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div class="hero-glassmorphic-card">
-            <h1 class="hero-title">Terms of Service</h1>
+            <h1 class="hero-title">{{ t('pages.terms.title') }}</h1>
             <p class="hero-subtitle">
               Please read these terms carefully before using our website, music, and services.
             </p>
@@ -348,7 +348,7 @@
       @click="scrollToTop" 
       class="back-to-top"
       :class="{ 'visible': showBackToTop }"
-      aria-label="Back to top"
+      :aria-label="t('pages.privacy.back_to_top')"
     >
       <i class="pi pi-chevron-up"></i>
     </button>
@@ -358,15 +358,17 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { getConfig } from '~/utils/configHelpers'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 // Meta tags for SEO
 useHead({
-  title: `Terms of Service - ${getConfig('general.bandName')}`,
+  title: `${t('pages.terms.title')} - ${getConfig('general.bandName')}`,
   meta: [
-    { name: 'description', content: `Terms of Service for ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}). Please read our terms carefully before using our website and services.` },
+    { name: 'description', content: `${t('pages.terms.title')} - ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).` },
     { name: 'keywords', content: `terms of service, ${getConfig('general.bandName')}, ${getConfig('general.fullBandName')}, user agreement, legal terms` },
-    { property: 'og:title', content: `Terms of Service - ${getConfig('general.bandName')}` },
-    { property: 'og:description', content: `Terms of Service for ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}). Please read our terms carefully before using our website and services.` },
+    { property: 'og:title', content: `${t('pages.terms.title')} - ${getConfig('general.bandName')}` },
+    { property: 'og:description', content: `${t('pages.terms.title')} - ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).` },
     { property: 'og:type', content: 'website' }
   ]
 })
