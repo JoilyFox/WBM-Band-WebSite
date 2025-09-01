@@ -13,7 +13,7 @@
       loading="lazy"
       preset="album"
       :show-placeholder="true"
-      error-text="Album cover unavailable"
+      :error-text="t('music.album_cover.unavailable')"
       @error="handleImageError"
     />
     
@@ -24,7 +24,7 @@
     >
       <div class="text-center text-white/60">
         <i class="pi pi-image text-4xl mb-2"></i>
-        <p class="text-xs font-medium uppercase tracking-wider">No Image</p>
+        <p class="text-xs font-medium uppercase tracking-wider">{{ t('music.album_cover.no_image') }}</p>
       </div>    
     </div>
     
@@ -38,7 +38,7 @@
     <!-- Release Type Badge -->
     <div class="absolute top-2 left-2 z-30">
       <span :class="badgeClass" class="badge-glass">
-        {{ releaseType }}
+        {{ displayTypeName }}
       </span>
     </div>
   </div>
@@ -47,6 +47,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { MusicRelease } from '~/data/musicLibrary'
+import { useI18n } from 'vue-i18n'
 
 interface Props {
   imageUrl: string
@@ -55,6 +56,8 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+// Use global composer to align SSR/CSR
+const { t, locale } = useI18n({ useScope: 'global' })
 
 const imageError = ref(false)
 
@@ -62,6 +65,27 @@ const badgeClass = computed(() => {
   // For now, using dark badge (works well on most album covers)
   // Could be enhanced later with image analysis for smart contrast
   return 'badge-contrast'
+})
+
+const displayTypeName = computed(() => {
+  const raw = (props.releaseType || '').toString().toLowerCase().replace(/\s+/g, '_')
+  const key = `music.types.${raw}`
+  const value = t(key) as string
+  if (value !== key) return value
+  // Deterministic fallback per locale to avoid hydration mismatch
+  const mapUA: Record<string, string> = {
+    single: 'Сингл',
+    album: 'Альбом',
+    ep: 'EP',
+    new_release: 'Новий реліз'
+  }
+  const mapEN: Record<string, string> = {
+    single: 'Single',
+    album: 'Album',
+    ep: 'EP',
+    new_release: 'New release'
+  }
+  return (locale.value === 'ua' ? mapUA : mapEN)[raw] || raw
 })
 
 const handleImageError = () => {

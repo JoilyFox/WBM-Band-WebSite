@@ -26,7 +26,7 @@
               <!-- Album Cover with Progressive Loading -->
               <UiAlbumCover
                 :image-url="blurredNewReleaseImageUrl"
-                :alt="newReleasePreviewData?.title || 'New Release'"
+                :alt="newReleasePreviewData?.title || t('music.new_release.card_title_fallback')"
                 release-type="new release"
               />
             
@@ -39,7 +39,7 @@
                   <i class="pi pi-calendar"></i>
                 </div>
                 <h3 class="new-release-title">{{ newReleasePreviewData?.title }}</h3>
-                <p class="new-release-date">Coming {{ newReleasePreviewData?.releaseDate }}</p>
+                <p class="new-release-date">{{ newReleaseComingText }}</p>
               </div>
             </div>
           </div>
@@ -96,7 +96,7 @@ import { computed, ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { MusicRelease } from '~/data/musicLibrary'
 import { getLatestReleases, getAllReleases } from '~/data/musicLibrary'
-import { getConfig, formatReleaseDate, isUpcomingRelease } from '~/utils/configHelpers'
+import { getConfig, isUpcomingRelease } from '~/utils/configHelpers'
 import { useSnackbar } from '~/composables/useSnackbar'
 
 // Computed properties for config values
@@ -108,7 +108,8 @@ const nextReleaseTitle = computed(() => getConfig('general.nextReleaseTitle'))
 const nextReleaseImageUrl = computed(() => getConfig('general.nextReleaseImageUrl'))
 
 // i18n
-const { t } = useI18n()
+// Use global composer to align SSR and CSR for lazy-loaded messages
+const { t, locale } = useI18n({ useScope: 'global' })
 
 // Props
 interface Props {
@@ -156,19 +157,13 @@ const shouldShowComingSoon = computed(() => {
   return totalReleases < maxReleasesBeforeHideComingSoon.value
 })
 
-const comingSoonTitle = computed(() => {
-  return 'Soon'
-})
+const comingSoonTitle = computed(() => t('music.coming_soon.title') as string)
 
 const comingSoonText = computed(() => {
-  const totalReleases = getAllReleases().length
-  if (totalReleases === 0) {
-    return 'Our debut release is in the works.'
-  } else if (totalReleases === 1) {
-    return 'More tracks are on the horizon.'
-  } else {
-    return 'More music coming soon!'
-  }
+  const total = getAllReleases().length
+  if (total === 0) return t('music.coming_soon.text_none') as string
+  if (total === 1) return t('music.coming_soon.text_one') as string
+  return t('music.coming_soon.text_many') as string
 })
 
 // New Release Preview functionality
@@ -180,12 +175,37 @@ const shouldShowNewReleasePreview = computed(() => {
 const newReleasePreviewData = computed(() => {
   const dateValue = nextReleaseDate.value
   if (!dateValue) return null
-  
+
+  const date = new Date(dateValue)
+  const currentLocale = locale.value === 'ua' ? 'uk-UA' : 'en-US'
+  const formatted = date.toLocaleDateString(currentLocale, {
+    year: 'numeric',
+    month: 'long',
+  day: 'numeric',
+  // Force UTC to keep SSR/CSR consistent regardless of server/client timezones
+  timeZone: 'UTC'
+  })
+
+  const key = 'music.new_release.card_title_fallback'
+  const label = t(key) as string
   return {
-    title: nextReleaseTitle.value || 'New Release',
-    releaseDate: formatReleaseDate(dateValue),
+    title: nextReleaseTitle.value || (label !== key ? label : (locale.value === 'ua' ? 'Новий реліз' : 'New Release')),
+    releaseDate: formatted,
     imageUrl: nextReleaseImageUrl.value || '/images/albums-images/IMG_1822.JPG' // Fallback image
   }
+})
+
+// Build a stable "Coming {date}" label with deterministic fallback when i18n is not yet loaded during SSR
+const newReleaseComingText = computed(() => {
+  const dateStr = newReleasePreviewData.value?.releaseDate || ''
+  const key = 'music.new_release.coming_prefix'
+  const translated = t(key, { date: dateStr }) as string
+  if (translated === key) {
+    // Use exact locale string from locales to avoid UA-only SSR/CSR mismatches
+    const template = locale.value === 'ua' ? 'Вихід {date}' : 'Coming {date}'
+    return template.replace('{date}', dateStr)
+  }
+  return translated
 })
 
 // Use a pre-blurred variant of the new release image to avoid runtime backdrop blur
@@ -213,8 +233,8 @@ const handleNewReleasePreviewClick = () => {
   const releaseData = newReleasePreviewData.value
   if (releaseData) {
     showSuccessSnackbar(
-      `"${releaseData.title}" coming ${releaseData.releaseDate}!`,
-      'Stay tuned for more updates'
+      newReleaseComingText.value,
+      t('snackbar.music_library.subtitle') as string
     )
   }
 }

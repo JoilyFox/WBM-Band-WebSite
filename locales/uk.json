@@ -36,6 +36,8 @@
 		"tagline_long": "{name} — розширюємо межі року, альтернативи та інді. Долучайтеся до нашої музичної подорожі та слідкуйте за останніми релізами і датами туру."
   },
   "snackbar": {
+    "copy_link_success": "Посилання скопійовано!",
+    "copy_link_error": "Не вдалося скопіювати посилання",
     "upload_complete": {
       "title": "Завантаження завершено!",
       "subtitle": "Файл успішно завантажено"
@@ -86,6 +88,47 @@
     "section_title": "Наша музика",
     "section_subtitle": "Досліджуйте музику {name}. Слухайте наші найновіші релізи вже зараз.",
     "show_all": "Показати всю музику",
+    "types": {
+      "single": "Сингл",
+      "album": "Альбом",
+      "ep": "EP",
+      "new_release": "Новий реліз"
+    },
+    "buttons": {
+      "share": "Поділитися",
+      "collapse": "Згорнути",
+      "listen_now": "Слухати зараз",
+      "copy": "Копіювати",
+      "copied": "Скопійовано!"
+    },
+    "detail": {
+      "listen_now_title": "Слухати зараз"
+    },
+    "a11y": {
+      "back_to_section": "Назад до розділу музики",
+      "go_to_library": "До медіатеки",
+      "share_release": "Поділитися релізом",
+      "close_share_popup": "Закрити вікно поширення"
+    },
+    "share_popup": {
+      "title": "Поділитися",
+      "description": "Поділіться цим релізом з іншими:",
+      "check_out": "Оцініть \"{title}\""
+    },
+    "coming_soon": {
+      "title": "Скоро",
+      "text_none": "Наш дебютний реліз у процесі підготовки.",
+      "text_one": "Скоро буде більше треків.",
+      "text_many": "Більше музики зовсім скоро!"
+    },
+    "new_release": {
+      "card_title_fallback": "Новий реліз",
+      "coming_prefix": "Вихід {date}"
+    },
+    "album_cover": {
+      "unavailable": "Обкладинка недоступна",
+      "no_image": "Немає зображення"
+    },
     "streaming": {
       "spotify_title": "Слухати на Spotify",
       "apple_title": "Слухати в Apple Music",
@@ -96,5 +139,15 @@
     "english": "English",
     "ukrainian": "Українська",
     "switch_label": "Мова"
+  },
+  "releases": {
+    "midnight-echoes": {
+      "title": "Нічні відлуння",
+      "description": "Наш новий повноформатний альбом із 12 атмосферними рок-треками."
+    },
+    "electric-dreams": {
+      "title": "Електричні сни",
+      "description": "EP з 5 треків, що досліджує електронні саундскейпи."
+    }
   }
 }

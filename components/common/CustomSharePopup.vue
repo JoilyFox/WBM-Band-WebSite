@@ -15,7 +15,7 @@
       >
         <!-- Header -->
         <div class="share-popup-header">
-          <h3 class="share-popup-title">Share</h3>
+          <h3 class="share-popup-title">{{ t('music.share_popup.title') }}</h3>
           <button
             @click="$emit('close')"
             class="share-popup-close"
@@ -28,7 +28,7 @@
 
         <!-- Content -->
         <div class="share-popup-content">
-          <p class="share-popup-description">Share this release with others:</p>
+          <p class="share-popup-description">{{ t('music.share_popup.description') }}</p>
           
           <!-- URL Input with Copy Button -->
           <div class="share-popup-input-group">
@@ -54,7 +54,7 @@
             >
               <i v-if="justCopied" class="pi pi-check"></i>
               <i v-else class="pi pi-copy"></i>
-              <span>{{ justCopied ? 'Copied!' : 'Copy' }}</span>
+              <span>{{ justCopied ? t('music.buttons.copied') : t('music.buttons.copy') }}</span>
             </Button>
           </div>
         </div>
@@ -68,6 +68,7 @@ import { ref, nextTick, computed, watch, onMounted, onUnmounted } from 'vue'
 import Button from 'primevue/button'
 import { useShareFunctionality } from '~/composables/useShareFunctionality'
 import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
+import { useI18n } from 'vue-i18n'
 
 interface Props {
   visible: boolean
@@ -83,6 +84,7 @@ const emit = defineEmits<{
 
 const { copyToClipboard } = useShareFunctionality()
 const { isLowPerformanceDevice } = usePerformanceOptimization()
+const { t } = useI18n()
 
 const popupContainer = ref<HTMLElement>()
 const popup = ref<HTMLElement>()

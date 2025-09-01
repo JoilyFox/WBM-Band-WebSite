@@ -6,35 +6,36 @@
     <!-- Album Cover -->
     <UiAlbumCover 
       :image-url="release.imageUrl"
-      :alt="release.title"
+      :alt="displayTitle"
       :release-type="release.type"
     />
 
     <!-- Release Info -->
     <div class="space-y-1 mb-3 mt-3">
       <h3 class="text-white font-semibold text-sm group-hover:text-primary-400 transition-colors duration-300 line-clamp-1">
-        {{ release.title }}
+        {{ displayTitle }}
       </h3>
       <p class="text-white/60 text-xs">
         {{ formattedDate }}
       </p>
-      <p v-if="release.description" class="text-white/50 text-xs line-clamp-2 leading-tight hidden sm:block">
-        {{ release.description }}
+      <p v-if="displayDescription" class="text-white/50 text-xs line-clamp-2 leading-tight hidden sm:block">
+        {{ displayDescription }}
       </p>
     </div>
 
     <!-- Streaming Links -->
     <UiStreamingButtons 
-      :spotify-url="release.spotifyUrl"
-      :apple-music-url="release.appleMusicUrl"
-      :youtube-url="release.youtubeUrl"
+      :spotify-url="release.musicPlatformLinks.spotify"
+      :apple-music-url="release.musicPlatformLinks.appleMusic"
+      :youtube-url="release.musicPlatformLinks.youtubeMusic"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import type { MusicRelease } from '~/data/musicLibrary'
+import { useI18n } from 'vue-i18n'
 
 interface Props {
   release: MusicRelease
@@ -46,11 +47,39 @@ const emit = defineEmits<{
   click: [release: MusicRelease]
 }>()
 
+// Use global i18n to keep SSR/CSR in sync
+const { t, locale } = useI18n({ useScope: 'global' })
+
+// During client hydration, render the SSR fallback to avoid mismatches; switch to translations after mount
+const isHydrating = ref(process.client)
+onMounted(() => { isHydrating.value = false })
+
+const stableReleaseText = (key: string, fallback: string | undefined) => {
+  const translated = t(key) as string
+  if (isHydrating.value) {
+    return fallback || ''
+  }
+  return translated !== key && translated ? translated : (fallback || '')
+}
+
+// Localized title/description from locales.releases[slug]
+const displayTitle = computed(() => {
+  const key = `releases.${props.release.slug}.title`
+  return stableReleaseText(key, props.release.title || props.release.slug)
+})
+
+const displayDescription = computed(() => {
+  const key = `releases.${props.release.slug}.description`
+  return stableReleaseText(key, props.release.description || '')
+})
+
 const formattedDate = computed(() => {
   const date = new Date(props.release.releaseDate)
-  return date.toLocaleDateString('en-US', {
+  const currentLocale = locale.value === 'ua' ? 'uk-UA' : 'en-US'
+  return date.toLocaleDateString(currentLocale, {
     year: 'numeric',
-    month: 'long'
+    month: 'long',
+    timeZone: 'UTC'
   })
 })
 

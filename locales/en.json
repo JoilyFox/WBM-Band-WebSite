@@ -36,6 +36,8 @@
 		"tagline_long": "{name} - Pushing the boundaries of rock, alternative, and indie music. Join us on our musical journey and stay connected for the latest releases and tour updates."
   },
   "snackbar": {
+    "copy_link_success": "Link copied to clipboard!",
+    "copy_link_error": "Failed to copy link",
     "upload_complete": {
       "title": "Upload Complete!",
       "subtitle": "File uploaded successfully"
@@ -86,6 +88,47 @@
     "section_title": "Our Music",
     "section_subtitle": "Explore the music of {name}. Stream our latest releases now.",
     "show_all": "Show All Music",
+    "types": {
+      "single": "Single",
+      "album": "Album",
+      "ep": "EP",
+      "new_release": "New release"
+    },
+    "buttons": {
+      "share": "Share",
+      "collapse": "Collapse",
+      "listen_now": "Listen Now",
+      "copy": "Copy",
+      "copied": "Copied!"
+    },
+    "detail": {
+      "listen_now_title": "Listen Now"
+    },
+    "a11y": {
+      "back_to_section": "Back to music section",
+      "go_to_library": "Go to music library",
+      "share_release": "Share release",
+      "close_share_popup": "Close share popup"
+    },
+    "share_popup": {
+      "title": "Share",
+      "description": "Share this release with others:",
+      "check_out": "Check out \"{title}\""
+    },
+    "coming_soon": {
+      "title": "Soon",
+      "text_none": "Our debut release is in the works.",
+      "text_one": "More tracks are on the horizon.",
+      "text_many": "More music coming soon!"
+    },
+    "new_release": {
+      "card_title_fallback": "New Release",
+      "coming_prefix": "Coming {date}"
+    },
+    "album_cover": {
+      "unavailable": "Album cover unavailable",
+      "no_image": "No Image"
+    },
     "streaming": {
       "spotify_title": "Listen on Spotify",
       "apple_title": "Listen on Apple Music",
@@ -96,5 +139,15 @@
     "english": "English",
     "ukrainian": "Українська",
     "switch_label": "Language"
+  },
+  "releases": {
+    "midnight-echoes": {
+      "title": "Midnight Echoes",
+      "description": "Our latest full-length album featuring 12 tracks of atmospheric rock."
+    },
+    "electric-dreams": {
+      "title": "Electric Dreams",
+      "description": "A 5-track EP exploring electronic soundscapes."
+    }
   }
 }

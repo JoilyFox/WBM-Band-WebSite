@@ -12,8 +12,8 @@
       <i :class="platformIcon"></i>
     </div>
     <div class="platform-content">
-      <span class="platform-name">{{ platformName }}</span>
-      <span class="platform-action">Listen Now</span>
+    <span class="platform-name">{{ platformName }}</span>
+    <span class="platform-action">{{ listenNowLabel }}</span>
     </div>
     <div class="platform-arrow">
       <i class="pi pi-external-link"></i>
@@ -24,6 +24,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
+import { useI18n } from 'vue-i18n'
 
 interface Props {
   platform: string
@@ -31,6 +32,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const { t, locale } = useI18n({ useScope: 'global' })
 
 // Performance optimization
 const {
@@ -130,6 +132,17 @@ const config = computed(() => {
 const platformName = computed(() => config.value.name)
 const platformIcon = computed(() => config.value.icon)
 const platformClass = computed(() => `platform-${props.platform}`)
+
+// Prevent SSR/CSR hydration mismatch when i18n messages are lazy-loaded
+const listenNowLabel = computed(() => {
+  const key = 'music.buttons.listen_now'
+  const value = t(key) as string
+  if (value === key) {
+    // Fallback to a deterministic string per current locale
+    return locale.value === 'ua' ? 'Слухати зараз' : 'Listen Now'
+  }
+  return value
+})
 
 const handleClick = () => {
   // Optional: Add analytics tracking here

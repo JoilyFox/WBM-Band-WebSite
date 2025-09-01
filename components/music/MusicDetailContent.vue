@@ -19,7 +19,7 @@
             'back-glass-btn--transparent': backBtnTransparent,
             'back-glass-btn--optimized': shouldUseMobileFallback 
           }]"
-          :aria-label="shouldShowBackArrow ? 'Back to music section' : 'Go to music library'"
+          :aria-label="shouldShowBackArrow ? t('music.a11y.back_to_section') : t('music.a11y.go_to_library')"
         >
           <i v-if="shouldShowBackArrow" class="pi pi-arrow-left text-xl"></i>
           <i v-else class="fa-solid fa-home text-lg"></i>
@@ -46,7 +46,7 @@
               'share-glass-btn--transparent': backBtnTransparent,
               'share-glass-btn--optimized': shouldUseMobileFallback
             }]"
-            aria-label="Share release"
+            :aria-label="t('music.a11y.share_release')"
           >
             <i class="pi pi-share-alt text-xl"></i>
           </button>
@@ -86,7 +86,7 @@
           <div class="relative w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-white/5 border border-white/10 shadow-lg" style="min-width: 64px; min-height: 64px; aspect-ratio: 1;">
             <UiProgressiveImage
               :src="release.imageUrl"
-              :alt="release.title"
+              :alt="displayTitle"
               container-class="w-full h-full"
               image-class="w-full h-full object-cover object-center"
               :loading="isModal ? 'lazy' : 'eager'"
@@ -96,15 +96,14 @@
               :width="64"
               :height="64"
               sizes="64px"
-              style="aspect-ratio: 1; object-fit: cover;"
             />
           </div>
           
           <!-- Compact Info -->
           <div class="flex-1 min-w-0">
-            <h1 class="text-lg font-bold text-primary-50 mb-[2px] truncate">{{ release.title }}</h1>
+            <h1 class="text-lg font-bold text-primary-50 mb-[2px] truncate">{{ displayTitle }}</h1>
             <p class="text-sm text-primary-200 opacity-70 font-base">
-              <span>{{ release.type.charAt(0).toUpperCase() + release.type.slice(1) }}</span>
+              <span>{{ displayTypeName }}</span>
               <span aria-hidden="true" class="mx-1.5">·</span>
               <span>{{ formatDate(release.releaseDate) }}</span>
             </p>
@@ -134,7 +133,7 @@
              }">
           <UiProgressiveImage
             :src="release.imageUrl"
-            :alt="release.title"
+            :alt="displayTitle"
             container-class="w-full h-full"
             image-class="w-full h-full object-cover"
             loading="eager"
@@ -148,7 +147,7 @@
           <!-- Release Type Badge -->
           <div class="music-badge absolute top-4 left-4 z-10">
             <span :class="badgeClass" class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md">
-              {{ release.type }}
+              {{ displayTypeName }}
             </span>
           </div>
         </div>
@@ -160,17 +159,17 @@
               class="flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 border border-white/20 text-primary-200 text-sm font-medium transition-all duration-300 md:hover:bg-white/20 md:hover:scale-105"
             >
               <i class="pi pi-chevron-up text-sm"></i>
-              <span>Collapse</span>
+              <span>{{ collapseLabel }}</span>
             </button>
           </div>
           
           <h1 class="music-title text-4xl md:text-6xl font-extrabold leading-tight mb-3 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-lg"
               :class="{ 'animate-titleGlow': isHighPerformanceDevice }">
-            {{ release.title }}
+            {{ displayTitle }}
           </h1>
           <p class="music-date text-primary-200 text-base md:text-lg font-medium mb-2">{{ formatDate(release.releaseDate) }}</p>
-          <p v-if="release.description" class="music-description text-primary-100 text-base md:text-lg max-w-xl mx-auto md:mx-0 mb-4">
-            {{ release.description }}
+          <p v-if="displayDescription" class="music-description text-primary-100 text-base md:text-lg max-w-xl mx-auto md:mx-0 mb-4">
+            {{ displayDescription }}
           </p>
           
           <!-- Desktop Share Button -->
@@ -180,12 +179,12 @@
               @click="showDesktopSharePopup"
               class="btn-glassmorphic"
               :class="{ 'btn-glassmorphic--optimized': shouldUseMobileFallback }"
-              aria-label="Share release"
+              :aria-label="t('music.a11y.share_release')"
               unstyled
               :pt="{ ripple: { style: 'display: none !important' } }"
             >
               <i class="pi pi-share-alt"></i>
-              <span>Share</span>
+              <span>{{ t('music.buttons.share') }}</span>
             </Button>
           </div>
         </div>
@@ -204,7 +203,7 @@
     <!-- Music Platform Links -->
     <section class="music-platforms flex-1 relative py-8 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/70">
       <div class="platforms-container max-w-3xl mx-auto rounded-xl">
-        <h2 class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-4 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md">Listen Now</h2>
+        <h2 class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-4 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md">{{ listenNowTitle }}</h2>
         <div class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch">
           <div 
             v-for="(url, platform) in availablePlatforms"
@@ -235,6 +234,7 @@ import type { MusicRelease } from '~/data/musicLibrary'
 import Logo from '~/components/ui/Logo.vue'
 import CustomSharePopup from '~/components/common/CustomSharePopup.vue'
 import { useLocalePath } from '#i18n'
+import { useI18n } from 'vue-i18n'
 
 interface Props {
   release: MusicRelease
@@ -245,6 +245,8 @@ const props = defineProps<Props>()
 const router = useRouter()
 const route = useRoute()
 const localePath = useLocalePath()
+// Use global composer to avoid per-component instances and keep SSR/CSR consistent
+const { t, locale } = useI18n({ useScope: 'global' })
 
 // Performance optimization system
 const {
@@ -300,6 +302,8 @@ const shouldShowBackArrow = ref(route.query.from === 'music')
 
 // Track if we're on client side to avoid SSR hydration issues
 const isClient = ref(false)
+// Keep SSR fallbacks during hydration to prevent mismatches; switch to translations after mount
+const isHydrating = ref(true)
 
 // Responsive breakpoint detection - start with a safe default
 const isDesktop = ref(false)
@@ -326,6 +330,8 @@ onMounted(() => {
   // Mark as client-side and update breakpoint immediately
   isClient.value = true
   updateBreakpoint()
+  // Hydration finished; allow switching to localized strings without triggering hydration warnings
+  isHydrating.value = false
   
   // Resize handler for responsive breakpoint (debounced)
   let resizeTimeout: NodeJS.Timeout
@@ -378,14 +384,65 @@ const badgeClass = computed(() => {
   return typeClasses[props.release.type] || 'badge-default'
 })
 
+// Localized title/description from locales.releases[slug]
+// Hydration-aware: keep SSR fallbacks during hydration to avoid mismatches
+const displayTitle = computed(() => {
+  const ssrFallback = props.release.title || props.release.slug
+  if (isHydrating.value) return ssrFallback
+  const key = `releases.${props.release.slug}.title`
+  const translated = t(key) as string
+  return translated !== key ? translated : ssrFallback
+})
+
+const displayDescription = computed(() => {
+  const ssrFallback = props.release.description
+  if (isHydrating.value) return ssrFallback
+  const key = `releases.${props.release.slug}.description`
+  const translated = t(key) as string
+  if (translated !== key && translated) return translated
+  return ssrFallback
+})
+
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
+  const currentLocale = locale.value === 'ua' ? 'uk-UA' : 'en-US'
+  return date.toLocaleDateString(currentLocale, {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    // Force UTC to ensure SSR/CSR consistency
+    timeZone: 'UTC'
   })
 }
+
+// Localized display name for release type
+const displayTypeName = computed(() => {
+  const key = (props.release.type || '').toString().toLowerCase().replace(/\s+/g, '_')
+  const i18nKey = `music.types.${key}`
+  const label = t(i18nKey) as string
+  if (label !== i18nKey) return label
+  const loc = locale.value === 'ua' ? 'ua' : 'en'
+  const map: Record<string, Record<string, string>> = {
+    en: { single: 'Single', album: 'Album', ep: 'EP', 'new_release': 'New Release' },
+    ua: { single: 'Сингл', album: 'Альбом', ep: 'EP', 'new_release': 'Новий реліз' }
+  }
+  return map[loc][key] || (props.release.type || '').toString()
+})
+
+// Deterministic labels for section titles/buttons to avoid SSR key rendering
+const listenNowTitle = computed(() => {
+  const key = 'music.detail.listen_now_title'
+  const label = t(key) as string
+  if (label !== key) return label
+  return locale.value === 'ua' ? 'Слухати зараз' : 'Listen Now'
+})
+
+const collapseLabel = computed(() => {
+  const key = 'music.buttons.collapse'
+  const label = t(key) as string
+  if (label !== key) return label
+  return locale.value === 'ua' ? 'Згорнути' : 'Collapse'
+})
 
 // Build a robust fallback URL for CSS backgrounds (prefer JPG)
 const bgCoverUrl = computed(() => {
@@ -1087,6 +1144,7 @@ const handleCopyToClipboard = async () => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(var(--perf-blur-strength, 0px));
   -webkit-backdrop-filter: blur(var(--perf-blur-strength, 0px));
   border: 1px solid rgba(255, 255, 255, 0.25);

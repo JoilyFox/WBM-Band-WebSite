@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { useSnackbar } from '~/composables/useSnackbar'
+import { useI18n } from 'vue-i18n'
 
 interface ShareData {
   title: string
@@ -9,6 +10,7 @@ interface ShareData {
 
 export const useShareFunctionality = () => {
   const { success: showSuccess, error: showError } = useSnackbar()
+  const { t } = useI18n()
   
   // Create clean URL without certain params
   const getCleanUrl = (removeParams: string[] = ['from']) => {
@@ -23,7 +25,8 @@ export const useShareFunctionality = () => {
   const getShareContent = (data: ShareData) => {
     const cleanUrl = data.url || getCleanUrl()
     const title = data.title
-    const text = `Check out "${title}"${data.description ? ` - ${data.description}` : ''}`
+    const base = t('music.share_popup.check_out', { title }) as string
+    const text = data.description ? `${base} - ${data.description}` : base
     const shareMessage = `${text}\n\n${cleanUrl}`
     
     return {
@@ -39,7 +42,8 @@ export const useShareFunctionality = () => {
     try {
       const cleanUrl = data.url || getCleanUrl()
       const title = data.title
-      const text = `Check out "${title}"${data.description ? ` - ${data.description}` : ''}`
+      const base = t('music.share_popup.check_out', { title }) as string
+      const text = data.description ? `${base} - ${data.description}` : base
       
       if (navigator.share) {
         // For Web Share API, don't include URL in text since it's provided separately
@@ -66,7 +70,7 @@ export const useShareFunctionality = () => {
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(text)
-        showSuccess('Link copied to clipboard!')
+        showSuccess(t('snackbar.copy_link_success') as string)
         return true
       } else {
         // Fallback for older browsers
@@ -80,11 +84,11 @@ export const useShareFunctionality = () => {
         textArea.select()
         document.execCommand('copy')
         textArea.remove()
-        showSuccess('Link copied to clipboard!')
+        showSuccess(t('snackbar.copy_link_success') as string)
         return true
       }
     } catch (error) {
-      showError('Failed to copy link')
+      showError(t('snackbar.copy_link_error') as string)
       return false
     }
   }
