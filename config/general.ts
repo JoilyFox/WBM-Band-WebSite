@@ -52,7 +52,7 @@ export interface GeneralConfig {
 
 export const generalConfig: GeneralConfig = {
   // Release information
-  nextReleaseDate: '2025-09-15', // Set to ISO date string like "2024-04-15" when you have a planned release
+  nextReleaseDate: '2025-10-17', // Set to ISO date string like "2024-04-15" when you have a planned release
   nextReleaseTitle: 'Mania', // Set to release title like "Electric Dreams EP"
   nextReleaseImageUrl: '/images/albums-images/IMG_1822.JPG', // Image for the upcoming release preview
   
