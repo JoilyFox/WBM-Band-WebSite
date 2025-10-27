@@ -102,7 +102,8 @@
       "copied": "Copied!"
     },
     "detail": {
-      "listen_now_title": "Listen Now"
+      "listen_now_title": "Listen Now",
+      "presave_title": "Pre-save Now"
     },
     "a11y": {
       "back_to_section": "Back to music section",
@@ -113,7 +114,8 @@
     "share_popup": {
       "title": "Share",
       "description": "Share this release with others:",
-      "check_out": "Check out \"{title}\""
+      "check_out": "Check out \"{title}\"",
+      "presave": "Pre-Save \"{title}\""
     },
     "coming_soon": {
       "title": "Soon",
@@ -124,6 +126,10 @@
     "new_release": {
       "card_title_fallback": "New Release",
       "coming_prefix": "Coming {date}"
+    },
+    "presave": {
+      "card_title_fallback": "Pre-save",
+      "coming_prefix": "Pre-save {date}"
     },
     "album_cover": {
       "unavailable": "Album cover unavailable",

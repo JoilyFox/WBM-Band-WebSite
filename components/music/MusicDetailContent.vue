@@ -147,7 +147,7 @@
           <!-- Release Type Badge -->
           <div class="music-badge absolute top-4 left-4 z-10">
             <span :class="badgeClass" class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md">
-              {{ displayTypeName }}
+              {{ isPreSave ? t('music.presave.card_title_fallback').toUpperCase() : displayTypeName }}
             </span>
           </div>
         </div>
@@ -201,9 +201,9 @@
     />
     
     <!-- Music Platform Links -->
-    <section class="music-platforms flex-1 relative py-8 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/70">
+    <section class="music-platforms flex-1 relative py-6 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/70">
       <div class="platforms-container max-w-3xl mx-auto rounded-xl">
-        <h2 class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-4 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md">{{ listenNowTitle }}</h2>
+        <h2 class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-6 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md">{{ listenNowTitle }}</h2>
         <div class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch">
           <div 
             v-for="(url, platform) in availablePlatforms"
@@ -213,6 +213,7 @@
             <MusicPlatformButton
               :platform="platform"
               :url="url"
+              :is-pre-save="isPreSave"
               class="w-full h-full flex-1"
             />
           </div>
@@ -239,9 +240,13 @@ import { useI18n } from 'vue-i18n'
 interface Props {
   release: MusicRelease
   isModal?: boolean
+  isPreSave?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  isModal: false,
+  isPreSave: false
+})
 const router = useRouter()
 const route = useRoute()
 const localePath = useLocalePath()
@@ -279,8 +284,9 @@ const isCopying = ref(false)
 const shareUrlForRelease = computed(() => {
   const config = useRuntimeConfig()
   const base = (config.app?.baseURL || '/').replace(/\/$/, '')
-  // Use locale-aware path for the music detail route
-  const localizedPath = localePath({ path: `/music/${props.release.slug}` })
+  // Use appropriate path based on pre-save mode
+  const pathPrefix = props.isPreSave ? '/pre-save/' : '/listen/'
+  const localizedPath = localePath({ path: `${pathPrefix}${props.release.slug}` })
   const relative = `${base}${localizedPath}`
   if (typeof window !== 'undefined') {
     return new URL(relative, window.location.origin).toString()
@@ -288,12 +294,22 @@ const shareUrlForRelease = computed(() => {
   return relative
 })
 
-// Computed share content – always use the deep link, even in desktop modal
+// Computed share content – use appropriate text for pre-save vs regular
 const shareContent = computed(() => {
-  return getShareContent({
-    title: props.release.title,
-    url: shareUrlForRelease.value
-  })
+  const cleanUrl = shareUrlForRelease.value
+  const title = props.release.title
+  
+  // Use localized share text
+  const key = props.isPreSave ? 'music.share_popup.presave' : 'music.share_popup.check_out'
+  const displayText = t(key, { title }) as string
+  const shareMessage = `${displayText}\n\n${cleanUrl}`
+  
+  return {
+    title,
+    text: shareMessage,
+    url: cleanUrl,
+    displayText: displayText
+  }
 })
 
 // Check if back button should show back arrow or music library icon
@@ -366,7 +382,12 @@ const accentVars = computed(() => ({
 
 const availablePlatforms = computed(() => {
   const platforms: Record<string, string> = {}
-  Object.entries(props.release.musicPlatformLinks).forEach(([platform, url]) => {
+  // Use pre-save links if in pre-save mode, otherwise use regular music platform links
+  const linkSource = props.isPreSave && props.release.preSaveMusicPlatformLinks 
+    ? props.release.preSaveMusicPlatformLinks 
+    : props.release.musicPlatformLinks
+  
+  Object.entries(linkSource).forEach(([platform, url]) => {
     if (url) {
       platforms[platform] = url
     }
@@ -375,6 +396,11 @@ const availablePlatforms = computed(() => {
 })
 
 const badgeClass = computed(() => {
+  // Use pre-save badge if in pre-save mode
+  if (props.isPreSave) {
+    return 'badge-presave'
+  }
+  
   const typeClasses = {
     'single': 'badge-single',
     'album': 'badge-album', 
@@ -431,6 +457,14 @@ const displayTypeName = computed(() => {
 
 // Deterministic labels for section titles/buttons to avoid SSR key rendering
 const listenNowTitle = computed(() => {
+  if (props.isPreSave) {
+    // Pre-save mode
+    const key = 'music.detail.presave_title'
+    const label = t(key) as string
+    if (label !== key) return label
+    return locale.value === 'ua' ? 'Зберегти наперед' : 'Pre-save Now'
+  }
+  // Regular listen now
   const key = 'music.detail.listen_now_title'
   const label = t(key) as string
   if (label !== key) return label
@@ -1158,6 +1192,29 @@ const handleCopyToClipboard = async () => {
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+}
+
+/* Badge color variants */
+.badge-presave {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(236, 72, 153, 0.5)) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.badge-single {
+  background: rgba(59, 130, 246, 0.4) !important;
+}
+
+.badge-album {
+  background: rgba(139, 92, 246, 0.4) !important;
+}
+
+.badge-ep {
+  background: rgba(236, 72, 153, 0.4) !important;
+}
+
+.badge-new {
+  background: rgba(34, 197, 94, 0.4) !important;
 }
 
 /* Title + text animation only */

@@ -102,7 +102,8 @@
       "copied": "Скопійовано!"
     },
     "detail": {
-      "listen_now_title": "Слухати зараз"
+      "listen_now_title": "Слухати зараз",
+      "presave_title": "Зберегти наперед"
     },
     "a11y": {
       "back_to_section": "Назад до розділу музики",
@@ -113,7 +114,8 @@
     "share_popup": {
       "title": "Поділитися",
       "description": "Поділіться цим релізом з іншими:",
-      "check_out": "Оцініть \"{title}\""
+      "check_out": "Оцініть \"{title}\"",
+      "presave": "Пресейв \"{title}\""
     },
     "coming_soon": {
       "title": "Скоро",
@@ -124,6 +126,10 @@
     "new_release": {
       "card_title_fallback": "Новий реліз",
       "coming_prefix": "Вихід {date}"
+    },
+    "presave": {
+      "card_title_fallback": "Пресейв",
+      "coming_prefix": "Пресейв {date}"
     },
     "album_cover": {
       "unavailable": "Обкладинка недоступна",

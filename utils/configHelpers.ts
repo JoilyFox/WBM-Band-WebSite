@@ -68,24 +68,69 @@ export const getConfig = (path: string, options: GetConfigOptions = {}): any => 
 
 /**
  * Helper function to format release date
+ * Supports ISO 8601 format with optional time
  */
-export const formatReleaseDate = (dateString: string): string => {
+export const formatReleaseDate = (dateString: string, locale: string = 'en-US'): string => {
   const date = new Date(dateString)
+  
+  // Check if the release date includes time (not just date)
+  const hasTime = dateString.includes('T') || dateString.includes(':')
+  
   const options: Intl.DateTimeFormatOptions = { 
     year: 'numeric', 
     month: 'long',
     day: 'numeric'
   }
-  return date.toLocaleDateString('en-US', options)
+  
+  // Add time formatting if time is specified
+  if (hasTime) {
+    options.hour = '2-digit'
+    options.minute = '2-digit'
+  }
+  
+  return date.toLocaleString(locale, options)
 }
 
 /**
  * Helper function to check if release date is in the future
+ * Supports ISO 8601 format with optional time: 'YYYY-MM-DD', 'YYYY-MM-DDTHH:mm:ss', 'YYYY-MM-DDTHH:mm:ssZ'
  */
 export const isUpcomingRelease = (dateString: string): boolean => {
   const releaseDate = new Date(dateString)
   const now = new Date()
   return releaseDate > now
+}
+
+/**
+ * Get the nearest upcoming release from the music library
+ * Note: Import is done at top of file to avoid runtime issues
+ */
+export const getNearestUpcomingRelease = () => {
+  // Import musicLibrary - this needs to be imported at the top of files that use it
+  // We'll handle this in the components that call this function
+  return null // Placeholder - components will use their own logic
+}
+
+/**
+ * Check if pre-save mode is active for a given release
+ * This is a simple check - components should handle the actual logic
+ */
+export const isPreSaveMode = (): boolean => {
+  const enablePreSave = getConfig('general.enablePreSave', { fallback: false })
+  return enablePreSave
+}
+
+/**
+ * Check if next release preview should be shown
+ * This is a simple check - components should handle the actual logic
+ */
+export const shouldShowNextReleasePreview = (): boolean => {
+  const enableNextReleasePreview = getConfig('general.enableNextReleasePreview', { fallback: false })
+  const enablePreSave = getConfig('general.enablePreSave', { fallback: false })
+  
+  // Don't show preview if pre-save is enabled
+  if (enablePreSave) return false
+  return enableNextReleasePreview
 }
 
 /**

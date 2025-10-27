@@ -36,7 +36,7 @@
     </div>
 
     <!-- Release Type Badge -->
-    <div class="absolute top-2 left-2 z-30">
+    <div v-if="showBadge" class="absolute top-2 left-2 z-30">
       <span :class="badgeClass" class="badge-glass">
         {{ displayTypeName }}
       </span>
@@ -53,9 +53,12 @@ interface Props {
   imageUrl: string
   alt: string
   releaseType: MusicRelease['type']
+  showBadge?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  showBadge: true
+})
 // Use global composer to align SSR/CSR
 const { t, locale } = useI18n({ useScope: 'global' })
 

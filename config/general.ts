@@ -3,11 +3,6 @@
  */
 
 export interface GeneralConfig {
-  // Release information
-  nextReleaseDate: string | null // ISO date string or null
-  nextReleaseTitle: string | null // Title of the upcoming release
-  nextReleaseImageUrl: string | null // Image URL for the upcoming release
-  
   // Band information
   bandName: string
   fullBandName: string
@@ -48,14 +43,11 @@ export interface GeneralConfig {
   // Website settings
   enableComingSoonCard: boolean
   maxReleasesBeforeHideComingSoon: number
+  enableNextReleasePreview: boolean // Show non-clickable preview card for upcoming releases
+  enablePreSave: boolean // Enable pre-save functionality for upcoming releases (overrides preview)
 }
 
 export const generalConfig: GeneralConfig = {
-  // Release information
-  nextReleaseDate: '2025-10-17', // Set to ISO date string like "2024-04-15" when you have a planned release
-  nextReleaseTitle: 'Mania', // Set to release title like "Electric Dreams EP"
-  nextReleaseImageUrl: '/images/albums-images/IMG_1822.JPG', // Image for the upcoming release preview
-  
   // Band information
   bandName: "WBM Band",
   fullBandName: "Woman Based Mechanics",
@@ -94,6 +86,8 @@ export const generalConfig: GeneralConfig = {
   },
   
   // Website settings
-  enableComingSoonCard: true,
-  maxReleasesBeforeHideComingSoon: 6
+  enableComingSoonCard: false,
+  maxReleasesBeforeHideComingSoon: 6,
+  enableNextReleasePreview: true, // Show non-clickable preview card for upcoming releases
+  enablePreSave: true // Enable pre-save functionality (when true, replaces preview with clickable pre-save card)
 }

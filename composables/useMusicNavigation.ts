@@ -1,6 +1,7 @@
 import { ref, computed, readonly } from 'vue'
 import { useLocalePath } from '#i18n'
 import type { MusicRelease } from '~/data/musicLibrary'
+import { isUpcomingRelease } from '~/utils/configHelpers'
 
 export const useMusicNavigation = () => {
   const selectedRelease = ref<MusicRelease | null>(null)
@@ -16,14 +17,32 @@ export const useMusicNavigation = () => {
   })
 
   /**
+   * Determine if a release is in pre-save mode
+   */
+  const isReleaseInPreSaveMode = (release: MusicRelease): boolean => {
+    return isUpcomingRelease(release.releaseDate) && !!release.preSaveMusicPlatformLinks
+  }
+
+  /**
+   * Check if the currently selected release is in pre-save mode
+   */
+  const isSelectedReleasePreSave = computed(() => {
+    if (!selectedRelease.value) return false
+    return isReleaseInPreSaveMode(selectedRelease.value)
+  })
+
+  /**
    * Handle music card click
    * On mobile: navigate to page with music origin parameter
    * On desktop: open modal
    */
   const handleMusicClick = async (release: MusicRelease) => {
+    const isPreSave = isReleaseInPreSaveMode(release)
+    const basePath = isPreSave ? '/pre-save' : '/listen'
+    
     if (isMobile.value) {
-    // Navigate to the locale-aware music page on mobile with 'from=music' parameter
-    const path = localePath({ path: `/music/${release.slug}`, query: { from: 'music' } })
+    // Navigate to the locale-aware listen/pre-save page on mobile with 'from=music' parameter
+    const path = localePath({ path: `${basePath}/${release.slug}`, query: { from: 'music' } })
     await navigateTo(path)
     } else {
       // Open modal on desktop
@@ -45,7 +64,9 @@ export const useMusicNavigation = () => {
    */
   const goToFullPage = async (release: MusicRelease) => {
     closeModal()
-    const path = localePath({ path: `/music/${release.slug}`, query: { from: 'music' } })
+    const isPreSave = isReleaseInPreSaveMode(release)
+    const basePath = isPreSave ? '/pre-save' : '/listen'
+    const path = localePath({ path: `${basePath}/${release.slug}`, query: { from: 'music' } })
     await navigateTo(path)
   }
 
@@ -80,6 +101,7 @@ export const useMusicNavigation = () => {
   return {
     selectedRelease: readonly(selectedRelease),
     isModalOpen: readonly(isModalOpen),
+    isSelectedReleasePreSave: readonly(isSelectedReleasePreSave),
     isMobile,
     handleMusicClick,
     closeModal,

@@ -29,9 +29,12 @@ import { useI18n } from 'vue-i18n'
 interface Props {
   platform: string
   url: string
+  isPreSave?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  isPreSave: false
+})
 const { t, locale } = useI18n({ useScope: 'global' })
 
 // Performance optimization
@@ -133,15 +136,11 @@ const platformName = computed(() => config.value.name)
 const platformIcon = computed(() => config.value.icon)
 const platformClass = computed(() => `platform-${props.platform}`)
 
-// Prevent SSR/CSR hydration mismatch when i18n messages are lazy-loaded
 const listenNowLabel = computed(() => {
-  const key = 'music.buttons.listen_now'
-  const value = t(key) as string
-  if (value === key) {
-    // Fallback to a deterministic string per current locale
-    return locale.value === 'ua' ? 'Слухати зараз' : 'Listen Now'
+  if (props.isPreSave) {
+    return t('music.detail.presave_title')
   }
-  return value
+  return t('music.buttons.listen_now')
 })
 
 const handleClick = () => {

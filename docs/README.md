@@ -14,6 +14,7 @@ This directory contains documentation for all the main features of the WBM Band 
 - [Pre‑Blurred Images](./pre-blurred-images.md) - Build-time blur/tint generation to replace runtime overlay blur
 - [Image Utilities](./image-utilities.md) - Composables and helper functions for image loading states and optimization
 - [Favicon Setup](./favicon-setup.md) - Complete favicon generation system with multi-platform support and PWA compatibility
+- [Pre-save Functionality](./presave-functionality.md) - Pre-save system for upcoming music releases with automatic state transitions
 
 ## Tech Stack
 

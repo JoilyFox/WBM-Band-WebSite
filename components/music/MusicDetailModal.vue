@@ -27,6 +27,7 @@
               <MusicDetailContent 
                 :release="release"
                 :is-modal="true"
+                :is-pre-save="isPreSave"
               />
             </div>
           </div>
@@ -43,13 +44,16 @@ import type { MusicRelease } from '~/data/musicLibrary'
 interface Props {
   release: MusicRelease
   isVisible: boolean
+  isPreSave?: boolean
 }
 
 interface Emits {
   (e: 'close'): void
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  isPreSave: false
+})
 const emit = defineEmits<Emits>()
 
 const isAnimating = ref(false)

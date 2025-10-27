@@ -21,6 +21,7 @@
       v-if="selectedRelease"
       :release="selectedRelease"
       :is-visible="isModalOpen"
+      :is-pre-save="isSelectedReleasePreSave"
       @close="closeModal"
     />
   </div>
@@ -62,7 +63,7 @@ useHead({
 const snackbar = useSnackbar()
 const { scrollToElement, scrollToElementWithNavigation } = useScrollTo()
 const { preloadHeroImages, preloadAlbumCovers } = useImagePreloader()
-const { selectedRelease, isModalOpen, handleMusicClick, closeModal } = useMusicNavigation()
+const { selectedRelease, isModalOpen, isSelectedReleasePreSave, handleMusicClick, closeModal } = useMusicNavigation()
 
 // Hero images for preloading - using computed to properly reference config values
 const heroImages = computed(() => [

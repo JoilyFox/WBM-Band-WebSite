@@ -1,9 +1,9 @@
 <template>
-  <section id="music" class="pt-16 pb-4 lg:pb-16 lg:pt-24 px-4 sm:px-6 lg:px-8 bg-surface-950">
+  <section id="music" class="pt-16 pb-6 lg:pb-16 lg:pt-24 px-4 sm:px-6 lg:px-8 bg-surface-950">
     <div class="max-w-7xl mx-auto">
       <!-- Section Header -->
       <div class="text-center mb-10">
-  <CommonSectionTitle :level="2" size="xl" align="center" class="mb-6">
+        <CommonSectionTitle :level="2" size="xl" align="center" class="mb-6">
           {{ t('music.section_title') }}
         </CommonSectionTitle>
         <CommonSectionSubtitle align="center" max-width="md" size="base">
@@ -14,32 +14,49 @@
       <!-- Music Grid -->
       <div class="flex justify-center">
         <div class="flex flex-wrap justify-center gap-3 sm:gap-4 lg:gap-6 max-w-fit mx-auto">
-          <!-- New Release Preview Block - Always First -->
+          <!-- Upcoming Release Block (Preview or Pre-save) - Always First -->
           <div
-            v-if="shouldShowNewReleasePreview"
+            v-if="shouldShowNewReleasePreview || shouldShowPreSaveCard"
             ref="newReleasePreviewRef"
-            class="card-base new-release-preview cursor-pointer"
+            :class="['card-base', shouldShowPreSaveCard ? 'presave-card cursor-pointer' : 'new-release-preview cursor-pointer']"
             :style="{ transitionDelay: '0ms' }"
-            @click="handleNewReleasePreviewClick"
+            @click="handleUpcomingReleaseClick"
           >
-            <div class="new-release-content">
+            <div :class="shouldShowPreSaveCard ? 'presave-content' : 'new-release-content'">
               <!-- Album Cover with Progressive Loading -->
-              <UiAlbumCover
-                :image-url="blurredNewReleaseImageUrl"
-                :alt="newReleasePreviewData?.title || t('music.new_release.card_title_fallback')"
-                release-type="new release"
-              />
+              <div class="relative">
+                <UiAlbumCover
+                  :image-url="upcomingReleaseImageUrl"
+                  :alt="upcomingReleaseData?.title || t('music.new_release.card_title_fallback')"
+                  :release-type="upcomingReleaseData?.type || 'new release'"
+                  :show-badge="false"
+                />
+                
+                <!-- Custom Pre-save Badge (override the default type badge) -->
+                <div v-if="shouldShowPreSaveCard" class="absolute top-2 left-2 z-40">
+                  <span class="badge-presave px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md">
+                    {{ t('music.presave.card_title_fallback').toUpperCase() }}
+                  </span>
+                </div>
+                
+                <!-- New Release Badge for preview mode -->
+                <div v-else class="absolute top-2 left-2 z-40">
+                  <span class="badge-glass px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md">
+                    {{ t('music.new_release.card_title_fallback').toUpperCase() }}
+                  </span>
+                </div>
+              </div>
             
-              <!-- Background Overlay under text (no play button) -->
-              <div class="new-release-overlay"></div>
+              <!-- Background Overlay under text (no play button for preview, yes for pre-save) -->
+              <div :class="shouldShowPreSaveCard ? 'presave-overlay' : 'new-release-overlay'"></div>
 
               <!-- Text content layered above overlay -->
-              <div class="new-release-info">
-                <div class="new-release-icon">
-                  <i class="pi pi-calendar"></i>
+              <div :class="shouldShowPreSaveCard ? 'presave-info' : 'new-release-info'">
+                <div :class="shouldShowPreSaveCard ? 'presave-icon' : 'new-release-icon'">
+                  <i :class="shouldShowPreSaveCard ? 'pi pi-bookmark' : 'pi pi-calendar'"></i>
                 </div>
-                <h3 class="new-release-title">{{ newReleasePreviewData?.title }}</h3>
-                <p class="new-release-date">{{ newReleaseComingText }}</p>
+                <h3 :class="shouldShowPreSaveCard ? 'presave-title' : 'new-release-title'">{{ upcomingReleaseData?.title }}</h3>
+                <p :class="shouldShowPreSaveCard ? 'presave-date' : 'new-release-date'">{{ upcomingReleaseComingText }}</p>
               </div>
             </div>
           </div>
@@ -95,7 +112,7 @@
 import { computed, ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { MusicRelease } from '~/data/musicLibrary'
-import { getLatestReleases, getAllReleases } from '~/data/musicLibrary'
+import { getLatestReleases, getAllReleases, musicLibrary } from '~/data/musicLibrary'
 import { getConfig, isUpcomingRelease } from '~/utils/configHelpers'
 import { useSnackbar } from '~/composables/useSnackbar'
 
@@ -103,9 +120,8 @@ import { useSnackbar } from '~/composables/useSnackbar'
 const bandName = computed(() => getConfig('general.bandName'))
 const enableComingSoonCard = computed(() => getConfig('general.enableComingSoonCard'))
 const maxReleasesBeforeHideComingSoon = computed(() => getConfig('general.maxReleasesBeforeHideComingSoon'))
-const nextReleaseDate = computed(() => getConfig('general.nextReleaseDate'))
-const nextReleaseTitle = computed(() => getConfig('general.nextReleaseTitle'))
-const nextReleaseImageUrl = computed(() => getConfig('general.nextReleaseImageUrl'))
+const enablePreSave = computed(() => getConfig('general.enablePreSave'))
+const enableNextReleasePreview = computed(() => getConfig('general.enableNextReleasePreview'))
 
 // i18n
 // Use global composer to align SSR and CSR for lazy-loaded messages
@@ -141,7 +157,17 @@ let observer: IntersectionObserver | null = null
 
 // Computed
 const displayedReleases = computed(() => {
-  const releases = props.showAll ? getAllReleases() : getLatestReleases(props.maxItems)
+  let releases = props.showAll ? getAllReleases() : getLatestReleases(props.maxItems)
+  
+  // Filter out the upcoming release if it's being shown in preview/pre-save card
+  // This prevents showing the same release twice
+  if (shouldShowNewReleasePreview.value || shouldShowPreSaveCard.value) {
+    const upcomingReleaseId = upcomingRelease.value?.id
+    if (upcomingReleaseId) {
+      releases = releases.filter(release => release.id !== upcomingReleaseId)
+    }
+  }
+  
   return releases
 })
 
@@ -151,8 +177,8 @@ const hasMoreReleases = computed(() => {
 
 const shouldShowComingSoon = computed(() => {
   if (!enableComingSoonCard.value) return false
-  // Don't show if new release preview is active
-  if (shouldShowNewReleasePreview.value) return false
+  // Don't show if new release preview or pre-save is active
+  if (shouldShowNewReleasePreview.value || shouldShowPreSaveCard.value) return false
   const totalReleases = getAllReleases().length
   return totalReleases < maxReleasesBeforeHideComingSoon.value
 })
@@ -166,51 +192,79 @@ const comingSoonText = computed(() => {
   return t('music.coming_soon.text_many') as string
 })
 
-// New Release Preview functionality
-const shouldShowNewReleasePreview = computed(() => {
-  const dateValue = nextReleaseDate.value
-  return dateValue && isUpcomingRelease(dateValue)
+// Get the upcoming release from music library
+const upcomingRelease = computed<MusicRelease | null>(() => {
+  const upcoming = musicLibrary.filter(release => isUpcomingRelease(release.releaseDate))
+  if (upcoming.length === 0) return null
+  
+  return upcoming.reduce((nearest, current) => {
+    const nearestDate = new Date(nearest.releaseDate)
+    const currentDate = new Date(current.releaseDate)
+    return currentDate < nearestDate ? current : nearest
+  })
 })
 
-const newReleasePreviewData = computed(() => {
-  const dateValue = nextReleaseDate.value
-  if (!dateValue) return null
+// Pre-save functionality - shows clickable card with pre-save links
+const shouldShowPreSaveCard = computed(() => {
+  if (!enablePreSave.value) return false
+  const release = upcomingRelease.value
+  return release !== null && release.preSaveMusicPlatformLinks && Object.keys(release.preSaveMusicPlatformLinks).length > 0
+})
 
-  const date = new Date(dateValue)
+// Next Release Preview functionality - shows non-clickable preview card
+const shouldShowNewReleasePreview = computed(() => {
+  if (enablePreSave.value) return false // Pre-save takes precedence
+  if (!enableNextReleasePreview.value) return false
+  return upcomingRelease.value !== null
+})
+
+const upcomingReleaseData = computed(() => {
+  const release = upcomingRelease.value
+  if (!release) return null
+
+  const date = new Date(release.releaseDate)
   const currentLocale = locale.value === 'ua' ? 'uk-UA' : 'en-US'
-  const formatted = date.toLocaleDateString(currentLocale, {
-    year: 'numeric',
+  
+  // Format date with only month and day (no year, no time)
+  const formatOptions: Intl.DateTimeFormatOptions = {
     month: 'long',
-  day: 'numeric',
-  // Force UTC to keep SSR/CSR consistent regardless of server/client timezones
-  timeZone: 'UTC'
-  })
+    day: 'numeric',
+    // Force UTC to keep SSR/CSR consistent regardless of server/client timezones
+    timeZone: 'UTC'
+  }
+  
+  const formatted = date.toLocaleString(currentLocale, formatOptions)
 
-  const key = 'music.new_release.card_title_fallback'
-  const label = t(key) as string
   return {
-    title: nextReleaseTitle.value || (label !== key ? label : (locale.value === 'ua' ? 'Новий реліз' : 'New Release')),
-    releaseDate: formatted,
-    imageUrl: nextReleaseImageUrl.value || '/images/albums-images/IMG_1822.JPG' // Fallback image
+    ...release,
+    formattedDate: formatted
   }
 })
 
 // Build a stable "Coming {date}" label with deterministic fallback when i18n is not yet loaded during SSR
-const newReleaseComingText = computed(() => {
-  const dateStr = newReleasePreviewData.value?.releaseDate || ''
-  const key = 'music.new_release.coming_prefix'
+const upcomingReleaseComingText = computed(() => {
+  const dateStr = upcomingReleaseData.value?.formattedDate || ''
+  const key = shouldShowPreSaveCard.value ? 'music.presave.coming_prefix' : 'music.new_release.coming_prefix'
   const translated = t(key, { date: dateStr }) as string
   if (translated === key) {
     // Use exact locale string from locales to avoid UA-only SSR/CSR mismatches
-    const template = locale.value === 'ua' ? 'Вихід {date}' : 'Coming {date}'
+    const template = shouldShowPreSaveCard.value 
+      ? (locale.value === 'ua' ? 'Пресейв {date}' : 'Pre-save {date}')
+      : (locale.value === 'ua' ? 'Вихід {date}' : 'Coming {date}')
     return template.replace('{date}', dateStr)
   }
   return translated
 })
 
-// Use a pre-blurred variant of the new release image to avoid runtime backdrop blur
-const blurredNewReleaseImageUrl = computed(() => {
-  const src = newReleasePreviewData.value?.imageUrl || ''
+// Use a pre-blurred variant of the upcoming release image to avoid runtime backdrop blur
+const blurredUpcomingReleaseImageUrl = computed(() => {
+  // First check if the release has an explicit blurredImageUrl
+  if (upcomingReleaseData.value?.blurredImageUrl) {
+    return upcomingReleaseData.value.blurredImageUrl
+  }
+  
+  // Fallback to the old logic of adding "-blurred" suffix
+  const src = upcomingReleaseData.value?.imageUrl || ''
   if (!src) return ''
   // Insert "-blurred" before extension: cover.jpg -> cover-blurred.jpg
   const idx = src.lastIndexOf('.')
@@ -218,6 +272,17 @@ const blurredNewReleaseImageUrl = computed(() => {
   const base = src.slice(0, idx)
   const ext = src.slice(idx)
   return `${base}-blurred${ext}`
+})
+
+// Image URL for the upcoming release card - use regular image for pre-save, blurred for preview
+const upcomingReleaseImageUrl = computed(() => {
+  if (shouldShowPreSaveCard.value) {
+    // Pre-save mode: use regular optimized image
+    return upcomingReleaseData.value?.imageUrl || ''
+  } else {
+    // Preview mode: use blurred image
+    return blurredUpcomingReleaseImageUrl.value
+  }
 })
 
 // Methods
@@ -229,11 +294,17 @@ const handleShowMore = () => {
   emit('showMore')
 }
 
-const handleNewReleasePreviewClick = () => {
-  const releaseData = newReleasePreviewData.value
-  if (releaseData) {
+const handleUpcomingReleaseClick = () => {
+  const releaseData = upcomingReleaseData.value
+  if (!releaseData) return
+  
+  if (shouldShowPreSaveCard.value) {
+    // Pre-save mode - emit click to open modal/page
+    emit('releaseClick', releaseData)
+  } else {
+    // Preview mode - show snackbar
     showSuccessSnackbar(
-      newReleaseComingText.value,
+      upcomingReleaseComingText.value,
       t('snackbar.music_library.subtitle') as string
     )
   }
@@ -425,6 +496,18 @@ $shimmer-easing: ease-in-out;
   @include responsive-widths;
 }
 
+/* Mobile: Make single item cards wider */
+@media (max-width: 767px) {
+  .flex:has(.music-card-wrapper:nth-child(1):last-child) .music-card-wrapper,
+  .flex:has(.coming-soon-card:nth-child(1):last-child) .coming-soon-card,
+  .flex:has(.new-release-preview:nth-child(1):last-child) .new-release-preview,
+  .flex:has(.presave-card:nth-child(1):last-child) .presave-card {
+    width: 100%;
+    max-width: 210px;
+    min-width: 210px;
+  }
+}
+
 /* Desktop: Larger cards when few items */
 @media (min-width: 768px) {
   .flex:has(.music-card-wrapper:nth-child(-n+3):last-child) .music-card-wrapper,
@@ -432,7 +515,10 @@ $shimmer-easing: ease-in-out;
   .flex:has(.coming-soon-card:nth-child(-n+3):last-child) .coming-soon-card,
   .flex:has(.new-release-preview:nth-child(-n+3):last-child) .music-card-wrapper,
   .flex:has(.new-release-preview:nth-child(-n+3):last-child) .coming-soon-card,
-  .flex:has(.new-release-preview:nth-child(-n+3):last-child) .new-release-preview {
+  .flex:has(.new-release-preview:nth-child(-n+3):last-child) .new-release-preview,
+  .flex:has(.presave-card:nth-child(-n+3):last-child) .music-card-wrapper,
+  .flex:has(.presave-card:nth-child(-n+3):last-child) .coming-soon-card,
+  .flex:has(.presave-card:nth-child(-n+3):last-child) .presave-card {
     min-width: 240px;
     max-width: 280px;
   }
@@ -442,7 +528,10 @@ $shimmer-easing: ease-in-out;
   .flex:has(.coming-soon-card:nth-child(1):last-child) .coming-soon-card,
   .flex:has(.new-release-preview:nth-child(1):last-child) .music-card-wrapper,
   .flex:has(.new-release-preview:nth-child(1):last-child) .coming-soon-card,
-  .flex:has(.new-release-preview:nth-child(1):last-child) .new-release-preview {
+  .flex:has(.new-release-preview:nth-child(1):last-child) .new-release-preview,
+  .flex:has(.presave-card:nth-child(1):last-child) .music-card-wrapper,
+  .flex:has(.presave-card:nth-child(1):last-child) .coming-soon-card,
+  .flex:has(.presave-card:nth-child(1):last-child) .presave-card {
     min-width: 260px;
     max-width: 320px;
   }
@@ -685,6 +774,132 @@ $shimmer-easing: ease-in-out;
   100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
 }
 
+/* Pre-save Card (clickable, similar to new-release-preview but with different styling) */
+.presave-card {
+  @include card-sizing-large;
+}
+
+.presave-content {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform-origin: center;
+
+  // Add a subtle dark overlay to improve text readability
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.25) 0%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+  }
+}
+
+.presave-content:hover {
+  transform: translateY(-8px);
+}
+
+.presave-content:active {
+  transform: translateY(-4px) scale(0.98);
+}
+
+@media (max-width: 767px) {
+  .presave-content:hover {
+    transform: none;
+  }
+  .presave-content:active {
+    transform: scale(0.95);
+    transition: transform 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+}
+
+.presave-overlay {
+  @include absolute-overlay;
+  background:
+    radial-gradient(60% 60% at 50% 50%, rgba(0,0,0,0.3), transparent 70%),
+    linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: opacity $hover-duration $hover-easing, transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  opacity: 0;
+  z-index: 1;
+
+  &::before {
+    content: '';
+    @include absolute-overlay;
+    @include noise-texture;
+    mix-blend-mode: overlay;
+    opacity: 0.025;
+  }
+}
+
+.presave-info {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 1.5rem;
+  transition: all $hover-duration $hover-easing;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  @include absolute-overlay;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .presave-content:hover .presave-overlay {
+    transform: scale(1.03);
+    opacity: 0.98;
+  }
+  .presave-content:hover :deep(img) {
+    transform: scale(1.05);
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  .presave-content:hover .presave-icon {
+    transform: translateY(-2px) scale(1.1);
+    filter: drop-shadow(0 6px 16px rgba(168, 85, 247, 0.4));
+  }
+  .presave-content:hover .presave-title {
+    transform: translateY(-1px) scale(1.07);
+    letter-spacing: 0.2px;
+  }
+  .presave-content:hover .presave-date {
+    transform: translateY(-1px) scale(1.07);
+    opacity: 0.92;
+  }
+}
+
+.presave-icon {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.875rem;
+  transition: all $hover-duration $hover-easing;
+  filter: drop-shadow(0 4px 12px rgba(168, 85, 247, 0.3));
+}
+
+.presave-title {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.125rem;
+  font-weight: 600;
+  @include text-shadow-medium;
+  transition: all $hover-duration $hover-easing;
+}
+
+.presave-date {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  @include text-shadow-light;
+  transition: all $hover-duration $hover-easing;
+}
+
 /* Show More Button */
 .show-more-button {
   position: relative;
@@ -704,7 +919,8 @@ $shimmer-easing: ease-in-out;
   }
   
   .coming-soon-content,
-  .new-release-content {
+  .new-release-content,
+  .presave-content {
     min-height: 140px;
     min-width: 140px;
   }
@@ -764,20 +980,43 @@ $shimmer-easing: ease-in-out;
   }
   
   .coming-soon-content:hover,
-  .new-release-content:hover {
+  .new-release-content:hover,
+  .presave-content:hover {
     transform: none !important;
     
     .new-release-info,
     .new-release-icon,
     .new-release-title,
     .new-release-date,
-    .new-release-label {
+    .new-release-label,
+    .presave-info,
+    .presave-icon,
+    .presave-title,
+    .presave-date {
       transform: none !important;
     }
   }
   
-  .new-release-content:active {
+  .new-release-content:active,
+  .presave-content:active {
     transform: none !important;
   }
+}
+
+/* Badge styles for pre-save and new release cards */
+.badge-presave {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(236, 72, 153, 0.9)) !important;
+  color: white !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.badge-glass {
+  background: rgba(0, 0, 0, 0.5) !important;
+  color: white !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 </style>
