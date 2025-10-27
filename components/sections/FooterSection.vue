@@ -317,14 +317,20 @@ const handleNavClick = (elementId: string) => {
   scrollToElementWithNavigation(elementId)
 }
 
-// Helper function to resolve asset paths correctly for GitHub Pages
+// Helper function to resolve asset paths based on deployment target
 const resolveAssetPath = (path: string) => {
   // In development, use the path as-is
   if (process.dev) return path
   
-  // For production GitHub Pages, use the base URL from nuxt config
-  // The baseURL is '/WBM-Band-WebSite/' for this deployment
-  return `/WBM-Band-WebSite${path}`
+  // Get the base URL from runtime config (set via DEPLOY_TARGET env var)
+  const config = useRuntimeConfig()
+  const baseURL = config.app.baseURL || '/'
+  
+  // If baseURL is just '/', return path as-is (custom domain)
+  if (baseURL === '/') return path
+  
+  // For GitHub Pages, prepend the base URL
+  return `${baseURL.replace(/\/$/, '')}${path}`
 }
 
 // Computed properties for config values

@@ -14,7 +14,7 @@
     />
 
     <!-- Team Background Section (placeholder) -->
-    <SectionsTeamSection />
+    <!-- <SectionsTeamSection /> -->
 
     <!-- Music Detail Modal -->
     <MusicDetailModal

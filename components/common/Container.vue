@@ -48,7 +48,3 @@ const rootClasses = computed(() => {
   ].filter(Boolean).join(' ')
 })
 </script>
-
-<style scoped>
-/* Minimal; relies on utility classes */
-</style>

@@ -4,7 +4,7 @@
     
     <!-- Header with glassy background -->
     <header class="fixed top-0 left-0 right-0 z-40 bg-black/5 backdrop-blur-performance">
-      <CommonContainer size="xl" padding="md">
+      <CommonContainer size="xl" padding="md" :overflow-visible="true">
         <div class="flex items-start justify-between h-16 relative pt-1">
           
           <!-- Mobile Logo Fade System (dual logos for smooth transition) -->

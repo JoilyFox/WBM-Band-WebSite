@@ -8,7 +8,7 @@
         :title="t('music.streaming.spotify_title')"
       >
         <img 
-          src="/assets/images/icons/spotify-icon.svg" 
+          :src="getIconPath('spotify-icon.svg')" 
           alt="Spotify" 
           class="w-full h-full"
           loading="lazy"
@@ -21,7 +21,7 @@
         :title="t('music.streaming.apple_title')"
       >
         <img 
-          src="/assets/images/icons/apple-music-icon.svg" 
+          :src="getIconPath('apple-music-icon.svg')" 
           alt="Apple Music" 
           class="w-full h-full"
           loading="lazy"
@@ -34,7 +34,7 @@
         :title="t('music.streaming.youtube_title')"
       >
         <img 
-          src="/assets/images/icons/youtube-music-icon.svg" 
+          :src="getIconPath('youtube-music-icon.svg')" 
           alt="YouTube" 
           class="w-full h-full"
           loading="lazy"
@@ -55,6 +55,19 @@ const props = defineProps<Props>()
 
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
+
+// Get runtime config to determine base URL
+const config = useRuntimeConfig()
+const baseURL = config.app.baseURL || '/'
+
+// Helper function to resolve icon paths based on deployment target
+const getIconPath = (filename: string) => {
+  const path = `/assets/images/icons/${filename}`
+  // If baseURL is just '/', return path as-is (custom domain)
+  if (baseURL === '/') return path
+  // For GitHub Pages, prepend the base URL
+  return `${baseURL.replace(/\/$/, '')}${path}`
+}
 
 const openLink = (url: string) => {
   window.open(url, '_blank', 'noopener,noreferrer')
