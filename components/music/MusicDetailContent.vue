@@ -458,24 +458,13 @@ const displayTypeName = computed(() => {
 // Deterministic labels for section titles/buttons to avoid SSR key rendering
 const listenNowTitle = computed(() => {
   if (props.isPreSave) {
-    // Pre-save mode
-    const key = 'music.detail.presave_title'
-    const label = t(key) as string
-    if (label !== key) return label
-    return locale.value === 'ua' ? 'Зберегти наперед' : 'Pre-save Now'
+    return t('music.detail.presave_title')
   }
-  // Regular listen now
-  const key = 'music.detail.listen_now_title'
-  const label = t(key) as string
-  if (label !== key) return label
-  return locale.value === 'ua' ? 'Слухати зараз' : 'Listen Now'
+  return t('music.detail.listen_now_title')
 })
 
 const collapseLabel = computed(() => {
-  const key = 'music.buttons.collapse'
-  const label = t(key) as string
-  if (label !== key) return label
-  return locale.value === 'ua' ? 'Згорнути' : 'Collapse'
+  return t('music.buttons.collapse')
 })
 
 // Build a robust fallback URL for CSS backgrounds (prefer JPG)

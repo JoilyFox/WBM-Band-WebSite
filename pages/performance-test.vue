@@ -88,7 +88,7 @@
           </button>
           
           <NuxtLink 
-            :to="localePath({ path: '/music/midnight-echoes', query: { from: 'music' } })"
+            :to="localePath({ path: '/listen/mania', query: { from: 'music' } })"
             class="px-4 py-2 bg-secondary-600 hover:bg-secondary-700 rounded-lg transition-colors"
           >
             Test Music Page
