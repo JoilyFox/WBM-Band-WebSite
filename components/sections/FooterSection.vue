@@ -1,6 +1,6 @@
 <template>
   <footer :class="['footer-section bg-surface-950 border-t border-white/10', { 'footer-minimized': minimized }]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4 md2:mb-0">
+    <CommonContainer size="xl" padding="md" class="mb-4 md2:mb-0">
       
       <!-- Minimized Footer Layout -->
       <div v-if="minimized" class="py-6">
@@ -278,7 +278,7 @@
         </div>
       </div>
       </div>
-    </div>
+    </CommonContainer>
   </footer>
 </template>
 
@@ -290,6 +290,7 @@ import { getConfig } from '~/utils/configHelpers'
 import { footerNavigation } from '~/config/navigation'
 import Logo from '~/components/ui/Logo.vue'
 import CommonLanguageSwitcher from '~/components/common/LanguageSwitcher.vue'
+import CommonContainer from '~/components/common/Container.vue'
 
 // Props
 interface Props {
@@ -316,14 +317,20 @@ const handleNavClick = (elementId: string) => {
   scrollToElementWithNavigation(elementId)
 }
 
-// Helper function to resolve asset paths correctly for GitHub Pages
+// Helper function to resolve asset paths based on deployment target
 const resolveAssetPath = (path: string) => {
   // In development, use the path as-is
   if (process.dev) return path
   
-  // For production GitHub Pages, use the base URL from nuxt config
-  // The baseURL is '/WBM-Band-WebSite/' for this deployment
-  return `/WBM-Band-WebSite${path}`
+  // Get the base URL from runtime config (set via DEPLOY_TARGET env var)
+  const config = useRuntimeConfig()
+  const baseURL = config.app.baseURL || '/'
+  
+  // If baseURL is just '/', return path as-is (custom domain)
+  if (baseURL === '/') return path
+  
+  // For GitHub Pages, prepend the base URL
+  return `${baseURL.replace(/\/$/, '')}${path}`
 }
 
 // Computed properties for config values

@@ -12,26 +12,31 @@
     "generate-blurred": "node scripts/generate-blurred-image.js",
     "generate-favicons": "node scripts/generate-favicons.js",
     "analyze": "nuxt build --analyze",
-    "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html"
+    "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html",
+    "build:production": "nuxt generate",
+    "deploy:production": "npm run build:production && node scripts/deploy-production.js",
+    "deploy:github": "DEPLOY_TARGET=github nuxt generate"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.0.0",
     "@nuxtjs/google-fonts": "^3.2.0",
+    "@nuxtjs/i18n": "^8.5.5",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@pinia/nuxt": "^0.11.2",
     "@primevue/forms": "^4.3.6",
     "@primevue/nuxt-module": "^4.3.6",
     "@primevue/themes": "^4.3.6",
-    "@nuxtjs/i18n": "^8.5.5",
-    "vue-i18n": "^9.13.1",
     "nuxt": "^3.14.0",
-    "unhead": "^1.9.7",
     "pinia": "^3.0.3",
-    "primeicons": "^7.0.0"
+    "primeicons": "^7.0.0",
+    "unhead": "^1.9.7",
+    "vue-i18n": "^9.13.1"
   },
   "devDependencies": {
     "@vueuse/nuxt": "^13.6.0",
     "autoprefixer": "^10.4.21",
+    "dotenv": "^17.2.3",
+    "ftp-deploy": "^2.4.7",
     "imagemin": "^9.0.1",
     "imagemin-avif": "^0.1.6",
     "imagemin-webp": "^8.0.0",

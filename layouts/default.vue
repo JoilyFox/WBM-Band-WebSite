@@ -4,7 +4,7 @@
     
     <!-- Header with glassy background -->
     <header class="fixed top-0 left-0 right-0 z-40 bg-black/5 backdrop-blur-performance">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <CommonContainer size="xl" padding="md" :overflow-visible="true">
         <div class="flex items-start justify-between h-16 relative pt-1">
           
           <!-- Mobile Logo Fade System (dual logos for smooth transition) -->
@@ -74,7 +74,7 @@
             </button>
           </div>
         </div>
-      </div>
+  </CommonContainer>
       
       <!-- Desktop Logo (absolute positioned) -->
       <div class="hidden md2:block absolute top-[14px] left-1/2 transform -translate-x-1/2 z-50 transition-top duration-300" :class="logoPositionClass">
@@ -166,6 +166,7 @@ import { getConfig } from '~/utils/configHelpers'
 import { leftNavigation, rightNavigation, type NavigationItem } from '~/config/navigation'
 import Logo from '~/components/ui/Logo.vue'
 import CommonLanguageSwitcher from '~/components/common/LanguageSwitcher.vue'
+import CommonContainer from '~/components/common/Container.vue'
 
 // Computed properties for config values
 const bandName = computed(() => getConfig('general.bandName'))

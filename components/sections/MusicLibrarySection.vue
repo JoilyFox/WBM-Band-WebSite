@@ -3,16 +3,16 @@
     <div class="max-w-7xl mx-auto">
       <!-- Section Header -->
       <div class="text-center mb-10">
-        <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+  <CommonSectionTitle :level="2" size="xl" align="center" class="mb-6">
           {{ t('music.section_title') }}
-        </h2>
-        <p class="text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
+        </CommonSectionTitle>
+        <CommonSectionSubtitle align="center" max-width="md" size="base">
           {{ t('music.section_subtitle', { name: bandName }) }}
-        </p>
+        </CommonSectionSubtitle>
       </div>
 
       <!-- Music Grid -->
-      <div class="flex justify-center mb-12">
+      <div class="flex justify-center">
         <div class="flex flex-wrap justify-center gap-3 sm:gap-4 lg:gap-6 max-w-fit mx-auto">
           <!-- New Release Preview Block - Always First -->
           <div

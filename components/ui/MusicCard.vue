@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import type { MusicRelease } from '~/data/musicLibrary'
 import { useI18n } from 'vue-i18n'
 
@@ -50,15 +50,8 @@ const emit = defineEmits<{
 // Use global i18n to keep SSR/CSR in sync
 const { t, locale } = useI18n({ useScope: 'global' })
 
-// During client hydration, render the SSR fallback to avoid mismatches; switch to translations after mount
-const isHydrating = ref(process.client)
-onMounted(() => { isHydrating.value = false })
-
 const stableReleaseText = (key: string, fallback: string | undefined) => {
   const translated = t(key) as string
-  if (isHydrating.value) {
-    return fallback || ''
-  }
   return translated !== key && translated ? translated : (fallback || '')
 }
 

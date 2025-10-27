@@ -13,6 +13,9 @@
       @show-more="handleShowAllMusic"
     />
 
+    <!-- Team Background Section (placeholder) -->
+    <!-- <SectionsTeamSection /> -->
+
     <!-- Music Detail Modal -->
     <MusicDetailModal
       v-if="selectedRelease"
