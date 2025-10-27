@@ -52,7 +52,7 @@ const variantClass = computed(() => `layout-${props.variant}`)
   .team-grid.layout-columns :deep(.block-3) { grid-column: 5 / span 4; grid-row: 1 / span 4; }
   .team-grid.layout-columns :deep(.block-4) { grid-column: 5 / span 4; grid-row: 5 / span 3; }
   .team-grid.layout-columns :deep(.block-5) { grid-column: 9 / span 4; grid-row: 1 / span 3; }
-  .team-grid.layout-columns :deep(.block-6) { grid-column: 9 / span 4; grid-row: 4 / span 4	; }
+  .team-grid.layout-columns :deep(.block-6) { grid-column: 9 / span 4; grid-row: 4 / span 4; }
 }
 
 .member-block {
