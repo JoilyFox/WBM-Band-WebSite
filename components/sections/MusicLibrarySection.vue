@@ -128,6 +128,9 @@ const enableNextReleasePreview = computed(() => getConfig('general.enableNextRel
 // Use global composer to align SSR and CSR for lazy-loaded messages
 const { t, locale } = useI18n({ useScope: 'global' })
 
+// Track hydration to avoid SSR/client mismatches for localized strings
+const isHydrating = ref(true)
+
 // Props
 interface Props {
   showAll?: boolean
@@ -247,6 +250,7 @@ const upcomingReleaseTitle = computed(() => {
   if (!release) return ''
   const key = release.titleKey || `releases.${release.slug}.title`
   const fallback = release.title || release.slug
+  if (isHydrating.value) return fallback
   const translated = t(key) as string
   return translated !== key && translated ? translated : fallback
 })
@@ -446,6 +450,7 @@ const resetAnimations = async () => {
 watch(displayedReleases, resetAnimations)
 
 onMounted(() => {
+  isHydrating.value = false
   nextTick(() => {
     setupIntersectionObserver()
   })
