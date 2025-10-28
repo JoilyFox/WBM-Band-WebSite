@@ -280,18 +280,22 @@ const shareUrlInput = ref<HTMLInputElement>()
 const justCopied = ref(false)
 const isCopying = ref(false)
 
-// Build absolute deep link to this release (works on GitHub Pages baseURL)
+// Build clean share URL without language prefix and protocol
 const shareUrlForRelease = computed(() => {
   const config = useRuntimeConfig()
   const base = (config.app?.baseURL || '/').replace(/\/$/, '')
   // Use appropriate path based on pre-save mode
   const pathPrefix = props.isPreSave ? '/pre-save/' : '/listen/'
-  const localizedPath = localePath({ path: `${pathPrefix}${props.release.slug}` })
-  const relative = `${base}${localizedPath}`
+  // Build path without locale prefix
+  const path = `${pathPrefix}${props.release.slug}`
+  const relative = `${base}${path}`
+  
   if (typeof window !== 'undefined') {
-    return new URL(relative, window.location.origin).toString()
+    const fullUrl = new URL(relative, window.location.origin).toString()
+    // Remove protocol (http:// or https://)
+    return fullUrl.replace(/^https?:\/\//, '')
   }
-  return relative
+  return relative.replace(/^\//, '') // Remove leading slash for SSR
 })
 
 // Computed share content – use appropriate text for pre-save vs regular
