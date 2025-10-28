@@ -30,6 +30,7 @@
       
       <!-- Fallback JPEG image -->
       <img
+        ref="imgRef"
         :src="pictureSources.fallbackSrc"
         :alt="alt"
         :class="[
@@ -111,6 +112,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 // Template refs
 const containerRef = ref<HTMLElement>()
+const imgRef = ref<HTMLImageElement>()
 
 // Image loading composable
 const {
@@ -169,12 +171,25 @@ onMounted(() => {
   if (props.loading === 'lazy') {
     setIntersectionTarget(containerRef.value)
   }
+
+  if (imgRef.value && imgRef.value.complete && imgRef.value.naturalWidth > 0) {
+    // Image already cached/loaded before hydration completed – mark as loaded manually
+    handleImageLoad()
+  }
 })
 
 // Watch for src changes to reset states
-watch(() => props.src, () => {
-  resetImageStates()
-})
+watch(
+  () => props.src,
+  (newSrc, oldSrc) => {
+    if (newSrc !== oldSrc) {
+      resetImageStates()
+      if (process.client) {
+        console.log('[ProgressiveImage] src change', { oldSrc, newSrc })
+      }
+    }
+  }
+)
 </script>
 
 <style scoped>

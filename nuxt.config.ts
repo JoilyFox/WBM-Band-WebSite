@@ -99,7 +99,12 @@ export default defineNuxtConfig({
         '/ua/terms-of-service',
         '/en/terms-of-service',
         '/ua/cookies-policy',
-        '/en/cookies-policy'
+        '/en/cookies-policy',
+        // Pre-save and listen routes (only with locale prefix - non-localized routes handled by .htaccess)
+        '/ua/pre-save/mania',
+        '/en/pre-save/mania',
+        '/ua/listen/mania',
+        '/en/listen/mania'
       ]
     }
   },

@@ -1,0 +1,7 @@
+# Netlify/Vercel redirects file
+# Redirect non-localized share URLs to Ukrainian version (default locale)
+/pre-save/*  /ua/pre-save/:splat  301
+/listen/*    /ua/listen/:splat    301
+
+# SPA fallback for client-side routing
+/*  /index.html  200

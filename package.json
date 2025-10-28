@@ -5,7 +5,8 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "HOST=0.0.0.0 nuxt dev",
-    "generate": "nuxt generate",
+  "generate:base": "nuxt generate",
+  "generate": "npm run generate:base && node scripts/create-nonlocalized-aliases.js",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "compress-images": "node scripts/compress-images.js",
@@ -13,8 +14,8 @@
     "generate-favicons": "node scripts/generate-favicons.js",
     "analyze": "nuxt build --analyze",
     "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html",
-    "build:production": "nuxt generate",
-    "deploy:production": "npm run build:production && node scripts/deploy-production.js",
+  "build:production": "npm run generate",
+  "deploy:production": "npm run build:production && node scripts/deploy-production.js",
     "deploy:github": "DEPLOY_TARGET=github nuxt generate"
   },
   "dependencies": {

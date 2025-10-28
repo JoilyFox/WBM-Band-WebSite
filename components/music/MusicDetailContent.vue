@@ -124,7 +124,7 @@
           'mobile-expanded': isHeroExpanded && !isDesktop
         }]"
         :style="{
-          display: (!isDesktop && !isHeroExpanded && isClient) ? 'none' : ''
+          display: (!isDesktop && !isHeroExpanded && (isClient || isHydrating)) ? 'none' : ''
         }"
       >
         <div class="music-album-cover relative w-44 h-44 md:w-72 md:h-72 flex-shrink-0 rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl"
@@ -331,11 +331,6 @@ const updateBreakpoint = () => {
   if (typeof window !== 'undefined') {
     isDesktop.value = window.innerWidth >= 768 // md breakpoint
   }
-}
-
-// Initialize desktop detection immediately if possible
-if (typeof window !== 'undefined') {
-  isDesktop.value = window.innerWidth >= 768
 }
 
 // Mobile hero expansion state (default collapsed on mobile)
