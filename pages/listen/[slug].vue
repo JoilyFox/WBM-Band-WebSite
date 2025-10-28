@@ -18,7 +18,8 @@ import { getReleaseBySlug } from '~/data/musicLibrary'
 
 // Use the empty layout instead of default
 definePageMeta({
-  layout: 'empty'
+  layout: 'empty',
+  middleware: ['listen-access']
 })
 
 const route = useRoute()

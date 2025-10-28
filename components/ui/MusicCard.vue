@@ -15,7 +15,7 @@
       <h3 class="text-white font-semibold text-sm group-hover:text-primary-400 transition-colors duration-300 line-clamp-1">
         {{ displayTitle }}
       </h3>
-      <p class="text-white/60 text-xs">
+      <p class="text-white/60 text-xs ">
         {{ formattedDate }}
       </p>
       <p v-if="displayDescription" class="text-white/50 text-xs line-clamp-2 leading-tight hidden sm:block">
@@ -69,11 +69,14 @@ const displayDescription = computed(() => {
 const formattedDate = computed(() => {
   const date = new Date(props.release.releaseDate)
   const currentLocale = locale.value === 'ua' ? 'uk-UA' : 'en-US'
-  return date.toLocaleDateString(currentLocale, {
+  const formatted = date.toLocaleDateString(currentLocale, {
     year: 'numeric',
     month: 'long',
     timeZone: 'UTC'
   })
+
+  if (!formatted) return formatted
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1)
 })
 
 const handleClick = () => {

@@ -135,7 +135,11 @@
     "days_remaining": {
       "prefix": "in",
       "day": "day",
-      "days": "days"
+      "days": "days",
+      "hour": "hour",
+      "hours": "hours",
+      "minute": "minute",
+      "minutes": "minutes"
     },
     "album_cover": {
       "unavailable": "Album cover unavailable",

@@ -244,7 +244,7 @@ import { useScrollTo } from '~/composables/useScrollTo'
 import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
 import { useOptimizedScroll } from '~/composables/useOptimizedScroll'
 import { useShareFunctionality } from '~/composables/useShareFunctionality'
-import { isUpcomingRelease } from '~/utils/configHelpers'
+import { getLocalizedCountdown } from '~/utils/countdown'
 import type { MusicRelease } from '~/data/musicLibrary'
 import Logo from '~/components/ui/Logo.vue'
 import CustomSharePopup from '~/components/common/CustomSharePopup.vue'
@@ -331,62 +331,13 @@ const updateCountdown = () => {
     return
   }
 
-  const releaseDateRaw = props.release.releaseDate
-  if (!releaseDateRaw || !isUpcomingRelease(releaseDateRaw)) {
-    countdownText.value = ''
-    return
-  }
+  const text = getLocalizedCountdown({
+    releaseDate: props.release.releaseDate,
+    locale: locale.value,
+    t
+  })
 
-  const releaseDate = new Date(releaseDateRaw)
-  if (Number.isNaN(releaseDate.getTime())) {
-    countdownText.value = ''
-    return
-  }
-
-  const now = new Date()
-  const diffMs = releaseDate.getTime() - now.getTime()
-  const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
-
-  if (days <= 0) {
-    countdownText.value = ''
-    return
-  }
-
-  if (locale.value === 'ua') {
-    const rawPrefix = t('music.days_remaining.prefix') as string
-    const prefix = rawPrefix === 'music.days_remaining.prefix' ? 'через' : rawPrefix
-
-    const lastDigit = days % 10
-    const lastTwoDigits = days % 100
-
-    let dayKey = 'music.days_remaining.days_many'
-    if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
-      dayKey = 'music.days_remaining.days_many'
-    } else if (lastDigit === 1) {
-      dayKey = 'music.days_remaining.day'
-    } else if (lastDigit >= 2 && lastDigit <= 4) {
-      dayKey = 'music.days_remaining.days_2_4'
-    }
-
-    const rawDayWord = t(dayKey) as string
-    const dayWordFallbackMap: Record<string, string> = {
-      'music.days_remaining.day': 'день',
-      'music.days_remaining.days_2_4': 'дні',
-      'music.days_remaining.days_many': 'днів'
-    }
-    const dayWord = rawDayWord === dayKey ? (dayWordFallbackMap[dayKey] || 'днів') : rawDayWord
-
-    countdownText.value = `${prefix} ${days} ${dayWord}`
-    return
-  }
-
-  const rawPrefix = t('music.days_remaining.prefix') as string
-  const prefix = rawPrefix === 'music.days_remaining.prefix' ? 'in' : rawPrefix
-  const dayKey = days === 1 ? 'music.days_remaining.day' : 'music.days_remaining.days'
-  const rawDayWord = t(dayKey) as string
-  const dayWord = rawDayWord === dayKey ? (days === 1 ? 'day' : 'days') : rawDayWord
-
-  countdownText.value = `${prefix} ${days} ${dayWord}`
+  countdownText.value = text
 }
 
 watch(() => locale.value, () => updateCountdown())

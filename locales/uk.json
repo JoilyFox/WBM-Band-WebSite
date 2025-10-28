@@ -136,7 +136,13 @@
       "prefix": "через",
       "day": "день",
       "days_2_4": "дні",
-      "days_many": "днів"
+      "days_many": "днів",
+      "hour": "годину",
+      "hours_2_4": "години",
+      "hours_many": "годин",
+      "minute": "хвилину",
+      "minutes_2_4": "хвилини",
+      "minutes_many": "хвилин"
     },
     "album_cover": {
       "unavailable": "Обкладинка недоступна",

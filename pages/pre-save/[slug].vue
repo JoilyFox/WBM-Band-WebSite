@@ -20,7 +20,8 @@ import { isUpcomingRelease } from '~/utils/configHelpers'
 
 // Use the empty layout instead of default
 definePageMeta({
-  layout: 'empty'
+  layout: 'empty',
+  middleware: ['presave-access']
 })
 
 const route = useRoute()

@@ -115,6 +115,7 @@ import { useI18n } from 'vue-i18n'
 import type { MusicRelease } from '~/data/musicLibrary'
 import { getLatestReleases, getAllReleases, musicLibrary } from '~/data/musicLibrary'
 import { getConfig, isUpcomingRelease } from '~/utils/configHelpers'
+import { getLocalizedCountdown } from '~/utils/countdown'
 import { useSnackbar } from '~/composables/useSnackbar'
 
 // Computed properties for config values
@@ -271,64 +272,15 @@ const upcomingReleaseComingText = computed(() => {
 })
 
 // Calculate days remaining until release
-const daysUntilRelease = computed(() => {
-  if (!upcomingReleaseData.value?.releaseDate) return 0
-  const now = new Date()
-  const releaseDate = new Date(upcomingReleaseData.value.releaseDate)
-  const diffTime = releaseDate.getTime() - now.getTime()
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays > 0 ? diffDays : 0
-})
-
-// Text for "in X days"
 const daysRemainingText = computed(() => {
-  const days = daysUntilRelease.value
-  if (days === 0) return ''
-  
-  // Ukrainian pluralization with fallback for SSR
-  if (locale.value === 'ua') {
-    const lastDigit = days % 10
-    const lastTwoDigits = days % 100
-    
-    const prefix = t('music.days_remaining.prefix')
-    const usePrefix = prefix === 'music.days_remaining.prefix' ? 'через' : prefix
-    
-    let dayWord = ''
-    
-    // 11-19 always use "днів"
-    if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
-      const word = t('music.days_remaining.days_many')
-      dayWord = word === 'music.days_remaining.days_many' ? 'днів' : word
-    }
-    // 1 uses "день" (but not 11)
-    else if (lastDigit === 1) {
-      const word = t('music.days_remaining.day')
-      dayWord = word === 'music.days_remaining.day' ? 'день' : word
-    }
-    // 2-4 use "дні" (but not 12-14)
-    else if (lastDigit >= 2 && lastDigit <= 4) {
-      const word = t('music.days_remaining.days_2_4')
-      dayWord = word === 'music.days_remaining.days_2_4' ? 'дні' : word
-    }
-    // All others use "днів"
-    else {
-      const word = t('music.days_remaining.days_many')
-      dayWord = word === 'music.days_remaining.days_many' ? 'днів' : word
-    }
-    
-    return `${usePrefix} ${days} ${dayWord}`
-  }
-  
-  // English with fallback for SSR
-  const prefix = t('music.days_remaining.prefix')
-  const usePrefix = prefix === 'music.days_remaining.prefix' ? 'in' : prefix
-  
-  const dayTranslation = days === 1 ? t('music.days_remaining.day') : t('music.days_remaining.days')
-  const dayWord = dayTranslation.includes('music.days_remaining.') 
-    ? (days === 1 ? 'day' : 'days') 
-    : dayTranslation
-    
-  return `${usePrefix} ${days} ${dayWord}`
+  const releaseDate = upcomingReleaseData.value?.releaseDate
+  if (!releaseDate) return ''
+
+  return getLocalizedCountdown({
+    releaseDate,
+    locale: locale.value,
+    t
+  })
 })
 
 // Use a pre-blurred variant of the upcoming release image to avoid runtime backdrop blur
