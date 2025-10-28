@@ -52,7 +52,7 @@
     },
     "music_library": {
       "title": "Медіатека",
-      "subtitle": "Сторінка з повною медіатекою вже незабаром!"
+      "subtitle": "Залишилось чекати зовсім трошечки!"
     }
   },
   "errors": {
@@ -125,11 +125,17 @@
     },
     "new_release": {
       "card_title_fallback": "Новий реліз",
-      "coming_prefix": "Вихід {date}"
+      "coming_prefix": "Реліз {date}"
     },
     "presave": {
       "card_title_fallback": "Пресейв",
-      "coming_prefix": "Пресейв {date}"
+      "coming_prefix": "Реліз {date}"
+    },
+    "days_remaining": {
+      "prefix": "через",
+      "day": "день",
+      "days_2_4": "дні",
+      "days_many": "днів"
     },
     "album_cover": {
       "unavailable": "Обкладинка недоступна",

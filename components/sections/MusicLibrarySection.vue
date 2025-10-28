@@ -57,6 +57,7 @@
                 </div>
                 <h3 :class="shouldShowPreSaveCard ? 'presave-title' : 'new-release-title'">{{ upcomingReleaseData?.title }}</h3>
                 <p :class="shouldShowPreSaveCard ? 'presave-date' : 'new-release-date'">{{ upcomingReleaseComingText }}</p>
+                <p v-if="daysRemainingText" :class="shouldShowPreSaveCard ? 'presave-days' : 'new-release-days'">({{ daysRemainingText }})</p>
               </div>
             </div>
           </div>
@@ -241,19 +242,80 @@ const upcomingReleaseData = computed(() => {
   }
 })
 
-// Build a stable "Coming {date}" label with deterministic fallback when i18n is not yet loaded during SSR
+// Build a stable "Coming {date}" label with fallback for SSR
 const upcomingReleaseComingText = computed(() => {
   const dateStr = upcomingReleaseData.value?.formattedDate || ''
   const key = shouldShowPreSaveCard.value ? 'music.presave.coming_prefix' : 'music.new_release.coming_prefix'
   const translated = t(key, { date: dateStr }) as string
-  if (translated === key) {
-    // Use exact locale string from locales to avoid UA-only SSR/CSR mismatches
-    const template = shouldShowPreSaveCard.value 
-      ? (locale.value === 'ua' ? 'Пресейв {date}' : 'Pre-save {date}')
-      : (locale.value === 'ua' ? 'Вихід {date}' : 'Coming {date}')
+  
+  // Fallback if translation key is returned literally (SSR scenario)
+  if (translated === key || translated.includes('music.')) {
+    const template = locale.value === 'ua' ? 'Реліз {date}' : 'Release {date}'
     return template.replace('{date}', dateStr)
   }
+  
   return translated
+})
+
+// Calculate days remaining until release
+const daysUntilRelease = computed(() => {
+  if (!upcomingReleaseData.value?.releaseDate) return 0
+  const now = new Date()
+  const releaseDate = new Date(upcomingReleaseData.value.releaseDate)
+  const diffTime = releaseDate.getTime() - now.getTime()
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  return diffDays > 0 ? diffDays : 0
+})
+
+// Text for "in X days"
+const daysRemainingText = computed(() => {
+  const days = daysUntilRelease.value
+  if (days === 0) return ''
+  
+  // Ukrainian pluralization with fallback for SSR
+  if (locale.value === 'ua') {
+    const lastDigit = days % 10
+    const lastTwoDigits = days % 100
+    
+    const prefix = t('music.days_remaining.prefix')
+    const usePrefix = prefix === 'music.days_remaining.prefix' ? 'через' : prefix
+    
+    let dayWord = ''
+    
+    // 11-19 always use "днів"
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+      const word = t('music.days_remaining.days_many')
+      dayWord = word === 'music.days_remaining.days_many' ? 'днів' : word
+    }
+    // 1 uses "день" (but not 11)
+    else if (lastDigit === 1) {
+      const word = t('music.days_remaining.day')
+      dayWord = word === 'music.days_remaining.day' ? 'день' : word
+    }
+    // 2-4 use "дні" (but not 12-14)
+    else if (lastDigit >= 2 && lastDigit <= 4) {
+      const word = t('music.days_remaining.days_2_4')
+      dayWord = word === 'music.days_remaining.days_2_4' ? 'дні' : word
+    }
+    // All others use "днів"
+    else {
+      const word = t('music.days_remaining.days_many')
+      dayWord = word === 'music.days_remaining.days_many' ? 'днів' : word
+    }
+    
+    return `${usePrefix} ${days} ${dayWord}`
+  }
+  
+  // English with fallback for SSR
+  const prefix = t('music.days_remaining.prefix')
+  const usePrefix = prefix === 'music.days_remaining.prefix' ? 'in' : prefix
+  
+  const dayTranslation = days === 1 ? t('music.days_remaining.day') : t('music.days_remaining.days')
+  const dayWord = dayTranslation.includes('music.days_remaining.') 
+    ? (days === 1 ? 'day' : 'days') 
+    : dayTranslation
+    
+  return `${usePrefix} ${days} ${dayWord}`
 })
 
 // Use a pre-blurred variant of the upcoming release image to avoid runtime backdrop blur
@@ -719,6 +781,10 @@ $shimmer-easing: ease-in-out;
     transform: translateY(-1px) scale(1.07);
     opacity: 0.92;
   }
+  .new-release-content:hover .new-release-days {
+    transform: translateY(-1px) scale(1.07);
+    opacity: 0.92;
+  }
 }
 
 .new-release-icon {
@@ -742,6 +808,15 @@ $shimmer-easing: ease-in-out;
 .new-release-date {
   color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+  @include text-shadow-light;
+  transition: all $hover-duration $hover-easing;
+}
+
+.new-release-days {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  font-weight: 500;
   margin-bottom: 0.5rem;
   @include text-shadow-light;
   transition: all $hover-duration $hover-easing;
@@ -875,6 +950,10 @@ $shimmer-easing: ease-in-out;
     transform: translateY(-1px) scale(1.07);
     opacity: 0.92;
   }
+  .presave-content:hover .presave-days {
+    transform: translateY(-1px) scale(1.07);
+    opacity: 0.92;
+  }
 }
 
 .presave-icon {
@@ -895,6 +974,15 @@ $shimmer-easing: ease-in-out;
 .presave-date {
   color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+  @include text-shadow-light;
+  transition: all $hover-duration $hover-easing;
+}
+
+.presave-days {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  font-weight: 500;
   margin-bottom: 0.5rem;
   @include text-shadow-light;
   transition: all $hover-duration $hover-easing;
@@ -1005,7 +1093,7 @@ $shimmer-easing: ease-in-out;
 
 /* Badge styles for pre-save and new release cards */
 .badge-presave {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(236, 72, 153, 0.9)) !important;
+  background: rgba(0, 0, 0, 0.7) !important;
   color: white !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -1013,7 +1101,7 @@ $shimmer-easing: ease-in-out;
 }
 
 .badge-glass {
-  background: rgba(0, 0, 0, 0.5) !important;
+  background: rgba(0, 0, 0, 0.7) !important;
   color: white !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);

@@ -52,7 +52,7 @@
     },
     "music_library": {
       "title": "Music Library",
-      "subtitle": "Full music library page coming soon!"
+      "subtitle": "Just a little bit more to wait!"
     }
   },
   "errors": {
@@ -125,11 +125,16 @@
     },
     "new_release": {
       "card_title_fallback": "New Release",
-      "coming_prefix": "Coming {date}"
+      "coming_prefix": "Release {date}"
     },
     "presave": {
       "card_title_fallback": "Pre-save",
-      "coming_prefix": "Pre-save {date}"
+      "coming_prefix": "Release {date}"
+    },
+    "days_remaining": {
+      "prefix": "in",
+      "day": "day",
+      "days": "days"
     },
     "album_cover": {
       "unavailable": "Album cover unavailable",
