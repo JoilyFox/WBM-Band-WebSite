@@ -103,7 +103,8 @@
     },
     "detail": {
       "listen_now_title": "Слухати зараз",
-      "presave_title": "Зберегти наперед"
+      "presave_title": "Зберегти наперед",
+      "release_label": "Реліз {date}"
     },
     "a11y": {
       "back_to_section": "Назад до розділу музики",

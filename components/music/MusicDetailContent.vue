@@ -102,10 +102,17 @@
           <!-- Compact Info -->
           <div class="flex-1 min-w-0">
             <h1 class="text-lg font-bold text-primary-50 mb-[2px] truncate">{{ displayTitle }}</h1>
-            <p class="text-sm text-primary-200 opacity-70 font-base">
-              <span>{{ displayTypeName }}</span>
-              <span aria-hidden="true" class="mx-1.5">·</span>
-              <span>{{ formatDate(release.releaseDate) }}</span>
+            <p class="text-sm text-primary-200 opacity-70 font-base leading-[1.2]">
+              <span class="inline-flex mr-1">
+                <span>{{ compactInfoPrimary }}</span>
+                <span v-if="showCompactDate" class="whitespace-nowrap">
+                  <span aria-hidden="true" class="mx-1.5">·</span>
+                  <span>{{ formattedReleaseDate }}</span>
+                </span>
+              </span>
+              <span v-if="preSaveCountdownText" class="whitespace-nowrap">
+                <span class="text-[0.8rem] text-primary-200 opacity-80">({{ preSaveCountdownText }})</span>
+              </span>
             </p>
           </div>
           
@@ -167,8 +174,14 @@
               :class="{ 'animate-titleGlow': isHighPerformanceDevice }">
             {{ displayTitle }}
           </h1>
-          <p class="music-date text-primary-200 text-base md:text-lg font-medium mb-2">{{ formatDate(release.releaseDate) }}</p>
-          <p v-if="displayDescription" class="music-description text-primary-100 text-base md:text-lg max-w-xl mx-auto md:mx-0 mb-4">
+          <p class="music-date text-primary-200 text-base md:text-lg font-medium">{{ heroDateText }}</p>
+          <p
+            v-if="preSaveCountdownText"
+            class="music-countdown text-primary-200 opacity-70 text-xs md:text-sm font-normal tracking-[0.06em] mt-0.5 pb-1"
+          >
+            ({{ preSaveCountdownText }})
+          </p>
+          <p v-if="displayDescription" class="music-description text-primary-100 text-base md:text-lg max-w-xl mx-auto md:mx-0 mt-2 mb-4">
             {{ displayDescription }}
           </p>
           
@@ -224,13 +237,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Button from 'primevue/button'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
 import { useOptimizedScroll } from '~/composables/useOptimizedScroll'
 import { useShareFunctionality } from '~/composables/useShareFunctionality'
+import { isUpcomingRelease } from '~/utils/configHelpers'
 import type { MusicRelease } from '~/data/musicLibrary'
 import Logo from '~/components/ui/Logo.vue'
 import CustomSharePopup from '~/components/common/CustomSharePopup.vue'
@@ -275,6 +289,109 @@ const { getShareContent, shareViaMobile, copyToClipboard } = useShareFunctionali
 
 // Translation keys for the current release
 const releaseTitleKey = computed(() => props.release.titleKey || `releases.${props.release.slug}.title`)
+const countdownText = ref('')
+const preSaveCountdownText = computed(() => countdownText.value)
+const formattedReleaseDate = computed(() => formatDate(props.release.releaseDate, { includeYear: !props.isPreSave }))
+
+const displayTypeName = computed(() => {
+  const key = (props.release.type || '').toString().toLowerCase().replace(/\s+/g, '_')
+  const i18nKey = `music.types.${key}`
+  const label = t(i18nKey) as string
+  if (label !== i18nKey) return label
+  const loc = locale.value === 'ua' ? 'ua' : 'en'
+  const map: Record<string, Record<string, string>> = {
+    en: { single: 'Single', album: 'Album', ep: 'EP', 'new_release': 'New Release' },
+    ua: { single: 'Сингл', album: 'Альбом', ep: 'EP', 'new_release': 'Новий реліз' }
+  }
+  return map[loc][key] || (props.release.type || '').toString()
+})
+
+const releaseDateLabel = computed(() => {
+  if (!props.isPreSave) return formattedReleaseDate.value
+  const key = 'music.detail.release_label'
+  const translated = t(key, { date: formattedReleaseDate.value }) as string
+  if (translated !== key) return translated
+  const fallback = locale.value === 'ua' ? `Реліз ${formattedReleaseDate.value}` : `Release ${formattedReleaseDate.value}`
+  return fallback
+})
+
+const compactInfoPrimary = computed(() => {
+  if (props.isPreSave) return releaseDateLabel.value
+  return displayTypeName.value
+})
+
+const showCompactDate = computed(() => !props.isPreSave)
+
+const heroDateText = computed(() => releaseDateLabel.value)
+
+const updateCountdown = () => {
+  if (!process.client) return
+  if (!props.isPreSave) {
+    countdownText.value = ''
+    return
+  }
+
+  const releaseDateRaw = props.release.releaseDate
+  if (!releaseDateRaw || !isUpcomingRelease(releaseDateRaw)) {
+    countdownText.value = ''
+    return
+  }
+
+  const releaseDate = new Date(releaseDateRaw)
+  if (Number.isNaN(releaseDate.getTime())) {
+    countdownText.value = ''
+    return
+  }
+
+  const now = new Date()
+  const diffMs = releaseDate.getTime() - now.getTime()
+  const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+
+  if (days <= 0) {
+    countdownText.value = ''
+    return
+  }
+
+  if (locale.value === 'ua') {
+    const rawPrefix = t('music.days_remaining.prefix') as string
+    const prefix = rawPrefix === 'music.days_remaining.prefix' ? 'через' : rawPrefix
+
+    const lastDigit = days % 10
+    const lastTwoDigits = days % 100
+
+    let dayKey = 'music.days_remaining.days_many'
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+      dayKey = 'music.days_remaining.days_many'
+    } else if (lastDigit === 1) {
+      dayKey = 'music.days_remaining.day'
+    } else if (lastDigit >= 2 && lastDigit <= 4) {
+      dayKey = 'music.days_remaining.days_2_4'
+    }
+
+    const rawDayWord = t(dayKey) as string
+    const dayWordFallbackMap: Record<string, string> = {
+      'music.days_remaining.day': 'день',
+      'music.days_remaining.days_2_4': 'дні',
+      'music.days_remaining.days_many': 'днів'
+    }
+    const dayWord = rawDayWord === dayKey ? (dayWordFallbackMap[dayKey] || 'днів') : rawDayWord
+
+    countdownText.value = `${prefix} ${days} ${dayWord}`
+    return
+  }
+
+  const rawPrefix = t('music.days_remaining.prefix') as string
+  const prefix = rawPrefix === 'music.days_remaining.prefix' ? 'in' : rawPrefix
+  const dayKey = days === 1 ? 'music.days_remaining.day' : 'music.days_remaining.days'
+  const rawDayWord = t(dayKey) as string
+  const dayWord = rawDayWord === dayKey ? (days === 1 ? 'day' : 'days') : rawDayWord
+
+  countdownText.value = `${prefix} ${days} ${dayWord}`
+}
+
+watch(() => locale.value, () => updateCountdown())
+watch(() => props.release.releaseDate, () => updateCountdown())
+watch(() => props.isPreSave, () => updateCountdown())
 
 // Custom share popup state
 const showSharePopup = ref(false)
@@ -352,6 +469,7 @@ onMounted(() => {
   updateBreakpoint()
   // Hydration finished; allow switching to localized strings without triggering hydration warnings
   isHydrating.value = false
+  updateCountdown()
   
   // Resize handler for responsive breakpoint (debounced)
   let resizeTimeout: NodeJS.Timeout
@@ -433,32 +551,24 @@ const displayDescription = computed(() => {
   return ssrFallback
 })
 
-const formatDate = (dateString: string): string => {
+function formatDate(dateString: string, options: { includeYear?: boolean } = {}): string {
   const date = new Date(dateString)
   const currentLocale = locale.value === 'ua' ? 'uk-UA' : 'en-US'
-  return date.toLocaleDateString(currentLocale, {
-    year: 'numeric',
+  const includeYear = options.includeYear !== false
+  const formatOptions: Intl.DateTimeFormatOptions = {
     month: 'long',
     day: 'numeric',
-    // Force UTC to ensure SSR/CSR consistency
-    timeZone: 'UTC'
-  })
+    timeZone: 'UTC' // Force UTC to ensure SSR/CSR consistency
+  }
+
+  if (includeYear) {
+    formatOptions.year = 'numeric'
+  }
+
+  return date.toLocaleDateString(currentLocale, formatOptions)
 }
 
 // Localized display name for release type
-const displayTypeName = computed(() => {
-  const key = (props.release.type || '').toString().toLowerCase().replace(/\s+/g, '_')
-  const i18nKey = `music.types.${key}`
-  const label = t(i18nKey) as string
-  if (label !== i18nKey) return label
-  const loc = locale.value === 'ua' ? 'ua' : 'en'
-  const map: Record<string, Record<string, string>> = {
-    en: { single: 'Single', album: 'Album', ep: 'EP', 'new_release': 'New Release' },
-    ua: { single: 'Сингл', album: 'Альбом', ep: 'EP', 'new_release': 'Новий реліз' }
-  }
-  return map[loc][key] || (props.release.type || '').toString()
-})
-
 // Deterministic labels for section titles/buttons to avoid SSR key rendering
 const listenNowTitle = computed(() => {
   if (props.isPreSave) {

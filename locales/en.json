@@ -103,7 +103,8 @@
     },
     "detail": {
       "listen_now_title": "Listen Now",
-      "presave_title": "Pre-save Now"
+      "presave_title": "Pre-save Now",
+      "release_label": "Release {date}"
     },
     "a11y": {
       "back_to_section": "Back to music section",
