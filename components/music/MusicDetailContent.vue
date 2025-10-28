@@ -273,6 +273,9 @@ const { isScrolled } = useOptimizedScroll({ threshold: 60 })
 // Share functionality
 const { getShareContent, shareViaMobile, copyToClipboard } = useShareFunctionality()
 
+// Translation keys for the current release
+const releaseTitleKey = computed(() => props.release.titleKey || `releases.${props.release.slug}.title`)
+
 // Custom share popup state
 const showSharePopup = ref(false)
 const shareButtonElement = ref<HTMLElement>()
@@ -301,8 +304,10 @@ const shareUrlForRelease = computed(() => {
 // Computed share content – use appropriate text for pre-save vs regular
 const shareContent = computed(() => {
   const cleanUrl = shareUrlForRelease.value
-  const title = props.release.title
-  
+  const fallbackTitle = props.release.title || props.release.slug
+  const translatedTitle = t(releaseTitleKey.value) as string
+  const title = translatedTitle !== releaseTitleKey.value && translatedTitle ? translatedTitle : fallbackTitle
+
   // Use localized share text
   const key = props.isPreSave ? 'music.share_popup.presave' : 'music.share_popup.check_out'
   const displayText = t(key, { title }) as string
@@ -312,7 +317,7 @@ const shareContent = computed(() => {
     title,
     text: shareMessage,
     url: cleanUrl,
-    displayText: displayText
+    displayText
   }
 })
 
@@ -409,22 +414,22 @@ const badgeClass = computed(() => {
   return typeClasses[props.release.type] || 'badge-default'
 })
 
+const releaseDescriptionKey = computed(() => props.release.descriptionKey || `releases.${props.release.slug}.description`)
+
 // Localized title/description from locales.releases[slug]
 // Hydration-aware: keep SSR fallbacks during hydration to avoid mismatches
 const displayTitle = computed(() => {
   const ssrFallback = props.release.title || props.release.slug
   if (isHydrating.value) return ssrFallback
-  const key = `releases.${props.release.slug}.title`
-  const translated = t(key) as string
-  return translated !== key ? translated : ssrFallback
+  const translated = t(releaseTitleKey.value) as string
+  return translated !== releaseTitleKey.value ? translated : ssrFallback
 })
 
 const displayDescription = computed(() => {
   const ssrFallback = props.release.description
   if (isHydrating.value) return ssrFallback
-  const key = `releases.${props.release.slug}.description`
-  const translated = t(key) as string
-  if (translated !== key && translated) return translated
+  const translated = t(releaseDescriptionKey.value) as string
+  if (translated !== releaseDescriptionKey.value && translated) return translated
   return ssrFallback
 })
 
@@ -508,7 +513,7 @@ const scrollToHero = () => {
 // Share functionality - Mobile share handler (uses Web Share API)
 const handleShare = async () => {
   await shareViaMobile({
-    title: props.release.title,
+    title: shareContent.value.title,
     url: shareUrlForRelease.value
   })
 }

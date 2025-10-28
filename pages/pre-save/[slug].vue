@@ -14,6 +14,7 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { getReleaseBySlug } from '~/data/musicLibrary'
 import { isUpcomingRelease } from '~/utils/configHelpers'
 
@@ -29,6 +30,7 @@ const slug = route.params.slug as string
 
 // Find the release by slug
 const release = getReleaseBySlug(slug)
+const { t } = useI18n({ useScope: 'global' })
 
 // Validate that the release exists and is in pre-save mode
 if (!release) {
@@ -58,6 +60,14 @@ if (!release.preSaveMusicPlatformLinks || Object.keys(release.preSaveMusicPlatfo
   })
 }
 
+const releaseTitleKey = release.titleKey || `releases.${release.slug}.title`
+const releaseDescriptionKey = release.descriptionKey || `releases.${release.slug}.description`
+const translatedTitle = t(releaseTitleKey) as string
+const localizedTitle = translatedTitle !== releaseTitleKey && translatedTitle ? translatedTitle : (release.title || release.slug)
+const translatedDescription = t(releaseDescriptionKey) as string
+const fallbackDescription = release.description || `Pre-save ${localizedTitle} by WBM Band on your favorite music platform.`
+const localizedDescription = translatedDescription !== releaseDescriptionKey && translatedDescription ? translatedDescription : fallbackDescription
+
 // Handle scroll position on page mount
 onMounted(() => {
   if (process.client) {
@@ -80,15 +90,15 @@ onMounted(() => {
 
 // Set page meta
 useSeoMeta({
-  title: `Pre-save ${release.title} | WBM Band`,
-  description: release.description || `Pre-save ${release.title} by WBM Band on your favorite music platform.`,
-  ogTitle: `Pre-save ${release.title} | WBM Band`,
-  ogDescription: release.description || `Pre-save ${release.title} by WBM Band on your favorite music platform.`,
+  title: `Pre-save ${localizedTitle} | WBM Band`,
+  description: localizedDescription,
+  ogTitle: `Pre-save ${localizedTitle} | WBM Band`,
+  ogDescription: localizedDescription,
   ogImage: release.imageUrl,
   ogType: 'music.song',
   twitterCard: 'summary_large_image',
-  twitterTitle: `Pre-save ${release.title} | WBM Band`,
-  twitterDescription: release.description || `Pre-save ${release.title} by WBM Band on your favorite music platform.`,
+  twitterTitle: `Pre-save ${localizedTitle} | WBM Band`,
+  twitterDescription: localizedDescription,
   twitterImage: release.imageUrl
 })
 </script>

@@ -13,6 +13,7 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { getReleaseBySlug } from '~/data/musicLibrary'
 
 // Use the empty layout instead of default
@@ -27,6 +28,7 @@ const slug = route.params.slug as string
 
 // Find the release by slug
 const release = getReleaseBySlug(slug)
+const { t } = useI18n({ useScope: 'global' })
 
 // Handle invalid slug using Nuxt's error handling
 if (!release) {
@@ -38,6 +40,14 @@ if (!release) {
     }
   })
 }
+
+const releaseTitleKey = release.titleKey || `releases.${release.slug}.title`
+const releaseDescriptionKey = release.descriptionKey || `releases.${release.slug}.description`
+const translatedTitle = t(releaseTitleKey) as string
+const localizedTitle = translatedTitle !== releaseTitleKey && translatedTitle ? translatedTitle : (release.title || release.slug)
+const translatedDescription = t(releaseDescriptionKey) as string
+const fallbackDescription = release.description || `Listen to ${localizedTitle} by WBM Band on all major music platforms.`
+const localizedDescription = translatedDescription !== releaseDescriptionKey && translatedDescription ? translatedDescription : fallbackDescription
 
 // Handle scroll position on page mount
 onMounted(() => {
@@ -61,15 +71,15 @@ onMounted(() => {
 
 // Set page meta
 useSeoMeta({
-  title: `${release.title} | WBM Band`,
-  description: release.description || `Listen to ${release.title} by WBM Band on all major music platforms.`,
-  ogTitle: `${release.title} | WBM Band`,
-  ogDescription: release.description || `Listen to ${release.title} by WBM Band on all major music platforms.`,
+  title: `${localizedTitle} | WBM Band`,
+  description: localizedDescription,
+  ogTitle: `${localizedTitle} | WBM Band`,
+  ogDescription: localizedDescription,
   ogImage: release.imageUrl,
   ogType: 'music.song',
   twitterCard: 'summary_large_image',
-  twitterTitle: `${release.title} | WBM Band`,
-  twitterDescription: release.description || `Listen to ${release.title} by WBM Band on all major music platforms.`,
+  twitterTitle: `${localizedTitle} | WBM Band`,
+  twitterDescription: localizedDescription,
   twitterImage: release.imageUrl
 })
 </script>

@@ -27,7 +27,7 @@
               <div class="relative">
                 <UiAlbumCover
                   :image-url="upcomingReleaseImageUrl"
-                  :alt="upcomingReleaseData?.title || t('music.new_release.card_title_fallback')"
+                  :alt="upcomingReleaseTitle || t('music.new_release.card_title_fallback')"
                   :release-type="upcomingReleaseData?.type || 'new release'"
                   :show-badge="false"
                 />
@@ -55,7 +55,7 @@
                 <div :class="shouldShowPreSaveCard ? 'presave-icon' : 'new-release-icon'">
                   <i :class="shouldShowPreSaveCard ? 'pi pi-bookmark' : 'pi pi-calendar'"></i>
                 </div>
-                <h3 :class="shouldShowPreSaveCard ? 'presave-title' : 'new-release-title'">{{ upcomingReleaseData?.title }}</h3>
+                <h3 :class="shouldShowPreSaveCard ? 'presave-title' : 'new-release-title'">{{ upcomingReleaseTitle }}</h3>
                 <p :class="shouldShowPreSaveCard ? 'presave-date' : 'new-release-date'">{{ upcomingReleaseComingText }}</p>
                 <p v-if="daysRemainingText" :class="shouldShowPreSaveCard ? 'presave-days' : 'new-release-days'">({{ daysRemainingText }})</p>
               </div>
@@ -240,6 +240,15 @@ const upcomingReleaseData = computed(() => {
     ...release,
     formattedDate: formatted
   }
+})
+
+const upcomingReleaseTitle = computed(() => {
+  const release = upcomingRelease.value
+  if (!release) return ''
+  const key = release.titleKey || `releases.${release.slug}.title`
+  const fallback = release.title || release.slug
+  const translated = t(key) as string
+  return translated !== key && translated ? translated : fallback
 })
 
 // Build a stable "Coming {date}" label with fallback for SSR

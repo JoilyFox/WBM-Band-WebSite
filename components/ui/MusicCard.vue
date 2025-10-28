@@ -57,12 +57,12 @@ const stableReleaseText = (key: string, fallback: string | undefined) => {
 
 // Localized title/description from locales.releases[slug]
 const displayTitle = computed(() => {
-  const key = `releases.${props.release.slug}.title`
+  const key = props.release.titleKey || `releases.${props.release.slug}.title`
   return stableReleaseText(key, props.release.title || props.release.slug)
 })
 
 const displayDescription = computed(() => {
-  const key = `releases.${props.release.slug}.description`
+  const key = props.release.descriptionKey || `releases.${props.release.slug}.description`
   return stableReleaseText(key, props.release.description || '')
 })
 

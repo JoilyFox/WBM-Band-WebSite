@@ -2,11 +2,15 @@ export interface MusicRelease {
   id: string
   slug: string
   title: string
+  /** i18n key for localized title; falls back to slug-based default when omitted */
+  titleKey?: string
   type: 'single' | 'album' | 'ep' | 'new release'
   releaseDate: string // ISO 8601 format: 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:mm:ss' or 'YYYY-MM-DDTHH:mm:ssZ'
   imageUrl: string
   blurredImageUrl?: string
   description?: string
+  /** i18n key for localized description; falls back to slug-based default when omitted */
+  descriptionKey?: string
   featured?: boolean
   musicPlatformLinks: {
     spotify?: string
@@ -35,11 +39,13 @@ export const musicLibrary: MusicRelease[] = [
     id: '2',
     slug: 'mania',
     title: 'Mania',
+    titleKey: 'releases.mania.title',
     type: 'single',
     releaseDate: '2025-11-14T18:00:00', // November 14, 2025 at 6:00 PM (local time)
     imageUrl: '/images/optimized/albums-images/mania-cover.avif',
     blurredImageUrl: '/images/albums-images/mania-cover-blurred.jpg',
-    description: 'Mania Mania Mania Mania Mania Mania.',
+    description: 'A high-voltage single blending modern rock energy with cinematic synth layers.',
+    descriptionKey: 'releases.mania.description',
     featured: true,
     musicPlatformLinks: {
       spotify: 'https://open.spotify.com/album/example1',
