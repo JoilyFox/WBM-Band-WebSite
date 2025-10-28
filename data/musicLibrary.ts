@@ -41,7 +41,7 @@ export const musicLibrary: MusicRelease[] = [
     title: 'Mania',
     titleKey: 'releases.mania.title',
     type: 'single',
-    releaseDate: '2025-10-14T18:00:00',
+    releaseDate: '2025-11-14T18:00:00',
     imageUrl: '/images/optimized/albums-images/mania-cover.avif',
     blurredImageUrl: '/images/albums-images/mania-cover-blurred.jpg',
     description: 'A high-voltage single blending modern rock energy with cinematic synth layers.',

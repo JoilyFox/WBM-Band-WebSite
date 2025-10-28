@@ -164,6 +164,9 @@ let observer: IntersectionObserver | null = null
 const displayedReleases = computed(() => {
   let releases = props.showAll ? getAllReleases() : getLatestReleases(props.maxItems)
   
+  // Hide all upcoming releases until their release date has passed
+  releases = releases.filter(release => !isUpcomingRelease(release.releaseDate))
+
   // Filter out the upcoming release if it's being shown in preview/pre-save card
   // This prevents showing the same release twice
   if (shouldShowNewReleasePreview.value || shouldShowPreSaveCard.value) {
