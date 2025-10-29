@@ -2,6 +2,39 @@
   RewriteEngine On
   RewriteBase /
 
+  # Disable automatic directory slash redirect
+  DirectorySlash Off
+
+  # Internal rewrite for /pre-save/* without trailing slash to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} ^/pre-save/[^/]+$
+  RewriteRule ^pre-save/(.*)$ /ua/pre-save/$1/index.html [L]
+
+  # Internal rewrite for /listen/* without trailing slash to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} ^/listen/[^/]+$
+  RewriteRule ^listen/(.*)$ /ua/listen/$1/index.html [L]
+
+  # Internal rewrite for /ua/pre-save/* without trailing slash to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} ^/ua/pre-save/[^/]+$
+  RewriteRule ^ua/pre-save/(.*)$ /ua/pre-save/$1/index.html [L]
+
+  # Internal rewrite for /ua/listen/* without trailing slash to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} ^/ua/listen/[^/]+$
+  RewriteRule ^ua/listen/(.*)$ /ua/listen/$1/index.html [L]
+
+  # Internal rewrite for /en/pre-save/* without trailing slash to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} ^/en/pre-save/[^/]+$
+  RewriteRule ^en/pre-save/(.*)$ /en/pre-save/$1/index.html [L]
+
+  # Internal rewrite for /en/listen/* without trailing slash to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} ^/en/listen/[^/]+$
+  RewriteRule ^en/listen/(.*)$ /en/listen/$1/index.html [L]
+
   # Internal rewrite (not redirect) for /pre-save/* to serve /ua/pre-save/* content
   # This keeps the URL the same but serves the localized content
   RewriteCond %{REQUEST_FILENAME} !-f
