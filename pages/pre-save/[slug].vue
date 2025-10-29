@@ -44,6 +44,12 @@ if (!release) {
   })
 }
 
+// Check if we should redirect to distributor's pre-save page
+if (release.useDistributorPreSave && release.distributorPreSaveUrl) {
+  // Redirect to distributor's pre-save URL without loading the page
+  await navigateTo(release.distributorPreSaveUrl, { external: true, redirectCode: 302 })
+}
+
 // Check if this release is actually upcoming and has pre-save links
 if (!isUpcomingRelease(release.releaseDate)) {
   // Release date has passed, redirect to regular listen page

@@ -32,6 +32,10 @@ export interface MusicRelease {
     tidal?: string
     amazonMusic?: string
   }
+  /** If true and distributorPreSaveUrl is set, redirect to distributor's pre-save page instead of showing custom page */
+  useDistributorPreSave?: boolean
+  /** Direct link to distributor's pre-save page (e.g., DistroKid, TuneCore, etc.) */
+  distributorPreSaveUrl?: string
 }
 
 export const musicLibrary: MusicRelease[] = [
@@ -55,12 +59,12 @@ export const musicLibrary: MusicRelease[] = [
       amazonMusic: 'https://music.amazon.com/albums/example1'
     },
     preSaveMusicPlatformLinks: {
-      spotify: 'https://open.spotify.com/album/example1',
+      spotify: 'https://accounts.spotify.com/authorize?response_type=code&client_id=5a14783d79444ee9babd9176b256979e&scope=user-follow-modify+user-library-modify+playlist-modify-public+playlist-modify-private+user-read-email+user-read-private&redirect_uri=https%3A%2F%2Flnk.to%2F~%2Fprerelease%2Fspotify&state=bFVybD1hcnRpc3RzLmxhbmRyLmNvbSUyRjA1NzgyOTkwODQxMyZzSWQ9ZjBlYjk2NTUtYjFkZS00OWE2LWI4OGQtN2ZlNGFlMTFhYTU1JnRJZD01NmY2YTg3OS0wNWM2LTRhN2EtODEyZi1mMjQ0ODk0NjYxNTImdT1odHRwcyUzQSUyRiUyRmFydGlzdHMubGFuZHIuY29tJTJGMDU3ODI5OTA4NDEzJnZ0PWQ0NzlhMjIwY2ZmZTdmNGEyZTg5ZDg2YzVjZWM0NWFhJnZ1PTY5MDFlMzRiOTk5ZWI2LjIxNjI3MzE0JnJmPWh0dHBzJTNBJTJGJTJGYXBwLmxhbmRyLmNvbSUyRg%3D%3D',
       appleMusic: 'https://music.apple.com/album/example1',
-      youtubeMusic: 'https://youtube.com/playlist?list=example1',
-      tidal: 'https://tidal.com/browse/album/example1',
-      amazonMusic: 'https://music.amazon.com/albums/example1'
-    }
+    },
+    // Optional: Use distributor's pre-save page instead of custom page
+    useDistributorPreSave: true,
+    distributorPreSaveUrl: 'https://artists.landr.com/057829908413'
   },
 ]
 

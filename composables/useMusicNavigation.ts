@@ -35,9 +35,18 @@ export const useMusicNavigation = () => {
    * Handle music card click
    * On mobile: navigate to page with music origin parameter
    * On desktop: open modal
+   * If useDistributorPreSave is enabled: redirect directly to distributor URL
    */
   const handleMusicClick = async (release: MusicRelease) => {
     const isPreSave = isReleaseInPreSaveMode(release)
+    
+    // Check if we should redirect directly to distributor's pre-save page
+    if (isPreSave && release.useDistributorPreSave && release.distributorPreSaveUrl) {
+      // Direct external redirect to distributor URL
+      await navigateTo(release.distributorPreSaveUrl, { external: true, open: { target: '_blank' } })
+      return
+    }
+    
     const basePath = isPreSave ? '/pre-save' : '/listen'
     
     if (isMobile.value) {
