@@ -94,3 +94,25 @@ export const getReleaseBySlug = (slug: string): MusicRelease | undefined => {
 export const getReleaseById = (id: string): MusicRelease | undefined => {
   return musicLibrary.find(release => release.id === id)
 }
+
+/**
+ * Get the nearest upcoming release that has pre-save links
+ * @returns The nearest upcoming release with pre-save, or undefined if none found
+ */
+export const getNearestUpcomingPreSaveRelease = (): MusicRelease | undefined => {
+  const now = new Date().getTime()
+  
+  // Filter releases that are upcoming and have pre-save links
+  const upcomingWithPreSave = musicLibrary.filter(release => {
+    const releaseDate = new Date(release.releaseDate).getTime()
+    const hasPreSaveLinks = release.preSaveMusicPlatformLinks && Object.keys(release.preSaveMusicPlatformLinks).length > 0
+    return releaseDate > now && hasPreSaveLinks
+  })
+  
+  // Sort by release date (nearest first) and return the first one
+  if (upcomingWithPreSave.length === 0) return undefined
+  
+  return upcomingWithPreSave.sort((a, b) => {
+    return new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime()
+  })[0]
+}

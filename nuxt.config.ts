@@ -105,7 +105,8 @@ export default defineNuxtConfig({
         '/en/pre-save/mania',
         '/ua/listen/mania',
         '/en/listen/mania'
-      ]
+      ],
+      failOnError: false // Allow build to succeed even when maintenance mode returns 503 errors
     }
   },
 
