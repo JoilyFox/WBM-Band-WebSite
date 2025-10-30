@@ -63,6 +63,11 @@
       "title": "Page Not Found",
       "message": "Sorry, the page you are looking for does not exist. It might have been moved, deleted, or you entered the wrong URL."
     },
+    "maintenance": {
+      "title": "Under Construction",
+      "message": "Our website is currently under construction. We're working hard to bring you an amazing experience!",
+      "coming_soon": "Coming Soon"
+    },
     "support_hint": "If this problem persists, please contact support"
   },
   "pages": {

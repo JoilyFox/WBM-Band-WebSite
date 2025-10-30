@@ -22,8 +22,9 @@
         <div class="error-divider"></div>
         <p class="error-message">{{ message }}</p>
         
-        <!-- Action Button -->
+        <!-- Action Button (hidden for maintenance mode) -->
         <button 
+          v-if="buttonLink"
           @click="handleButtonClick"
           class="error-button"
           type="button"
@@ -118,7 +119,10 @@ const errorCode = computed(() => {
   const titleValue = title.value.toLowerCase()
   const routePath = route ? route.path : ''
   
-  if (titleValue.includes('not found') || routePath === '/404') {
+  if (titleValue.includes('construction') || titleValue.includes('maintenance') || titleValue.includes('обслуговування')) {
+    return '503'
+  }
+  if (titleValue.includes('not found') || titleValue.includes('знайдено') || routePath === '/404') {
     return '404'
   }
   if (titleValue.includes('server error')) {
@@ -133,6 +137,11 @@ const errorCode = computed(() => {
 const handleButtonClick = () => {
   if (process.client && router) {
     const link = buttonLink.value
+    
+    // Don't navigate if button is disabled (e.g., maintenance mode)
+    if (!link) {
+      return
+    }
     
     // Handle special case for music section scrolling
     if (link === '/#music') {
@@ -334,6 +343,7 @@ const handleButtonClick = () => {
   font-weight: 700;
   color: #ffffff;
   line-height: 1.2;
+  margin-bottom: 8px;
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
@@ -364,6 +374,7 @@ const handleButtonClick = () => {
   line-height: 1.6;
   max-width: 400px;
   margin: 0 auto;
+  margin-top: 10px;
 }
 
 // Button Styling
@@ -400,6 +411,34 @@ const handleButtonClick = () => {
     
     .button-ripple {
       animation: ripple 0.6s ease-out;
+    }
+  }
+  
+  // Disabled state for maintenance mode
+  &.button-disabled,
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    border-color: rgba(255, 255, 255, 0.4);
+    
+    &:hover {
+      transform: none;
+      box-shadow: none;
+      
+      .button-bg {
+        transform: scale(0);
+        opacity: 0;
+      }
+      
+      .button-content {
+        color: #ffffff;
+      }
+    }
+    
+    &:active {
+      .button-ripple {
+        animation: none;
+      }
     }
   }
 }

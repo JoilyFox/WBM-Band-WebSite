@@ -45,6 +45,7 @@ export interface GeneralConfig {
   maxReleasesBeforeHideComingSoon: number
   enableNextReleasePreview: boolean // Show non-clickable preview card for upcoming releases
   enablePreSave: boolean // Enable pre-save functionality for upcoming releases (overrides preview)
+  maintenanceMode: boolean // When true, redirect main page to "under construction" error page (other pages remain accessible)
 }
 
 export const generalConfig: GeneralConfig = {
@@ -89,5 +90,6 @@ export const generalConfig: GeneralConfig = {
   enableComingSoonCard: true,
   maxReleasesBeforeHideComingSoon: 6,
   enableNextReleasePreview: true, // Show non-clickable preview card for upcoming releases
-  enablePreSave: true // Enable pre-save functionality (when true, replaces preview with clickable pre-save card)
+  enablePreSave: true, // Enable pre-save functionality (when true, replaces preview with clickable pre-save card)
+  maintenanceMode: true // When true, main page shows "under construction" (other pages like /listen and /pre-save remain accessible)
 }

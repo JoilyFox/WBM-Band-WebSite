@@ -27,6 +27,10 @@ const props = defineProps<{
 
 // Handle different error types
 const errorTitle = computed(() => {
+  // Maintenance mode (503)
+  if (props.error?.statusCode === 503 || (props.error?.data?.isMaintenance)) {
+    return t('errors.maintenance.title') as string
+  }
   if (props.error?.statusCode === 404) {
     return t('errors.page_not_found.title') as string
   }
@@ -37,6 +41,10 @@ const errorTitle = computed(() => {
 })
 
 const errorMessage = computed(() => {
+  // Maintenance mode (503)
+  if (props.error?.statusCode === 503 || (props.error?.data?.isMaintenance)) {
+    return t('errors.maintenance.message') as string
+  }
   // Handle music track specific errors
   if (props.error?.statusCode === 404 && props.error?.statusMessage?.includes('Music track')) {
     return t('errors.page_not_found.message') as string
@@ -52,6 +60,10 @@ const errorMessage = computed(() => {
 })
 
 const buttonText = computed(() => {
+  // Maintenance mode - show "Coming Soon" instead of action button
+  if (props.error?.statusCode === 503 || (props.error?.data?.isMaintenance)) {
+    return t('errors.maintenance.coming_soon') as string
+  }
   // Handle music track specific errors
   if (props.error?.statusCode === 404 && props.error?.statusMessage?.includes('Music track')) {
     return t('errors.go_home') as string
@@ -64,6 +76,10 @@ const buttonText = computed(() => {
 })
 
 const buttonLink = computed(() => {
+  // Maintenance mode - no link (button will be disabled)
+  if (props.error?.statusCode === 503 || (props.error?.data?.isMaintenance)) {
+    return ''
+  }
   // Handle music track specific errors - redirect to home with music section anchor
   if (props.error?.statusCode === 404 && props.error?.statusMessage?.includes('Music track')) {
     return localePath('/') + '#music'

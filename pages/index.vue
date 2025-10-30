@@ -41,6 +41,18 @@ import type { MusicRelease } from '~/data/musicLibrary'
 
 const { t } = useI18n()
 
+// Check for maintenance mode
+const maintenanceMode = computed(() => getConfig('general.maintenanceMode'))
+if (maintenanceMode.value) {
+  throw createError({
+    statusCode: 503,
+    statusMessage: 'Site Under Construction',
+    data: {
+      isMaintenance: true
+    }
+  })
+}
+
 // Computed properties for config values
 const bandName = computed(() => getConfig('general.bandName'))
 const tagline = computed(() => getConfig('general.tagline'))
