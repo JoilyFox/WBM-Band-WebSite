@@ -93,5 +93,5 @@ export const generalConfig: GeneralConfig = {
   enablePreSave: true, // Enable pre-save functionality (when true, replaces preview with clickable pre-save card)
   
   // When true, main page shows "under construction" (other pages like /listen and /pre-save remain accessible)
-  maintenanceMode: true 
+  maintenanceMode: false  
 }

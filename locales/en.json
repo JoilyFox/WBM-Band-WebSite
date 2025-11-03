@@ -178,5 +178,10 @@
   "team": {
     "section_title": "Our Team",
     "section_subtitle": "The creative people shaping the WBM sound."
+  },
+  "about": {
+    "section_title": "About Us",
+    "section_subtitle": "Discover the story behind the music",
+    "content": "WBM Band is a modern rock group pushing the boundaries of alternative music. With a unique blend of classic rock influences and contemporary sounds, we create atmospheric experiences that resonate with listeners worldwide. Our journey began with a shared passion for music that transcends genres, and today we continue to evolve, experiment, and connect with our audience through powerful performances and meaningful lyrics. From intimate studio sessions to electrifying live shows, we pour our hearts into every note, creating music that speaks to the soul."
   }
 }

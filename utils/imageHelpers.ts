@@ -215,6 +215,7 @@ function getPresetConfig(preset: string) {
   const presets: Record<string, { width?: number; height?: number; quality?: number }> = {
     hero: { width: 1920, height: 1080, quality: 85 },
     heroMobile: { width: 768, height: 1024, quality: 80 },
+    about: { width: 1600, height: 900, quality: 85 },
     album: { width: 400, height: 400, quality: 85 },
     albumLarge: { width: 800, height: 800, quality: 90 },
     thumbnail: { width: 200, height: 200, quality: 80 }

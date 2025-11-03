@@ -17,6 +17,7 @@ export interface SliderOptions {
   interval?: number
   transition?: 'fade' | 'slide' | 'zoom'
   pauseOnHover?: boolean
+  transitionDuration?: number // Duration in ms for slide transitions
 }
 
 export function useHeroSlider(
@@ -27,7 +28,8 @@ export function useHeroSlider(
     autoPlay = true,
     interval = 5000,
     transition = 'fade',
-    pauseOnHover = true
+    pauseOnHover = true,
+    transitionDuration = 800
   } = options
 
   // Reactive state
@@ -61,7 +63,7 @@ export function useHeroSlider(
       // Reset transition state after animation
       setTimeout(() => {
         isTransitioning.value = false
-      }, 800)
+      }, transitionDuration)
       
       // Restart timer for auto-play
       if (isPlaying.value) {

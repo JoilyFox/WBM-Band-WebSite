@@ -13,6 +13,9 @@
       @show-more="handleShowAllMusic"
     />
 
+    <!-- About Us Section -->
+    <SectionsAboutUsSection />
+
     <!-- Team Background Section (placeholder) -->
     <!-- <SectionsTeamSection /> -->
 
