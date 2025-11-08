@@ -192,7 +192,7 @@
               {{ t('pages.privacy.cookies_text_2') }}
             </p>
             <p class="text-content">
-              <NuxtLink to="/cookies-policy" class="contact-link">{{ t('pages.privacy.cookies_policy_link') }}</NuxtLink>
+              <NuxtLink :to="localePath('/cookies-policy')" class="contact-link">{{ t('pages.privacy.cookies_policy_link') }}</NuxtLink>
             </p>
           </div>
         </div>
@@ -297,8 +297,9 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { getConfig } from '~/utils/configHelpers'
 import { useI18n } from 'vue-i18n'
-import { useLocaleHead } from '#i18n'
+import { useLocaleHead, useLocalePath } from '#i18n'
 const { t } = useI18n()
+const localePath = useLocalePath()
 
 // Meta tags for SEO
 useHead({

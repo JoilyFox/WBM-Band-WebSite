@@ -170,8 +170,8 @@
       "limitation_title": "Limitation of Access",
       "limitation_desc": "We reserve the right to limit or restrict access to our website and services for security, legal, or other legitimate reasons. We may do this without prior notice if necessary to protect the integrity of our services or the safety of our users.",
       "law_title": "Governing Law",
-      "law_text_1": "These Terms shall be interpreted and governed by the laws of Ukraine, without regard to its conflict of law provisions.",
-      "law_text_2": "Any disputes arising from these Terms or your use of our services will be resolved in accordance with Ukrainian law and jurisdiction.",
+      "law_text_1": "These Terms shall be interpreted and governed by the laws of Ukraine.",
+      "law_text_2": "Any disputes arising from these Terms or your use of our services will be resolved in accordance with Ukrainian law and in Ukraine's jurisdiction via negotiations, mediation, and, if necessary, court. We encourage all users to contact us directly in case of any such disputes.",
       "changes_title": "Changes to Terms",
       "changes_text_1": "We reserve the right to modify or replace these Terms at any time. If a revision is material, we will try to provide at least {dataResponseTime} notice prior to any new terms taking effect.",
       "changes_text_2": "What constitutes a material change will be determined at our sole discretion. By continuing to access or use our services after those revisions become effective, you agree to be bound by the revised terms.",
@@ -287,17 +287,9 @@
     "switch_label": "Language"
   },
   "releases": {
-    "midnight-echoes": {
-      "title": "Midnight Echoes",
-      "description": "Our latest full-length album featuring 12 tracks of atmospheric rock."
-    },
-    "electric-dreams": {
-      "title": "Electric Dreams",
-      "description": "A 5-track EP exploring electronic soundscapes."
-    },
     "mania": {
       "title": "Mania",
-      "description": "A high-voltage single blending modern rock energy with cinematic synth layers."
+      "description": "This is a song about the thin line between love and obsession, between real feelings and the destructive urge to possess an abstract image."
     }
   },
   "team": {
