@@ -29,9 +29,8 @@
 		"developer": "Made with ❤️ and 🎸 by",
 		"developer_prefix": "Made with ❤️ and 🎸 by",
 		"follow_instagram": "Follow us on Instagram",
-		"follow_twitter": "Follow us on Twitter",
+		"follow_tiktok": "Follow us on TikTok",
 		"subscribe_youtube": "Subscribe to our YouTube channel",
-		"like_facebook": "Like us on Facebook",
 		"tagline_short": "{name} - Modern rock with classic soul. Pushing boundaries in alternative music.",
 		"tagline_long": "{name} - Pushing the boundaries of rock, alternative, and indie music. Join us on our musical journey and stay connected for the latest releases and tour updates."
   },
@@ -183,5 +182,24 @@
     "section_title": "About Us",
     "section_subtitle": "Discover the story behind the music",
     "content": "WBM Band is a modern rock group pushing the boundaries of alternative music. With a unique blend of classic rock influences and contemporary sounds, we create atmospheric experiences that resonate with listeners worldwide. Our journey began with a shared passion for music that transcends genres, and today we continue to evolve, experiment, and connect with our audience through powerful performances and meaningful lyrics. From intimate studio sessions to electrifying live shows, we pour our hearts into every note, creating music that speaks to the soul."
+  },
+  "contacts": {
+    "section_title": "Get In Touch",
+    "section_subtitle": "Let's connect and make something amazing together",
+    "form_title": "Send us a message",
+    "name_label": "Your Name",
+    "name_placeholder": "Enter your name",
+    "email_label": "Email Address",
+    "email_placeholder": "your{'@'}email.com",
+    "message_label": "Message",
+    "message_placeholder": "Tell us what's on your mind...",
+    "submit_button": "Send Message",
+    "sending_button": "Sending...",
+    "success_message": "Message sent successfully! We'll get back to you soon.",
+    "error_message": "Oops! Something went wrong. Please try again.",
+    "email_us": "Email us directly",
+    "follow_us": "Follow Us",
+    "media_materials": "Press & Media",
+    "download_press_kit": "Download Press Kit"
   }
 }

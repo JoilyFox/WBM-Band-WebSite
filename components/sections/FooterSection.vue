@@ -52,13 +52,15 @@
           <div class="text-white/50 text-xs pt-2">
             {{ t('footer.developer_prefix') }} 
             <a 
-              href="https://www.instagram.com/feat.her_" 
+              v-if="developerInstagram"
+              :href="developerInstagram" 
               target="_blank" 
               rel="noopener noreferrer"
               class="developer-link"
             >
-              @feat.her_
+              {{ developerName }}
             </a>
+            <span v-else>{{ developerName }}</span>
           </div>
           
           <!-- Language Switcher (mobile minimized footer) -->
@@ -116,13 +118,15 @@
               <div class="text-white/50 text-xs">
                 {{ t('footer.developer_prefix') }} 
                 <a 
-                  href="https://www.instagram.com/feat.her_" 
+                  v-if="developerInstagram"
+                  :href="developerInstagram" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   class="developer-link"
                 >
-                  @feat.her_
+                  {{ developerName }}
                 </a>
+                <span v-else>{{ developerName }}</span>
               </div>
 
               <!-- Language Switcher -->
@@ -261,13 +265,15 @@
             <div class="text-white/50 md2:text-white/30 text-xs !mt-[26px] min-w-[150px] md2:!mt-0 two-line-clamp">
               {{ t('footer.developer_prefix') }} 
               <a 
-                href="https://www.instagram.com/feat.her_" 
+                v-if="developerInstagram"
+                :href="developerInstagram" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 class="developer-link"
               >
-                @feat.her_
+                {{ developerName }}
               </a>
+              <span v-else>{{ developerName }}</span>
             </div>
           </div>
           
@@ -340,56 +346,56 @@ const contactEmail = computed(() => getConfig('general.contact.email'))
 const contactLocationShort = computed(() => getConfig('general.contact.location.short'))
 const contactPhone = computed(() => getConfig('general.contact.phone'))
 const contactPhoneNumber = computed(() => getConfig('general.contact.phoneNumber'))
+const developerName = computed(() => getConfig('general.developer.name'))
+const developerInstagram = computed(() => getConfig('general.developer.instagramUrl'))
 
 // Current year for copyright
 const currentYear = computed(() => new Date().getFullYear())
 
 // Social media links (labels reactive to locale changes)
-const socialLinks = computed(() => ([
-  {
-    name: 'instagram',
-    icon: 'pi pi-instagram',
-    url: 'https://instagram.com/wbmband',
-    label: t('footer.follow_instagram')
-  },
-  {
-    name: 'twitter',
-    icon: 'pi pi-twitter',
-    url: 'https://twitter.com/wbmband',
-    label: t('footer.follow_twitter')
-  },
-  {
-    name: 'youtube',
-    icon: 'pi pi-youtube',
-    url: 'https://youtube.com/@wbmband',
-    label: t('footer.subscribe_youtube')
-  },
-  {
-    name: 'facebook',
-    icon: 'pi pi-facebook',
-    url: 'https://facebook.com/wbmband',
-    label: t('footer.like_facebook')
+const socialLinks = computed(() => {
+  const links = []
+  
+  const instagramUrl = getConfig('general.socialMedia.instagram')
+  const tiktokUrl = getConfig('general.socialMedia.tiktok')
+  const youtubeUrl = getConfig('general.socialMedia.youtube')
+  
+  if (instagramUrl) {
+    links.push({
+      name: 'instagram',
+      icon: 'pi pi-instagram',
+      url: instagramUrl,
+      label: t('footer.follow_instagram')
+    })
   }
-]))
+  
+  if (tiktokUrl) {
+    links.push({
+      name: 'tiktok',
+      icon: 'pi pi-tiktok',
+      url: tiktokUrl,
+      label: t('footer.follow_tiktok')
+    })
+  }
+  
+  if (youtubeUrl) {
+    links.push({
+      name: 'youtube',
+      icon: 'pi pi-youtube',
+      url: youtubeUrl,
+      label: t('footer.subscribe_youtube')
+    })
+  }
+  
+  return links
+})
 
 // Streaming platforms - using computed to ensure proper path resolution
-const streamingPlatforms = computed(() => [
-  {
-    name: 'Spotify',
-    icon: resolveAssetPath('/assets/images/icons/spotify-icon.svg'),
-    url: 'https://open.spotify.com/artist/wbmband'
-  },
-  {
-    name: 'Apple Music',
-    icon: resolveAssetPath('/assets/images/icons/apple-music-icon.svg'),
-    url: 'https://music.apple.com/artist/wbmband'
-  },
-  {
-    name: 'YouTube Music',
-    icon: resolveAssetPath('/assets/images/icons/youtube-music-icon.svg'),
-    url: 'https://music.youtube.com/channel/wbmband'
-  }
-])
+const streamingPlatforms = computed(() => {
+  const platforms: Array<{ name: string; icon: string; url: string }> = []
+
+  return platforms
+})
 
 // Legal links (labels reactive to locale changes)
 const legalLinks = computed(() => ([

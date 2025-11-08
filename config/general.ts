@@ -25,10 +25,22 @@ export interface GeneralConfig {
   
   // Social media
   socialMedia: {
+    instagram?: string
+    tiktok?: string
+    youtube?: string
+    facebook?: string
+    twitter?: string
     spotify?: string
     appleMusic?: string
-    youtube?: string
+    youtubeMusic?: string
+  }
+  
+  // Social media handles (for display)
+  socialHandles: {
     instagram?: string
+    tiktok?: string
+    youtube?: string
+    facebook?: string
     twitter?: string
   }
   
@@ -46,6 +58,15 @@ export interface GeneralConfig {
   enableNextReleasePreview: boolean // Show non-clickable preview card for upcoming releases
   enablePreSave: boolean // Enable pre-save functionality for upcoming releases (overrides preview)
   maintenanceMode: boolean // When true, redirect main page to "under construction" error page (other pages remain accessible)
+  
+  // Web3Forms API key for contact form
+  web3formsApiKey: string
+  
+  // Developer credit
+  developer: {
+    name: string
+    instagramUrl?: string
+  }
 }
 
 export const generalConfig: GeneralConfig = {
@@ -56,8 +77,8 @@ export const generalConfig: GeneralConfig = {
   
   // Contact information
   contact: {
-    email: "contact@wbmband.com",
-    privacyEmail: "privacy@wbmband.com",
+    email: "wbmbandofficial@gmail.com",
+    privacyEmail: "wbmbandofficial@gmail.com",
     phone: "+1 (234) 567-8900",
     phoneNumber: "+1234567890", // For tel: links
     location: {
@@ -71,11 +92,16 @@ export const generalConfig: GeneralConfig = {
   
   // Social media links
   socialMedia: {
-    spotify: "https://open.spotify.com/artist/wbmband",
-    appleMusic: "https://music.apple.com/artist/wbmband",
-    youtube: "https://youtube.com/@wbmband",
-    // instagram: "https://instagram.com/wbmband",
-    // twitter: "https://twitter.com/wbmband"
+    instagram: "https://instagram.com/wbmband",
+    tiktok: "https://tiktok.com/@wbmband",
+    youtube: "https://youtube.com/@wbmbandofficial"
+  },
+  
+  // Social media handles (for display purposes)
+  socialHandles: {
+    instagram: "@wbmband",
+    tiktok: "wbmband",
+    youtube: "wbmbandofficial"
   },
   
   // Legal and policy information
@@ -93,5 +119,14 @@ export const generalConfig: GeneralConfig = {
   enablePreSave: true, // Enable pre-save functionality (when true, replaces preview with clickable pre-save card)
   
   // When true, main page shows "under construction" (other pages like /listen and /pre-save remain accessible)
-  maintenanceMode: false  
+  maintenanceMode: false,
+  
+  // Web3Forms API key for contact form (get yours free at https://web3forms.com)
+  web3formsApiKey: "3d7d114e-f2cd-46db-8934-ba70907c3a07",
+  
+  // Developer credit
+  developer: {
+    name: "@feat.her_",
+    instagramUrl: "https://www.instagram.com/feat.her_"
+  }
 }

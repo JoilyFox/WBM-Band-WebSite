@@ -128,9 +128,7 @@ const onSwiper = (swiper: SwiperType) => {
 
 const onSlideChange = () => {
   // Optional: track slide changes
-  if (swiperInstance.value) {
-    console.log('Current slide:', swiperInstance.value.activeIndex)
-  }
+  // You can add analytics or other tracking here if needed
 }
 </script>
 

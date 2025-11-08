@@ -16,6 +16,9 @@
     <!-- About Us Section -->
     <SectionsAboutUsSection />
 
+    <!-- Contacts Section -->
+    <SectionsContactsSection />
+
     <!-- Team Background Section (placeholder) -->
     <!-- <SectionsTeamSection /> -->
 
