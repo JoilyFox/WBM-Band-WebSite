@@ -123,7 +123,7 @@ const { t } = useI18n()
 // Computed properties for config values
 const bandName = computed(() => getConfig('general.bandName'))
 const fullBandName = computed(() => getConfig('general.fullBandName'))
-const tagline = computed(() => getConfig('general.tagline'))
+const tagline = computed(() => t('app.tagline'))
 
 // Props
 interface Props {

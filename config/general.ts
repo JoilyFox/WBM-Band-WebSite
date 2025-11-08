@@ -6,7 +6,6 @@ export interface GeneralConfig {
   // Band information
   bandName: string
   fullBandName: string
-  tagline: string
   
   // Contact information
   contact: {
@@ -73,7 +72,6 @@ export const generalConfig: GeneralConfig = {
   // Band information
   bandName: "WBM Band",
   fullBandName: "Woman Based Mechanics",
-  tagline: "Rock • Metal • Alternative",
   
   // Contact information
   contact: {

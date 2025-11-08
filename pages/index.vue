@@ -61,7 +61,7 @@ if (maintenanceMode.value) {
 
 // Computed properties for config values
 const bandName = computed(() => getConfig('general.bandName'))
-const tagline = computed(() => getConfig('general.tagline'))
+const tagline = computed(() => t('app.tagline'))
 
 // Computed properties for page title and description
 const pageTitle = computed(() => createPageTitle(`${bandName.value} - ${tagline.value}`))

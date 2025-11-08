@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "WBM Band",
-    "tagline": "Modern rock with classic soul",
+    "tagline": "Rock • Indie • Alternative",
 		"welcome": "Welcome to {name}!",
 		"ready": "Your modern Nuxt 3 application is ready to rock! 🎸",
 		"all_rights": "All rights reserved."
