@@ -12,6 +12,7 @@
       <div class="relative z-10 mb-6">
         <div class="slider-wrapper-container mx-auto max-w-5xl">
           <Swiper
+            v-if="imagesPreloaded"
             :modules="modules"
             :slides-per-view="1"
             :space-between="0"
@@ -33,6 +34,7 @@
             :touch-angle="45"
             :threshold="10"
             :resistance-ratio="0.85"
+            :watch-slides-progress="true"
             class="about-swiper rounded-3xl shadow-2xl"
             @swiper="onSwiper"
             @slideChange="onSlideChange"
@@ -45,7 +47,7 @@
               <UiProgressiveImage
                 :src="image.src"
                 :alt="image.alt"
-                loading="lazy"
+                loading="eager"
                 :fetchPriority="index === 0 ? 'high' : 'auto'"
                 preset="about"
                 container-class="slider-image-container"
@@ -54,6 +56,14 @@
               />
             </SwiperSlide>
           </Swiper>
+          
+          <!-- Loading placeholder while images preload -->
+          <div 
+            v-else
+            class="about-swiper rounded-3xl shadow-2xl bg-surface-800/20 flex items-center justify-center"
+          >
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+          </div>
         </div>
       </div>
 
@@ -73,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules'
@@ -122,6 +132,10 @@ const sliderImages = computed(() => props.images)
 // Swiper instance
 const swiperInstance = ref<SwiperType | null>(null)
 
+// Track if images are preloaded
+const imagesPreloaded = ref(false)
+const preloadedCount = ref(0)
+
 const onSwiper = (swiper: SwiperType) => {
   swiperInstance.value = swiper
 }
@@ -130,6 +144,52 @@ const onSlideChange = () => {
   // Optional: track slide changes
   // You can add analytics or other tracking here if needed
 }
+
+// Preload images on component mount to prevent loading issues
+onMounted(() => {
+  // Preload all slider images since there are only 3
+  if (process.client) {
+    const totalImages = sliderImages.value.length
+    
+    sliderImages.value.forEach((image, index) => {
+      const img = new Image()
+      img.src = image.src
+      
+      img.onload = () => {
+        preloadedCount.value++
+        console.log(`[AboutUsSection] Preloaded image ${index + 1}/${totalImages}:`, image.src)
+        
+        // Once all images are preloaded, show the swiper
+        if (preloadedCount.value === totalImages) {
+          imagesPreloaded.value = true
+          console.log('[AboutUsSection] All images preloaded, initializing swiper')
+        }
+      }
+      
+      img.onerror = () => {
+        preloadedCount.value++
+        console.error(`[AboutUsSection] Failed to preload image ${index + 1}:`, image.src)
+        
+        // Still initialize swiper even if some images fail to load
+        if (preloadedCount.value === totalImages) {
+          imagesPreloaded.value = true
+          console.log('[AboutUsSection] Preloading complete (with errors), initializing swiper')
+        }
+      }
+    })
+    
+    // Fallback: if images don't load within 3 seconds, show swiper anyway
+    setTimeout(() => {
+      if (!imagesPreloaded.value) {
+        console.warn('[AboutUsSection] Preload timeout, forcing swiper initialization')
+        imagesPreloaded.value = true
+      }
+    }, 3000)
+  } else {
+    // On server, just set to true immediately
+    imagesPreloaded.value = true
+  }
+})
 </script>
 
 <style scoped lang="scss">
