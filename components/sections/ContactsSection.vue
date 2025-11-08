@@ -309,19 +309,17 @@ const handleSubmit = async () => {
   isolation: isolate;
   background:
     linear-gradient(to bottom,
-      rgba(0,0,0,0.88) 0%,
-      rgba(12,12,13,0.70) 460px,
-      rgba(22,22,24,0.62) 680px,
-      rgba(30,30,33,0.56) 880px,
-      rgba(38,38,42,0.50) 100%),
+      rgba(38,38,42,0.50) 0%,
+      rgba(32,32,35,0.58) 280px,
+      rgba(24,24,26,0.68) 480px,
+      rgba(16,16,17,0.78) 680px,
+      rgba(8,8,9,0.88) 880px,
+      rgba(0,0,0,0.95) 100%), /* reversed vertical fade - lighter to darker */
     linear-gradient(140deg, rgba(14,14,15,0.95) 0%, rgba(18,18,20,0.85) 40%, rgba(24,24,26,0.78) 75%, rgba(30,30,32,0.72) 100%),
     radial-gradient(circle at 24% 30%, rgba(255,255,255,0.07), transparent 62%),
     radial-gradient(circle at 80% 70%, rgba(255,255,255,0.055), transparent 68%),
     #070707;
   background-blend-mode: normal, overlay, overlay, overlay, normal;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.03),
-    inset 0 -1px 0 rgba(255,255,255,0.02);
   overflow: hidden;
 }
 
