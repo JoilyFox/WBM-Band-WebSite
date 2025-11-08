@@ -11,12 +11,12 @@
         </CommonSectionSubtitle>
       </div>
 
-      <div class="relative z-10 max-w-6xl mx-auto mb-20">
-        <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
+      <div class="relative z-10 max-w-6xl mx-auto mb-4 md:mb-14">
+        <div class="grid md:grid-cols-2 gap-y-2 gap-x-8 lg:gap-12">
           <!-- Left Side: Contact Form (order-2 on mobile, order-1 on desktop) -->
-          <div class="contact-form-wrapper order-2 md:order-1">
+          <div class="contact-form-wrapper order-2 md:order-1 gap-y-4 flex flex-col">
             <div class="form-card">
-              <h3 class="text-2xl font-bold text-white mb-6">
+              <h3 class="section-heading">
                 {{ t('contacts.form_title') }}
               </h3>
               
@@ -85,6 +85,24 @@
                 </div>
               </form>
             </div>
+
+            <!-- Email Contact -->
+            <a 
+              :href="`mailto:${contactEmail}`" 
+              class="info-card info-card-clickable"
+            >
+              <div class="info-card-content">
+                <div class="info-icon">
+                  <i class="pi pi-envelope"></i>
+                </div>
+                <div>
+                  <p class="info-label">{{ t('contacts.email_us') }}</p>
+                  <span class="info-link">
+                    {{ contactEmail }}
+                  </span>
+                </div>
+              </div>
+            </a>
           </div>
 
           <!-- Right Side: Social Media & Info (order-1 on mobile, order-2 on desktop) -->
@@ -113,43 +131,27 @@
               </div>
             </div>
 
-            <!-- Email Contact -->
-            <a 
-              :href="`mailto:${contactEmail}`" 
-              class="info-card info-card-clickable"
-            >
-              <div class="info-card-content">
-                <div class="info-icon">
-                  <i class="pi pi-envelope"></i>
-                </div>
-                <div>
-                  <p class="info-label">{{ t('contacts.email_us') }}</p>
-                  <span class="info-link">
-                    {{ contactEmail }}
-                  </span>
-                </div>
-              </div>
-            </a>
-
             <!-- Media Materials -->
-            <a 
-              href="https://drive.google.com/drive/folders/1qXD2N1WQe2JMUt2SUpkgJrOaOF1qSddY?usp=drive_link"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="info-card media-card info-card-clickable"
-            >
-              <div class="info-card-content">
-                <div class="info-icon">
-                  <i class="pi pi-images"></i>
-                </div>
-                <div>
-                  <p class="info-label">{{ t('contacts.media_materials') }}</p>
+            <div class="info-card media-card md:!pt-7">
+              <h3 class="section-heading">{{ t('contacts.media_materials') }}</h3>
+              <div class="media-buttons-container">
+                <a 
+                  v-for="mediaItem in mediaButtons"
+                  :key="mediaItem.id"
+                  :href="mediaItem.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="media-button"
+                >
+                  <div class="info-icon">
+                    <i :class="mediaItem.icon"></i>
+                  </div>
                   <span class="info-link">
-                    {{ t('contacts.download_press_kit') }}
+                    {{ t(mediaItem.label) }}
                   </span>
-                </div>
+                </a>
               </div>
-            </a>
+            </div>
           </div>
         </div>
       </div>
@@ -217,6 +219,22 @@ const socialLinks = computed(() => {
   
   return links
 })
+
+// Media materials buttons
+const mediaButtons = [
+  // {
+  //   id: 'press-kit',
+  //   label: 'contacts.download_press_kit',
+  //   url: 'https://docs.google.com/document/d/1BevwPXBAW2BBHeWpxRouOsJwR-CQCx2F/edit?usp=drive_link&ouid=102349361282053889906&rtpof=true&sd=true',
+  //   icon: 'pi pi-file-pdf'
+  // },
+  {
+    id: 'media-materials',
+    label: 'contacts.media_materials_button',
+    url: 'https://drive.google.com/drive/folders/1qXD2N1WQe2JMUt2SUpkgJrOaOF1qSddY?usp=drive_link',
+    icon: 'pi pi-images'
+  }
+]
 
 const formData = reactive({
   name: '',
@@ -331,13 +349,18 @@ const handleSubmit = async () => {
 
 /* Form Card */
 .form-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 24px;
-  padding: 2.5rem;
+  background: 
+    linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%),
+    linear-gradient(225deg, rgba(147, 51, 234, 0.03) 0%, transparent 60%);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 1.5rem;
+  padding-top: 1.75rem;
   backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
 }
@@ -503,7 +526,8 @@ const handleSubmit = async () => {
     linear-gradient(180deg, rgba(147, 51, 234, 0.02) 0%, transparent 100%);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 20px;
-  padding: 2rem;
+  padding: 1.5rem;
+  padding-top: 1.75rem;
   backdrop-filter: blur(20px);
   margin-bottom: 1rem;
   position: relative;
@@ -663,7 +687,6 @@ const handleSubmit = async () => {
   border-radius: 18px;
   padding: 1.5rem;
   backdrop-filter: blur(20px);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   margin-bottom: 1rem;
   position: relative;
   overflow: hidden;
@@ -676,9 +699,10 @@ const handleSubmit = async () => {
   display: block;
   text-decoration: none;
   cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.info-card::before {
+.info-card-clickable::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -687,13 +711,9 @@ const handleSubmit = async () => {
   transition: opacity 0.25s ease;
 }
 
-.info-card:last-child {
-  opacity: 1;
-}
-
-/* Desktop hover effects only */
+/* Desktop hover effects only for clickable cards */
 @media (hover: hover) and (pointer: fine) {
-  .info-card:hover {
+  .info-card-clickable:hover {
     border-color: rgba(255,255,255,0.2);
     transform: translateY(-2px);
     box-shadow: 
@@ -701,50 +721,33 @@ const handleSubmit = async () => {
       inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
 
-  .info-card:hover::before {
+  .info-card-clickable:hover::before {
     opacity: 1;
   }
 
-  .info-card:hover .info-icon {
+  .info-card-clickable:hover .info-icon {
     transform: scale(1.08);
     box-shadow: 
       0 6px 16px rgba(0, 0, 0, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
-
-  .info-link:hover {
-    color: rgba(255,255,255,0.9);
-    transform: translateX(2px);
-  }
-
-  .media-card:hover .info-icon {
-    background: linear-gradient(135deg, rgba(147, 51, 234, 0.5), rgba(79, 70, 229, 0.4));
-    box-shadow: 
-      0 6px 20px rgba(147, 51, 234, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
 }
 
-/* Mobile and touch device specific styles */
+/* Mobile and touch device specific styles for clickable cards */
 @media (hover: none) and (pointer: coarse) {
-  .info-card:active {
+  .info-card-clickable:active {
     border-color: rgba(255,255,255,0.2);
     transform: translateY(-2px);
     transition-duration: 0.15s;
   }
 
-  .info-card:active::before {
+  .info-card-clickable:active::before {
     opacity: 1;
   }
 
-  .info-card:active .info-icon {
+  .info-card-clickable:active .info-icon {
     transform: scale(1.08);
     transition-duration: 0.15s;
-  }
-
-  .info-link:active {
-    color: rgba(255,255,255,0.9);
-    transform: translateX(2px);
   }
 }
 
@@ -791,11 +794,81 @@ const handleSubmit = async () => {
   pointer-events: none; /* Prevent nested link behavior */
 }
 
-.media-card .info-icon {
-  background: linear-gradient(135deg, rgba(147, 51, 234, 0.4), rgba(79, 70, 229, 0.3));
+.media-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.media-card .section-heading {
+  margin-bottom: 1rem;
+}
+
+.media-buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.media-button {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: 
+    linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%),
+    rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 1rem;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
   box-shadow: 
-    0 4px 16px rgba(147, 51, 234, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 4px 20px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.media-button .info-link {
+  pointer-events: auto;
+}
+
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .media-button:hover {
+    background: 
+      linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%),
+      rgba(0,0,0,0.3);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateX(4px);
+    box-shadow: 
+      0 6px 24px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .media-button:hover .info-icon {
+    transform: scale(1.05);
+    box-shadow: 
+      0 6px 18px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+}
+
+/* Mobile and touch device specific styles */
+@media (hover: none) and (pointer: coarse) {
+  .media-button:active {
+    background: 
+      linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%),
+      rgba(0,0,0,0.3);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateX(4px);
+    transition-duration: 0.15s;
+  }
+
+  .media-button:active .info-icon {
+    transform: scale(1.05);
+    transition-duration: 0.15s;
+  }
 }
 
 /* Remove old styles */

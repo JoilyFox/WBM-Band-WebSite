@@ -330,6 +330,8 @@ const onSlideChange = () => {
 .text-content {
   text-align: center;
   padding: 2rem 1rem;
+  padding-top: 1rem;
+  padding-bottom: 3rem;
 }
 
 .text-content p {
