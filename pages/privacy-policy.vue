@@ -25,17 +25,17 @@
         <!-- Introduction -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Introduction</h2>
+            <h2 class="section-title">{{ t('pages.privacy.intro_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              Welcome to {{ fullBandName }} ({{ bandName }}). We respect your privacy and are committed to protecting your personal data. 
-              This privacy policy explains how we collect, use, and safeguard your information when you visit our website, 
-              interact with our music, or engage with our services.
+              {{ t('pages.privacy.intro_text_1', { fullBandName, bandName }) }}
             </p>
             <p class="text-content">
-              This policy applies to all information collected through our website, social media channels, 
-              streaming platforms, and any related services, sales, marketing, or events.
+              {{ t('pages.privacy.intro_text_2') }}
+            </p>
+            <p class="text-content">
+              {{ t('pages.privacy.intro_text_3') }}
             </p>
           </div>
         </div>
@@ -43,37 +43,25 @@
         <!-- Information We Collect -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Information We Collect</h2>
+            <h2 class="section-title">{{ t('pages.privacy.collect_title') }}</h2>
           </div>
           <div class="card-content">
             <div class="subsection">
-              <h3 class="subsection-title">Personal Information</h3>
+              <h3 class="subsection-title">{{ t('pages.privacy.collect_personal_title') }}</h3>
+              <p class="text-content">{{ t('pages.privacy.collect_personal_desc') }}</p>
               <ul class="info-list">
-                <li>Contact information (name, email address, phone number)</li>
-                <li>Demographic information (age, location, music preferences)</li>
-                <li>Social media profile information when you connect with us</li>
-                <li>Communication preferences and consent records</li>
+                <li>{{ t('pages.privacy.collect_personal_1') }}</li>
+                <li>{{ t('pages.privacy.collect_personal_2') }}</li>
+                <li>{{ t('pages.privacy.collect_personal_3') }}</li>
+                <li>{{ t('pages.privacy.collect_personal_4') }}</li>
               </ul>
             </div>
             
             <div class="subsection">
-              <h3 class="subsection-title">Technical Information</h3>
+              <h3 class="subsection-title">{{ t('pages.privacy.collect_technical_title') }}</h3>
+              <p class="text-content">{{ t('pages.privacy.collect_technical_desc') }}</p>
               <ul class="info-list">
-                <li>IP address and geolocation data</li>
-                <li>Browser type, version, and settings</li>
-                <li>Device information and operating system</li>
-                <li>Website usage data and analytics</li>
-                <li>Cookies and similar tracking technologies</li>
-              </ul>
-            </div>
-
-            <div class="subsection">
-              <h3 class="subsection-title">Music and Engagement Data</h3>
-              <ul class="info-list">
-                <li>Streaming history and music preferences</li>
-                <li>Concert attendance and ticket purchases</li>
-                <li>Merchandise orders and transaction history</li>
-                <li>Fan club membership and engagement metrics</li>
+                <li>{{ t('pages.privacy.collect_technical_1') }}</li>
               </ul>
             </div>
           </div>
@@ -82,37 +70,18 @@
         <!-- How We Use Your Information -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">How We Use Your Information</h2>
+            <h2 class="section-title">{{ t('pages.privacy.use_title') }}</h2>
           </div>
           <div class="card-content">
+            <p class="text-content">{{ t('pages.privacy.use_intro') }}</p>
             <div class="usage-grid">
-              <div class="usage-item">
-                <div class="usage-icon">
-                  <i class="pi pi-play"></i>
-                </div>
-                <h4 class="usage-title">Music & Content</h4>
-                <p class="usage-description">
-                  To provide and improve our music content, recommend songs, and personalize your listening experience.
-                </p>
-              </div>
-              
               <div class="usage-item">
                 <div class="usage-icon">
                   <i class="pi pi-envelope"></i>
                 </div>
-                <h4 class="usage-title">Communication</h4>
+                <h4 class="usage-title">{{ t('pages.privacy.use_communication_title') }}</h4>
                 <p class="usage-description">
-                  To send you updates about new releases, concerts, and band news that you've subscribed to receive.
-                </p>
-              </div>
-              
-              <div class="usage-item">
-                <div class="usage-icon">
-                  <i class="pi pi-chart-line"></i>
-                </div>
-                <h4 class="usage-title">Analytics</h4>
-                <p class="usage-description">
-                  To analyze website usage, understand fan preferences, and improve our services and content.
+                  {{ t('pages.privacy.use_communication_desc') }}
                 </p>
               </div>
               
@@ -120,9 +89,9 @@
                 <div class="usage-icon">
                   <i class="pi pi-shield"></i>
                 </div>
-                <h4 class="usage-title">Security</h4>
+                <h4 class="usage-title">{{ t('pages.privacy.use_security_title') }}</h4>
                 <p class="usage-description">
-                  To protect our website, prevent fraud, and ensure the security of our platform and users.
+                  {{ t('pages.privacy.use_security_desc') }}
                 </p>
               </div>
             </div>
@@ -132,35 +101,25 @@
         <!-- Data Sharing -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Data Sharing and Disclosure</h2>
+            <h2 class="section-title">{{ t('pages.privacy.share_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:
+              {{ t('pages.privacy.share_intro') }}
             </p>
             
             <div class="sharing-list">
               <div class="sharing-item">
-                <h4 class="sharing-title">Service Providers</h4>
+                <h4 class="sharing-title">{{ t('pages.privacy.share_providers_title') }}</h4>
                 <p class="sharing-description">
-                  With trusted third-party services that help us operate our website, conduct business, or serve our fans, 
-                  such as email marketing platforms, analytics services, and payment processors.
+                  {{ t('pages.privacy.share_providers_desc') }}
                 </p>
               </div>
               
               <div class="sharing-item">
-                <h4 class="sharing-title">Legal Requirements</h4>
+                <h4 class="sharing-title">{{ t('pages.privacy.share_legal_title') }}</h4>
                 <p class="sharing-description">
-                  When required by law, court order, or government regulation, or to protect the rights, 
-                  property, and safety of {{ bandName }}, our users, or others.
-                </p>
-              </div>
-              
-              <div class="sharing-item">
-                <h4 class="sharing-title">Business Transfers</h4>
-                <p class="sharing-description">
-                  In connection with any merger, sale of assets, financing, or acquisition of all or 
-                  a portion of our business to another company.
+                  {{ t('pages.privacy.share_legal_desc') }}
                 </p>
               </div>
             </div>
@@ -170,11 +129,11 @@
         <!-- Your Rights -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Your Privacy Rights</h2>
+            <h2 class="section-title">{{ t('pages.privacy.rights_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              You have several rights regarding your personal information:
+              {{ t('pages.privacy.rights_intro') }}
             </p>
             
             <div class="rights-grid">
@@ -182,49 +141,40 @@
                 <div class="rights-icon">
                   <i class="pi pi-eye"></i>
                 </div>
-                <h4 class="rights-title">Access</h4>
-                <p class="rights-description">Request access to your personal data we hold</p>
+                <h4 class="rights-title">{{ t('pages.privacy.rights_access_title') }}</h4>
+                <p class="rights-description">{{ t('pages.privacy.rights_access_desc') }}</p>
               </div>
               
               <div class="rights-item">
                 <div class="rights-icon">
                   <i class="pi pi-pencil"></i>
                 </div>
-                <h4 class="rights-title">Correction</h4>
-                <p class="rights-description">Request correction of inaccurate personal data</p>
+                <h4 class="rights-title">{{ t('pages.privacy.rights_rectification_title') }}</h4>
+                <p class="rights-description">{{ t('pages.privacy.rights_rectification_desc') }}</p>
               </div>
               
               <div class="rights-item">
                 <div class="rights-icon">
                   <i class="pi pi-trash"></i>
                 </div>
-                <h4 class="rights-title">Deletion</h4>
-                <p class="rights-description">Request deletion of your personal data</p>
-              </div>
-              
-              <div class="rights-item">
-                <div class="rights-icon">
-                  <i class="pi pi-ban"></i>
-                </div>
-                <h4 class="rights-title">Restriction</h4>
-                <p class="rights-description">Request restriction of processing your data</p>
-              </div>
-              
-              <div class="rights-item">
-                <div class="rights-icon">
-                  <i class="pi pi-download"></i>
-                </div>
-                <h4 class="rights-title">Portability</h4>
-                <p class="rights-description">Request transfer of your data to another service</p>
+                <h4 class="rights-title">{{ t('pages.privacy.rights_erasure_title') }}</h4>
+                <p class="rights-description">{{ t('pages.privacy.rights_erasure_desc') }}</p>
               </div>
               
               <div class="rights-item">
                 <div class="rights-icon">
                   <i class="pi pi-times-circle"></i>
                 </div>
-                <h4 class="rights-title">Opt-out</h4>
-                <p class="rights-description">Opt-out of marketing communications</p>
+                <h4 class="rights-title">{{ t('pages.privacy.rights_objection_title') }}</h4>
+                <p class="rights-description">{{ t('pages.privacy.rights_objection_desc') }}</p>
               </div>
+            </div>
+            
+            <div class="subsection" style="margin-top: 2rem;">
+              <h3 class="subsection-title">{{ t('pages.privacy.rights_exercise_title') }}</h3>
+              <p class="text-content">
+                {{ t('pages.privacy.rights_exercise_desc', { email: privacyEmail, dataResponseTime }) }}
+              </p>
             </div>
           </div>
         </div>
@@ -232,79 +182,91 @@
         <!-- Cookies -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Cookies and Tracking</h2>
+            <h2 class="section-title">{{ t('pages.privacy.cookies_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              We use cookies and similar tracking technologies to enhance your browsing experience, 
-              analyze site traffic, and understand where our visitors are coming from.
+              {{ t('pages.privacy.cookies_text_1', { cookiesPolicy: t('pages.privacy.cookies_policy_link') }) }}
             </p>
-            
-            <div class="cookie-types">
-              <div class="cookie-type">
-                <h4 class="cookie-title">Essential Cookies</h4>
-                <p class="cookie-description">
-                  Required for the website to function properly. These cannot be disabled.
-                </p>
-              </div>
-              
-              <div class="cookie-type">
-                <h4 class="cookie-title">Analytics Cookies</h4>
-                <p class="cookie-description">
-                  Help us understand how visitors interact with our website by collecting and reporting information.
-                </p>
-              </div>
-              
-              <div class="cookie-type">
-                <h4 class="cookie-title">Marketing Cookies</h4>
-                <p class="cookie-description">
-                  Used to track visitors across websites to display relevant and engaging advertisements.
-                </p>
-              </div>
-            </div>
+            <p class="text-content">
+              {{ t('pages.privacy.cookies_text_2') }}
+            </p>
+            <p class="text-content">
+              <NuxtLink to="/cookies-policy" class="contact-link">{{ t('pages.privacy.cookies_policy_link') }}</NuxtLink>
+            </p>
           </div>
         </div>
 
         <!-- Data Security -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Data Security</h2>
+            <h2 class="section-title">{{ t('pages.privacy.security_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              We implement appropriate technical and organizational security measures to protect your personal information 
-              against unauthorized access, alteration, disclosure, or destruction.
+              {{ t('pages.privacy.security_intro') }}
             </p>
             
             <div class="security-measures">
               <div class="security-item">
                 <i class="pi pi-lock"></i>
-                <span>SSL/TLS encryption for data transmission</span>
+                <span>{{ t('pages.privacy.security_1') }}</span>
               </div>
               <div class="security-item">
                 <i class="pi pi-server"></i>
-                <span>Secure server infrastructure and hosting</span>
-              </div>
-              <div class="security-item">
-                <i class="pi pi-key"></i>
-                <span>Access controls and authentication systems</span>
-              </div>
-              <div class="security-item">
-                <i class="pi pi-refresh"></i>
-                <span>Regular security updates and monitoring</span>
+                <span>{{ t('pages.privacy.security_2') }}</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Data Retention -->
+        <div class="content-card">
+          <div class="card-header">
+            <h2 class="section-title">{{ t('pages.privacy.retention_title') }}</h2>
+          </div>
+          <div class="card-content">
+            <p class="text-content">
+              {{ t('pages.privacy.retention_text') }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Children's Privacy -->
+        <div class="content-card">
+          <div class="card-header">
+            <h2 class="section-title">{{ t('pages.privacy.children_title') }}</h2>
+          </div>
+          <div class="card-content">
+            <p class="text-content">
+              {{ t('pages.privacy.children_text') }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Updates -->
+        <div class="content-card">
+          <div class="card-header">
+            <h2 class="section-title">{{ t('pages.privacy.changes_title') }}</h2>
+          </div>
+          <div class="card-content">
+            <p class="text-content">
+              {{ t('pages.privacy.changes_text_1') }}
+            </p>
+            <p class="text-content">
+              {{ t('pages.privacy.changes_text_2') }}
+            </p>
           </div>
         </div>
 
         <!-- Contact Information -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Contact Us</h2>
+            <h2 class="section-title">{{ t('pages.privacy.contact_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              If you have any questions about this Privacy Policy or our data practices, please contact us:
+              {{ t('pages.privacy.contact_text') }}
             </p>
             
             <div class="contact-info">
@@ -312,39 +274,7 @@
                 <i class="pi pi-envelope"></i>
                 <a :href="`mailto:${privacyEmail}`" class="contact-link">{{ privacyEmail }}</a>
               </div>
-              <div class="contact-item">
-                <i class="pi pi-map-marker"></i>
-                <span>{{ contactLocation }}</span>
-              </div>
-              <div class="contact-item">
-                <i class="pi pi-phone"></i>
-                <a :href="`tel:${contactPhoneNumber}`" class="contact-link">{{ contactPhone }}</a>
-              </div>
             </div>
-            
-            <div class="response-time">
-              <p class="response-text">
-                <i class="pi pi-clock"></i>
-                We will respond to your privacy-related inquiries within {{ dataResponseTime }}.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Updates -->
-        <div class="content-card">
-          <div class="card-header">
-            <h2 class="section-title">Policy Updates</h2>
-          </div>
-          <div class="card-content">
-            <p class="text-content">
-              We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, 
-              legal, or regulatory reasons. We will notify you of any material changes by posting the new Privacy Policy on this page 
-              and updating the "Last updated" date.
-            </p>
-            <p class="text-content">
-              We encourage you to review this Privacy Policy periodically to stay informed about how we are protecting your information.
-            </p>
           </div>
         </div>
 
@@ -389,7 +319,6 @@ const showBackToTop = ref(false)
 const bandName = computed(() => getConfig('general.bandName'))
 const fullBandName = computed(() => getConfig('general.fullBandName'))
 const privacyEmail = computed(() => getConfig('general.contact.privacyEmail'))
-const contactLocation = computed(() => getConfig('general.contact.location.full'))
 const contactPhone = computed(() => getConfig('general.contact.phone'))
 const contactPhoneNumber = computed(() => getConfig('general.contact.phoneNumber'))
 const dataResponseTime = computed(() => getConfig('general.legal.dataResponseTime'))

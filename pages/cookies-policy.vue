@@ -6,12 +6,12 @@
       <div class="hero-content">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div class="hero-glassmorphic-card">
-            <h1 class="hero-title">Cookies Policy</h1>
+            <h1 class="hero-title">{{ t('pages.cookies.title') }}</h1>
             <p class="hero-subtitle">
-              Learn about how we use cookies and similar technologies to enhance your experience on our website.
+              {{ t('pages.cookies.subtitle') }}
             </p>
             <div class="hero-meta">
-              <span class="last-updated">Last updated: {{ lastUpdated }}</span>
+              <span class="last-updated">{{ t('pages.cookies.last_updated', { date: lastUpdated }) }}</span>
             </div>
           </div>
         </div>
@@ -25,17 +25,14 @@
         <!-- Introduction -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">What Are Cookies?</h2>
+            <h2 class="section-title">{{ t('pages.cookies.what_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              Cookies are small text files that are placed on your device when you visit the {{ fullBandName }} ({{ bandName }}) website. 
-              They help us provide you with a better browsing experience by remembering your preferences, 
-              analyzing how you use our site, and enabling certain features.
+              {{ t('pages.cookies.what_text_1') }}
             </p>
             <p class="text-content">
-              Similar technologies such as web beacons, pixels, and local storage may also be used alongside cookies 
-              to collect and store information about your interactions with our website and services.
+              {{ t('pages.cookies.what_text_2', { fullBandName, bandName }) }}
             </p>
           </div>
         </div>
@@ -43,21 +40,23 @@
         <!-- Types of Cookies -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Types of Cookies We Use</h2>
+            <h2 class="section-title">{{ t('pages.cookies.types_title') }}</h2>
           </div>
           <div class="card-content">
+            <p class="text-content">
+              {{ t('pages.cookies.types_intro') }}
+            </p>
             <div class="cookie-types-grid">
               <div class="cookie-type-item">
                 <div class="cookie-icon essential">
                   <i class="pi pi-cog"></i>
                 </div>
-                <h3 class="cookie-type-title">Essential Cookies</h3>
+                <h3 class="cookie-type-title">{{ t('pages.cookies.essential_title') }}</h3>
                 <p class="cookie-type-description">
-                  These cookies are necessary for the website to function properly and cannot be disabled. 
-                  They enable basic functions like page navigation, security, and access to secure areas.
+                  {{ t('pages.cookies.essential_desc') }}
                 </p>
                 <div class="cookie-examples">
-                  <strong>Examples:</strong> Session management, security tokens, load balancing
+                  {{ t('pages.cookies.essential_examples') }}
                 </div>
               </div>
               
@@ -65,179 +64,12 @@
                 <div class="cookie-icon analytics">
                   <i class="pi pi-chart-line"></i>
                 </div>
-                <h3 class="cookie-type-title">Analytics Cookies</h3>
+                <h3 class="cookie-type-title">{{ t('pages.cookies.nonessential_title') }}</h3>
                 <p class="cookie-type-description">
-                  These cookies help us understand how visitors interact with our website by collecting 
-                  and reporting information anonymously about site usage and performance.
+                  {{ t('pages.cookies.nonessential_desc') }}
                 </p>
                 <div class="cookie-examples">
-                  <strong>Examples:</strong> Google Analytics, visitor statistics, page views
-                </div>
-              </div>
-              
-              <div class="cookie-type-item">
-                <div class="cookie-icon functional">
-                  <i class="pi pi-users"></i>
-                </div>
-                <h3 class="cookie-type-title">Functional Cookies</h3>
-                <p class="cookie-type-description">
-                  These cookies enable enhanced functionality and personalization, such as remembering your 
-                  preferences, language settings, and previous interactions with our content.
-                </p>
-                <div class="cookie-examples">
-                  <strong>Examples:</strong> Music preferences, volume settings, language choice
-                </div>
-              </div>
-              
-              <div class="cookie-type-item">
-                <div class="cookie-icon marketing">
-                  <i class="pi pi-megaphone"></i>
-                </div>
-                <h3 class="cookie-type-title">Marketing Cookies</h3>
-                <p class="cookie-type-description">
-                  These cookies track visitors across websites to display relevant advertisements 
-                  and measure the effectiveness of our marketing campaigns.
-                </p>
-                <div class="cookie-examples">
-                  <strong>Examples:</strong> Social media tracking, advertising networks, conversion tracking
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Specific Cookies -->
-        <div class="content-card">
-          <div class="card-header">
-            <h2 class="section-title">Specific Cookies on Our Website</h2>
-          </div>
-          <div class="card-content">
-            <div class="cookie-list">
-              <div class="cookie-item">
-                <div class="cookie-header">
-                  <h4 class="cookie-name">Google Analytics</h4>
-                  <span class="cookie-category analytics">Analytics</span>
-                </div>
-                <div class="cookie-details">
-                  <p class="cookie-purpose">Tracks website usage and visitor behavior to help us improve our site.</p>
-                  <div class="cookie-meta">
-                    <span class="cookie-duration">Duration: 2 years</span>
-                    <span class="cookie-provider">Provider: Google</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="cookie-item">
-                <div class="cookie-header">
-                  <h4 class="cookie-name">Session Cookies</h4>
-                  <span class="cookie-category essential">Essential</span>
-                </div>
-                <div class="cookie-details">
-                  <p class="cookie-purpose">Maintains your session state and security while browsing our website.</p>
-                  <div class="cookie-meta">
-                    <span class="cookie-duration">Duration: Session only</span>
-                    <span class="cookie-provider">Provider: {{ bandName }}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="cookie-item">
-                <div class="cookie-header">
-                  <h4 class="cookie-name">Social Media Widgets</h4>
-                  <span class="cookie-category marketing">Marketing</span>
-                </div>
-                <div class="cookie-details">
-                  <p class="cookie-purpose">Enables sharing content on social media platforms and tracks engagement.</p>
-                  <div class="cookie-meta">
-                    <span class="cookie-duration">Duration: Varies</span>
-                    <span class="cookie-provider">Provider: Facebook, Instagram, Twitter</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="cookie-item">
-                <div class="cookie-header">
-                  <h4 class="cookie-name">Streaming Platform Integration</h4>
-                  <span class="cookie-category functional">Functional</span>
-                </div>
-                <div class="cookie-details">
-                  <p class="cookie-purpose">Integrates with music streaming platforms for playback and recommendations.</p>
-                  <div class="cookie-meta">
-                    <span class="cookie-duration">Duration: 1 year</span>
-                    <span class="cookie-provider">Provider: Spotify, Apple Music, YouTube</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="cookie-item">
-                <div class="cookie-header">
-                  <h4 class="cookie-name">Newsletter Preferences</h4>
-                  <span class="cookie-category functional">Functional</span>
-                </div>
-                <div class="cookie-details">
-                  <p class="cookie-purpose">Remembers your newsletter subscription preferences and settings.</p>
-                  <div class="cookie-meta">
-                    <span class="cookie-duration">Duration: 6 months</span>
-                    <span class="cookie-provider">Provider: {{ bandName }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Third-Party Services -->
-        <div class="content-card">
-          <div class="card-header">
-            <h2 class="section-title">Third-Party Services</h2>
-          </div>
-          <div class="card-content">
-            <p class="text-content">
-              Our website integrates with various third-party services that may set their own cookies. 
-              We have no control over these cookies, and you should check the privacy policies of these services for more information.
-            </p>
-            
-            <div class="third-party-grid">
-              <div class="third-party-item">
-                <div class="third-party-icon">
-                  <i class="pi pi-chart-bar"></i>
-                </div>
-                <h4 class="third-party-title">Google Analytics</h4>
-                <p class="third-party-description">Web analytics service that tracks and reports website traffic.</p>
-                <a href="https://policies.google.com/privacy" target="_blank" class="third-party-link">
-                  Privacy Policy <i class="pi pi-external-link"></i>
-                </a>
-              </div>
-              
-              <div class="third-party-item">
-                <div class="third-party-icon">
-                  <i class="pi pi-play"></i>
-                </div>
-                <h4 class="third-party-title">Streaming Platforms</h4>
-                <p class="third-party-description">Music streaming services for playing our songs and albums.</p>
-                <div class="streaming-links">
-                  <a href="https://www.spotify.com/privacy" target="_blank" class="third-party-link">
-                    Spotify <i class="pi pi-external-link"></i>
-                  </a>
-                  <a href="https://www.apple.com/privacy/" target="_blank" class="third-party-link">
-                    Apple Music <i class="pi pi-external-link"></i>
-                  </a>
-                </div>
-              </div>
-              
-              <div class="third-party-item">
-                <div class="third-party-icon">
-                  <i class="pi pi-share-alt"></i>
-                </div>
-                <h4 class="third-party-title">Social Media</h4>
-                <p class="third-party-description">Social media platforms for sharing content and engagement.</p>
-                <div class="social-links">
-                  <a href="https://www.facebook.com/privacy" target="_blank" class="third-party-link">
-                    Facebook <i class="pi pi-external-link"></i>
-                  </a>
-                  <a href="https://help.instagram.com/privacy" target="_blank" class="third-party-link">
-                    Instagram <i class="pi pi-external-link"></i>
-                  </a>
+                  {{ t('pages.cookies.nonessential_examples') }}
                 </div>
               </div>
             </div>
@@ -247,63 +79,26 @@
         <!-- Managing Cookies -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">How to Manage Cookies</h2>
+            <h2 class="section-title">{{ t('pages.cookies.manage_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              You have several options for managing cookies on our website. Please note that disabling certain cookies 
-              may affect the functionality and your experience on our website.
+              {{ t('pages.cookies.manage_text_1') }}
             </p>
-            
-            <div class="management-options">
-              <div class="management-section">
-                <h4 class="management-title">Browser Settings</h4>
-                <p class="management-description">
-                  You can control cookies through your browser settings. Most browsers allow you to:
-                </p>
-                <ul class="management-list">
-                  <li>View cookies stored on your device</li>
-                  <li>Delete existing cookies</li>
-                  <li>Block cookies from specific websites</li>
-                  <li>Block all cookies</li>
-                  <li>Set cookies to be deleted when you close your browser</li>
-                </ul>
-              </div>
-              
-              <div class="browser-guides">
-                <h4 class="management-title">Browser-Specific Instructions</h4>
-                <div class="browser-links">
-                  <a href="https://support.google.com/chrome/answer/95647" target="_blank" class="browser-link">
-                    <i class="pi pi-globe"></i>
-                    Google Chrome
-                  </a>
-                  <a href="https://www.mozilla.org/en-US/privacy/websites/" target="_blank" class="browser-link">
-                    <i class="pi pi-globe"></i>
-                    Mozilla Firefox
-                  </a>
-                  <a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac" target="_blank" class="browser-link">
-                    <i class="pi pi-globe"></i>
-                    Safari
-                  </a>
-                  <a href="https://support.microsoft.com/en-us/help/17442/windows-internet-explorer-delete-manage-cookies" target="_blank" class="browser-link">
-                    <i class="pi pi-globe"></i>
-                    Internet Explorer
-                  </a>
-                </div>
-              </div>
-            </div>
+            <p class="text-content">
+              {{ t('pages.cookies.manage_text_2') }}
+            </p>
           </div>
         </div>
 
         <!-- Cookie Consent -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Cookie Consent</h2>
+            <h2 class="section-title">{{ t('pages.cookies.consent_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              When you first visit our website, you may see a cookie consent banner. This allows you to choose which 
-              types of cookies you want to accept. You can change your preferences at any time.
+              {{ t('pages.cookies.consent_text') }}
             </p>
             
             <div class="consent-options">
@@ -312,21 +107,9 @@
                   <i class="pi pi-check"></i>
                 </div>
                 <div class="consent-content">
-                  <h4 class="consent-title">Accept All Cookies</h4>
+                  <h4 class="consent-title">{{ t('pages.cookies.consent_accept_title') }}</h4>
                   <p class="consent-description">
-                    Allows all cookies for the best website experience and functionality.
-                  </p>
-                </div>
-              </div>
-              
-              <div class="consent-item">
-                <div class="consent-icon customize">
-                  <i class="pi pi-sliders-h"></i>
-                </div>
-                <div class="consent-content">
-                  <h4 class="consent-title">Customize Settings</h4>
-                  <p class="consent-description">
-                    Choose which types of cookies to accept based on your preferences.
+                    {{ t('pages.cookies.consent_accept_desc') }}
                   </p>
                 </div>
               </div>
@@ -336,42 +119,11 @@
                   <i class="pi pi-times"></i>
                 </div>
                 <div class="consent-content">
-                  <h4 class="consent-title">Essential Only</h4>
+                  <h4 class="consent-title">{{ t('pages.cookies.consent_essential_title') }}</h4>
                   <p class="consent-description">
-                    Only allows essential cookies necessary for basic website functionality.
+                    {{ t('pages.cookies.consent_essential_desc') }}
                   </p>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Legal Basis -->
-        <div class="content-card">
-          <div class="card-header">
-            <h2 class="section-title">Legal Basis for Cookie Usage</h2>
-          </div>
-          <div class="card-content">
-            <div class="legal-basis">
-              <div class="legal-item">
-                <h4 class="legal-title">Essential Cookies</h4>
-                <p class="legal-description">
-                  Used based on legitimate interest to ensure website functionality and security.
-                </p>
-              </div>
-              
-              <div class="legal-item">
-                <h4 class="legal-title">Analytics and Marketing Cookies</h4>
-                <p class="legal-description">
-                  Used based on your explicit consent, which can be withdrawn at any time.
-                </p>
-              </div>
-              
-              <div class="legal-item">
-                <h4 class="legal-title">Functional Cookies</h4>
-                <p class="legal-description">
-                  Used based on legitimate interest to enhance your user experience and provide personalized content.
-                </p>
               </div>
             </div>
           </div>
@@ -380,17 +132,14 @@
         <!-- Updates to Policy -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Updates to This Policy</h2>
+            <h2 class="section-title">{{ t('pages.cookies.updates_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              We may update this Cookies Policy from time to time to reflect changes in our practices, 
-              new technologies, or legal requirements. We will notify you of any material changes by 
-              posting the updated policy on this page and updating the "Last updated" date.
+              {{ t('pages.cookies.updates_text_1') }}
             </p>
             <p class="text-content">
-              We encourage you to review this policy periodically to stay informed about how we use cookies 
-              and how you can manage your preferences.
+              {{ t('pages.cookies.updates_text_2') }}
             </p>
           </div>
         </div>
@@ -398,11 +147,11 @@
         <!-- Contact Information -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Contact Us</h2>
+            <h2 class="section-title">{{ t('pages.cookies.contact_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              If you have any questions about our use of cookies or this Cookies Policy, please contact us:
+              {{ t('pages.cookies.contact_text') }}
             </p>
             
             <div class="contact-info">
@@ -410,21 +159,6 @@
                 <i class="pi pi-envelope"></i>
                 <a :href="`mailto:${contactEmail}`" class="contact-link">{{ contactEmail }}</a>
               </div>
-              <div class="contact-item">
-                <i class="pi pi-map-marker"></i>
-                <span>{{ contactLocation }}</span>
-              </div>
-              <div class="contact-item">
-                <i class="pi pi-phone"></i>
-                <a :href="`tel:${contactPhoneNumber}`" class="contact-link">{{ contactPhone }}</a>
-              </div>
-            </div>
-            
-            <div class="response-time">
-              <p class="response-text">
-                <i class="pi pi-clock"></i>
-                We will respond to your cookie-related inquiries within {{ dataResponseTime }}.
-              </p>
             </div>
           </div>
         </div>
@@ -469,7 +203,6 @@ const showBackToTop = ref(false)
 const bandName = computed(() => getConfig('general.bandName'))
 const fullBandName = computed(() => getConfig('general.fullBandName'))
 const contactEmail = computed(() => getConfig('general.contact.email'))
-const contactLocation = computed(() => getConfig('general.contact.location.full'))
 const contactPhone = computed(() => getConfig('general.contact.phone'))
 const contactPhoneNumber = computed(() => getConfig('general.contact.phoneNumber'))
 const dataResponseTime = computed(() => getConfig('general.legal.dataResponseTime'))

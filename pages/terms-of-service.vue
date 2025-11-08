@@ -8,10 +8,10 @@
           <div class="hero-glassmorphic-card">
             <h1 class="hero-title">{{ t('pages.terms.title') }}</h1>
             <p class="hero-subtitle">
-              Please read these terms carefully before using our website, music, and services.
+              {{ t('pages.terms.subtitle') }}
             </p>
             <div class="hero-meta">
-              <span class="last-updated">Last updated: {{ lastUpdated }}</span>
+              <span class="last-updated">{{ t('pages.terms.last_updated', { date: lastUpdated }) }}</span>
             </div>
           </div>
         </div>
@@ -25,16 +25,14 @@
         <!-- Introduction -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Agreement to Terms</h2>
+            <h2 class="section-title">{{ t('pages.terms.intro_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              These Terms of Service ("Terms") govern your use of the {{ fullBandName }} ({{ bandName }}) website, 
-              music, services, and any related content. By accessing or using our services, you agree to be bound by these Terms.
+              {{ t('pages.terms.intro_text_1', { fullBandName, bandName }) }}
             </p>
             <p class="text-content">
-              If you disagree with any part of these terms, then you may not access the service. 
-              These Terms apply to all visitors, users, and others who access or use the service.
+              {{ t('pages.terms.intro_text_2') }}
             </p>
           </div>
         </div>
@@ -42,29 +40,28 @@
         <!-- Use of Services -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Use of Our Services</h2>
+            <h2 class="section-title">{{ t('pages.terms.use_title') }}</h2>
           </div>
           <div class="card-content">
             <div class="subsection">
-              <h3 class="subsection-title">Permitted Uses</h3>
+              <h3 class="subsection-title">{{ t('pages.terms.permitted_title') }}</h3>
               <ul class="info-list">
-                <li>Personal, non-commercial enjoyment of our music and content</li>
-                <li>Sharing our official releases through authorized platforms</li>
-                <li>Attending concerts and purchasing official merchandise</li>
-                <li>Engaging with our social media and fan community</li>
-                <li>Using our website for information about tours, releases, and band updates</li>
+                <li>{{ t('pages.terms.permitted_1') }}</li>
+                <li>{{ t('pages.terms.permitted_2') }}</li>
+                <li>{{ t('pages.terms.permitted_3') }}</li>
+                <li>{{ t('pages.terms.permitted_4') }}</li>
               </ul>
             </div>
             
             <div class="subsection">
-              <h3 class="subsection-title">Prohibited Uses</h3>
+              <h3 class="subsection-title">{{ t('pages.terms.prohibited_title') }}</h3>
               <ul class="info-list">
-                <li>Unauthorized reproduction, distribution, or modification of our music</li>
-                <li>Commercial use of our content without explicit written permission</li>
-                <li>Attempting to reverse engineer, hack, or exploit our website</li>
-                <li>Using our services for illegal or harmful activities</li>
-                <li>Impersonating {{ bandName }} or its members</li>
-                <li>Uploading malicious code, viruses, or harmful content</li>
+                <li>{{ t('pages.terms.prohibited_1') }}</li>
+                <li>{{ t('pages.terms.prohibited_2') }}</li>
+                <li>{{ t('pages.terms.prohibited_3') }}</li>
+                <li>{{ t('pages.terms.prohibited_4') }}</li>
+                <li>{{ t('pages.terms.prohibited_5', { bandName }) }}</li>
+                <li>{{ t('pages.terms.prohibited_6') }}</li>
               </ul>
             </div>
           </div>
@@ -73,7 +70,7 @@
         <!-- Intellectual Property Rights -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Intellectual Property Rights</h2>
+            <h2 class="section-title">{{ t('pages.terms.ip_title') }}</h2>
           </div>
           <div class="card-content">
             <div class="rights-grid">
@@ -81,9 +78,9 @@
                 <div class="rights-icon">
                   <i class="pi pi-volume-up"></i>
                 </div>
-                <h4 class="rights-title">Music & Recordings</h4>
+                <h4 class="rights-title">{{ t('pages.terms.ip_music_title') }}</h4>
                 <p class="rights-description">
-                  All music, recordings, and compositions are owned by {{ bandName }} and protected by copyright law.
+                  {{ t('pages.terms.ip_music_desc', { bandName }) }}
                 </p>
               </div>
               
@@ -91,9 +88,9 @@
                 <div class="rights-icon">
                   <i class="pi pi-image"></i>
                 </div>
-                <h4 class="rights-title">Visual Content</h4>
+                <h4 class="rights-title">{{ t('pages.terms.ip_visual_title') }}</h4>
                 <p class="rights-description">
-                  Photos, videos, artwork, and graphics are our exclusive property and may not be used without permission.
+                  {{ t('pages.terms.ip_visual_desc') }}
                 </p>
               </div>
               
@@ -101,95 +98,11 @@
                 <div class="rights-icon">
                   <i class="pi pi-globe"></i>
                 </div>
-                <h4 class="rights-title">Website & Brand</h4>
+                <h4 class="rights-title">{{ t('pages.terms.ip_brand_title') }}</h4>
                 <p class="rights-description">
-                  Website design, logos, and band name are trademarks of {{ fullBandName }}.
+                  {{ t('pages.terms.ip_brand_desc') }}
                 </p>
               </div>
-              
-              <div class="rights-item">
-                <div class="rights-icon">
-                  <i class="pi pi-shield"></i>
-                </div>
-                <h4 class="rights-title">User Content</h4>
-                <p class="rights-description">
-                  Content you submit may be used by us for promotional purposes while respecting your rights.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- User Accounts and Conduct -->
-        <div class="content-card">
-          <div class="card-header">
-            <h2 class="section-title">User Accounts and Conduct</h2>
-          </div>
-          <div class="card-content">
-            <p class="text-content">
-              When creating an account or interacting with our services, you agree to:
-            </p>
-            
-            <div class="conduct-list">
-              <div class="conduct-item">
-                <h4 class="conduct-title">Account Security</h4>
-                <p class="conduct-description">
-                  Maintain the confidentiality of your account credentials and notify us immediately of any unauthorized access.
-                </p>
-              </div>
-              
-              <div class="conduct-item">
-                <h4 class="conduct-title">Accurate Information</h4>
-                <p class="conduct-description">
-                  Provide truthful and current information when creating accounts or making purchases.
-                </p>
-              </div>
-              
-              <div class="conduct-item">
-                <h4 class="conduct-title">Respectful Behavior</h4>
-                <p class="conduct-description">
-                  Treat other fans, band members, and staff with respect in all interactions and communications.
-                </p>
-              </div>
-              
-              <div class="conduct-item">
-                <h4 class="conduct-title">Content Guidelines</h4>
-                <p class="conduct-description">
-                  Any content you submit must be appropriate, legal, and not infringe on others' rights.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Purchases and Payments -->
-        <div class="content-card">
-          <div class="card-header">
-            <h2 class="section-title">Purchases and Payments</h2>
-          </div>
-          <div class="card-content">
-            <div class="subsection">
-              <h3 class="subsection-title">Concert Tickets</h3>
-              <p class="text-content">
-                Ticket purchases are subject to availability and the terms of the specific venue or ticketing platform. 
-                Refund policies vary by event and will be clearly stated at the time of purchase.
-              </p>
-            </div>
-            
-            <div class="subsection">
-              <h3 class="subsection-title">Merchandise</h3>
-              <p class="text-content">
-                All merchandise sales are final unless items arrive damaged or defective. 
-                We reserve the right to limit quantities and refuse orders at our discretion.
-              </p>
-            </div>
-            
-            <div class="subsection">
-              <h3 class="subsection-title">Digital Content</h3>
-              <p class="text-content">
-                Digital music and content purchases are for personal use only and may not be resold, 
-                redistributed, or used for commercial purposes.
-              </p>
             </div>
           </div>
         </div>
@@ -197,75 +110,42 @@
         <!-- Disclaimers and Limitations -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Disclaimers and Limitations</h2>
+            <h2 class="section-title">{{ t('pages.terms.disclaimer_title') }}</h2>
           </div>
           <div class="card-content">
             <div class="disclaimer-types">
               <div class="disclaimer-type">
-                <h4 class="disclaimer-title">Service Availability</h4>
+                <h4 class="disclaimer-title">{{ t('pages.terms.disclaimer_availability_title') }}</h4>
                 <p class="disclaimer-description">
-                  We do not guarantee uninterrupted access to our website or services. 
-                  Maintenance, updates, or technical issues may cause temporary unavailability.
+                  {{ t('pages.terms.disclaimer_availability_desc') }}
                 </p>
               </div>
               
               <div class="disclaimer-type">
-                <h4 class="disclaimer-title">Content Accuracy</h4>
+                <h4 class="disclaimer-title">{{ t('pages.terms.disclaimer_links_title') }}</h4>
                 <p class="disclaimer-description">
-                  While we strive for accuracy, we cannot guarantee that all information on our website is current or error-free.
+                  {{ t('pages.terms.disclaimer_links_desc') }}
                 </p>
               </div>
               
               <div class="disclaimer-type">
-                <h4 class="disclaimer-title">Third-Party Links</h4>
+                <h4 class="disclaimer-title">{{ t('pages.terms.disclaimer_liability_title') }}</h4>
                 <p class="disclaimer-description">
-                  Our website may contain links to third-party sites. We are not responsible for their content or privacy practices.
-                </p>
-              </div>
-              
-              <div class="disclaimer-type">
-                <h4 class="disclaimer-title">Limitation of Liability</h4>
-                <p class="disclaimer-description">
-                  {{ bandName }} shall not be liable for any indirect, incidental, or consequential damages arising from your use of our services.
+                  {{ t('pages.terms.disclaimer_liability_desc', { bandName }) }}
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Termination -->
+        <!-- Limitation of Access -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Termination</h2>
+            <h2 class="section-title">{{ t('pages.terms.limitation_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              We may terminate or suspend your access to our services immediately, without prior notice or liability, 
-              for any reason, including breach of these Terms.
-            </p>
-            
-            <div class="termination-reasons">
-              <div class="termination-item">
-                <i class="pi pi-exclamation-triangle"></i>
-                <span>Violation of these Terms of Service</span>
-              </div>
-              <div class="termination-item">
-                <i class="pi pi-ban"></i>
-                <span>Abuse of our services or harassment of other users</span>
-              </div>
-              <div class="termination-item">
-                <i class="pi pi-shield"></i>
-                <span>Suspected fraudulent or illegal activity</span>
-              </div>
-              <div class="termination-item">
-                <i class="pi pi-times-circle"></i>
-                <span>Extended period of account inactivity</span>
-              </div>
-            </div>
-            
-            <p class="text-content">
-              Upon termination, your right to use the service will cease immediately. 
-              You may also terminate your account at any time by contacting us.
+              {{ t('pages.terms.limitation_desc') }}
             </p>
           </div>
         </div>
@@ -273,17 +153,14 @@
         <!-- Governing Law -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Governing Law</h2>
+            <h2 class="section-title">{{ t('pages.terms.law_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              These Terms shall be interpreted and governed by the laws of {{ contactState }}, {{ contactCountry }}, 
-              without regard to its conflict of law provisions.
+              {{ t('pages.terms.law_text_1') }}
             </p>
             <p class="text-content">
-              Any disputes arising from these Terms or your use of our services will be resolved through binding arbitration 
-              in {{ contactCity }}, {{ contactState }}, rather than in court, 
-              except that you may assert claims in small claims court if your claims qualify.
+              {{ t('pages.terms.law_text_2') }}
             </p>
           </div>
         </div>
@@ -291,17 +168,14 @@
         <!-- Changes to Terms -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Changes to Terms</h2>
+            <h2 class="section-title">{{ t('pages.terms.changes_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              We reserve the right to modify or replace these Terms at any time. If a revision is material, 
-              we will try to provide at least {{ dataResponseTime }} notice prior to any new terms taking effect.
+              {{ t('pages.terms.changes_text_1', { dataResponseTime }) }}
             </p>
             <p class="text-content">
-              What constitutes a material change will be determined at our sole discretion. 
-              By continuing to access or use our services after those revisions become effective, 
-              you agree to be bound by the revised terms.
+              {{ t('pages.terms.changes_text_2') }}
             </p>
           </div>
         </div>
@@ -309,11 +183,11 @@
         <!-- Contact Information -->
         <div class="content-card">
           <div class="card-header">
-            <h2 class="section-title">Contact Us</h2>
+            <h2 class="section-title">{{ t('pages.terms.contact_title') }}</h2>
           </div>
           <div class="card-content">
             <p class="text-content">
-              If you have any questions about these Terms of Service, please contact us:
+              {{ t('pages.terms.contact_text') }}
             </p>
             
             <div class="contact-info">
@@ -321,20 +195,12 @@
                 <i class="pi pi-envelope"></i>
                 <a :href="`mailto:${contactEmail}`" class="contact-link">{{ contactEmail }}</a>
               </div>
-              <div class="contact-item">
-                <i class="pi pi-map-marker"></i>
-                <span>{{ contactLocation }}</span>
-              </div>
-              <div class="contact-item">
-                <i class="pi pi-phone"></i>
-                <a :href="`tel:${contactPhoneNumber}`" class="contact-link">{{ contactPhone }}</a>
-              </div>
             </div>
             
             <div class="response-time">
               <p class="response-text">
                 <i class="pi pi-clock"></i>
-                We will respond to your inquiries within {{ dataResponseTime }}.
+                {{ t('pages.terms.contact_response', { dataResponseTime }) }}
               </p>
             </div>
           </div>
@@ -380,12 +246,8 @@ const showBackToTop = ref(false)
 const bandName = computed(() => getConfig('general.bandName'))
 const fullBandName = computed(() => getConfig('general.fullBandName'))
 const contactEmail = computed(() => getConfig('general.contact.email'))
-const contactLocation = computed(() => getConfig('general.contact.location.full'))
 const contactPhone = computed(() => getConfig('general.contact.phone'))
 const contactPhoneNumber = computed(() => getConfig('general.contact.phoneNumber'))
-const contactState = computed(() => getConfig('general.contact.location.state'))
-const contactCountry = computed(() => getConfig('general.contact.location.country'))
-const contactCity = computed(() => getConfig('general.contact.location.city'))
 const dataResponseTime = computed(() => getConfig('general.legal.dataResponseTime'))
 
 // Computed
