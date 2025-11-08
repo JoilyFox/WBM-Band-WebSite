@@ -112,16 +112,48 @@ const props = withDefaults(defineProps<Props>(), {
   interval: 30000, // 30 seconds
   images: () => [
     {
-      src: '/images/optimized/hero-images/hero-1.avif',
-      alt: 'WBM Band performing live on stage'
+      src: '/images/optimized/about-us-images/DSC02185.avif',
+      alt: 'About us image'
     },
     {
-      src: '/images/optimized/hero-images/hero-2.avif',
-      alt: 'WBM Band in recording studio'
+      src: '/images/optimized/about-us-images/DSC02209-2.avif',
+      alt: 'About us image'
     },
     {
-      src: '/images/optimized/hero-images/hero-3.avif',
-      alt: 'WBM Band concert crowd'
+      src: '/images/optimized/about-us-images/DSC02213-2.avif',
+      alt: 'About us image'
+    },
+    {
+      src: '/images/optimized/about-us-images/DSC02256.avif',
+      alt: 'About us image'
+    },
+    {
+      src: '/images/optimized/about-us-images/DSC02268.avif',
+      alt: 'About us image'
+    },
+    {
+      src: '/images/optimized/about-us-images/DSC02277.avif',
+      alt: 'About us image'
+    },
+    {
+      src: '/images/optimized/about-us-images/DSC02287.avif',
+      alt: 'About us image'
+    },
+    {
+      src: '/images/optimized/about-us-images/DSC02291.avif',
+      alt: 'About us image'
+    },
+    {
+      src: '/images/optimized/about-us-images/DSC02299.avif',
+      alt: 'About us image'
+    },
+    {
+      src: '/images/optimized/about-us-images/DSC02323.avif',
+      alt: 'About us image'
+    },
+    {
+      src: '/images/optimized/about-us-images/DSC02356.avif',
+      alt: 'About us image'
     }
   ]
 })
@@ -147,7 +179,7 @@ const onSlideChange = () => {
 
 // Preload images on component mount to prevent loading issues
 onMounted(() => {
-  // Preload all slider images since there are only 3
+  // Preload all slider images
   if (process.client) {
     const totalImages = sliderImages.value.length
     

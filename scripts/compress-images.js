@@ -30,6 +30,12 @@ const COMPRESSION_SETTINGS = {
     quality: 85,
     formats: ['avif', 'webp', 'jpg']
   },
+  about: {
+    width: 1920,
+    height: 1080,
+    quality: 85,
+    formats: ['avif', 'webp', 'jpg']
+  },
   thumbnail: {
     width: 400,
     height: 400,
@@ -43,6 +49,7 @@ async function createOptimizedDir() {
     await fs.mkdir(OUTPUT_DIR, { recursive: true })
     await fs.mkdir(path.join(OUTPUT_DIR, 'hero-images'), { recursive: true })
     await fs.mkdir(path.join(OUTPUT_DIR, 'albums-images'), { recursive: true })
+    await fs.mkdir(path.join(OUTPUT_DIR, 'about-us-images'), { recursive: true })
   } catch (error) {
     console.error('Error creating directories:', error)
   }
@@ -127,6 +134,23 @@ async function processImages() {
       await fs.mkdir(thumbDir, { recursive: true })
       await compressImage(inputPath, thumbDir, file, COMPRESSION_SETTINGS.thumbnail)
     }
+  }
+  
+  // Process about-us images
+  console.log('\n👥 Processing about-us images...')
+  const aboutDir = path.join(INPUT_DIR, 'about-us-images')
+  try {
+    const aboutFiles = await fs.readdir(aboutDir)
+    
+    for (const file of aboutFiles) {
+      if (file.match(/\.(jpg|jpeg|png)$/i)) {
+        const inputPath = path.join(aboutDir, file)
+        const outputDir = path.join(OUTPUT_DIR, 'about-us-images')
+        await compressImage(inputPath, outputDir, file, COMPRESSION_SETTINGS.about)
+      }
+    }
+  } catch (error) {
+    console.log('No about-us images found or error processing:', error.message)
   }
   
   console.log('\n✅ Image compression complete!')

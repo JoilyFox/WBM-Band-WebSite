@@ -152,22 +152,40 @@ const props = withDefaults(defineProps<Props>(), {
   heroImages: () => [
     {
       src: '/images/optimized/hero-images/hero-1.avif',
-      alt: 'WBM performing live on stage',
-      title: 'WBM',
-      subtitle: 'Live Performance'
+      alt: 'WBM performing live on stage'
     },
     {
       src: '/images/optimized/hero-images/hero-2.avif',
-      alt: 'WBM in recording studio',
-      title: 'WBM',
-      subtitle: 'In Studio'
+      alt: 'WBM in recording studio'
     },
     {
       src: '/images/optimized/hero-images/hero-3.avif',
-      alt: 'WBM concert crowd',
-      title: 'WBM',
-      subtitle: 'Concert Experience'
+      alt: 'WBM concert crowd'
     },
+    {
+      src: '/images/optimized/hero-images/hero-4.avif',
+      alt: 'WBM Band performing on stage'
+    },
+    {
+      src: '/images/optimized/hero-images/hero-5.avif',
+      alt: 'WBM Band live concert'
+    },
+    {
+      src: '/images/optimized/hero-images/hero-6.avif',
+      alt: 'WBM Band with crowd'
+    },
+    {
+      src: '/images/optimized/hero-images/hero-7.avif',
+      alt: 'WBM Band performance moment'
+    },
+    {
+      src: '/images/optimized/hero-images/hero-8.avif',
+      alt: 'WBM Band together on stage'
+    },
+    {
+      src: '/images/optimized/hero-images/hero-9.avif',
+      alt: 'WBM Band concert atmosphere'
+    }
   ]
 })
 
