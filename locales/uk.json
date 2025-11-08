@@ -8,9 +8,9 @@
   },
   "nav": {
     "music": "Музика",
-    "tour": "Тур",
     "about": "Про нас",
-    "contact": "Контакти"
+    "contact": "Контакти",
+    "press_media": "Для преси"
   },
   "hero": {
     "listen_now": "Слухати зараз",

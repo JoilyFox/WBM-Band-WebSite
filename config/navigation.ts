@@ -15,20 +15,20 @@ export const leftNavigation: NavigationItem[] = [
     elementId: 'music'
   },
   {
-    label: 'nav.tour',
-    elementId: 'tour'
+    label: 'nav.about',
+    elementId: 'about'
   }
 ]
 
 // Right navigation items for header
 export const rightNavigation: NavigationItem[] = [
   {
-    label: 'nav.about',
-    elementId: 'about'
+    label: 'nav.contact',
+    elementId: 'contacts'
   },
   {
-    label: 'nav.contact',
-    elementId: 'contact'
+    label: 'nav.press_media',
+    elementId: 'press-media'
   }
 ]
 

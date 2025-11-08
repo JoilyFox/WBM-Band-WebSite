@@ -132,7 +132,7 @@
             </div>
 
             <!-- Media Materials -->
-            <div class="info-card media-card md:!pt-7">
+            <div id="press-media" class="info-card media-card md:!pt-7">
               <h3 class="section-heading">{{ t('contacts.media_materials') }}</h3>
               <div class="media-buttons-container">
                 <a 

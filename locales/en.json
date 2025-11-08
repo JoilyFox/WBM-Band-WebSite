@@ -8,9 +8,9 @@
   },
   "nav": {
     "music": "Music",
-    "tour": "Tour",
-    "about": "About",
-    "contact": "Contact"
+    "about": "About Us",
+    "contact": "Contacts",
+    "press_media": "For Press"
   },
   "hero": {
     "listen_now": "Listen Now",

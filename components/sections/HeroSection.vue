@@ -90,12 +90,12 @@
           :icon="primaryButtonIcon"
           @click="handlePrimaryAction"
         />
-        <Button 
+        <!-- <Button 
           :label="t(secondaryButtonLabel)" 
           class="btn-outline text-lg px-8 py-3"
           :icon="secondaryButtonIcon"
           @click="handleSecondaryAction"
-        />
+        /> -->
       </div>
     </div>
     
