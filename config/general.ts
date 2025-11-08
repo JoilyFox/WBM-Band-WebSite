@@ -14,13 +14,6 @@ export interface GeneralConfig {
     privacyEmail: string
     phone: string
     phoneNumber: string // For tel: links (without formatting)
-    location: {
-      city: string
-      state: string
-      country: string
-      full: string
-      short: string // For footer
-    }
   }
   
   // Social media
@@ -86,15 +79,8 @@ export const generalConfig: GeneralConfig = {
   contact: {
     email: "wbmbandofficial@gmail.com",
     privacyEmail: "wbmbandofficial@gmail.com",
-    phone: "+1 (234) 567-8900",
-    phoneNumber: "+1234567890", // For tel: links
-    location: {
-      city: "Los Angeles",
-      state: "CA",
-      country: "United States",
-      full: "Los Angeles, CA, United States",
-      short: "Los Angeles, CA"
-    }
+    phone: "",
+    phoneNumber: "" // For tel: links
   },
   
   // Social media links

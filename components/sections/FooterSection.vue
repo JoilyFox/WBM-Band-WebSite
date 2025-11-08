@@ -194,7 +194,7 @@
           <div class="text-center lg:text-left">
             <h3 class="footer-heading">{{ t('footer.contact') }}</h3>
             <ul class="space-y-3">
-              <li class="footer-contact-item justify-center lg:justify-start">
+              <li v-if="contactEmail" class="footer-contact-item justify-center lg:justify-start">
                 <i class="pi pi-envelope text-white/60"></i>
                 <a :href="`mailto:${contactEmail}`" class="footer-link">
                   {{ contactEmail }}
@@ -203,10 +203,10 @@
               <li class="footer-contact-item justify-center lg:justify-start">
                 <i class="pi pi-map-marker text-white/60"></i>
                 <span class="text-white/70 text-sm">
-                  {{ contactLocationShort }}
+                  {{ t('footer.location') }}
                 </span>
               </li>
-              <li class="footer-contact-item justify-center lg:justify-start">
+              <li v-if="contactPhoneNumber && contactPhone" class="footer-contact-item justify-center lg:justify-start">
                 <i class="pi pi-phone text-white/60"></i>
                 <a :href="`tel:${contactPhoneNumber}`" class="footer-link">
                   {{ contactPhone }}
@@ -343,7 +343,6 @@ const resolveAssetPath = (path: string) => {
 const bandName = computed(() => getConfig('general.bandName'))
 const fullBandName = computed(() => getConfig('general.fullBandName'))
 const contactEmail = computed(() => getConfig('general.contact.email'))
-const contactLocationShort = computed(() => getConfig('general.contact.location.short'))
 const contactPhone = computed(() => getConfig('general.contact.phone'))
 const contactPhoneNumber = computed(() => getConfig('general.contact.phoneNumber'))
 const developerName = computed(() => getConfig('general.developer.name'))

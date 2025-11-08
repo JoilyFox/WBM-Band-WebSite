@@ -20,6 +20,7 @@
   "footer": {
 		"navigation": "Navigation",
 		"contact": "Contact",
+		"location": "Kyiv, Ukraine",
 		"listen_on": "Listen on your favorite platform",
 		"listen_on_platform": "Listen on {name}",
 		"platform_icon_alt": "{name} icon",

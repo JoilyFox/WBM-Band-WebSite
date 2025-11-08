@@ -20,6 +20,7 @@
   "footer": {
 		"navigation": "Навігація",
 		"contact": "Контакти",
+		"location": "Київ, Україна",
 		"listen_on": "Слухайте на улюбленій платформі",
 		"listen_on_platform": "Слухати на {name}",
 		"platform_icon_alt": "Іконка {name}",
