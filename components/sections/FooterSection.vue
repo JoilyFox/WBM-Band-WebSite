@@ -217,8 +217,8 @@
         </div>
       </div>
 
-      <!-- Streaming Platforms -->
-      <div class="py-8 border-t border-white/10">
+      <!-- Streaming Platforms (only show if there are platforms) -->
+      <div v-if="streamingPlatforms.length > 0" class="py-8 border-t border-white/10">
         <div class="text-center">
               <h4 class="text-white/80 text-sm font-medium mb-4">{{ t('footer.listen_on') }}</h4>
           <div class="flex justify-center items-center space-x-8 flex-wrap gap-y-6">
@@ -393,6 +393,34 @@ const socialLinks = computed(() => {
 // Streaming platforms - using computed to ensure proper path resolution
 const streamingPlatforms = computed(() => {
   const platforms: Array<{ name: string; icon: string; url: string }> = []
+  
+  const spotifyUrl = getConfig('general.streamingPlatforms.spotify')
+  const appleMusicUrl = getConfig('general.streamingPlatforms.appleMusic')
+  const youtubeMusicUrl = getConfig('general.streamingPlatforms.youtubeMusic')
+  
+  if (spotifyUrl) {
+    platforms.push({
+      name: 'Spotify',
+      icon: resolveAssetPath('/assets/images/icons/spotify-icon.svg'),
+      url: spotifyUrl
+    })
+  }
+  
+  if (appleMusicUrl) {
+    platforms.push({
+      name: 'Apple Music',
+      icon: resolveAssetPath('/assets/images/icons/apple-music-icon.svg'),
+      url: appleMusicUrl
+    })
+  }
+  
+  if (youtubeMusicUrl) {
+    platforms.push({
+      name: 'YouTube Music',
+      icon: resolveAssetPath('/assets/images/icons/youtube-music-icon.svg'),
+      url: youtubeMusicUrl
+    })
+  }
 
   return platforms
 })

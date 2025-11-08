@@ -2,7 +2,7 @@
   <section id="about" class="about-bg-section relative overflow-hidden">
     <CommonContainer size="xl" padding="md">
       <!-- Header -->
-      <div class="relative z-10 mt-20 mb-10 text-center">
+      <div class="relative z-10 mt-10 mb-10 text-center">
         <CommonSectionTitle :level="2" size="xl" align="center" class="mb-6">
           {{ t('about.section_title') }}
         </CommonSectionTitle>

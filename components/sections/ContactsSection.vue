@@ -400,11 +400,25 @@ const handleSubmit = async () => {
   backdrop-filter: blur(10px);
 }
 
-.submit-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.15) 100%);
-  border-color: rgba(255,255,255,0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+/* Desktop hover effects only */
+@media (hover: hover) and (pointer: fine) {
+  .submit-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.15) 100%);
+    border-color: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Mobile and touch device active effects */
+@media (hover: none) and (pointer: coarse) {
+  .submit-button:active:not(:disabled) {
+    background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.15) 100%);
+    border-color: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    transition-duration: 0.15s;
+  }
 }
 
 .submit-button:disabled {

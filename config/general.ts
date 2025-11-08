@@ -44,6 +44,13 @@ export interface GeneralConfig {
     twitter?: string
   }
   
+  // Streaming platforms
+  streamingPlatforms: {
+    spotify?: string
+    appleMusic?: string
+    youtubeMusic?: string
+  }
+  
   // Legal and policy information
   legal: {
     privacyPolicyLastUpdated: string // ISO date string
@@ -102,6 +109,13 @@ export const generalConfig: GeneralConfig = {
     instagram: "@wbmband",
     tiktok: "wbmband",
     youtube: "wbmbandofficial"
+  },
+  
+  // Streaming platforms (placeholder - add actual links when available)
+  streamingPlatforms: {
+    spotify: "https://spotify.com/wbmband",
+    appleMusic: "https://apple.com/wbmband",
+    youtubeMusic: "https://youtube.com/wbmband"
   },
   
   // Legal and policy information
