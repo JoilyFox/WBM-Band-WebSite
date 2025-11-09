@@ -125,7 +125,8 @@ export default defineNuxtConfig({
           useCookie: true,
           cookieKey: 'i18n_redirected',
           redirectOn: 'root',
-          alwaysRedirect: false
+          alwaysRedirect: true,
+          fallbackLocale: 'ua'
         },
         locales: [
       { code: 'en', language: 'en-US', name: 'English', file: 'en.json' },

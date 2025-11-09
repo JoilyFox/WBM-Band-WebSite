@@ -1,7 +1,7 @@
 <template>
   <component
     :is="tag"
-    class="section-title font-bold tracking-tight text-white"
+    class="section-title font-bold tracking-tight text-white mb-2 md:mb-4"
     :class="computedClasses"
   >
     <slot />

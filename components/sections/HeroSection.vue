@@ -1,7 +1,7 @@
 <template>
   <section 
     id="hero"
-  class="hero-section relative w-full flex items-center justify-center px-4 overflow-hidden"
+    class="hero-section relative w-full flex items-center justify-center px-4 overflow-hidden"
     ref="heroEl"
   >
     <!-- Background Images Slider -->
@@ -152,40 +152,36 @@ const props = withDefaults(defineProps<Props>(), {
   heroImages: () => [
     {
       src: '/images/optimized/hero-images/hero-1.avif',
-      alt: 'WBM performing live on stage'
+      alt: 'Hero Image - WBM Band'
     },
     {
       src: '/images/optimized/hero-images/hero-2.avif',
-      alt: 'WBM in recording studio'
+      alt: 'Hero Image - WBM Band'
     },
     {
       src: '/images/optimized/hero-images/hero-3.avif',
-      alt: 'WBM concert crowd'
-    },
-    {
-      src: '/images/optimized/hero-images/hero-4.avif',
-      alt: 'WBM Band performing on stage'
+      alt: 'Hero Image - WBM Band'
     },
     {
       src: '/images/optimized/hero-images/hero-5.avif',
-      alt: 'WBM Band live concert'
+      alt: 'Hero Image - WBM Band'
     },
     {
       src: '/images/optimized/hero-images/hero-6.avif',
-      alt: 'WBM Band with crowd'
+      alt: 'Hero Image - WBM Band'
     },
     {
       src: '/images/optimized/hero-images/hero-7.avif',
-      alt: 'WBM Band performance moment'
+      alt: 'Hero Image - WBM Band'
     },
     {
       src: '/images/optimized/hero-images/hero-8.avif',
-      alt: 'WBM Band together on stage'
+      alt: 'Hero Image - WBM Band'
     },
     {
       src: '/images/optimized/hero-images/hero-9.avif',
-      alt: 'WBM Band concert atmosphere'
-    }
+      alt: 'Hero Image - WBM Band'
+    },
   ]
 })
 

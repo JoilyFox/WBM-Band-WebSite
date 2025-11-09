@@ -3,7 +3,7 @@
     <div class="max-w-7xl mx-auto">
       <!-- Section Header -->
       <div class="text-center mb-10">
-        <CommonSectionTitle :level="2" size="xl" align="center" class="mb-6">
+        <CommonSectionTitle :level="2" size="xl" align="center">
           {{ t('music.section_title') }}
         </CommonSectionTitle>
         <CommonSectionSubtitle align="center" max-width="md" size="base">

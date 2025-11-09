@@ -36,6 +36,12 @@ const COMPRESSION_SETTINGS = {
     quality: 85,
     formats: ['avif', 'webp', 'jpg']
   },
+  meta: {
+    width: 1200,
+    height: 630,
+    quality: 85,
+    formats: ['jpg', 'png']
+  },
   thumbnail: {
     width: 400,
     height: 400,
@@ -50,6 +56,7 @@ async function createOptimizedDir() {
     await fs.mkdir(path.join(OUTPUT_DIR, 'hero-images'), { recursive: true })
     await fs.mkdir(path.join(OUTPUT_DIR, 'albums-images'), { recursive: true })
     await fs.mkdir(path.join(OUTPUT_DIR, 'about-us-images'), { recursive: true })
+    await fs.mkdir(path.join(OUTPUT_DIR, 'meta-images'), { recursive: true })
   } catch (error) {
     console.error('Error creating directories:', error)
   }
@@ -151,6 +158,23 @@ async function processImages() {
     }
   } catch (error) {
     console.log('No about-us images found or error processing:', error.message)
+  }
+  
+  // Process meta images
+  console.log('\n🏷️  Processing meta images...')
+  const metaDir = path.join(INPUT_DIR, 'meta-images')
+  try {
+    const metaFiles = await fs.readdir(metaDir)
+    
+    for (const file of metaFiles) {
+      if (file.match(/\.(jpg|jpeg|png)$/i)) {
+        const inputPath = path.join(metaDir, file)
+        const outputDir = path.join(OUTPUT_DIR, 'meta-images')
+        await compressImage(inputPath, outputDir, file, COMPRESSION_SETTINGS.meta)
+      }
+    }
+  } catch (error) {
+    console.log('No meta images found or error processing:', error.message)
   }
   
   console.log('\n✅ Image compression complete!')

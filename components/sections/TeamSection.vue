@@ -3,7 +3,7 @@
     <CommonContainer size="xl" padding="md">
       <!-- Header -->
       <div class="relative z-10 mt-20 mb-10 text-center">
-        <CommonSectionTitle :level="2" size="xl" align="center" class="mb-6">
+        <CommonSectionTitle :level="2" size="xl" align="center">
           {{ t('team.section_title') }}
         </CommonSectionTitle>
         <CommonSectionSubtitle align="center" max-width="md" size="base">

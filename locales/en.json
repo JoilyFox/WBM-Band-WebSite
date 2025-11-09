@@ -1,7 +1,8 @@
 {
   "app": {
     "name": "WBM Band",
-    "tagline": "Rock • Indie • Alternative",
+    "tagline": "Alternative • Punk • Rock",
+    "meta_description": "WBM Band - alternative punk rock band. Listen to our new release {release}!",
 		"welcome": "Welcome to {name}!",
 		"ready": "Your modern Nuxt 3 application is ready to rock! 🎸",
 		"all_rights": "All rights reserved."
@@ -216,7 +217,7 @@
   },
   "music": {
     "section_title": "Our Music",
-    "section_subtitle": "Explore the music of {name}. Stream our latest releases now.",
+    "section_subtitle": "New music coming soon. Stay tuned!",
     "show_all": "Show All Music",
     "types": {
       "single": "Single",
@@ -299,7 +300,7 @@
   "about": {
     "section_title": "About Us",
     "section_subtitle": "Discover the story behind the music",
-    "content": "WBM Band is a modern rock group pushing the boundaries of alternative music. With a unique blend of classic rock influences and contemporary sounds, we create atmospheric experiences that resonate with listeners worldwide. Our journey began with a shared passion for music that transcends genres, and today we continue to evolve, experiment, and connect with our audience through powerful performances and meaningful lyrics. From intimate studio sessions to electrifying live shows, we pour our hearts into every note, creating music that speaks to the soul."
+    "content": "WBM is a young team of ambitious, driven musicians gathered around frontwoman Daria, who is the founder and main creative inspiration of the band. We love combining different genre influences together, using unconventional practices and elements during recording and songwriting, as well as delving into the images and ideas of the 'ugly' side of the human soul and psychology, about victories and defeats over oneself, that resonate in the hearts of our like-minded people."
   },
   "contacts": {
     "section_title": "Get In Touch",

@@ -45,7 +45,7 @@ import { musicLibrary } from '~/data/musicLibrary'
 import { getConfig } from '~/utils/configHelpers'
 import type { MusicRelease } from '~/data/musicLibrary'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 // Check for maintenance mode
 const maintenanceMode = computed(() => getConfig('general.maintenanceMode'))
@@ -61,11 +61,40 @@ if (maintenanceMode.value) {
 
 // Computed properties for config values
 const bandName = computed(() => getConfig('general.bandName'))
-const tagline = computed(() => t('app.tagline'))
+const fullBandName = computed(() => getConfig('general.fullBandName'))
+
+// Get the latest released track
+const latestRelease = computed(() => {
+  const now = new Date()
+  const released = musicLibrary
+    .filter(release => new Date(release.releaseDate) <= now)
+    .sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime())
+  return released.length > 0 ? released[0] : null
+})
+
+// Get release title (localized if available)
+const latestReleaseTitle = computed(() => {
+  if (!latestRelease.value) return ''
+  if (latestRelease.value.titleKey) {
+    return t(latestRelease.value.titleKey)
+  }
+  return latestRelease.value.title
+})
 
 // Computed properties for page title and description
-const pageTitle = computed(() => createPageTitle(`${bandName.value} - ${tagline.value}`))
-const pageDescription = computed(() => `${bandName.value} - ${t('app.tagline')}`)
+const pageTitle = computed(() => fullBandName.value)
+const pageDescription = computed(() => {
+  if (latestReleaseTitle.value) {
+    return t('app.meta_description', { release: latestReleaseTitle.value })
+  }
+  return `${bandName.value} - ${t('app.tagline')}`
+})
+
+// Meta image URL
+const metaImageUrl = computed(() => {
+  const baseUrl = 'https://www.wbmband.com'
+  return `${baseUrl}/images/optimized/meta-images/meta-cover.jpg`
+})
 
 useHead({
   title: pageTitle,
@@ -73,13 +102,59 @@ useHead({
     {
       name: 'description',
       content: pageDescription
+    },
+    // Open Graph
+    {
+      property: 'og:title',
+      content: pageTitle
+    },
+    {
+      property: 'og:description',
+      content: pageDescription
+    },
+    {
+      property: 'og:image',
+      content: metaImageUrl
+    },
+    {
+      property: 'og:image:width',
+      content: '1200'
+    },
+    {
+      property: 'og:image:height',
+      content: '630'
+    },
+    {
+      property: 'og:type',
+      content: 'website'
+    },
+    {
+      property: 'og:url',
+      content: `https://www.wbmband.com/${locale.value === 'ua' ? '' : locale.value}`
+    },
+    // Twitter Card
+    {
+      name: 'twitter:card',
+      content: 'summary_large_image'
+    },
+    {
+      name: 'twitter:title',
+      content: pageTitle
+    },
+    {
+      name: 'twitter:description',
+      content: pageDescription
+    },
+    {
+      name: 'twitter:image',
+      content: metaImageUrl
     }
   ]
 })
 
 // Composables
 const snackbar = useSnackbar()
-const { scrollToElement, scrollToElementWithNavigation } = useScrollTo()
+const { scrollToElement } = useScrollTo()
 const { preloadHeroImages, preloadAlbumCovers } = useImagePreloader()
 const { selectedRelease, isModalOpen, isSelectedReleasePreSave, handleMusicClick, closeModal } = useMusicNavigation()
 
@@ -122,8 +197,8 @@ const handleTourDates = () => {
   // TODO: Implement navigation to tour dates section
   snackbar.show({
     type: 'info', 
-  message: t('snackbar.tour.title') as string,
-  subtitle: t('snackbar.tour.subtitle') as string
+    message: t('snackbar.tour.title') as string,
+    subtitle: t('snackbar.tour.subtitle') as string
   })
 }
 
@@ -136,8 +211,8 @@ const handleShowAllMusic = () => {
   // TODO: Navigate to dedicated music library page
   snackbar.show({
     type: 'info',
-  message: t('snackbar.music_library.title') as string,
-  subtitle: t('snackbar.music_library.subtitle') as string
+    message: t('snackbar.music_library.title') as string,
+    subtitle: t('snackbar.music_library.subtitle') as string
   })
 }
 </script>
