@@ -111,7 +111,7 @@ export const generalConfig: GeneralConfig = {
   },
   
   // Website settings
-  enableComingSoonCard: true,
+  enableComingSoonCard: false,
   maxReleasesBeforeHideComingSoon: 6,
   enableNextReleasePreview: true, // Show non-clickable preview card for upcoming releases
   enablePreSave: true, // Enable pre-save functionality (when true, replaces preview with clickable pre-save card)

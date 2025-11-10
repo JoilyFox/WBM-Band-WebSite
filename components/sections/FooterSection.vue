@@ -156,7 +156,7 @@
               />
             </div>
             <p class="text-white/70 text-sm leading-relaxed mb-6 max-lg:text-center max-w-md mx-auto md:mx-0">
-              {{ t('footer.tagline_long', { name: fullBandName }) }}
+              {{ t('footer.tagline_long') }}
             </p>
             
             <!-- Social Media Links -->
@@ -341,6 +341,7 @@ const resolveAssetPath = (path: string) => {
 
 // Computed properties for config values
 const bandName = computed(() => getConfig('general.bandName'))
+const shortBandName = computed(() => getConfig('general.bandName'))
 const fullBandName = computed(() => getConfig('general.fullBandName'))
 const contactEmail = computed(() => getConfig('general.contact.email'))
 const contactPhone = computed(() => getConfig('general.contact.phone'))

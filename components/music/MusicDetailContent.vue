@@ -174,7 +174,7 @@
               :class="{ 'animate-titleGlow': isHighPerformanceDevice }">
             {{ displayTitle }}
           </h1>
-          <p class="music-date text-primary-200 text-base md:text-lg font-medium">{{ heroDateText }}</p>
+          <p class="music-date text-primary-200 text-sm md:text-lg font-medium">{{ heroDateText }}</p>
           <p
             v-if="preSaveCountdownText"
             class="music-countdown text-primary-200 opacity-70 text-xs md:text-sm font-normal tracking-[0.06em] mt-0.5 pb-1"

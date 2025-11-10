@@ -74,7 +74,7 @@
             </button>
           </div>
         </div>
-  </CommonContainer>
+      </CommonContainer>
       
       <!-- Desktop Logo (absolute positioned) -->
       <div class="hidden md2:block absolute top-[14px] left-1/2 transform -translate-x-1/2 z-50 transition-top duration-300" :class="logoPositionClass">
