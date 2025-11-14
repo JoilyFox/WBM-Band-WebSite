@@ -25,15 +25,14 @@ export const useShareFunctionality = () => {
   const getShareContent = (data: ShareData) => {
     const cleanUrl = data.url || getCleanUrl()
     const title = data.title
-    const base = t('music.share_popup.check_out', { title }) as string
-    const text = data.description ? `${base} - ${data.description}` : base
-    const shareMessage = `${text}\n\n${cleanUrl}`
+    // Only use the URL without additional text
+    const shareMessage = cleanUrl
     
     return {
       title,
       text: shareMessage,
       url: cleanUrl,
-      displayText: text
+      displayText: cleanUrl
     }
   }
   
@@ -42,21 +41,17 @@ export const useShareFunctionality = () => {
     try {
       const cleanUrl = data.url || getCleanUrl()
       const title = data.title
-      const base = t('music.share_popup.check_out', { title }) as string
-      const text = data.description ? `${base} - ${data.description}` : base
       
       if (navigator.share) {
-        // For Web Share API, don't include URL in text since it's provided separately
+        // For Web Share API, only share the URL
         await navigator.share({
           title,
-          text,
           url: cleanUrl
         })
         return true
       } else {
-        // Fallback to clipboard with full share message including URL
-        const shareMessage = `${text}\n\n${cleanUrl}`
-        await copyToClipboard(shareMessage)
+        // Fallback to clipboard with only the URL
+        await copyToClipboard(cleanUrl)
         return true
       }
     } catch (error) {

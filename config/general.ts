@@ -97,9 +97,9 @@ export const generalConfig: GeneralConfig = {
   
   // Streaming platforms (placeholder - add actual links when available)
   streamingPlatforms: {
-    spotify: "https://spotify.com/wbmband",
-    appleMusic: "https://apple.com/wbmband",
-    youtubeMusic: "https://youtube.com/wbmband"
+    spotify: "",
+    appleMusic: "",
+    youtubeMusic: ""
   },
   
   // Legal and policy information

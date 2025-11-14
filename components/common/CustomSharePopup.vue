@@ -34,12 +34,12 @@
           <div class="share-popup-input-group">
             <textarea
               ref="urlInput"
-              :value="`${shareText}\n\n${shareUrl}`"
+              :value="shareUrl"
               readonly
               class="share-popup-input share-popup-textarea"
               :class="{ 'share-popup-input--copied': justCopied }"
               @click="selectAllText"
-              rows="3"
+              rows="1"
             ></textarea>
             <Button
               @click="handleCopy"
@@ -160,9 +160,8 @@ const handleCopy = async () => {
   if (isLoading.value) return
   
   isLoading.value = true
-  // Copy the complete share message: text + URL
-  const fullShareText = `${props.shareText}\n\n${props.shareUrl}`
-  const success = await copyToClipboard(fullShareText)
+  // Copy only the URL without additional text
+  const success = await copyToClipboard(props.shareUrl)
   
   if (success) {
     justCopied.value = true

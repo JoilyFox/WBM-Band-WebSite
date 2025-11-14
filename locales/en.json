@@ -217,7 +217,7 @@
   },
   "music": {
     "section_title": "Our Music",
-    "section_subtitle": "New music coming soon. Stay tuned!",
+    "section_subtitle": "Listen to us on all platforms!",
     "show_all": "Show All Music",
     "types": {
       "single": "Single",
@@ -322,5 +322,8 @@
     "download_press_kit": "Latest Release Press Kit",
     "photos": "Photos",
     "media_materials_button": "Media Materials"
+  },
+  "listen": {
+    "meta_description": "{songName} - listen on all platforms!"
   }
 }

@@ -36,6 +36,7 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useLocalePath } from '#i18n'
 import { useSnackbar } from '~/composables/useSnackbar'
 import { useScrollTo } from '~/composables/useScrollTo'
 import { useImagePreloader } from '~/composables/useImagePreloader'
@@ -96,6 +97,17 @@ const metaImageUrl = computed(() => {
   return `${baseUrl}/images/optimized/meta-images/meta-cover.jpg`
 })
 
+// Page URL for og:url - handles root URL (wbmband.com) to show Ukrainian
+const pageUrl = computed(() => {
+  const baseUrl = 'https://www.wbmband.com'
+  // For Ukrainian locale, use root URL or /ua
+  if (locale.value === 'ua') {
+    return baseUrl
+  }
+  // For other locales, include the locale prefix
+  return `${baseUrl}/${locale.value}`
+})
+
 useHead({
   title: pageTitle,
   meta: [
@@ -130,7 +142,7 @@ useHead({
     },
     {
       property: 'og:url',
-      content: `https://www.wbmband.com/${locale.value === 'ua' ? '' : locale.value}`
+      content: pageUrl
     },
     // Twitter Card
     {
@@ -189,8 +201,17 @@ onMounted(async () => {
 
 // Event handlers for hero section
 const handleListenNow = () => {
-  // Scroll to music section
-  scrollToElement('music')
+  // Check if device is mobile (screen width <= 768px)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+  
+  if (isMobile && latestRelease.value) {
+    // On mobile, navigate to the latest release listen page
+    const localePath = useLocalePath()
+    navigateTo(localePath(`/listen/${latestRelease.value.slug}`))
+  } else {
+    // On desktop, scroll to music section
+    scrollToElement('music')
+  }
 }
 
 const handleTourDates = () => {

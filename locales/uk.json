@@ -217,7 +217,7 @@
   },
   "music": {
     "section_title": "Наша музика",
-    "section_subtitle": "Скоро реліз! Слідкуйте за оновленнями.",
+    "section_subtitle": "Слухайте нас на всіх платформах!",
     "show_all": "Показати всю музику",
     "types": {
       "single": "Сингл",
@@ -325,5 +325,8 @@
     "download_press_kit": "Прес-кіт останнього релізу",
     "photos": "Фото",
     "media_materials_button": "Медіа матеріали"
+  },
+  "listen": {
+    "meta_description": "{songName} - слухати на всіх платформах!"
   }
 }

@@ -362,11 +362,11 @@ const shareUrlForRelease = computed(() => {
   const relative = `${base}${path}`
   
   if (typeof window !== 'undefined') {
-    const fullUrl = new URL(relative, window.location.origin).toString()
-    // Remove protocol (http:// or https://)
-    return fullUrl.replace(/^https?:\/\//, '')
+    // Return full URL with protocol to avoid concatenation issues
+    return new URL(relative, window.location.origin).toString()
   }
-  return relative.replace(/^\//, '') // Remove leading slash for SSR
+  // For SSR, return relative path (will be converted to full URL on client)
+  return relative
 })
 
 // Computed share content – use appropriate text for pre-save vs regular
