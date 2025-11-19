@@ -3,9 +3,9 @@
     "name": "WBM Band",
     "tagline": "Alternative • Punk • Rock",
     "meta_description": "WBM Band - alternative punk rock band. Listen to our new release {release}!",
-		"welcome": "Welcome to {name}!",
-		"ready": "Your modern Nuxt 3 application is ready to rock! 🎸",
-		"all_rights": "All rights reserved."
+    "welcome": "Welcome to {name}!",
+    "ready": "Your modern Nuxt 3 application is ready to rock! 🎸",
+    "all_rights": "All rights reserved."
   },
   "nav": {
     "music": "Music",
@@ -19,22 +19,22 @@
     "scroll_down": "Scroll down"
   },
   "footer": {
-		"navigation": "Navigation",
-		"contact": "Contact",
-		"location": "Kyiv, Ukraine",
-		"listen_on": "Listen on your favorite platform",
-		"listen_on_platform": "Listen on {name}",
-		"platform_icon_alt": "{name} icon",
-		"privacy": "Privacy Policy",
-		"terms": "Terms of Service",
-		"cookies": "Cookies",
-		"developer": "Made with ❤️ and 🎸 by",
-		"developer_prefix": "Made with ❤️ and 🎸 by",
-		"follow_instagram": "Follow us on Instagram",
-		"follow_tiktok": "Follow us on TikTok",
-		"subscribe_youtube": "Subscribe to our YouTube channel",
-		"tagline_short": "{name} - Modern rock with classic soul. Pushing boundaries in alternative music.",
-		"tagline_long": "{name} - Pushing the boundaries of rock, alternative, and indie music. Join us on our musical journey and stay connected for the latest releases and tour updates."
+    "navigation": "Navigation",
+    "contact": "Contact",
+    "location": "Kyiv, Ukraine",
+    "listen_on": "Listen on your favorite platform",
+    "listen_on_platform": "Listen on {name}",
+    "platform_icon_alt": "{name} icon",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "cookies": "Cookies",
+    "developer": "Made with ❤️ and 🎸 by",
+    "developer_prefix": "Made with ❤️ and 🎸 by",
+    "follow_instagram": "Follow us on Instagram",
+    "follow_tiktok": "Follow us on TikTok",
+    "subscribe_youtube": "Subscribe to our YouTube channel",
+    "tagline_short": "WBM — rock, punk, alternative and with a bow on the side 🎀",
+    "tagline_long": "WBM — rock, punk, alternative and with a bow on the side 🎀"
   },
   "snackbar": {
     "copy_link_success": "Link copied to clipboard!",
