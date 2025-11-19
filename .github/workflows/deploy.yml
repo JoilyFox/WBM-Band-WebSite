@@ -40,7 +40,9 @@ jobs:
         run: npm ci
         
       - name: Generate static site
-        run: npm run generate
+        run: npm run deploy:github
+        env:
+          DEPLOY_TARGET: github
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
