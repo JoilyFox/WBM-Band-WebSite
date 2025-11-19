@@ -52,16 +52,12 @@ export const musicLibrary: MusicRelease[] = [
     descriptionKey: 'releases.mania.description',
     featured: true,
     musicPlatformLinks: {
-      spotify: 'https://open.spotify.com/album/0pjAORRhgVsS7eP4R6JbMF?si=XS1TsvsdRMqAWLKYNouKTg',
-      appleMusic: 'https://music.apple.com/ua/album/%D0%BC%D0%B0%D0%BD%D1%96%D1%8F/1849021879?i=1849021943',
-      youtubeMusic: 'https://music.youtube.com/playlist?list=OLAK5uy_kYiOPbe8RWJzftzhv3KjQHg6gsR_aa8HQ&si=d8-TRmzibZXz1JWN',
+      spotify: 'https://open.spotify.com/album/0pjAORRhgVsS7eP4R6JbMF?go=1',
+      appleMusic: 'https://music.apple.com/ua/album/1849021879?app=music&at=1l3vpUI&ct=LFV_42c959c7fa393b8da43ecd14d3420636&itscg=30440&itsct=catchall_p1&lId=214367132&cId=none&sr=1&src=Linkfire&ls=1',
+      youtubeMusic: 'https://music.youtube.com/playlist?list=OLAK5uy_kYiOPbe8RWJzftzhv3KjQHg6gsR_aa8HQ&src=Linkfire&lId=d0225857-ffa6-4866-94dd-63ec2394cfd0&cId=d3d58fd7-4c47-11e6-9fd0-066c3e7a8751',
       // tidal: 'https://tidal.com/browse/album/example1',
       amazonMusic: 'https://music.amazon.com/albums/B0FXYHVS59?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_O0FTj6Yaw48FAewockBknpO7w',
       deezer: 'https://link.deezer.com/s/31BimrANA5l0xTuEjk4YW',
-    },
-    preSaveMusicPlatformLinks: {
-      spotify: 'https://accounts.spotify.com/authorize?response_type=code&client_id=5a14783d79444ee9babd9176b256979e&scope=user-follow-modify+user-library-modify+playlist-modify-public+playlist-modify-private+user-read-email+user-read-private&redirect_uri=https%3A%2F%2Flnk.to%2F~%2Fprerelease%2Fspotify&state=bFVybD1hcnRpc3RzLmxhbmRyLmNvbSUyRjA1NzgyOTkwODQxMyZzSWQ9ZjBlYjk2NTUtYjFkZS00OWE2LWI4OGQtN2ZlNGFlMTFhYTU1JnRJZD01NmY2YTg3OS0wNWM2LTRhN2EtODEyZi1mMjQ0ODk0NjYxNTImdT1odHRwcyUzQSUyRiUyRmFydGlzdHMubGFuZHIuY29tJTJGMDU3ODI5OTA4NDEzJnZ0PWQ0NzlhMjIwY2ZmZTdmNGEyZTg5ZDg2YzVjZWM0NWFhJnZ1PTY5MDFlMzRiOTk5ZWI2LjIxNjI3MzE0JnJmPWh0dHBzJTNBJTJGJTJGYXBwLmxhbmRyLmNvbSUyRg%3D%3D',
-      appleMusic: 'https://music.apple.com/album/example1',
     },
     // Optional: Use distributor's pre-save page instead of custom page
     useDistributorPreSave: true,
