@@ -4,7 +4,7 @@
     "tagline": "Альтернатива • Панк • Рок",
     "meta_description": "WBM Band - альтернативний панк-рок гурт. Слухайте наш новий реліз {release}!",
     "welcome": "Ласкаво просимо до {name}!",
-  	"ready": "Ваша сучасна Nuxt 3 апка готова запалювати! 🎸",
+    "ready": "Ваша сучасна Nuxt 3 апка готова запалювати! 🎸",
     "all_rights": "Всі права захищено."
   },
   "nav": {
@@ -19,22 +19,22 @@
     "scroll_down": "Прокрутіть вниз"
   },
   "footer": {
-		"navigation": "Навігація",
-		"contact": "Контакти",
-		"location": "Київ, Україна",
-		"listen_on": "Слухайте на улюбленій платформі",
-		"listen_on_platform": "Слухати на {name}",
-		"platform_icon_alt": "Іконка {name}",
-		"privacy": "Політика конфіденційності",
-		"terms": "Умови користування",
-		"cookies": "Cookies",
-		"developer": "Зроблено з ❤️ та 🎸 від",
-		"developer_prefix": "Зроблено з ❤️ та 🎸 від",
-		"follow_instagram": "Підписуйтесь на нас в Instagram",
-		"follow_tiktok": "Підписуйтесь на нас у TikTok",
-		"subscribe_youtube": "Підписуйтесь на наш YouTube-канал",
-		"tagline_short": "WBM — рок, панк, альтернатива і з боку бантик 🎀",
-		"tagline_long": "WBM — рок, панк, альтернатива і з боку бантик 🎀"
+    "navigation": "Навігація",
+    "contact": "Контакти",
+    "location": "Київ, Україна",
+    "listen_on": "Слухайте на улюбленій платформі",
+    "listen_on_platform": "Слухати на {name}",
+    "platform_icon_alt": "Іконка {name}",
+    "privacy": "Політика конфіденційності",
+    "terms": "Умови користування",
+    "cookies": "Cookies",
+    "developer": "Зроблено з ❤️ та 🎸 від",
+    "developer_prefix": "Зроблено з ❤️ та 🎸 від",
+    "follow_instagram": "Підписуйтесь на нас в Instagram",
+    "follow_tiktok": "Підписуйтесь на нас у TikTok",
+    "subscribe_youtube": "Підписуйтесь на наш YouTube-канал",
+    "tagline_short": "WBM — рок, панк, альтернатива і з боку бантик 🎀",
+    "tagline_long": "WBM — рок, панк, альтернатива і з боку бантик 🎀"
   },
   "snackbar": {
     "copy_link_success": "Посилання скопійовано!",
@@ -230,7 +230,8 @@
       "collapse": "Згорнути",
       "listen_now": "Слухати зараз",
       "copy": "Копіювати",
-      "copied": "Скопійовано!"
+      "copied": "Скопійовано!",
+      "watch_video": "Дивитись кліп"
     },
     "detail": {
       "listen_now_title": "Слухати зараз",

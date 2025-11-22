@@ -35,7 +35,7 @@ export const musicPlatforms: Record<string, MusicPlatform> = {
   },
   youtubeMusic: {
     name: 'youtubeMusic',
-    icon: 'pi pi-youtube',
+    icon: 'pi pi-play-circle',
     colors: {
       bg: 'from-red-600 to-red-500',
       hover: 'from-red-700 to-red-600',
@@ -98,6 +98,17 @@ export const musicPlatforms: Record<string, MusicPlatform> = {
       border: 'border-blue-500/30'
     },
     displayName: 'Amazon Music'
+  },
+  musicVideo: {
+    name: 'musicVideo',
+    icon: 'pi pi-youtube',
+    colors: {
+      bg: 'from-red-600 to-red-500',
+      hover: 'from-red-700 to-red-600',
+      text: 'text-white',
+      border: 'border-red-500/30'
+    },
+    displayName: 'Music Video'
   }
 }
 

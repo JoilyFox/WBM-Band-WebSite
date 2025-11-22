@@ -114,6 +114,52 @@ onMounted(() => {
   }
 })
 
+// Generate comprehensive keywords for SEO
+const keywords = computed(() => {
+  const baseKeywords = [
+    'WBM', 'WBM Band', 'Woman Based Mechanics', 
+    'ВМБ', 'ВБМ гурт', 'Вуман Бейсд Меканікс', 'Вумен Бейсд Мекенікс',
+    'rock', 'punk', 'alternative', 'music', 'band',
+    'рок', 'панк', 'альтернатива', 'музика', 'гурт',
+    'wbm music', 'вбм музика', 'вмб музика'
+  ]
+  
+  const title = localizedTitle.value
+  const titleLower = title.toLowerCase()
+  
+  // Add release specific keywords
+  const releaseKeywords = [
+    title,
+    `${title} WBM`,
+    `${title} WBM Band`,
+    `${title} Woman Based Mechanics`,
+    `${title} ВМБ`,
+    `${title} ВБМ`,
+    `${title} Вуман Бейсд Меканікс`
+  ]
+
+  // Add transliteration support if title is in Cyrillic (basic check)
+  if (/[а-яА-Я]/.test(title)) {
+    // This is a simplified transliteration map for common cases
+    // For a robust solution, a library would be better, but this covers the user's request
+    const translitMap: Record<string, string> = {
+      'а': 'a', 'б': 'b', 'в': 'v', 'г': 'h', 'ґ': 'g', 'д': 'd', 'е': 'e', 'є': 'ye', 'ж': 'zh', 'з': 'z',
+      'и': 'y', 'і': 'i', 'ї': 'yi', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p',
+      'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch',
+      'ь': '', 'ю': 'yu', 'я': 'ya'
+    }
+    
+    const transliterated = titleLower.split('').map(char => translitMap[char] || char).join('')
+    if (transliterated !== titleLower) {
+      releaseKeywords.push(transliterated)
+      releaseKeywords.push(`${transliterated} WBM`)
+      releaseKeywords.push(`${transliterated} WBM Band`)
+    }
+  }
+
+  return [...new Set([...releaseKeywords, ...baseKeywords])].join(', ')
+})
+
 // Set comprehensive meta tags for social media sharing
 useHead({
   title: pageTitle,
@@ -121,6 +167,10 @@ useHead({
     {
       name: 'description',
       content: localizedDescription
+    },
+    {
+      name: 'keywords',
+      content: keywords
     },
     // Open Graph
     {
@@ -151,10 +201,10 @@ useHead({
       property: 'og:url',
       content: pageUrl
     },
-    // Twitter Card
+    // Twitter Card - using 'summary' for small image on left side
     {
       name: 'twitter:card',
-      content: 'summary_large_image'
+      content: 'summary'
     },
     {
       name: 'twitter:title',

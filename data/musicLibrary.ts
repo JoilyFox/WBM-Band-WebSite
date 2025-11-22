@@ -21,6 +21,7 @@ export interface MusicRelease {
     bandcamp?: string
     tidal?: string
     amazonMusic?: string
+    musicVideo?: string
   }
   preSaveMusicPlatformLinks?: {
     spotify?: string
@@ -58,6 +59,7 @@ export const musicLibrary: MusicRelease[] = [
       // tidal: 'https://tidal.com/browse/album/example1',
       amazonMusic: 'https://music.amazon.com/albums/B0FXYHVS59?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_O0FTj6Yaw48FAewockBknpO7w',
       deezer: 'https://link.deezer.com/s/31BimrANA5l0xTuEjk4YW',
+      musicVideo: 'https://www.youtube.com/watch?v=z_uH1gA9Gwo'
     },
     // Optional: Use distributor's pre-save page instead of custom page
     useDistributorPreSave: true,
@@ -98,17 +100,17 @@ export const getReleaseById = (id: string): MusicRelease | undefined => {
  */
 export const getNearestUpcomingPreSaveRelease = (): MusicRelease | undefined => {
   const now = new Date().getTime()
-  
+
   // Filter releases that are upcoming and have pre-save links
   const upcomingWithPreSave = musicLibrary.filter(release => {
     const releaseDate = new Date(release.releaseDate).getTime()
     const hasPreSaveLinks = release.preSaveMusicPlatformLinks && Object.keys(release.preSaveMusicPlatformLinks).length > 0
     return releaseDate > now && hasPreSaveLinks
   })
-  
+
   // Sort by release date (nearest first) and return the first one
   if (upcomingWithPreSave.length === 0) return undefined
-  
+
   return upcomingWithPreSave.sort((a, b) => {
     return new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime()
   })[0]

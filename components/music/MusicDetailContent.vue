@@ -460,12 +460,24 @@ const availablePlatforms = computed(() => {
     ? props.release.preSaveMusicPlatformLinks 
     : props.release.musicPlatformLinks
   
-  Object.entries(linkSource).forEach(([platform, url]) => {
-    if (url) {
-      platforms[platform] = url
+  const orderedPlatforms: Record<string, string> = {}
+  const priorityOrder = ['spotify', 'youtubeMusic', 'appleMusic', 'musicVideo']
+  
+  // Add priority platforms first
+  priorityOrder.forEach(platform => {
+    if (platform in linkSource && linkSource[platform as keyof typeof linkSource]) {
+      orderedPlatforms[platform] = linkSource[platform as keyof typeof linkSource] as string
     }
   })
-  return platforms
+  
+  // Add remaining platforms
+  Object.entries(linkSource).forEach(([platform, url]) => {
+    if (!priorityOrder.includes(platform) && url) {
+      orderedPlatforms[platform] = url
+    }
+  })
+  
+  return orderedPlatforms
 })
 
 const badgeClass = computed(() => {

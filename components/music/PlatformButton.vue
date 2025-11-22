@@ -61,7 +61,7 @@ const platformConfig = {
   },
   youtubeMusic: {
     name: 'YouTube Music',
-    icon: 'fab fa-youtube',
+    icon: 'fas fa-play-circle',
     color: '#FF0000',
     gradient: 'linear-gradient(135deg, #FF0000 0%, #ff4444 100%)'
   },
@@ -117,7 +117,14 @@ const platformConfig = {
     name: 'iTunes',
     icon: 'fab fa-itunes',
     color: '#FA243C',
+    color: '#FA243C',
     gradient: 'linear-gradient(135deg, #FA243C 0%, #ff4757 100%)'
+  },
+  musicVideo: {
+    name: 'YouTube',
+    icon: 'fab fa-youtube',
+    color: '#FF0000',
+    gradient: 'linear-gradient(135deg, #FF0000 0%, #ff4444 100%)'
   }
 }
 
@@ -139,6 +146,9 @@ const platformClass = computed(() => `platform-${props.platform}`)
 const listenNowLabel = computed(() => {
   if (props.isPreSave) {
     return t('music.detail.presave_title')
+  }
+  if (props.platform === 'musicVideo') {
+    return t('music.buttons.watch_video')
   }
   return t('music.buttons.listen_now')
 })

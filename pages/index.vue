@@ -108,12 +108,30 @@ const pageUrl = computed(() => {
   return `${baseUrl}/${locale.value}`
 })
 
+// Comprehensive keywords for SEO
+const keywords = computed(() => {
+  const baseKeywords = [
+    'WBM', 'WBM Band', 'Woman Based Mechanics', 
+    'ВМБ', 'ВБМ гурт', 'Вуман Бейсд Меканікс', 'Вумен Бейсд Мекенікс',
+    'rock', 'punk', 'alternative', 'music', 'band',
+    'рок', 'панк', 'альтернатива', 'музика', 'гурт',
+    'wbm music', 'вбм музика', 'вмб музика',
+    'WBM Kyiv', 'WBM Ukraine', 'ВМБ Київ', 'ВМБ Україна',
+    'WBM concerts', 'WBM tour', 'ВМБ концерти', 'ВМБ тур'
+  ]
+  return baseKeywords.join(', ')
+})
+
 useHead({
   title: pageTitle,
   meta: [
     {
       name: 'description',
       content: pageDescription
+    },
+    {
+      name: 'keywords',
+      content: keywords
     },
     // Open Graph
     {
