@@ -42,6 +42,6 @@ export const useGlobalLoadingStore = defineStore('globalLoading', () => {
     setProgress,
 
     // Getters
-    getLoadingState,
+    getLoadingState
   }
 })

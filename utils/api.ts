@@ -24,18 +24,18 @@ interface ErrorOptions {
  */
 function handleApiError(error: any, operation: string, options: ErrorOptions = {}) {
   const { showNotification = true, rethrow = true, defaultValue = null } = options
-  
+
   console.error(`API Error during ${operation}:`, error)
-  
+
   if (showNotification) {
     // You can integrate with your snackbar system here if needed
     console.warn(`${operation} failed:`, error.message)
   }
-  
+
   if (rethrow) {
     throw error
   }
-  
+
   return defaultValue
 }
 
@@ -44,13 +44,13 @@ function handleApiError(error: any, operation: string, options: ErrorOptions = {
  */
 function buildQueryString(params: Record<string, any>): string {
   const searchParams = new URLSearchParams()
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== null && value !== undefined) {
       searchParams.append(key, String(value))
     }
   })
-  
+
   return searchParams.toString()
 }
 
@@ -64,15 +64,15 @@ export async function cachedApiRequest(
   errorOptions: ErrorOptions = {}
 ): Promise<any> {
   const { method = 'GET', headers = {}, body, params } = options
-  
+
   const {
     enabled = false,
     ttl = 5 * 60 * 1000, // 5 minutes
     key: customKey
   } = cacheOptions
-  
+
   const operation = `${method.toLowerCase()} request to ${url}`
-  
+
   try {
     // Build full URL with query parameters
     let fullUrl = url
@@ -80,10 +80,10 @@ export async function cachedApiRequest(
       const queryString = buildQueryString(params)
       fullUrl += (url.includes('?') ? '&' : '?') + queryString
     }
-    
+
     // Generate cache key
     const cacheKey = customKey || apiCache.generateCacheKey(fullUrl, { method, body })
-    
+
     // Check cache first if enabled and method is GET
     if (enabled && method.toLowerCase() === 'get') {
       const cachedData = await apiCache.get(cacheKey, ttl)
@@ -92,7 +92,7 @@ export async function cachedApiRequest(
         return cachedData
       }
     }
-    
+
     // Prepare fetch options
     const fetchOptions: RequestInit = {
       method,
@@ -101,27 +101,27 @@ export async function cachedApiRequest(
         ...headers
       }
     }
-    
+
     if (body && method.toLowerCase() !== 'get') {
       fetchOptions.body = JSON.stringify(body)
     }
-    
+
     // Make API request
     console.log(`Making ${operation}`)
     const response = await fetch(fullUrl, fetchOptions)
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
-    
+
     const responseData = await response.json()
-    
+
     // Cache the response if enabled and method is GET
     if (enabled && method.toLowerCase() === 'get') {
       await apiCache.set(cacheKey, responseData)
       console.log(`Cached response for ${operation}`)
     }
-    
+
     return responseData
   } catch (error) {
     return handleApiError(error, operation, errorOptions)
@@ -137,12 +137,7 @@ export async function cachedGet(
   cacheOptions: CacheOptions = {},
   errorOptions: ErrorOptions = {}
 ): Promise<any> {
-  return cachedApiRequest(
-    url,
-    { ...options, method: 'GET' },
-    cacheOptions,
-    errorOptions
-  )
+  return cachedApiRequest(url, { ...options, method: 'GET' }, cacheOptions, errorOptions)
 }
 
 /**
@@ -203,19 +198,18 @@ export async function apiDelete(
 export async function invalidateCache(pattern: string | RegExp): Promise<void> {
   try {
     if (typeof window === 'undefined') return
-    
+
     // Check if using localStorage fallback
     if (apiCache.useLocalStorage) {
       const keys = Object.keys(localStorage)
       const prefix = `${apiCache.cacheName}:`
-      
-      keys.forEach(key => {
+
+      keys.forEach((key) => {
         if (key.startsWith(prefix)) {
           const cacheKey = key.substring(prefix.length)
-          const shouldInvalidate = typeof pattern === 'string' 
-            ? cacheKey.includes(pattern) 
-            : pattern.test(cacheKey)
-          
+          const shouldInvalidate =
+            typeof pattern === 'string' ? cacheKey.includes(pattern) : pattern.test(cacheKey)
+
           if (shouldInvalidate) {
             localStorage.removeItem(key)
             console.log(`Invalidated localStorage cache for: ${cacheKey}`)
@@ -224,18 +218,17 @@ export async function invalidateCache(pattern: string | RegExp): Promise<void> {
       })
       return
     }
-    
+
     if (!('caches' in window)) return
-    
+
     const cache = await caches.open(apiCache.cacheName)
     const requests = await cache.keys()
-    
+
     for (const request of requests) {
       const url = request.url
-      const shouldInvalidate = typeof pattern === 'string' 
-        ? url.includes(pattern) 
-        : pattern.test(url)
-      
+      const shouldInvalidate =
+        typeof pattern === 'string' ? url.includes(pattern) : pattern.test(url)
+
       if (shouldInvalidate) {
         await cache.delete(request)
         console.log(`Invalidated cache for: ${url}`)

@@ -1,12 +1,15 @@
 <template>
-  <footer :class="['footer-section bg-surface-950 border-t border-white/10', { 'footer-minimized': minimized }]">
+  <footer
+    :class="[
+      'footer-section bg-surface-950 border-t border-white/10',
+      { 'footer-minimized': minimized }
+    ]"
+  >
     <CommonContainer size="xl" padding="md" class="mb-4 md2:mb-0">
-      
       <!-- Minimized Footer Layout -->
       <div v-if="minimized" class="py-6">
         <!-- Mobile: Centered Column Layout -->
         <div class="flex flex-col items-center space-y-4 text-center md2:hidden">
-          
           <!-- Logo -->
           <Logo
             size="custom"
@@ -15,18 +18,18 @@
             image-class="h-10 w-auto filter drop-shadow-lg"
             loading="lazy"
           />
-          
+
           <!-- Description Text -->
           <p class="text-white/70 text-sm leading-relaxed max-w-md">
             {{ t('footer.tagline_short', { name: bandName }) }}
           </p>
-          
+
           <!-- Social Media Links Row -->
           <div class="flex space-x-4">
-            <a 
-              v-for="social in socialLinks" 
+            <a
+              v-for="social in socialLinks"
               :key="social.name"
-              :href="social.url" 
+              :href="social.url"
               :aria-label="social.label"
               class="social-link-minimal"
               target="_blank"
@@ -35,26 +38,26 @@
               <i :class="social.icon" class="text-lg"></i>
             </a>
           </div>
-          
+
           <!-- Privacy Policy Links Row -->
           <div class="flex space-x-6 text-sm white !mt-6 justify-center gap-y-3 flex-wrap">
-            <button 
-              v-for="legal in legalLinks" 
+            <button
+              v-for="legal in legalLinks"
               :key="legal.action"
-              @click="handleLegalLink(legal.action)"
               class="legal-link-minimal whitespace-nowrap"
+              @click="handleLegalLink(legal.action)"
             >
               {{ t(legal.label) }}
             </button>
           </div>
-          
+
           <!-- Developer Credit -->
           <div class="text-white/50 text-xs pt-2">
-            {{ t('footer.developer_prefix') }} 
-            <a 
+            {{ t('footer.developer_prefix') }}
+            <a
               v-if="developerInstagram"
-              :href="developerInstagram" 
-              target="_blank" 
+              :href="developerInstagram"
+              target="_blank"
               rel="noopener noreferrer"
               class="developer-link"
             >
@@ -62,7 +65,7 @@
             </a>
             <span v-else>{{ developerName }}</span>
           </div>
-          
+
           <!-- Language Switcher (mobile minimized footer) -->
           <div class="flex items-center justify-center md:justify-start !mt-6">
             <CommonLanguageSwitcher />
@@ -71,7 +74,6 @@
 
         <!-- Desktop: Traditional Horizontal Layout -->
         <div class="hidden md2:flex gap-8 md:items-center md:justify-between">
-          
           <!-- Left Section: Logo and Description -->
           <div class="flex items-center space-x-6">
             <Logo
@@ -85,13 +87,13 @@
               {{ t('footer.tagline_short', { name: bandName }) }}
             </p>
           </div>
-          
+
           <!-- Center Section: Social Media Links -->
           <div class="flex space-x-4">
-            <a 
-              v-for="social in socialLinks" 
+            <a
+              v-for="social in socialLinks"
               :key="social.name"
-              :href="social.url" 
+              :href="social.url"
               :aria-label="social.label"
               class="social-link-minimal"
               target="_blank"
@@ -100,15 +102,15 @@
               <i :class="social.icon" class="text-lg"></i>
             </a>
           </div>
-          
+
           <!-- Right Section: Legal Links and Developer Credit -->
           <div class="flex flex-col items-end space-y-2">
             <div class="flex space-x-6 text-sm items-center">
-              <button 
-                v-for="legal in legalLinks" 
+              <button
+                v-for="legal in legalLinks"
                 :key="legal.action"
-                @click="handleLegalLink(legal.action)"
                 class="legal-link-minimal whitespace-nowrap"
+                @click="handleLegalLink(legal.action)"
               >
                 {{ legal.label }}
               </button>
@@ -116,11 +118,11 @@
             <div class="flex items-center justify-between w-full gap-8">
               <!-- Developer Credit -->
               <div class="text-white/50 text-xs">
-                {{ t('footer.developer_prefix') }} 
-                <a 
+                {{ t('footer.developer_prefix') }}
+                <a
                   v-if="developerInstagram"
-                  :href="developerInstagram" 
-                  target="_blank" 
+                  :href="developerInstagram"
+                  target="_blank"
                   rel="noopener noreferrer"
                   class="developer-link"
                 >
@@ -141,1020 +143,1027 @@
       <!-- Full Footer Layout (existing) -->
       <div v-else>
         <!-- Main Footer Content -->
-      <div class="pb-12 pt-0 sm:pt-8 lg:py-16 lg:pt-12">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          
-          <!-- Brand Section -->
-          <div class="lg:col-span-2 text-center md:text-left">
-            <div class="flex items-center justify-center lg:justify-start mb-6">
-              <Logo
-                size="custom"
-                :clickable="true"
-                :on-click="scrollToHero"
-                image-class="h-12 w-auto filter drop-shadow-lg"
-                loading="lazy"
-              />
+        <div class="pb-12 pt-0 sm:pt-8 lg:py-16 lg:pt-12">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Brand Section -->
+            <div class="lg:col-span-2 text-center md:text-left">
+              <div class="flex items-center justify-center lg:justify-start mb-6">
+                <Logo
+                  size="custom"
+                  :clickable="true"
+                  :on-click="scrollToHero"
+                  image-class="h-12 w-auto filter drop-shadow-lg"
+                  loading="lazy"
+                />
+              </div>
+              <p
+                class="text-white/70 text-sm leading-relaxed mb-6 max-lg:text-center max-w-md mx-auto md:mx-0"
+              >
+                {{ t('footer.tagline_long') }}
+              </p>
+
+              <!-- Social Media Links -->
+              <div class="flex space-x-4 justify-center lg:justify-start">
+                <a
+                  v-for="social in socialLinks"
+                  :key="social.name"
+                  :href="social.url"
+                  :aria-label="social.label"
+                  class="social-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i :class="social.icon" class="text-xl"></i>
+                </a>
+              </div>
             </div>
-            <p class="text-white/70 text-sm leading-relaxed mb-6 max-lg:text-center max-w-md mx-auto md:mx-0">
-              {{ t('footer.tagline_long') }}
-            </p>
-            
-            <!-- Social Media Links -->
-            <div class="flex space-x-4 justify-center lg:justify-start">
-              <a 
-                v-for="social in socialLinks" 
-                :key="social.name"
-                :href="social.url" 
-                :aria-label="social.label"
-                class="social-link"
+
+            <!-- Navigation Section (Desktop Only) -->
+            <div class="hidden lg:block text-center md:text-left">
+              <h3 class="footer-heading">{{ t('footer.navigation') }}</h3>
+              <ul class="space-y-3">
+                <li v-for="item in navigationItems" :key="item.elementId">
+                  <button class="footer-link" @click="handleNavClick(item.elementId)">
+                    {{ t(item.label) }}
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="text-center lg:text-left">
+              <h3 class="footer-heading">{{ t('footer.contact') }}</h3>
+              <ul class="space-y-3">
+                <li v-if="contactEmail" class="footer-contact-item justify-center lg:justify-start">
+                  <i class="pi pi-envelope text-white/60"></i>
+                  <a :href="`mailto:${contactEmail}`" class="footer-link">
+                    {{ contactEmail }}
+                  </a>
+                </li>
+                <li class="footer-contact-item justify-center lg:justify-start">
+                  <i class="pi pi-map-marker text-white/60"></i>
+                  <span class="text-white/70 text-sm">
+                    {{ t('footer.location') }}
+                  </span>
+                </li>
+                <li
+                  v-if="contactPhoneNumber && contactPhone"
+                  class="footer-contact-item justify-center lg:justify-start"
+                >
+                  <i class="pi pi-phone text-white/60"></i>
+                  <a :href="`tel:${contactPhoneNumber}`" class="footer-link">
+                    {{ contactPhone }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Streaming Platforms (only show if there are platforms) -->
+        <div v-if="streamingPlatforms.length > 0" class="py-8 border-t border-white/10">
+          <div class="text-center">
+            <h4 class="text-white/80 text-sm font-medium mb-4">{{ t('footer.listen_on') }}</h4>
+            <div class="flex justify-center items-center space-x-8 flex-wrap gap-y-6">
+              <a
+                v-for="platform in streamingPlatforms"
+                :key="platform.name"
+                :href="platform.url"
+                :aria-label="`Listen on ${platform.name}`"
+                class="streaming-icon-link"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <i :class="social.icon" class="text-xl"></i>
+                <img
+                  :src="platform.icon"
+                  :alt="t('footer.platform_icon_alt', { name: platform.name })"
+                  class="streaming-icon"
+                  loading="lazy"
+                />
               </a>
             </div>
           </div>
-
-          <!-- Navigation Section (Desktop Only) -->
-          <div class="hidden lg:block text-center md:text-left">
-            <h3 class="footer-heading">{{ t('footer.navigation') }}</h3>
-            <ul class="space-y-3">
-              <li v-for="item in navigationItems" :key="item.elementId">
-                <button 
-                  @click="handleNavClick(item.elementId)"
-                  class="footer-link"
-                >
-                  {{ t(item.label) }}
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Contact Info -->
-          <div class="text-center lg:text-left">
-            <h3 class="footer-heading">{{ t('footer.contact') }}</h3>
-            <ul class="space-y-3">
-              <li v-if="contactEmail" class="footer-contact-item justify-center lg:justify-start">
-                <i class="pi pi-envelope text-white/60"></i>
-                <a :href="`mailto:${contactEmail}`" class="footer-link">
-                  {{ contactEmail }}
-                </a>
-              </li>
-              <li class="footer-contact-item justify-center lg:justify-start">
-                <i class="pi pi-map-marker text-white/60"></i>
-                <span class="text-white/70 text-sm">
-                  {{ t('footer.location') }}
-                </span>
-              </li>
-              <li v-if="contactPhoneNumber && contactPhone" class="footer-contact-item justify-center lg:justify-start">
-                <i class="pi pi-phone text-white/60"></i>
-                <a :href="`tel:${contactPhoneNumber}`" class="footer-link">
-                  {{ contactPhone }}
-                </a>
-              </li>
-            </ul>
-          </div>
         </div>
-      </div>
 
-      <!-- Streaming Platforms (only show if there are platforms) -->
-      <div v-if="streamingPlatforms.length > 0" class="py-8 border-t border-white/10">
-        <div class="text-center">
-              <h4 class="text-white/80 text-sm font-medium mb-4">{{ t('footer.listen_on') }}</h4>
-          <div class="flex justify-center items-center space-x-8 flex-wrap gap-y-6">
-            <a 
-              v-for="platform in streamingPlatforms" 
-              :key="platform.name"
-              :href="platform.url" 
-              :aria-label="`Listen on ${platform.name}`"
-              class="streaming-icon-link"
-              target="_blank"
-              rel="noopener noreferrer"
+        <!-- Bottom Bar -->
+        <div class="py-6 border-t border-white/10 mb-4 md2:mb-0">
+          <div
+            class="flex flex-col md2:flex-row justify-between items-center space-y-4 md2:space-y-0 gap-x-8"
+          >
+            <div class="text-center md2:text-left">
+              <p class="text-white/50 text-xs">
+                © {{ currentYear }} {{ fullBandName }}. {{ t('app.all_rights') }}
+              </p>
+            </div>
+
+            <div
+              class="flex flex-col md2:flex-row items-center md2:space-x-6 space-y-3 md2:space-y-0"
             >
-              <img 
-                :src="platform.icon" 
-                :alt="t('footer.platform_icon_alt', { name: platform.name })"
-                class="streaming-icon"
-                loading="lazy"
-              />
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom Bar -->
-      <div class="py-6 border-t border-white/10 mb-4 md2:mb-0">
-        <div class="flex flex-col md2:flex-row justify-between items-center space-y-4 md2:space-y-0 gap-x-8">
-          <div class="text-center md2:text-left">
-            <p class="text-white/50 text-xs">
-              © {{ currentYear }} {{ fullBandName }}. {{ t('app.all_rights') }}
-            </p>
-          </div>
-
-          <div class="flex flex-col md2:flex-row items-center md2:space-x-6 space-y-3 md2:space-y-0">
-            <div class="flex items-center space-x-6">
-              <button 
-                v-for="legal in legalLinks" 
-                :key="legal.label"
-                @click="handleLegalLink(legal.action)"
-                class="legal-link whitespace-nowrap"
+              <div class="flex items-center space-x-6">
+                <button
+                  v-for="legal in legalLinks"
+                  :key="legal.label"
+                  class="legal-link whitespace-nowrap"
+                  @click="handleLegalLink(legal.action)"
+                >
+                  {{ legal.label }}
+                </button>
+              </div>
+              <div
+                class="text-white/50 md2:text-white/30 text-xs !mt-[26px] min-w-[150px] md2:!mt-0 two-line-clamp"
               >
-                {{ legal.label }}
-              </button>
+                {{ t('footer.developer_prefix') }}
+                <a
+                  v-if="developerInstagram"
+                  :href="developerInstagram"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="developer-link"
+                >
+                  {{ developerName }}
+                </a>
+                <span v-else>{{ developerName }}</span>
+              </div>
             </div>
-            <div class="text-white/50 md2:text-white/30 text-xs !mt-[26px] min-w-[150px] md2:!mt-0 two-line-clamp">
-              {{ t('footer.developer_prefix') }} 
-              <a 
-                v-if="developerInstagram"
-                :href="developerInstagram" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                class="developer-link"
-              >
-                {{ developerName }}
-              </a>
-              <span v-else>{{ developerName }}</span>
+
+            <!-- Language Switcher (desktop full footer) -->
+            <div class="flex items-center justify-center md2:justify-start">
+              <CommonLanguageSwitcher />
             </div>
           </div>
-          
-          <!-- Language Switcher (desktop full footer) -->
-          <div class="flex items-center justify-center md2:justify-start">
-            <CommonLanguageSwitcher />
-          </div>
         </div>
-      </div>
       </div>
     </CommonContainer>
   </footer>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useSnackbar } from '~/composables/useSnackbar'
-import { useScrollTo } from '~/composables/useScrollTo'
-import { getConfig } from '~/utils/configHelpers'
-import { footerNavigation } from '~/config/navigation'
-import Logo from '~/components/ui/Logo.vue'
-import CommonLanguageSwitcher from '~/components/common/LanguageSwitcher.vue'
-import CommonContainer from '~/components/common/Container.vue'
+  import { computed } from 'vue'
+  import { useSnackbar } from '~/composables/useSnackbar'
+  import { useScrollTo } from '~/composables/useScrollTo'
+  import { getConfig } from '~/utils/configHelpers'
+  import { footerNavigation } from '~/config/navigation'
+  import Logo from '~/components/ui/Logo.vue'
+  import CommonLanguageSwitcher from '~/components/common/LanguageSwitcher.vue'
+  import CommonContainer from '~/components/common/Container.vue'
 
-// Props
-interface Props {
-  minimized?: boolean
-}
+  // Composables
+  import { useI18n } from 'vue-i18n'
+  import { useLocalePath } from '#i18n'
 
-const props = withDefaults(defineProps<Props>(), {
-  minimized: false
-})
-
-// Composables
-import { useI18n } from 'vue-i18n'
-import { useLocalePath } from '#i18n'
-const snackbar = useSnackbar()
-const { t } = useI18n()
-const localePath = useLocalePath()
-const { scrollToElementWithNavigation } = useScrollTo()
-
-// Navigation items from config
-const navigationItems = footerNavigation
-
-// Navigation handler
-const handleNavClick = (elementId: string) => {
-  scrollToElementWithNavigation(elementId)
-}
-
-// Helper function to resolve asset paths based on deployment target
-const resolveAssetPath = (path: string) => {
-  // In development, use the path as-is
-  if (process.dev) return path
-  
-  // Get the base URL from runtime config (set via DEPLOY_TARGET env var)
-  const config = useRuntimeConfig()
-  const baseURL = config.app.baseURL || '/'
-  
-  // If baseURL is just '/', return path as-is (custom domain)
-  if (baseURL === '/') return path
-  
-  // For GitHub Pages, prepend the base URL
-  return `${baseURL.replace(/\/$/, '')}${path}`
-}
-
-// Computed properties for config values
-const bandName = computed(() => getConfig('general.bandName'))
-const shortBandName = computed(() => getConfig('general.bandName'))
-const fullBandName = computed(() => getConfig('general.fullBandName'))
-const contactEmail = computed(() => getConfig('general.contact.email'))
-const contactPhone = computed(() => getConfig('general.contact.phone'))
-const contactPhoneNumber = computed(() => getConfig('general.contact.phoneNumber'))
-const developerName = computed(() => getConfig('general.developer.name'))
-const developerInstagram = computed(() => getConfig('general.developer.instagramUrl'))
-
-// Current year for copyright
-const currentYear = computed(() => new Date().getFullYear())
-
-// Social media links (labels reactive to locale changes)
-const socialLinks = computed(() => {
-  const links = []
-  
-  const instagramUrl = getConfig('general.socialMedia.instagram')
-  const tiktokUrl = getConfig('general.socialMedia.tiktok')
-  const youtubeUrl = getConfig('general.socialMedia.youtube')
-  
-  if (instagramUrl) {
-    links.push({
-      name: 'instagram',
-      icon: 'pi pi-instagram',
-      url: instagramUrl,
-      label: t('footer.follow_instagram')
-    })
-  }
-  
-  if (tiktokUrl) {
-    links.push({
-      name: 'tiktok',
-      icon: 'pi pi-tiktok',
-      url: tiktokUrl,
-      label: t('footer.follow_tiktok')
-    })
-  }
-  
-  if (youtubeUrl) {
-    links.push({
-      name: 'youtube',
-      icon: 'pi pi-youtube',
-      url: youtubeUrl,
-      label: t('footer.subscribe_youtube')
-    })
-  }
-  
-  return links
-})
-
-// Streaming platforms - using computed to ensure proper path resolution
-const streamingPlatforms = computed(() => {
-  const platforms: Array<{ name: string; icon: string; url: string }> = []
-  
-  const spotifyUrl = getConfig('general.streamingPlatforms.spotify')
-  const appleMusicUrl = getConfig('general.streamingPlatforms.appleMusic')
-  const youtubeMusicUrl = getConfig('general.streamingPlatforms.youtubeMusic')
-  
-  if (spotifyUrl) {
-    platforms.push({
-      name: 'Spotify',
-      icon: resolveAssetPath('/assets/images/icons/spotify-icon.svg'),
-      url: spotifyUrl
-    })
-  }
-  
-  if (appleMusicUrl) {
-    platforms.push({
-      name: 'Apple Music',
-      icon: resolveAssetPath('/assets/images/icons/apple-music-icon.svg'),
-      url: appleMusicUrl
-    })
-  }
-  
-  if (youtubeMusicUrl) {
-    platforms.push({
-      name: 'YouTube Music',
-      icon: resolveAssetPath('/assets/images/icons/youtube-music-icon.svg'),
-      url: youtubeMusicUrl
-    })
+  // Props
+  interface Props {
+    minimized?: boolean
   }
 
-  return platforms
-})
+  const props = withDefaults(defineProps<Props>(), {
+    minimized: false
+  })
+  const snackbar = useSnackbar()
+  const { t } = useI18n()
+  const localePath = useLocalePath()
+  const { scrollToElementWithNavigation } = useScrollTo()
 
-// Legal links (labels reactive to locale changes)
-const legalLinks = computed(() => ([
-  { label: t('footer.privacy'), action: 'privacy' },
-  { label: t('footer.terms'), action: 'terms' },
-  { label: t('footer.cookies'), action: 'cookies' }
-]))
+  // Navigation items from config
+  const navigationItems = footerNavigation
 
-// Legal link handler
-const handleLegalLink = (action: string) => {
-  switch (action) {
-    case 'privacy':
-      navigateTo(localePath('/privacy-policy'))
-      break
-    case 'terms':
-      navigateTo(localePath('/terms-of-service'))
-      break
-    case 'cookies':
-      navigateTo(localePath('/cookies-policy'))
-      break
-    default:
-      console.warn('Unknown legal link action:', action)
+  // Navigation handler
+  const handleNavClick = (elementId: string) => {
+    scrollToElementWithNavigation(elementId)
   }
-}
 
-// Logo click handler for smooth scrolling to hero section
-const scrollToHero = () => {
-  scrollToElementWithNavigation('hero')
-}
+  // Helper function to resolve asset paths based on deployment target
+  const resolveAssetPath = (path: string) => {
+    // In development, use the path as-is
+    if (import.meta.dev) return path
+
+    // Get the base URL from runtime config (set via DEPLOY_TARGET env var)
+    const config = useRuntimeConfig()
+    const baseURL = config.app.baseURL || '/'
+
+    // If baseURL is just '/', return path as-is (custom domain)
+    if (baseURL === '/') return path
+
+    // For GitHub Pages, prepend the base URL
+    return `${baseURL.replace(/\/$/, '')}${path}`
+  }
+
+  // Computed properties for config values
+  const bandName = computed(() => getConfig('general.bandName'))
+  const shortBandName = computed(() => getConfig('general.bandName'))
+  const fullBandName = computed(() => getConfig('general.fullBandName'))
+  const contactEmail = computed(() => getConfig('general.contact.email'))
+  const contactPhone = computed(() => getConfig('general.contact.phone'))
+  const contactPhoneNumber = computed(() => getConfig('general.contact.phoneNumber'))
+  const developerName = computed(() => getConfig('general.developer.name'))
+  const developerInstagram = computed(() => getConfig('general.developer.instagramUrl'))
+
+  // Current year for copyright
+  const currentYear = computed(() => new Date().getFullYear())
+
+  // Social media links (labels reactive to locale changes)
+  const socialLinks = computed(() => {
+    const links = []
+
+    const instagramUrl = getConfig('general.socialMedia.instagram')
+    const tiktokUrl = getConfig('general.socialMedia.tiktok')
+    const youtubeUrl = getConfig('general.socialMedia.youtube')
+
+    if (instagramUrl) {
+      links.push({
+        name: 'instagram',
+        icon: 'pi pi-instagram',
+        url: instagramUrl,
+        label: t('footer.follow_instagram')
+      })
+    }
+
+    if (tiktokUrl) {
+      links.push({
+        name: 'tiktok',
+        icon: 'pi pi-tiktok',
+        url: tiktokUrl,
+        label: t('footer.follow_tiktok')
+      })
+    }
+
+    if (youtubeUrl) {
+      links.push({
+        name: 'youtube',
+        icon: 'pi pi-youtube',
+        url: youtubeUrl,
+        label: t('footer.subscribe_youtube')
+      })
+    }
+
+    return links
+  })
+
+  // Streaming platforms - using computed to ensure proper path resolution
+  const streamingPlatforms = computed(() => {
+    const platforms: Array<{ name: string; icon: string; url: string }> = []
+
+    const spotifyUrl = getConfig('general.streamingPlatforms.spotify')
+    const appleMusicUrl = getConfig('general.streamingPlatforms.appleMusic')
+    const youtubeMusicUrl = getConfig('general.streamingPlatforms.youtubeMusic')
+
+    if (spotifyUrl) {
+      platforms.push({
+        name: 'Spotify',
+        icon: resolveAssetPath('/assets/images/icons/spotify-icon.svg'),
+        url: spotifyUrl
+      })
+    }
+
+    if (appleMusicUrl) {
+      platforms.push({
+        name: 'Apple Music',
+        icon: resolveAssetPath('/assets/images/icons/apple-music-icon.svg'),
+        url: appleMusicUrl
+      })
+    }
+
+    if (youtubeMusicUrl) {
+      platforms.push({
+        name: 'YouTube Music',
+        icon: resolveAssetPath('/assets/images/icons/youtube-music-icon.svg'),
+        url: youtubeMusicUrl
+      })
+    }
+
+    return platforms
+  })
+
+  // Legal links (labels reactive to locale changes)
+  const legalLinks = computed(() => [
+    { label: t('footer.privacy'), action: 'privacy' },
+    { label: t('footer.terms'), action: 'terms' },
+    { label: t('footer.cookies'), action: 'cookies' }
+  ])
+
+  // Legal link handler
+  const handleLegalLink = (action: string) => {
+    switch (action) {
+      case 'privacy':
+        navigateTo(localePath('/privacy-policy'))
+        break
+      case 'terms':
+        navigateTo(localePath('/terms-of-service'))
+        break
+      case 'cookies':
+        navigateTo(localePath('/cookies-policy'))
+        break
+      default:
+        console.warn('Unknown legal link action:', action)
+    }
+  }
+
+  // Logo click handler for smooth scrolling to hero section
+  const scrollToHero = () => {
+    scrollToElementWithNavigation('hero')
+  }
 </script>
 
 <style scoped>
-/* Footer section base */
-.footer-section {
-  background: 
-    linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%),
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.05) 0%, transparent 50%);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Remove default focus rings for all interactive elements */
-.footer-section button,
-.footer-section a {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Only show focus outline for keyboard navigation */
-.footer-section button:focus-visible,
-.footer-section a:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.3);
-  outline-offset: 2px;
-}
-
-.footer-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.015'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
-
-/* Footer headings */
-.footer-heading {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-/* Footer logo button */
-.footer-logo-button {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-radius: 0.5rem;
-}
-
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .footer-logo-button:hover {
-    transform: translateY(-2px) scale(1.03);
-    filter: drop-shadow(0 4px 15px rgba(255, 255, 255, 0.1));
-  }
-  
-  .footer-logo-button:hover img {
-    filter: brightness(1.1) drop-shadow(0 4px 15px rgba(255, 255, 255, 0.2));
-  }
-}
-
-/* Mobile and touch device specific styles */
-@media (hover: none) and (pointer: coarse) {
-  .footer-logo-button:active {
-    transform: scale(0.97);
-    transition-duration: 0.15s;
-  }
-  
-  .footer-logo-button:active img {
-    filter: brightness(1.1);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Fallback for devices that support both hover and touch */
-@media (hover: hover) and (pointer: coarse) {
-  .footer-logo-button:hover {
-    transform: none;
-    filter: none;
-  }
-  
-  .footer-logo-button:hover img {
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-  }
-  
-  .footer-logo-button:active {
-    transform: scale(0.97);
-    transition-duration: 0.15s;
-  }
-  
-  .footer-logo-button:active img {
-    filter: brightness(1.1);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Footer links */
-.footer-link {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-}
-
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .footer-link:hover {
-    color: rgba(255, 255, 255, 0.9);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    transform: translateX(2px);
-  }
-}
-
-/* Mobile and touch device specific styles */
-@media (hover: none) and (pointer: coarse) {
-  .footer-link:active {
-    color: rgba(255, 255, 255, 0.9);
-    transform: scale(0.98);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Social media links */
-.social-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  color: rgba(255, 255, 255, 0.7);
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .social-link:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.9);
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 
-      0 4px 15px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-}
-
-/* Mobile and touch device specific styles */
-@media (hover: none) and (pointer: coarse) {
-  .social-link:active {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.9);
-    transform: scale(0.95);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Contact items */
-.footer-contact-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-/* Legal links */
-.legal-link {
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 0.75rem;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-}
-
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .legal-link:hover {
-    color: rgba(255, 255, 255, 0.7);
-  }
-}
-
-/* Mobile and touch device specific styles */
-@media (hover: none) and (pointer: coarse) {
-  .legal-link:active {
-    color: rgba(255, 255, 255, 0.7);
-    transform: scale(0.98);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Fallback for devices that support both hover and touch */
-@media (hover: hover) and (pointer: coarse) {
-  .legal-link:hover {
-    color: rgba(255, 255, 255, 0.3); /* Disable hover */
-  }
-  
-  .legal-link:active {
-    color: rgba(255, 255, 255, 0.7);
-    transform: scale(0.98);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Developer link styles */
-.developer-link {
-  text-decoration: none;
-  transition: all 0.3s ease;
-  font-weight: 500;
-}
-
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .developer-link:hover {
-    color: rgba(255, 255, 255, 0.668);
-    text-decoration: underline;
-  }
-}
-
-/* Mobile and touch device specific styles */
-@media (hover: none) and (pointer: coarse) {
-  .developer-link:active {
-    color: rgba(255, 255, 255, 0.668);
-    transform: scale(0.98);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Focus state for accessibility */
-.developer-link:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.3);
-  outline-offset: 1px;
-    color: rgba(255, 255, 255, 0.668);
-}
-
-/* Clamp long text to 2 lines */
-.two-line-clamp {
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Streaming platform icon links */
-.streaming-icon-link {
-  display: inline-block;
-  position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: center;
-}
-
-.streaming-icon {
-  height: 2rem;
-  width: 2rem;
-  filter: brightness(0.85) saturate(0.9);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .streaming-icon-link:hover {
-    transform: translateY(-3px) scale(1.15);
-  }
-  
-  .streaming-icon-link:hover .streaming-icon {
-    filter: brightness(1.2) saturate(1.3);
-  }
-  
-  /* Platform-specific glow effects - clean glows without borders */
-  .streaming-icon-link:nth-child(1):hover .streaming-icon {
-    filter: brightness(1.2) saturate(1.3) drop-shadow(0 0 15px rgba(29, 185, 84, 0.4));
-  }
-  
-  .streaming-icon-link:nth-child(2):hover .streaming-icon {
-    filter: brightness(1.2) saturate(1.3) drop-shadow(0 0 15px rgba(255, 45, 85, 0.4));
-  }
-  
-  .streaming-icon-link:nth-child(3):hover .streaming-icon {
-    filter: brightness(1.2) saturate(1.3) drop-shadow(0 0 15px rgba(255, 0, 0, 0.4));
-  }
-}
-
-/* Mobile and touch device specific styles */
-@media (hover: none) and (pointer: coarse) {
-  .streaming-icon-link:active {
-    transform: scale(0.9);
-    transition-duration: 0.15s;
-  }
-  
-  .streaming-icon-link:active .streaming-icon {
-    filter: brightness(1.2) saturate(1.3);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Fallback for devices that support both hover and touch */
-@media (hover: hover) and (pointer: coarse) {
-  .streaming-icon-link:hover {
-    transform: none;
-  }
-  
-  .streaming-icon-link:hover .streaming-icon {
-    filter: brightness(0.85) saturate(0.9);
-  }
-  
-  .streaming-icon-link:active {
-    transform: scale(0.9);
-    transition-duration: 0.15s;
-  }
-  
-  .streaming-icon-link:active .streaming-icon {
-    filter: brightness(1.2) saturate(1.3);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Focus states for accessibility */
-.footer-link:focus-visible,
-.social-link:focus-visible,
-.streaming-icon-link:focus-visible,
-.legal-link:focus-visible,
-.footer-logo-button:focus-visible,
-.developer-link:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.3);
-  outline-offset: 2px;
-}
-
-/* Remove default focus outlines on click */
-.footer-link:focus:not(:focus-visible),
-.social-link:focus:not(:focus-visible),
-.streaming-icon-link:focus:not(:focus-visible),
-.legal-link:focus:not(:focus-visible),
-.footer-logo-button:focus:not(:focus-visible),
-.developer-link:focus:not(:focus-visible) {
-  outline: none;
-}
-
-.streaming-icon-link:focus-visible .streaming-icon {
-  filter: brightness(1.2) saturate(1.3);
-}
-
-.legal-link:focus-visible {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.footer-logo-button:focus-visible img {
-  filter: brightness(1.1) drop-shadow(0 4px 15px rgba(255, 255, 255, 0.2));
-}
-
-/* Mobile responsive adjustments */
-@media (max-width: 767px) {
+  /* Footer section base */
   .footer-section {
-    padding-top: 1.5rem;
+    background:
+      linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%),
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.05) 0%, transparent 50%);
+    position: relative;
+    overflow: hidden;
+  }
 
-    &.footer-minimized {
-      padding-top: 0;
+  /* Remove default focus rings for all interactive elements */
+  .footer-section button,
+  .footer-section a {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Only show focus outline for keyboard navigation */
+  .footer-section button:focus-visible,
+  .footer-section a:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
+  }
+
+  .footer-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.015'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* Footer headings */
+  .footer-heading {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Footer logo button */
+  .footer-logo-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+  }
+
+  /* Desktop hover effects only */
+  @media (hover: hover) and (pointer: fine) {
+    .footer-logo-button:hover {
+      transform: translateY(-2px) scale(1.03);
+      filter: drop-shadow(0 4px 15px rgba(255, 255, 255, 0.1));
+    }
+
+    .footer-logo-button:hover img {
+      filter: brightness(1.1) drop-shadow(0 4px 15px rgba(255, 255, 255, 0.2));
     }
   }
-  
-  .footer-heading {
-    font-size: 0.9rem;
-    margin-bottom: 0.75rem;
+
+  /* Mobile and touch device specific styles */
+  @media (hover: none) and (pointer: coarse) {
+    .footer-logo-button:active {
+      transform: scale(0.97);
+      transition-duration: 0.15s;
+    }
+
+    .footer-logo-button:active img {
+      filter: brightness(1.1);
+      transition-duration: 0.15s;
+    }
   }
-  
+
+  /* Fallback for devices that support both hover and touch */
+  @media (hover: hover) and (pointer: coarse) {
+    .footer-logo-button:hover {
+      transform: none;
+      filter: none;
+    }
+
+    .footer-logo-button:hover img {
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+    }
+
+    .footer-logo-button:active {
+      transform: scale(0.97);
+      transition-duration: 0.15s;
+    }
+
+    .footer-logo-button:active img {
+      filter: brightness(1.1);
+      transition-duration: 0.15s;
+    }
+  }
+
+  /* Footer links */
   .footer-link {
-    font-size: 0.8rem;
-  }
-  
-  .social-link {
-    width: 2.25rem;
-    height: 2.25rem;
-  }
-  
-  .legal-link {
-    font-size: 0.7rem;
-  }
-  
-  /* Smaller streaming icons on mobile */
-  .streaming-icon {
-    height: 1.75rem;
-    width: 1.75rem;
-  }
-  
-  /* Reduce spacing between streaming icons on mobile */
-  .streaming-icon-link + .streaming-icon-link {
-    margin-left: 1.5rem;
-  }
-}
-
-/* Reduce motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .footer-link,
-  .social-link,
-  .streaming-icon-link,
-  .legal-link,
-  .footer-logo-button,
-  .developer-link {
-    transition: none;
-  }
-  
-  .streaming-icon {
-    transition: none;
-  }
-  
-  .footer-link:hover,
-  .social-link:hover,
-  .streaming-icon-link:hover,
-  .legal-link:hover,
-  .footer-logo-button:hover,
-  .developer-link:hover {
-    transform: none;
-  }
-  
-  .streaming-icon-link:hover .streaming-icon {
-    transform: none;
-  }
-  
-  .footer-logo-button:hover img {
-    transform: none;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-  }
-  
-  .footer-link:active,
-  .social-link:active,
-  .streaming-icon-link:active,
-  .legal-link:active,
-  .footer-logo-button:active,
-  .developer-link:active {
-    transform: none;
-  }
-}
-
-/* Minimized Footer Styles */
-.footer-minimized {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.footer-logo-link-minimal {
-  display: inline-block;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-radius: 0.5rem;
-}
-
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .footer-logo-link-minimal:hover {
-    transform: translateY(-1px) scale(1.03);
-    filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
-  }
-  
-  .footer-logo-link-minimal:hover img {
-    filter: brightness(1.1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2));
-  }
-}
-
-/* Mobile and touch device specific styles */
-@media (hover: none) and (pointer: coarse) {
-  .footer-logo-link-minimal:active {
-    transform: scale(0.97);
-    transition-duration: 0.15s;
-  }
-  
-  .footer-logo-link-minimal:active img {
-    filter: brightness(1.1);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Focus state for accessibility */
-.footer-logo-link-minimal:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.3);
-  outline-offset: 2px;
-}
-
-.footer-logo-link-minimal:focus-visible img {
-  filter: brightness(1.1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2));
-}
-
-.social-link-minimal {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  color: rgba(255, 255, 255, 0.7);
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  text-decoration: none;
-}
-
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .social-link-minimal:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.9);
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 
-      0 4px 15px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-}
-
-/* Mobile and touch device specific styles */
-@media (hover: none) and (pointer: coarse) {
-  .social-link-minimal:active {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.9);
-    transform: scale(0.95);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Focus state for accessibility */
-.social-link-minimal:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.3);
-  outline-offset: 2px;
-}
-
-.legal-link-minimal {
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 0.75rem;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-}
-
-/* Desktop hover effects only */
-@media (hover: hover) and (pointer: fine) {
-  .legal-link-minimal:hover {
     color: rgba(255, 255, 255, 0.7);
-  }
-}
-
-/* Mobile and touch device specific styles */
-@media (hover: none) and (pointer: coarse) {
-  .legal-link-minimal:active {
-    color: rgba(255, 255, 255, 0.7);
-    transform: scale(0.98);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Fallback for devices that support both hover and touch */
-@media (hover: hover) and (pointer: coarse) {
-  .legal-link-minimal:hover {
-    color: rgba(255, 255, 255, 0.3); /* Disable hover */
-  }
-  
-  .legal-link-minimal:active {
-    color: rgba(255, 255, 255, 0.7);
-    transform: scale(0.98);
-    transition-duration: 0.15s;
-  }
-}
-
-/* Focus state for accessibility */
-.legal-link-minimal:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.3);
-  outline-offset: 1px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* Reduced motion support for minimized footer */
-@media (prefers-reduced-motion: reduce) {
-  .footer-logo-link-minimal,
-  .social-link-minimal,
-  .legal-link-minimal {
-    transition: none;
-  }
-  
-  .footer-logo-link-minimal:hover,
-  .social-link-minimal:hover,
-  .legal-link-minimal:hover {
-    transform: none;
-  }
-  
-  .footer-logo-link-minimal:active,
-  .social-link-minimal:active,
-  .legal-link-minimal:active {
-    transform: none;
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .footer-section {
-    background: #000000;
-    border-top: 2px solid #ffffff;
-  }
-  
-  .footer-link,
-  .social-link,
-  .legal-link,
-  .developer-link {
-    color: #ffffff;
-    border-color: #ffffff;
-  }
-  
-  .footer-link:hover,
-  .footer-link:focus,
-  .social-link:hover,
-  .social-link:focus,
-  .legal-link:hover,
-  .legal-link:focus,
-  .developer-link:hover,
-  .developer-link:focus {
-    background: #ffffff;
-    color: #000000;
-  }
-  
-  .footer-logo-button:focus {
-    outline: 2px solid #ffffff;
-    outline-offset: 2px;
-  }
-  
-  .footer-logo-button:focus img,
-  .footer-logo-button:hover img {
-    filter: brightness(1.2) contrast(1.3);
-  }
-  
-  .streaming-icon {
-    filter: brightness(1.2) contrast(1.3);
-  }
-  
-  .streaming-icon-link:focus .streaming-icon {
-    outline: 2px solid #ffffff;
-    outline-offset: 2px;
-  }
-
-  .footer-nav-link {
-    color: theme('colors.gray.300');
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
     text-decoration: none;
-    transition: color 0.3s ease;
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
     text-align: left;
     font-family: inherit;
-    font-size: 0.875rem;
-    
-    @media (hover: hover) {
-      &:hover {
-        color: white;
-      }
+  }
+
+  /* Desktop hover effects only */
+  @media (hover: hover) and (pointer: fine) {
+    .footer-link:hover {
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      transform: translateX(2px);
     }
   }
 
-  /* High contrast overrides for minimized footer */
-  .footer-minimized .footer-logo-link-minimal,
-  .footer-minimized .social-link-minimal,
-  .footer-minimized .legal-link-minimal {
-    color: #ffffff;
-    border-color: #ffffff;
+  /* Mobile and touch device specific styles */
+  @media (hover: none) and (pointer: coarse) {
+    .footer-link:active {
+      color: rgba(255, 255, 255, 0.9);
+      transform: scale(0.98);
+      transition-duration: 0.15s;
+    }
   }
-  
-  .footer-minimized .footer-logo-link-minimal:hover,
-  .footer-minimized .footer-logo-link-minimal:focus,
-  .footer-minimized .social-link-minimal:hover,
-  .footer-minimized .social-link-minimal:focus,
-  .footer-minimized .legal-link-minimal:hover,
-  .footer-minimized .legal-link-minimal:focus {
-    background: #ffffff;
-    color: #000000;
+
+  /* Social media links */
+  .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
-}
+
+  /* Desktop hover effects only */
+  @media (hover: hover) and (pointer: fine) {
+    .social-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.9);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  /* Mobile and touch device specific styles */
+  @media (hover: none) and (pointer: coarse) {
+    .social-link:active {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.9);
+      transform: scale(0.95);
+      transition-duration: 0.15s;
+    }
+  }
+
+  /* Contact items */
+  .footer-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* Legal links */
+  .legal-link {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.75rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+  }
+
+  /* Desktop hover effects only */
+  @media (hover: hover) and (pointer: fine) {
+    .legal-link:hover {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  /* Mobile and touch device specific styles */
+  @media (hover: none) and (pointer: coarse) {
+    .legal-link:active {
+      color: rgba(255, 255, 255, 0.7);
+      transform: scale(0.98);
+      transition-duration: 0.15s;
+    }
+  }
+
+  /* Fallback for devices that support both hover and touch */
+  @media (hover: hover) and (pointer: coarse) {
+    .legal-link:hover {
+      color: rgba(255, 255, 255, 0.3); /* Disable hover */
+    }
+
+    .legal-link:active {
+      color: rgba(255, 255, 255, 0.7);
+      transform: scale(0.98);
+      transition-duration: 0.15s;
+    }
+  }
+
+  /* Developer link styles */
+  .developer-link {
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+
+  /* Desktop hover effects only */
+  @media (hover: hover) and (pointer: fine) {
+    .developer-link:hover {
+      color: rgba(255, 255, 255, 0.668);
+      text-decoration: underline;
+    }
+  }
+
+  /* Mobile and touch device specific styles */
+  @media (hover: none) and (pointer: coarse) {
+    .developer-link:active {
+      color: rgba(255, 255, 255, 0.668);
+      transform: scale(0.98);
+      transition-duration: 0.15s;
+    }
+  }
+
+  /* Focus state for accessibility */
+  .developer-link:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 1px;
+    color: rgba(255, 255, 255, 0.668);
+  }
+
+  /* Clamp long text to 2 lines */
+  .two-line-clamp {
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Streaming platform icon links */
+  .streaming-icon-link {
+    display: inline-block;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+  }
+
+  .streaming-icon {
+    height: 2rem;
+    width: 2rem;
+    filter: brightness(0.85) saturate(0.9);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Desktop hover effects only */
+  @media (hover: hover) and (pointer: fine) {
+    .streaming-icon-link:hover {
+      transform: translateY(-3px) scale(1.15);
+    }
+
+    .streaming-icon-link:hover .streaming-icon {
+      filter: brightness(1.2) saturate(1.3);
+    }
+
+    /* Platform-specific glow effects - clean glows without borders */
+    .streaming-icon-link:nth-child(1):hover .streaming-icon {
+      filter: brightness(1.2) saturate(1.3) drop-shadow(0 0 15px rgba(29, 185, 84, 0.4));
+    }
+
+    .streaming-icon-link:nth-child(2):hover .streaming-icon {
+      filter: brightness(1.2) saturate(1.3) drop-shadow(0 0 15px rgba(255, 45, 85, 0.4));
+    }
+
+    .streaming-icon-link:nth-child(3):hover .streaming-icon {
+      filter: brightness(1.2) saturate(1.3) drop-shadow(0 0 15px rgba(255, 0, 0, 0.4));
+    }
+  }
+
+  /* Mobile and touch device specific styles */
+  @media (hover: none) and (pointer: coarse) {
+    .streaming-icon-link:active {
+      transform: scale(0.9);
+      transition-duration: 0.15s;
+    }
+
+    .streaming-icon-link:active .streaming-icon {
+      filter: brightness(1.2) saturate(1.3);
+      transition-duration: 0.15s;
+    }
+  }
+
+  /* Fallback for devices that support both hover and touch */
+  @media (hover: hover) and (pointer: coarse) {
+    .streaming-icon-link:hover {
+      transform: none;
+    }
+
+    .streaming-icon-link:hover .streaming-icon {
+      filter: brightness(0.85) saturate(0.9);
+    }
+
+    .streaming-icon-link:active {
+      transform: scale(0.9);
+      transition-duration: 0.15s;
+    }
+
+    .streaming-icon-link:active .streaming-icon {
+      filter: brightness(1.2) saturate(1.3);
+      transition-duration: 0.15s;
+    }
+  }
+
+  /* Focus states for accessibility */
+  .footer-link:focus-visible,
+  .social-link:focus-visible,
+  .streaming-icon-link:focus-visible,
+  .legal-link:focus-visible,
+  .footer-logo-button:focus-visible,
+  .developer-link:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
+  }
+
+  /* Remove default focus outlines on click */
+  .footer-link:focus:not(:focus-visible),
+  .social-link:focus:not(:focus-visible),
+  .streaming-icon-link:focus:not(:focus-visible),
+  .legal-link:focus:not(:focus-visible),
+  .footer-logo-button:focus:not(:focus-visible),
+  .developer-link:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  .streaming-icon-link:focus-visible .streaming-icon {
+    filter: brightness(1.2) saturate(1.3);
+  }
+
+  .legal-link:focus-visible {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .footer-logo-button:focus-visible img {
+    filter: brightness(1.1) drop-shadow(0 4px 15px rgba(255, 255, 255, 0.2));
+  }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 767px) {
+    .footer-section {
+      padding-top: 1.5rem;
+
+      &.footer-minimized {
+        padding-top: 0;
+      }
+    }
+
+    .footer-heading {
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-link {
+      font-size: 0.8rem;
+    }
+
+    .social-link {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    .legal-link {
+      font-size: 0.7rem;
+    }
+
+    /* Smaller streaming icons on mobile */
+    .streaming-icon {
+      height: 1.75rem;
+      width: 1.75rem;
+    }
+
+    /* Reduce spacing between streaming icons on mobile */
+    .streaming-icon-link + .streaming-icon-link {
+      margin-left: 1.5rem;
+    }
+  }
+
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .footer-link,
+    .social-link,
+    .streaming-icon-link,
+    .legal-link,
+    .footer-logo-button,
+    .developer-link {
+      transition: none;
+    }
+
+    .streaming-icon {
+      transition: none;
+    }
+
+    .footer-link:hover,
+    .social-link:hover,
+    .streaming-icon-link:hover,
+    .legal-link:hover,
+    .footer-logo-button:hover,
+    .developer-link:hover {
+      transform: none;
+    }
+
+    .streaming-icon-link:hover .streaming-icon {
+      transform: none;
+    }
+
+    .footer-logo-button:hover img {
+      transform: none;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+    }
+
+    .footer-link:active,
+    .social-link:active,
+    .streaming-icon-link:active,
+    .legal-link:active,
+    .footer-logo-button:active,
+    .developer-link:active {
+      transform: none;
+    }
+  }
+
+  /* Minimized Footer Styles */
+  .footer-minimized {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .footer-logo-link-minimal {
+    display: inline-block;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+  }
+
+  /* Desktop hover effects only */
+  @media (hover: hover) and (pointer: fine) {
+    .footer-logo-link-minimal:hover {
+      transform: translateY(-1px) scale(1.03);
+      filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+    }
+
+    .footer-logo-link-minimal:hover img {
+      filter: brightness(1.1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2));
+    }
+  }
+
+  /* Mobile and touch device specific styles */
+  @media (hover: none) and (pointer: coarse) {
+    .footer-logo-link-minimal:active {
+      transform: scale(0.97);
+      transition-duration: 0.15s;
+    }
+
+    .footer-logo-link-minimal:active img {
+      filter: brightness(1.1);
+      transition-duration: 0.15s;
+    }
+  }
+
+  /* Focus state for accessibility */
+  .footer-logo-link-minimal:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
+  }
+
+  .footer-logo-link-minimal:focus-visible img {
+    filter: brightness(1.1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2));
+  }
+
+  .social-link-minimal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    text-decoration: none;
+  }
+
+  /* Desktop hover effects only */
+  @media (hover: hover) and (pointer: fine) {
+    .social-link-minimal:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.9);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  /* Mobile and touch device specific styles */
+  @media (hover: none) and (pointer: coarse) {
+    .social-link-minimal:active {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.9);
+      transform: scale(0.95);
+      transition-duration: 0.15s;
+    }
+  }
+
+  /* Focus state for accessibility */
+  .social-link-minimal:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
+  }
+
+  .legal-link-minimal {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.75rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+  }
+
+  /* Desktop hover effects only */
+  @media (hover: hover) and (pointer: fine) {
+    .legal-link-minimal:hover {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  /* Mobile and touch device specific styles */
+  @media (hover: none) and (pointer: coarse) {
+    .legal-link-minimal:active {
+      color: rgba(255, 255, 255, 0.7);
+      transform: scale(0.98);
+      transition-duration: 0.15s;
+    }
+  }
+
+  /* Fallback for devices that support both hover and touch */
+  @media (hover: hover) and (pointer: coarse) {
+    .legal-link-minimal:hover {
+      color: rgba(255, 255, 255, 0.3); /* Disable hover */
+    }
+
+    .legal-link-minimal:active {
+      color: rgba(255, 255, 255, 0.7);
+      transform: scale(0.98);
+      transition-duration: 0.15s;
+    }
+  }
+
+  /* Focus state for accessibility */
+  .legal-link-minimal:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 1px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Reduced motion support for minimized footer */
+  @media (prefers-reduced-motion: reduce) {
+    .footer-logo-link-minimal,
+    .social-link-minimal,
+    .legal-link-minimal {
+      transition: none;
+    }
+
+    .footer-logo-link-minimal:hover,
+    .social-link-minimal:hover,
+    .legal-link-minimal:hover {
+      transform: none;
+    }
+
+    .footer-logo-link-minimal:active,
+    .social-link-minimal:active,
+    .legal-link-minimal:active {
+      transform: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .footer-section {
+      background: #000000;
+      border-top: 2px solid #ffffff;
+    }
+
+    .footer-link,
+    .social-link,
+    .legal-link,
+    .developer-link {
+      color: #ffffff;
+      border-color: #ffffff;
+    }
+
+    .footer-link:hover,
+    .footer-link:focus,
+    .social-link:hover,
+    .social-link:focus,
+    .legal-link:hover,
+    .legal-link:focus,
+    .developer-link:hover,
+    .developer-link:focus {
+      background: #ffffff;
+      color: #000000;
+    }
+
+    .footer-logo-button:focus {
+      outline: 2px solid #ffffff;
+      outline-offset: 2px;
+    }
+
+    .footer-logo-button:focus img,
+    .footer-logo-button:hover img {
+      filter: brightness(1.2) contrast(1.3);
+    }
+
+    .streaming-icon {
+      filter: brightness(1.2) contrast(1.3);
+    }
+
+    .streaming-icon-link:focus .streaming-icon {
+      outline: 2px solid #ffffff;
+      outline-offset: 2px;
+    }
+
+    .footer-nav-link {
+      color: theme('colors.gray.300');
+      text-decoration: none;
+      transition: color 0.3s ease;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      font-size: 0.875rem;
+
+      @media (hover: hover) {
+        &:hover {
+          color: white;
+        }
+      }
+    }
+
+    /* High contrast overrides for minimized footer */
+    .footer-minimized .footer-logo-link-minimal,
+    .footer-minimized .social-link-minimal,
+    .footer-minimized .legal-link-minimal {
+      color: #ffffff;
+      border-color: #ffffff;
+    }
+
+    .footer-minimized .footer-logo-link-minimal:hover,
+    .footer-minimized .footer-logo-link-minimal:focus,
+    .footer-minimized .social-link-minimal:hover,
+    .footer-minimized .social-link-minimal:focus,
+    .footer-minimized .legal-link-minimal:hover,
+    .footer-minimized .legal-link-minimal:focus {
+      background: #ffffff;
+      color: #000000;
+    }
+  }
 </style>

@@ -22,21 +22,22 @@ This document describes how to generate blurred, tinted album cover variants at 
 
 ## Quick start
 
-1) Generate a blurred variant for a cover image:
+1. Generate a blurred variant for a cover image:
 
 ```bash
 npm run generate-blurred -- public/images/albums-images/cover.jpg
 ```
 
 Options (all optional):
-- `--sigma=100`      Gaussian blur strength
+
+- `--sigma=100` Gaussian blur strength
 - `--saturation=1.8` Saturation multiplier
-- `--darken=0.4`     Dark layer opacity (0..1)
+- `--darken=0.4` Dark layer opacity (0..1)
 - `--suffix=-blurred` Custom filename suffix
 
 The output is saved next to the input with the suffix, e.g. `cover-blurred.jpg`.
 
-2) Ensure your New Release config points to the original image path. The component computes the blurred URL automatically (inserting `-blurred` before the extension).
+2. Ensure your New Release config points to the original image path. The component computes the blurred URL automatically (inserting `-blurred` before the extension).
 
 ## Component changes
 

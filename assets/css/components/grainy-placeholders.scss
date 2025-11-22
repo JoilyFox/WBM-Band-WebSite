@@ -11,7 +11,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-image: 
+  background-image:
     radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
     radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.015) 0%, transparent 50%),
     repeating-linear-gradient(
@@ -36,15 +36,14 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-image: 
-    repeating-conic-gradient(
-      from 0deg at 50% 50%,
-      transparent 0deg,
-      rgba(255, 255, 255, 0.005) 90deg,
-      transparent 180deg,
-      rgba(255, 255, 255, 0.01) 270deg,
-      transparent 360deg
-    );
+  background-image: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.005) 90deg,
+    transparent 180deg,
+    rgba(255, 255, 255, 0.01) 270deg,
+    transparent 360deg
+  );
   animation: grainRotate 12s linear infinite;
   pointer-events: none;
 }
@@ -53,7 +52,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.02) 0%, transparent 40%),
     radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.015) 0%, transparent 40%),
     radial-gradient(circle at 60% 40%, rgba(255, 255, 255, 0.01) 0%, transparent 30%);

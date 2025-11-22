@@ -21,7 +21,7 @@ export function useImageLoading() {
    */
   const handleImageLoad = (event?: Event) => {
     imageLoaded.value = true
-    if (process.client) {
+    if (import.meta.client) {
       const target = event?.target as HTMLImageElement | undefined
       console.log('[ProgressiveImage] loaded', target?.currentSrc || target?.src || 'unknown')
     }
@@ -47,7 +47,7 @@ export function useImageLoading() {
   const resetImageStates = () => {
     imageLoadError.value = false
     imageLoaded.value = false
-    if (process.client) {
+    if (import.meta.client) {
       console.log('[ProgressiveImage] states reset')
     }
   }
@@ -65,13 +65,13 @@ export function useImageLoading() {
    * @param target - Target element to observe
    */
   const setIntersectionTarget = (target: HTMLElement) => {
-    if (process.client && 'IntersectionObserver' in window) {
+    if (import.meta.client && 'IntersectionObserver' in window) {
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
             isIntersecting.value = true
             observer.disconnect()
-            if (process.client) {
+            if (import.meta.client) {
               console.log('[ProgressiveImage] intersecting, begin load')
             }
           }
@@ -81,24 +81,24 @@ export function useImageLoading() {
           rootMargin: '50px'
         }
       )
-      
+
       observer.observe(target)
-      
+
       // If already in viewport, trigger immediately
       const rect = target.getBoundingClientRect()
       const isInViewport = rect.top < window.innerHeight && rect.bottom > 0
-      
+
       if (isInViewport) {
         isIntersecting.value = true
         observer.disconnect()
-        if (process.client) {
+        if (import.meta.client) {
           console.log('[ProgressiveImage] already in viewport, begin load')
         }
       }
     } else {
       // Fallback for browsers without IntersectionObserver
       isIntersecting.value = true
-      if (process.client) {
+      if (import.meta.client) {
         console.log('[ProgressiveImage] IntersectionObserver unavailable, load immediately')
       }
     }
@@ -110,7 +110,7 @@ export function useImageLoading() {
     imageLoaded: readonly(imageLoaded),
     isImageLoading: readonly(isImageLoading),
     isIntersecting: readonly(isIntersecting),
-    
+
     // Handler functions
     handleImageLoad,
     handleImageError,
@@ -127,10 +127,10 @@ export function useImageLoading() {
 export function preloadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
-    
+
     img.onload = () => resolve(img)
     img.onerror = () => reject(new Error(`Failed to load image: ${src}`))
-    
+
     img.src = src
   })
 }
@@ -139,14 +139,14 @@ export function preloadImage(src: string): Promise<HTMLImageElement> {
  * Get optimized image URL with format fallbacks for different screen sizes
  * @param src - Original image source
  * @param width - Target width
- * @param height - Target height  
+ * @param height - Target height
  * @param quality - Image quality (1-100)
  * @param preset - Preset name for predefined configurations
  * @returns Object with optimized image URLs and srcset
  */
 export function getOptimizedImageUrl(
-  src: string, 
-  width?: number, 
+  src: string,
+  width?: number,
   height?: number,
   quality: number = 80,
   preset?: string
@@ -163,12 +163,12 @@ export function getOptimizedImageUrl(
   // Remove file extension and get base path
   const basePath = src.replace(/\.[^/.]+$/, '')
   const isOptimizedPath = src.includes('/optimized/')
-  
+
   // If already optimized path, use as is
   if (isOptimizedPath) {
     return {
       avif: basePath + '.avif',
-      webp: basePath + '.webp', 
+      webp: basePath + '.webp',
       jpg: basePath + '.jpg',
       srcSet: {
         avif: basePath + '.avif',
@@ -177,30 +177,29 @@ export function getOptimizedImageUrl(
       }
     }
   }
-  
+
   // Apply preset configurations
   let targetWidth = width
   let targetHeight = height
   let targetQuality = quality
-  
+
   if (preset) {
     const presetConfig = getPresetConfig(preset)
     targetWidth = presetConfig.width || width
     targetHeight = presetConfig.height || height
     targetQuality = presetConfig.quality || quality
   }
-  
+
   // Convert original path to optimized path
-  const optimizedBasePath = src.replace('/images/', '/images/optimized/')
-    .replace(/\.[^/.]+$/, '')
-  
+  const optimizedBasePath = src.replace('/images/', '/images/optimized/').replace(/\.[^/.]+$/, '')
+
   return {
     avif: optimizedBasePath + '.avif',
     webp: optimizedBasePath + '.webp',
     jpg: optimizedBasePath + '.jpg',
     srcSet: {
       avif: optimizedBasePath + '.avif',
-      webp: optimizedBasePath + '.webp', 
+      webp: optimizedBasePath + '.webp',
       jpg: optimizedBasePath + '.jpg'
     }
   }
@@ -220,7 +219,7 @@ function getPresetConfig(preset: string) {
     albumLarge: { width: 800, height: 800, quality: 90 },
     thumbnail: { width: 200, height: 200, quality: 80 }
   }
-  
+
   return presets[preset] || { quality: 80 }
 }
 
@@ -231,13 +230,9 @@ function getPresetConfig(preset: string) {
  * @param preset - Preset name for predefined configurations
  * @returns Object with source elements for picture tag
  */
-export function generatePictureSources(
-  src: string,
-  sizes?: string,
-  preset?: string
-) {
+export function generatePictureSources(src: string, sizes?: string, preset?: string) {
   const optimizedUrls = getOptimizedImageUrl(src, undefined, undefined, 80, preset)
-  
+
   return {
     avifSource: {
       srcset: optimizedUrls.avif,
@@ -246,7 +241,7 @@ export function generatePictureSources(
     },
     webpSource: {
       srcset: optimizedUrls.webp,
-      type: 'image/webp', 
+      type: 'image/webp',
       sizes: sizes || '100vw'
     },
     fallbackSrc: optimizedUrls.jpg
@@ -258,14 +253,14 @@ export function generatePictureSources(
  * @returns Object indicating format support
  */
 export function checkImageFormatSupport() {
-  if (!process.client) {
+  if (!import.meta.client) {
     return { avif: false, webp: false }
   }
-  
+
   const canvas = document.createElement('canvas')
   canvas.width = 1
   canvas.height = 1
-  
+
   return {
     avif: canvas.toDataURL('image/avif').indexOf('data:image/avif') === 0,
     webp: canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0
@@ -285,7 +280,7 @@ export function getResponsiveImageSrcSet(
   quality: number = 80
 ): string {
   return sizes
-    .map(size => {
+    .map((size) => {
       const optimizedUrls = getOptimizedImageUrl(src, size, undefined, quality)
       return `${optimizedUrls.jpg} ${size}w`
     })
@@ -300,27 +295,27 @@ export function getResponsiveImageSrcSet(
  */
 export function generateBlurPlaceholder(width: number = 40, height: number = 40): string {
   // Return empty string on server side
-  if (!process.client) {
+  if (!import.meta.client) {
     return ''
   }
-  
+
   try {
     const canvas = document.createElement('canvas')
     canvas.width = width
     canvas.height = height
-    
+
     const ctx = canvas.getContext('2d')
     if (!ctx) return ''
-    
+
     // Create simple black to white gradient
     const gradient = ctx.createLinearGradient(0, 0, width, height)
     gradient.addColorStop(0, '#000000')
     gradient.addColorStop(0.5, '#333333')
     gradient.addColorStop(1, '#000000')
-    
+
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, width, height)
-    
+
     return canvas.toDataURL('image/jpeg', 0.1)
   } catch (error) {
     console.warn('Failed to generate gradient placeholder:', error)
@@ -338,24 +333,24 @@ export function preloadCriticalImages(
   images: string[],
   priority: 'high' | 'medium' | 'low' = 'high'
 ): Promise<HTMLImageElement>[] {
-  return images.map(src => {
+  return images.map((src) => {
     return new Promise((resolve, reject) => {
       const img = new Image()
-      
+
       // Set loading priority if supported
       if ('loading' in img) {
         img.loading = priority === 'high' ? 'eager' : 'lazy'
       }
-      
+
       // Set fetch priority if supported (convert medium to auto for HTML standard)
       if ('fetchPriority' in img) {
-        const fetchPriority = priority === 'medium' ? 'auto' : priority as 'high' | 'low'
+        const fetchPriority = priority === 'medium' ? 'auto' : (priority as 'high' | 'low')
         img.fetchPriority = fetchPriority
       }
-      
+
       img.onload = () => resolve(img)
       img.onerror = () => reject(new Error(`Failed to preload image: ${src}`))
-      
+
       // Use AVIF format as primary, with fallback to original src
       const optimizedUrls = getOptimizedImageUrl(src, 1920, 1080, 85, 'hero')
       img.src = optimizedUrls.avif || src
@@ -380,33 +375,33 @@ export enum ImageLoadingState {
 export function useAdvancedImageLoading() {
   const loadingState = ref<ImageLoadingState>(ImageLoadingState.IDLE)
   const loadingProgress = ref(0)
-  
+
   const handleImageLoadStart = () => {
     loadingState.value = ImageLoadingState.LOADING
     loadingProgress.value = 0
   }
-  
+
   const handleImageLoadProgress = (event: ProgressEvent) => {
     if (event.lengthComputable) {
       loadingProgress.value = (event.loaded / event.total) * 100
     }
   }
-  
+
   const handleImageLoadSuccess = () => {
     loadingState.value = ImageLoadingState.LOADED
     loadingProgress.value = 100
   }
-  
+
   const handleImageLoadError = () => {
     loadingState.value = ImageLoadingState.ERROR
     loadingProgress.value = 0
   }
-  
+
   const resetLoadingState = () => {
     loadingState.value = ImageLoadingState.IDLE
     loadingProgress.value = 0
   }
-  
+
   return {
     loadingState: readonly(loadingState),
     loadingProgress: readonly(loadingProgress),

@@ -15,7 +15,7 @@ export const useErrorPage = () => {
     buttonIcon?: string
   }) => {
     const query: Record<string, string> = {}
-    
+
     if (options.title) query.title = options.title
     if (options.message) query.message = options.message
     if (options.buttonText) query.buttonText = options.buttonText
@@ -41,7 +41,9 @@ export const useErrorPage = () => {
   const redirectToDataError = (customMessage?: string) => {
     return redirectToError({
       title: 'Data Load Error',
-      message: customMessage || 'Failed to load the requested data. Please check your connection and try again.',
+      message:
+        customMessage ||
+        'Failed to load the requested data. Please check your connection and try again.',
       buttonText: 'Try Again',
       buttonLink: '/',
       buttonIcon: 'pi pi-refresh'
@@ -54,7 +56,8 @@ export const useErrorPage = () => {
   const redirectToAccessError = () => {
     return redirectToError({
       title: 'Access Denied',
-      message: 'You do not have permission to access this page. Please contact an administrator if you believe this is an error.',
+      message:
+        'You do not have permission to access this page. Please contact an administrator if you believe this is an error.',
       buttonText: 'Go to Home',
       buttonLink: '/',
       buttonIcon: 'pi pi-home'

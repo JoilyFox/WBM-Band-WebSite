@@ -70,28 +70,28 @@ export function usePerformanceOptimization() {
     iphone: [
       // iPhone 12 and newer (A14+)
       /iPhone1[3-9],/i, // iPhone 13, 14, 15+
-      /iPhone1[2-9],[2-9]/i, // iPhone 12 Pro Max etc
+      /iPhone1[2-9],[2-9]/i // iPhone 12 Pro Max etc
     ],
     samsung: [
       // Galaxy S20+ and Galaxy Note 20+ (2020+)
       /SM-[GN][0-9]{3}[0-9]+/i, // S21, S22, S23, S24, Note series
-      /SM-F[0-9]{3}/i, // Galaxy Fold/Flip series
+      /SM-F[0-9]{3}/i // Galaxy Fold/Flip series
     ],
     google: [
       // Pixel 6+ (Tensor chips)
       /Pixel [6-9]/i,
-      /Pixel 1[0-9]/i, // Pixel 10+
+      /Pixel 1[0-9]/i // Pixel 10+
     ],
     oneplus: [
       // OnePlus 8+ (2020+)
       /OnePlus [8-9]/i,
-      /OnePlus 1[0-9]/i,
+      /OnePlus 1[0-9]/i
     ],
     xiaomi: [
       // Xiaomi flagship series
       /Mi 1[0-9]/i, // Mi 10, 11, 12+
       /Xiaomi 1[0-9]/i,
-      /Redmi K[3-9][0-9]/i, // Redmi K30+
+      /Redmi K[3-9][0-9]/i // Redmi K30+
     ]
   }
 
@@ -102,53 +102,55 @@ export function usePerformanceOptimization() {
       /iPhone1[2-9],[2-9]/i,
       /iPad13,[0-9]/i, // iPad Air 4+
       /iPad1[4-9],[0-9]/i, // iPad Pro 2021+
-      
+
       // Android flagships with Adreno 650+, Mali-G78+, etc.
       /Adreno \(TM\) [6-9][5-9][0-9]/i,
-      /Mali-G[7-9][8-9]/i,
+      /Mali-G[7-9][8-9]/i
     ],
     medium: [
       // Apple A10-A13 (iPhone 7-11, iPad 6-8)
       /iPhone(?:9|10|11|12),[0-9]/i,
       /iPad[6-8],[0-9]/i,
-      
+
       // Mid-range Android GPUs
       /Adreno \(TM\) [5-6][0-4][0-9]/i,
-      /Mali-G[5-7][0-7]/i,
+      /Mali-G[5-7][0-7]/i
     ]
   }
 
   // Detect device characteristics
-  const detectDeviceModel = (userAgent: string): { model: string; isFlagship: boolean; gpuTier: 'low' | 'medium' | 'high' } => {
+  const detectDeviceModel = (
+    userAgent: string
+  ): { model: string; isFlagship: boolean; gpuTier: 'low' | 'medium' | 'high' } => {
     const ua = userAgent.toLowerCase()
-    
+
     // Check flagship devices
     let isFlagship = false
     for (const [brand, patterns] of Object.entries(FLAGSHIP_DEVICES)) {
-      if (patterns.some(pattern => pattern.test(userAgent))) {
+      if (patterns.some((pattern) => pattern.test(userAgent))) {
         isFlagship = true
         break
       }
     }
-    
+
     // Determine GPU tier
     let gpuTier: 'low' | 'medium' | 'high' = 'low'
-    if (GPU_TIER_INDICATORS.high.some(pattern => pattern.test(userAgent))) {
+    if (GPU_TIER_INDICATORS.high.some((pattern) => pattern.test(userAgent))) {
       gpuTier = 'high'
-    } else if (GPU_TIER_INDICATORS.medium.some(pattern => pattern.test(userAgent))) {
+    } else if (GPU_TIER_INDICATORS.medium.some((pattern) => pattern.test(userAgent))) {
       gpuTier = 'medium'
     }
-    
+
     // Extract device model name
     let model = 'unknown'
     const iphoneMatch = userAgent.match(/iPhone[0-9,]+/i)
     const samsungMatch = userAgent.match(/SM-[A-Z0-9]+/i)
     const pixelMatch = userAgent.match(/Pixel [0-9]+/i)
-    
+
     if (iphoneMatch) model = iphoneMatch[0]
     else if (samsungMatch) model = samsungMatch[0]
     else if (pixelMatch) model = pixelMatch[0]
-    
+
     return { model, isFlagship, gpuTier }
   }
 
@@ -156,8 +158,8 @@ export function usePerformanceOptimization() {
   const isLowPerformanceDevice = computed(() => performanceLevel.value.level === 'low')
   const isMediumPerformanceDevice = computed(() => performanceLevel.value.level === 'medium')
   const isHighPerformanceDevice = computed(() => performanceLevel.value.level === 'high')
-  const shouldReduceAnimations = computed(() => 
-    prefersReducedMotion.value || performanceLevel.value.level === 'low'
+  const shouldReduceAnimations = computed(
+    () => prefersReducedMotion.value || performanceLevel.value.level === 'low'
   )
 
   // Performance-based CSS variables
@@ -165,7 +167,12 @@ export function usePerformanceOptimization() {
     '--perf-blur-strength': `${performanceLevel.value.blurStrength}px`,
     '--perf-animation-duration': `${performanceLevel.value.animationDuration}s`,
     '--perf-max-animations': performanceLevel.value.maxAnimationCount.toString(),
-    '--perf-opacity': performanceLevel.value.level === 'low' ? '0.8' : performanceLevel.value.level === 'medium' ? '0.9' : '1'
+    '--perf-opacity':
+      performanceLevel.value.level === 'low'
+        ? '0.8'
+        : performanceLevel.value.level === 'medium'
+          ? '0.9'
+          : '1'
   }))
 
   const detectDeviceCapabilities = () => {
@@ -177,8 +184,11 @@ export function usePerformanceOptimization() {
 
     // Detect device characteristics
     const deviceInfo = detectDeviceModel(userAgent)
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)
-    const isTablet = /(iPad|Android.*tablet|Windows.*touch)/i.test(userAgent) && !/Mobile/i.test(userAgent)
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      userAgent
+    )
+    const isTablet =
+      /(iPad|Android.*tablet|Windows.*touch)/i.test(userAgent) && !/Mobile/i.test(userAgent)
 
     // Collect device metrics with all required fields
     deviceMetrics.value = {
@@ -198,7 +208,7 @@ export function usePerformanceOptimization() {
     // Check for reduced motion preference
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     prefersReducedMotion.value = mediaQuery.matches
-    
+
     mediaQuery.addEventListener('change', (e) => {
       prefersReducedMotion.value = e.matches
       calculatePerformanceLevel()
@@ -209,30 +219,34 @@ export function usePerformanceOptimization() {
 
   const calculatePerformanceLevel = () => {
     const metrics = deviceMetrics.value
-    
+
     // Mobile-First Strategy: Start with conservative mobile settings
     if (metrics.isMobile && !metrics.isTablet) {
       // Mobile devices - default to low performance, upgrade only flagships
       let mobileStrategy: 'flagship' | 'standard' | 'conservative' = 'conservative'
       let level: PerformanceLevel['level'] = 'low'
-      
+
       if (metrics.isFlagship && metrics.gpuTier === 'high') {
         // Only the best mobile devices get high performance
         mobileStrategy = 'flagship'
         level = 'high'
       } else if (metrics.isFlagship || metrics.gpuTier === 'medium') {
         // Good mobile devices get medium performance
-        mobileStrategy = 'standard' 
+        mobileStrategy = 'standard'
         level = 'medium'
       }
       // All other mobile devices stay at 'conservative' low performance
-      
+
       // Override for reduced motion or very low specs
-      if (prefersReducedMotion.value || metrics.deviceMemory < 2 || metrics.hardwareConcurrency < 2) {
+      if (
+        prefersReducedMotion.value ||
+        metrics.deviceMemory < 2 ||
+        metrics.hardwareConcurrency < 2
+      ) {
         level = 'low'
         mobileStrategy = 'conservative'
       }
-      
+
       // Set mobile performance configuration
       performanceLevel.value = {
         level,
@@ -277,7 +291,8 @@ export function usePerformanceOptimization() {
 
       // Screen resolution consideration
       const totalPixels = metrics.screenWidth * metrics.screenHeight * metrics.pixelRatio
-      if (totalPixels > 4000000) score -= 2 // Very high res displays
+      if (totalPixels > 4000000)
+        score -= 2 // Very high res displays
       else if (totalPixels > 2000000) score -= 1 // 4K displays
 
       // GPU tier bonus for desktop
@@ -324,7 +339,7 @@ export function usePerformanceOptimization() {
   // CSS class helpers
   const getPerformanceClass = () => {
     const classes = [`perf-${performanceLevel.value.level}`]
-    
+
     if (deviceMetrics.value.isMobile) {
       classes.push('mobile-device')
       classes.push(`mobile-${performanceLevel.value.mobileStrategy}`)
@@ -336,22 +351,22 @@ export function usePerformanceOptimization() {
     if (!performanceLevel.value.enableComplexGradients) classes.push('simple-gradients')
     if (!performanceLevel.value.enableFloatingEffects) classes.push('no-floating')
     if (!performanceLevel.value.enableParallax) classes.push('no-parallax')
-    
+
     return classes.join(' ')
   }
 
   // Mobile-specific performance checks
-  const isMobileFlagship = computed(() => 
-    deviceMetrics.value.isMobile && deviceMetrics.value.isFlagship
+  const isMobileFlagship = computed(
+    () => deviceMetrics.value.isMobile && deviceMetrics.value.isFlagship
   )
-  const shouldUseMobileFallback = computed(() =>
-    deviceMetrics.value.isMobile && performanceLevel.value.mobileStrategy === 'conservative'
+  const shouldUseMobileFallback = computed(
+    () => deviceMetrics.value.isMobile && performanceLevel.value.mobileStrategy === 'conservative'
   )
 
   // Animation budget system
   const activeAnimationCount = ref(0)
-  const canAddAnimation = computed(() => 
-    activeAnimationCount.value < performanceLevel.value.maxAnimationCount
+  const canAddAnimation = computed(
+    () => activeAnimationCount.value < performanceLevel.value.maxAnimationCount
   )
 
   const requestAnimation = (name: string) => {
@@ -396,7 +411,7 @@ export function usePerformanceOptimization() {
     deviceMetrics: readonly(deviceMetrics),
     performanceLevel: readonly(performanceLevel),
     prefersReducedMotion: readonly(prefersReducedMotion),
-    
+
     // Computed
     isLowPerformanceDevice,
     isMediumPerformanceDevice,
@@ -406,7 +421,7 @@ export function usePerformanceOptimization() {
     shouldUseMobileFallback,
     performanceCSSVars,
     canAddAnimation,
-    
+
     // Methods
     getPerformanceClass,
     requestAnimation,

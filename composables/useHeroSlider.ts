@@ -20,10 +20,7 @@ export interface SliderOptions {
   transitionDuration?: number // Duration in ms for slide transitions
 }
 
-export function useHeroSlider(
-  images: HeroImage[], 
-  options: SliderOptions = {}
-) {
+export function useHeroSlider(images: HeroImage[], options: SliderOptions = {}) {
   const {
     autoPlay = true,
     interval = 5000,
@@ -46,8 +43,10 @@ export function useHeroSlider(
   // Computed properties
   const currentImage = computed(() => images[currentIndex.value])
   const nextImage = computed(() => images[(currentIndex.value + 1) % images.length])
-  const previousImage = computed(() => images[currentIndex.value === 0 ? images.length - 1 : currentIndex.value - 1])
-  
+  const previousImage = computed(
+    () => images[currentIndex.value === 0 ? images.length - 1 : currentIndex.value - 1]
+  )
+
   const totalImages = computed(() => images.length)
   const canSlide = computed(() => images.length > 1)
 
@@ -56,15 +55,15 @@ export function useHeroSlider(
     if (index >= 0 && index < images.length && index !== currentIndex.value) {
       isTransitioning.value = true
       currentIndex.value = index
-      
+
       // Force progress bar restart
       progressKey.value++
-      
+
       // Reset transition state after animation
       setTimeout(() => {
         isTransitioning.value = false
       }, transitionDuration)
-      
+
       // Restart timer for auto-play
       if (isPlaying.value) {
         startAutoPlay()
@@ -85,12 +84,12 @@ export function useHeroSlider(
   // Auto-play controls
   const startAutoPlay = () => {
     if (!canSlide.value || !isPlaying.value) return
-    
+
     stopAutoPlay()
-    
+
     // Force progress bar restart
     progressKey.value++
-    
+
     timer = setInterval(() => {
       nextSlide()
     }, interval)
@@ -151,29 +150,29 @@ export function useHeroSlider(
     isTransitioning: readonly(isTransitioning),
     progressKey: readonly(progressKey),
     progressVisible: readonly(progressVisible),
-    
+
     // Computed
     currentImage,
     nextImage,
     previousImage,
     totalImages,
     canSlide,
-    
+
     // Navigation
     goToSlide,
     nextSlide,
     previousSlide,
-    
+
     // Auto-play controls
     startAutoPlay,
     stopAutoPlay,
     pauseAutoPlay,
     resumeAutoPlay,
     toggleAutoPlay,
-    
+
     // Utilities
     getSlideProgress,
-    
+
     // Configuration
     transition,
     interval

@@ -16,7 +16,19 @@
     "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html",
     "build:production": "npm run generate",
     "deploy:production": "npm run build:production && node scripts/deploy-production.js",
-    "deploy:github": "DEPLOY_TARGET=github nuxt generate"
+    "deploy:github": "DEPLOY_TARGET=github nuxt generate",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue,json,md}": [
+      "prettier --write"
+    ],
+    "*.{js,ts,vue}": [
+      "eslint --fix"
+    ]
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.0.0",
@@ -35,14 +47,21 @@
     "vue-i18n": "^9.13.1"
   },
   "devDependencies": {
+    "@nuxt/eslint": "^1.10.0",
     "@vueuse/nuxt": "^13.6.0",
     "autoprefixer": "^10.4.21",
     "dotenv": "^17.2.3",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "ftp-deploy": "^2.4.7",
+    "husky": "^9.1.7",
     "imagemin": "^9.0.1",
     "imagemin-avif": "^0.1.6",
     "imagemin-webp": "^8.0.0",
+    "lint-staged": "^16.2.7",
     "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
     "sass": "^1.89.2",
     "sharp": "^0.34.3",
     "vite-plugin-imagemin": "^0.6.1",

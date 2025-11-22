@@ -64,19 +64,18 @@ async function createOptimizedDir() {
 
 async function compressImage(inputPath, outputDir, filename, settings) {
   console.log(`Compressing ${filename}...`)
-  
+
   const baseFilename = path.parse(filename).name
-  
+
   try {
     for (const format of settings.formats) {
       const outputPath = path.join(outputDir, `${baseFilename}.${format}`)
-      
-      let pipeline = sharp(inputPath)
-        .resize(settings.width, settings.height, {
-          fit: 'cover',
-          position: 'center'
-        })
-      
+
+      let pipeline = sharp(inputPath).resize(settings.width, settings.height, {
+        fit: 'cover',
+        position: 'center'
+      })
+
       switch (format) {
         case 'avif':
           pipeline = pipeline.avif({ quality: settings.quality })
@@ -85,22 +84,26 @@ async function compressImage(inputPath, outputDir, filename, settings) {
           pipeline = pipeline.webp({ quality: settings.quality })
           break
         case 'jpg':
-          pipeline = pipeline.jpeg({ 
+          pipeline = pipeline.jpeg({
             quality: settings.quality,
             progressive: true,
             mozjpeg: true
           })
           break
       }
-      
+
       await pipeline.toFile(outputPath)
-      
+
       // Log file size reduction
       const originalStats = await fs.stat(inputPath)
       const newStats = await fs.stat(outputPath)
-      const reduction = ((originalStats.size - newStats.size) / originalStats.size * 100).toFixed(1)
-      
-      console.log(`  ${format.toUpperCase()}: ${(newStats.size / 1024 / 1024).toFixed(2)}MB (${reduction}% reduction)`)
+      const reduction = (((originalStats.size - newStats.size) / originalStats.size) * 100).toFixed(
+        1
+      )
+
+      console.log(
+        `  ${format.toUpperCase()}: ${(newStats.size / 1024 / 1024).toFixed(2)}MB (${reduction}% reduction)`
+      )
     }
   } catch (error) {
     console.error(`Error compressing ${filename}:`, error)
@@ -109,14 +112,14 @@ async function compressImage(inputPath, outputDir, filename, settings) {
 
 async function processImages() {
   console.log('🖼️  Starting image compression...')
-  
+
   await createOptimizedDir()
-  
+
   // Process hero images
   console.log('\n📸 Processing hero images...')
   const heroDir = path.join(INPUT_DIR, 'hero-images')
   const heroFiles = await fs.readdir(heroDir)
-  
+
   for (const file of heroFiles) {
     if (file.match(/\.(jpg|jpeg|png)$/i)) {
       const inputPath = path.join(heroDir, file)
@@ -124,31 +127,31 @@ async function processImages() {
       await compressImage(inputPath, outputDir, file, COMPRESSION_SETTINGS.hero)
     }
   }
-  
+
   // Process album images
   console.log('\n🎵 Processing album images...')
   const albumDir = path.join(INPUT_DIR, 'albums-images')
   const albumFiles = await fs.readdir(albumDir)
-  
+
   for (const file of albumFiles) {
     if (file.match(/\.(jpg|jpeg|png)$/i)) {
       const inputPath = path.join(albumDir, file)
       const outputDir = path.join(OUTPUT_DIR, 'albums-images')
       await compressImage(inputPath, outputDir, file, COMPRESSION_SETTINGS.album)
-      
+
       // Also create thumbnails
       const thumbDir = path.join(OUTPUT_DIR, 'albums-images', 'thumbs')
       await fs.mkdir(thumbDir, { recursive: true })
       await compressImage(inputPath, thumbDir, file, COMPRESSION_SETTINGS.thumbnail)
     }
   }
-  
+
   // Process about-us images
   console.log('\n👥 Processing about-us images...')
   const aboutDir = path.join(INPUT_DIR, 'about-us-images')
   try {
     const aboutFiles = await fs.readdir(aboutDir)
-    
+
     for (const file of aboutFiles) {
       if (file.match(/\.(jpg|jpeg|png)$/i)) {
         const inputPath = path.join(aboutDir, file)
@@ -159,13 +162,13 @@ async function processImages() {
   } catch (error) {
     console.log('No about-us images found or error processing:', error.message)
   }
-  
+
   // Process meta images
   console.log('\n🏷️  Processing meta images...')
   const metaDir = path.join(INPUT_DIR, 'meta-images')
   try {
     const metaFiles = await fs.readdir(metaDir)
-    
+
     for (const file of metaFiles) {
       if (file.match(/\.(jpg|jpeg|png)$/i)) {
         const inputPath = path.join(metaDir, file)
@@ -176,7 +179,7 @@ async function processImages() {
   } catch (error) {
     console.log('No meta images found or error processing:', error.message)
   }
-  
+
   console.log('\n✅ Image compression complete!')
   console.log('📁 Optimized images saved to:', OUTPUT_DIR)
   console.log('\n💡 Next steps:')

@@ -5,6 +5,7 @@ This guide explains how to deploy the WBM Band website to your production hostin
 ## Overview
 
 The deployment system allows you to:
+
 - ✅ **Test on GitHub Pages** first (automatic on push)
 - ✅ **Deploy to production manually** when ready (one command)
 - ✅ **Full control** over when updates go live
@@ -14,10 +15,10 @@ The deployment system allows you to:
 
 ### Deployment Targets
 
-| Environment | URL | Deployment | `baseURL` setting |
-|-------------|-----|------------|-------------------|
-| **Testing** | GitHub Pages | Automatic on push | `/WBM-Band-WebSite/` (when `DEPLOY_TARGET=github`)
-| **Production** | wbmband.com | Manual local command | `/` (when `DEPLOY_TARGET` is unset) |
+| Environment    | URL          | Deployment           | `baseURL` setting                                  |
+| -------------- | ------------ | -------------------- | -------------------------------------------------- |
+| **Testing**    | GitHub Pages | Automatic on push    | `/WBM-Band-WebSite/` (when `DEPLOY_TARGET=github`) |
+| **Production** | wbmband.com  | Manual local command | `/` (when `DEPLOY_TARGET` is unset)                |
 
 ### Configuration Strategy
 
@@ -26,17 +27,18 @@ We use a single `nuxt.config.ts` file and switch paths with an environment varia
 ```ts
 // nuxt.config.ts (excerpt)
 export default defineNuxtConfig({
-   app: {
-      baseURL: process.env.DEPLOY_TARGET === 'github'
-         ? '/WBM-Band-WebSite/'
-         : '/',
-      head: {
-         link: [
-            { rel: 'icon', href: `${process.env.DEPLOY_TARGET === 'github' ? '/WBM-Band-WebSite' : ''}/favicon.ico` }
-            // ...other head assets follow the same pattern
-         ]
-      }
-   }
+  app: {
+    baseURL: process.env.DEPLOY_TARGET === 'github' ? '/WBM-Band-WebSite/' : '/',
+    head: {
+      link: [
+        {
+          rel: 'icon',
+          href: `${process.env.DEPLOY_TARGET === 'github' ? '/WBM-Band-WebSite' : ''}/favicon.ico`
+        }
+        // ...other head assets follow the same pattern
+      ]
+    }
+  }
 })
 ```
 
@@ -63,7 +65,8 @@ FTP_ROOT=/home/wbmband/
 DELETE_REMOTE=false
 ```
 
-**Important:** 
+**Important:**
+
 - ⚠️ Replace `your_actual_password_here` with your real FTP password
 - ⚠️ This file is ignored by git (never commit passwords!)
 - ✅ Keep this file secure on your local machine
@@ -85,7 +88,7 @@ TTL: 3600
 
 Type: A
 Host: www
-Value: [Your hosting IP address]  
+Value: [Your hosting IP address]
 TTL: 3600
 ```
 
@@ -123,6 +126,7 @@ npm run deploy:production
 ```
 
 This command will:
+
 1. ✅ Build the site using the default (root) `baseURL`
 2. ✅ Connect to your FTP server
 3. ✅ Upload all files to `/home/wbmband/`
@@ -130,6 +134,7 @@ This command will:
 5. ✅ Confirm when deployment is complete
 
 **Expected Output:**
+
 ```
 🚀 WBM Band - Production Deployment
 ═══════════════════════════════════════════
@@ -170,12 +175,15 @@ This command will:
 If you want to build and deploy separately:
 
 ### Build Only
+
 ```bash
 npm run build:production
 ```
+
 This creates the production build in `.output/public/` using root-relative paths (same settings as `deploy:production`).
 
 ### Deploy Only
+
 ```bash
 node scripts/deploy-production.js
 ```
@@ -195,6 +203,7 @@ This uploads the existing build to your FTP server.
 ### [`.env.production`](../.env.production)
 
 FTP credentials (never committed):
+
 ```env
 FTP_HOST=wbmband.ftp.tools
 FTP_USERNAME=wbmband_ftp
@@ -207,6 +216,7 @@ DELETE_REMOTE=false
 ### [`scripts/deploy-production.js`](../scripts/deploy-production.js)
 
 Deployment script features:
+
 - ✅ Validates build exists
 - ✅ Checks FTP credentials
 - ✅ Shows upload progress
@@ -220,12 +230,14 @@ Deployment script features:
 ### Error: Build not found
 
 **Problem:**
+
 ```
 ❌ Error: Build not found!
 ```
 
 **Solution:**
 Run the build command first:
+
 ```bash
 npm run build:production
 ```
@@ -235,11 +247,13 @@ npm run build:production
 ### Error: Missing FTP credentials
 
 **Problem:**
+
 ```
 ❌ Error: Missing FTP credentials!
 ```
 
 **Solution:**
+
 1. Check that `.env.production` exists
 2. Verify all required fields are filled:
    - `FTP_HOST`
@@ -252,12 +266,14 @@ npm run build:production
 ### Error: Connection timeout (ETIMEDOUT)
 
 **Problem:**
+
 ```
 ❌ Deployment failed!
 Error: ETIMEDOUT
 ```
 
 **Solutions:**
+
 1. Check your internet connection
 2. Verify `FTP_HOST` is correct in `.env.production`
 3. Check if your hosting firewall allows FTP connections
@@ -268,12 +284,14 @@ Error: ETIMEDOUT
 ### Error: Login incorrect (530)
 
 **Problem:**
+
 ```
 ❌ Deployment failed!
 Error: 530 Login incorrect
 ```
 
 **Solutions:**
+
 1. Double-check `FTP_USERNAME` in `.env.production`
 2. Verify `FTP_PASSWORD` is correct (no extra spaces)
 3. Confirm your FTP account is active in hosting control panel
@@ -284,12 +302,14 @@ Error: 530 Login incorrect
 ### Error: Directory not found (550)
 
 **Problem:**
+
 ```
 ❌ Deployment failed!
 Error: 550 Directory not found
 ```
 
 **Solutions:**
+
 1. Verify `FTP_ROOT` path in `.env.production`
 2. Check that `/home/wbmband/` exists on the server
 3. Ensure you have write permissions to the directory
@@ -371,6 +391,7 @@ npm run deploy:production
 ### 2. Create Backups
 
 Before major deployments:
+
 ```bash
 # Option 1: Download via FTP client (FileZilla, Cyberduck)
 # Option 2: Use hosting control panel backup feature
@@ -380,11 +401,13 @@ Before major deployments:
 ### 3. Incremental Updates
 
 For small changes, set `DELETE_REMOTE=false` in `.env.production` to:
+
 - ✅ Upload only changed files
 - ✅ Faster deployments
 - ✅ Less bandwidth usage
 
 For major updates, set `DELETE_REMOTE=true` to:
+
 - ✅ Remove old files
 - ✅ Clean slate deployment
 - ⚠️ Use with caution!
@@ -392,6 +415,7 @@ For major updates, set `DELETE_REMOTE=true` to:
 ### 4. Monitor Deployment
 
 Watch the upload progress:
+
 - Check file count matches your build
 - Verify no upload errors
 - Confirm success message appears
@@ -399,6 +423,7 @@ Watch the upload progress:
 ### 5. Post-Deployment Verification
 
 After deployment:
+
 1. ✅ Visit https://wbmband.com
 2. ✅ Test all pages and links
 3. ✅ Check images load correctly
@@ -411,26 +436,26 @@ After deployment:
 
 ### `.env.production`
 
-| Variable | Required | Description | Example |
-|----------|----------|-------------|---------|
-| `FTP_HOST` | ✅ Yes | FTP server hostname | `wbmband.ftp.tools` |
-| `FTP_USERNAME` | ✅ Yes | FTP login username | `wbmband_ftp` |
-| `FTP_PASSWORD` | ✅ Yes | FTP password | `your_secure_password` |
-| `FTP_PORT` | ❌ No | FTP port (default: 21) | `21` |
-| `FTP_ROOT` | ✅ Yes | Remote directory path | `/home/wbmband/` |
-| `DELETE_REMOTE` | ❌ No | Delete old files (default: false) | `false` |
+| Variable        | Required | Description                       | Example                |
+| --------------- | -------- | --------------------------------- | ---------------------- |
+| `FTP_HOST`      | ✅ Yes   | FTP server hostname               | `wbmband.ftp.tools`    |
+| `FTP_USERNAME`  | ✅ Yes   | FTP login username                | `wbmband_ftp`          |
+| `FTP_PASSWORD`  | ✅ Yes   | FTP password                      | `your_secure_password` |
+| `FTP_PORT`      | ❌ No    | FTP port (default: 21)            | `21`                   |
+| `FTP_ROOT`      | ✅ Yes   | Remote directory path             | `/home/wbmband/`       |
+| `DELETE_REMOTE` | ❌ No    | Delete old files (default: false) | `false`                |
 
 ---
 
 ## NPM Scripts Reference
 
-| Command | Description | When to Use |
-|---------|-------------|-------------|
-| `npm run dev` | Start local dev server | Local development |
-| `npm run generate` | Build for GitHub Pages | Testing deployment |
-| `npm run build:production` | Build for production | Before manual deploy |
-| `npm run deploy:production` | Build + deploy to production | Push to live site |
-| `node scripts/deploy-production.js` | Deploy only (no build) | Re-upload existing build |
+| Command                             | Description                  | When to Use              |
+| ----------------------------------- | ---------------------------- | ------------------------ |
+| `npm run dev`                       | Start local dev server       | Local development        |
+| `npm run generate`                  | Build for GitHub Pages       | Testing deployment       |
+| `npm run build:production`          | Build for production         | Before manual deploy     |
+| `npm run deploy:production`         | Build + deploy to production | Push to live site        |
+| `node scripts/deploy-production.js` | Deploy only (no build)       | Re-upload existing build |
 
 ---
 
@@ -455,6 +480,7 @@ WBM-Band-WebSite/
 ### ⚠️ Never Commit Credentials
 
 The `.gitignore` file is configured to exclude:
+
 ```
 .env
 .env.production
@@ -464,6 +490,7 @@ The `.gitignore` file is configured to exclude:
 ```
 
 **Always verify before committing:**
+
 ```bash
 git status
 # Make sure .env.production is NOT listed
@@ -480,6 +507,7 @@ git status
 ### 🛡️ FTP Security
 
 Consider these security improvements:
+
 1. **Use SFTP instead of FTP** (if hosting supports it)
    - Set `FTP_PORT=22` in `.env.production`
    - More secure encryption
@@ -492,16 +520,19 @@ Consider these security improvements:
 ## Support & Resources
 
 ### Hosting Support
+
 - **ukraine.com.ua Support**: Contact for hosting-specific issues
 - **FTP Issues**: Check control panel or contact support
 - **DNS Configuration**: Get help from hosting support team
 
 ### Project Support
+
 - **GitHub Repository**: [JoilyFox/WBM-Band-WebSite](https://github.com/JoilyFox/WBM-Band-WebSite)
 - **Documentation**: Check [`docs/`](../docs/) folder for feature guides
 - **Issues**: Report bugs via GitHub Issues
 
 ### Related Documentation
+
 - [Performance Optimization](./performance-optimization.md)
 - [Image Optimization Guide](./image-optimization-guide.md)
 - [Error Page System](./error-page-system.md)
@@ -512,28 +543,33 @@ Consider these security improvements:
 ## Quick Reference Card
 
 **🚀 Deploy to Production:**
+
 ```bash
 npm run deploy:production
 ```
 
 **🧪 Test on GitHub Pages:**
+
 ```bash
 git push
 # Visit: https://joilyfox.github.io/WBM-Band-WebSite/
 ```
 
 **📁 FTP Credentials:**
+
 ```
 File: .env.production
 Location: Project root (not committed)
 ```
 
 **🌐 Production URL:**
+
 ```
 https://wbmband.com
 ```
 
 **⚙️ Configuration:**
+
 ```
 All targets: nuxt.config.ts (set DEPLOY_TARGET=github for GitHub Pages)
 ```

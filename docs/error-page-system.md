@@ -51,21 +51,21 @@ throw new Error('Something went wrong')
 </template>
 
 <script setup lang="ts">
-const { redirectToDataError, redirectToError } = useErrorPage()
+  const { redirectToDataError, redirectToError } = useErrorPage()
 
-const handleDataError = () => {
-  redirectToDataError('Failed to load user data from the server')
-}
+  const handleDataError = () => {
+    redirectToDataError('Failed to load user data from the server')
+  }
 
-const handleCustomError = () => {
-  redirectToError({
-    title: 'Feature Unavailable',
-    message: 'This feature is temporarily unavailable. Please try again later.',
-    buttonText: 'Go Back',
-    buttonLink: '/dashboard',
-    buttonIcon: 'pi pi-arrow-left'
-  })
-}
+  const handleCustomError = () => {
+    redirectToError({
+      title: 'Feature Unavailable',
+      message: 'This feature is temporarily unavailable. Please try again later.',
+      buttonText: 'Go Back',
+      buttonLink: '/dashboard',
+      buttonIcon: 'pi pi-arrow-left'
+    })
+  }
 </script>
 ```
 
@@ -90,11 +90,11 @@ errorPage.redirectToError(options: ErrorPageOptions)
 
 ```typescript
 interface ErrorPageOptions {
-  title?: string           // Error page title
-  message?: string         // Detailed error message
-  buttonText?: string      // Action button text
-  buttonLink?: string      // Where button navigates to
-  buttonIcon?: string      // PrimeIcons class for button icon
+  title?: string // Error page title
+  message?: string // Detailed error message
+  buttonText?: string // Action button text
+  buttonLink?: string // Where button navigates to
+  buttonIcon?: string // PrimeIcons class for button icon
 }
 ```
 
@@ -102,11 +102,11 @@ interface ErrorPageOptions {
 
 ```typescript
 interface ErrorPageProps {
-  title?: string           // Default: 'Oops! Something went wrong'
-  message?: string         // Default: 'We encountered an unexpected error...'
-  buttonText?: string      // Default: 'Go to Home'
-  buttonLink?: string      // Default: '/'
-  buttonIcon?: string      // Default: 'pi pi-home'
+  title?: string // Default: 'Oops! Something went wrong'
+  message?: string // Default: 'We encountered an unexpected error...'
+  buttonText?: string // Default: 'Go to Home'
+  buttonLink?: string // Default: '/'
+  buttonIcon?: string // Default: 'pi pi-home'
 }
 ```
 
@@ -131,30 +131,35 @@ router.push({
 ## Error Types and Scenarios
 
 ### 404 - Page Not Found
+
 - **Triggered**: Unknown URLs, missing pages
 - **Icon**: Exclamation triangle (amber)
 - **Default Message**: "Sorry, the page you are looking for does not exist..."
 - **Button**: "Go to Home" → `/`
 
 ### 500 - Server Error
+
 - **Triggered**: Server-side errors, API failures
 - **Icon**: Times circle (red)
 - **Default Message**: "We encountered an internal server error..."
 - **Button**: "Try Again" → refresh or home
 
 ### Data Load Error
+
 - **Triggered**: API fetch failures, network issues
 - **Icon**: Exclamation triangle
 - **Default Message**: "Failed to load the requested data..."
 - **Button**: "Try Again" → `/`
 
 ### Access Denied
+
 - **Triggered**: Permission errors, authentication failures
 - **Icon**: Ban circle
 - **Default Message**: "You do not have permission to access this page..."
 - **Button**: "Go to Home" → `/`
 
 ### Maintenance Mode
+
 - **Triggered**: Feature temporarily unavailable
 - **Icon**: Wrench
 - **Default Message**: "This feature is currently under maintenance..."
@@ -166,17 +171,17 @@ router.push({
 
 ```vue
 <script setup lang="ts">
-const { redirectToDataError } = useErrorPage()
+  const { redirectToDataError } = useErrorPage()
 
-const fetchUserData = async (userId: string) => {
-  try {
-    const user = await $fetch(`/api/users/${userId}`)
-    return user
-  } catch (error) {
-    // Redirect to error page instead of showing blank page
-    redirectToDataError(`Failed to load user ${userId}. Please check your connection.`)
+  const fetchUserData = async (userId: string) => {
+    try {
+      const user = await $fetch(`/api/users/${userId}`)
+      return user
+    } catch (error) {
+      // Redirect to error page instead of showing blank page
+      redirectToDataError(`Failed to load user ${userId}. Please check your connection.`)
+    }
   }
-}
 </script>
 ```
 
@@ -187,7 +192,7 @@ const fetchUserData = async (userId: string) => {
 export default defineNuxtRouteMiddleware((to) => {
   const { redirectToAccessError } = useErrorPage()
   const user = useAuthUser()
-  
+
   if (!user.value) {
     return redirectToAccessError()
   }
@@ -198,19 +203,19 @@ export default defineNuxtRouteMiddleware((to) => {
 
 ```vue
 <script setup lang="ts">
-const { redirectToMaintenance } = useErrorPage()
+  const { redirectToMaintenance } = useErrorPage()
 
-const checkFeatureAvailability = () => {
-  const config = useRuntimeConfig()
-  
-  if (!config.public.featureEnabled) {
-    redirectToMaintenance()
+  const checkFeatureAvailability = () => {
+    const config = useRuntimeConfig()
+
+    if (!config.public.featureEnabled) {
+      redirectToMaintenance()
+    }
   }
-}
 
-onMounted(() => {
-  checkFeatureAvailability()
-})
+  onMounted(() => {
+    checkFeatureAvailability()
+  })
 </script>
 ```
 
@@ -218,22 +223,23 @@ onMounted(() => {
 
 ```vue
 <script setup lang="ts">
-const { redirectToError } = useErrorPage()
+  const { redirectToError } = useErrorPage()
 
-const handleFormSubmit = async (formData: any) => {
-  try {
-    await $fetch('/api/submit', { method: 'POST', body: formData })
-    // Success handling
-  } catch (error) {
-    redirectToError({
-      title: 'Submission Failed',
-      message: 'Your form could not be submitted. Please check your internet connection and try again.',
-      buttonText: 'Back to Form',
-      buttonLink: '/contact',
-      buttonIcon: 'pi pi-arrow-left'
-    })
+  const handleFormSubmit = async (formData: any) => {
+    try {
+      await $fetch('/api/submit', { method: 'POST', body: formData })
+      // Success handling
+    } catch (error) {
+      redirectToError({
+        title: 'Submission Failed',
+        message:
+          'Your form could not be submitted. Please check your internet connection and try again.',
+        buttonText: 'Back to Form',
+        buttonLink: '/contact',
+        buttonIcon: 'pi pi-arrow-left'
+      })
+    }
   }
-}
 </script>
 ```
 
@@ -248,7 +254,7 @@ The error page features modern glassmorphism design:
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 
+  box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.25),
     0 0 0 1px rgba(255, 255, 255, 0.05);
 }
@@ -262,7 +268,7 @@ The error page features modern glassmorphism design:
     margin: 0 1rem;
     padding: 1.5rem;
   }
-  
+
   .error-title {
     font-size: 1.5rem;
   }
@@ -277,7 +283,7 @@ The error page features modern glassmorphism design:
     transform: translateY(-2px) scale(1.05);
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
   }
-  
+
   &:active {
     transform: translateY(0) scale(0.95);
   }
@@ -303,9 +309,7 @@ The error page uses [PrimeIcons](https://primevue.org/icons/) for visual feedbac
 ```typescript
 useHead({
   title: '404 - Page Not Found | WBM Band Website',
-  meta: [
-    { name: 'robots', content: 'noindex' }
-  ]
+  meta: [{ name: 'robots', content: 'noindex' }]
 })
 ```
 

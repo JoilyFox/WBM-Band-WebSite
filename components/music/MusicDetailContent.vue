@@ -14,17 +14,22 @@
     <Teleport to="body">
       <div v-if="!isModal" class="floating-controls">
         <button
+          :class="[
+            'back-glass-btn',
+            {
+              'back-glass-btn--transparent': backBtnTransparent,
+              'back-glass-btn--optimized': shouldUseMobileFallback
+            }
+          ]"
+          :aria-label="
+            shouldShowBackArrow ? t('music.a11y.back_to_section') : t('music.a11y.go_to_library')
+          "
           @click="handleBack"
-          :class="['back-glass-btn', { 
-            'back-glass-btn--transparent': backBtnTransparent,
-            'back-glass-btn--optimized': shouldUseMobileFallback 
-          }]"
-          :aria-label="shouldShowBackArrow ? t('music.a11y.back_to_section') : t('music.a11y.go_to_library')"
         >
           <i v-if="shouldShowBackArrow" class="pi pi-arrow-left text-xl"></i>
           <i v-else class="fa-solid fa-home text-lg"></i>
         </button>
-        
+
         <!-- Logo and Share button only on mobile -->
         <template v-if="!isDesktop && isClient">
           <!-- Logo in the center (mobile only) -->
@@ -39,14 +44,17 @@
               :blend-mode="'exclusion'"
             />
           </div>
-          
+
           <button
-            @click="handleShare"
-            :class="['share-glass-btn', { 
-              'share-glass-btn--transparent': backBtnTransparent,
-              'share-glass-btn--optimized': shouldUseMobileFallback
-            }]"
+            :class="[
+              'share-glass-btn',
+              {
+                'share-glass-btn--transparent': backBtnTransparent,
+                'share-glass-btn--optimized': shouldUseMobileFallback
+              }
+            ]"
             :aria-label="t('music.a11y.share_release')"
+            @click="handleShare"
           >
             <i class="pi pi-share-alt text-xl"></i>
           </button>
@@ -55,35 +63,45 @@
     </Teleport>
 
     <!-- Hero Section with Album Cover -->
-    <section :class="['music-hero flex items-center justify-center relative overflow-hidden', {
-      'pt-20 pb-4 px-4 md:py-16 md:px-8': !isHeroExpanded && !isDesktop && !isModal,
-      'py-4 px-4': !isHeroExpanded && !isDesktop && isModal,
-      'py-16 px-4 md:px-8': isHeroExpanded || isDesktop,
-      'modal-hero': isModal
-    }]">
-      <div 
-        class="music-hero-background absolute inset-0 z-0" 
-        :class="{ 
-          'modal-bg': isModal 
+    <section
+      :class="[
+        'music-hero flex items-center justify-center relative overflow-hidden',
+        {
+          'pt-20 pb-4 px-4 md:py-16 md:px-8': !isHeroExpanded && !isDesktop && !isModal,
+          'py-4 px-4': !isHeroExpanded && !isDesktop && isModal,
+          'py-16 px-4 md:px-8': isHeroExpanded || isDesktop,
+          'modal-hero': isModal
+        }
+      ]"
+    >
+      <div
+        class="music-hero-background absolute inset-0 z-0"
+        :class="{
+          'modal-bg': isModal
         }"
       >
-        <div 
+        <div
           class="music-hero-overlay"
-          :class="{ 
-            'modal-overlay': isModal 
+          :class="{
+            'modal-overlay': isModal
           }"
         ></div>
       </div>
-      
+
       <!-- Mobile Compact Hero (default state on mobile) -->
-      <div 
-        v-if="!isHeroExpanded" 
+      <div
+        v-if="!isHeroExpanded"
         class="md:hidden w-full max-w-5xl z-10 cursor-pointer transform transition-all duration-400 ease-out md:hover:scale-[1.02] animate-slideInCompact"
         @click="toggleHeroExpansion"
       >
-        <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md transition-all duration-400 ease-out hover:bg-white/8 hover:border-white/15 hover:shadow-lg md:hover:bg-white/8 md:hover:border-white/15 md:hover:shadow-lg">
+        <div
+          class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md transition-all duration-400 ease-out hover:bg-white/8 hover:border-white/15 hover:shadow-lg md:hover:bg-white/8 md:hover:border-white/15 md:hover:shadow-lg"
+        >
           <!-- Small Album Cover -->
-          <div class="relative w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-white/5 border border-white/10 shadow-lg" style="min-width: 64px; min-height: 64px; aspect-ratio: 1;">
+          <div
+            class="relative w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden bg-white/5 border border-white/10 shadow-lg"
+            style="min-width: 64px; min-height: 64px; aspect-ratio: 1"
+          >
             <UiProgressiveImage
               :src="release.imageUrl"
               :alt="displayTitle"
@@ -98,7 +116,7 @@
               sizes="64px"
             />
           </div>
-          
+
           <!-- Compact Info -->
           <div class="flex-1 min-w-0">
             <h1 class="text-lg font-bold text-primary-50 mb-[2px] truncate">{{ displayTitle }}</h1>
@@ -111,33 +129,42 @@
                 </span>
               </span>
               <span v-if="preSaveCountdownText" class="whitespace-nowrap">
-                <span class="text-[0.8rem] text-primary-200 opacity-80">({{ preSaveCountdownText }})</span>
+                <span class="text-[0.8rem] text-primary-200 opacity-80"
+                  >({{ preSaveCountdownText }})</span
+                >
               </span>
             </p>
           </div>
-          
+
           <!-- Expand Icon -->
           <div class="flex-shrink-0">
-            <i class="pi pi-chevron-down text-primary-200 text-lg transition-all duration-300 ease-out"></i>
+            <i
+              class="pi pi-chevron-down text-primary-200 text-lg transition-all duration-300 ease-out"
+            ></i>
           </div>
         </div>
       </div>
-      
+
       <!-- Full Hero (desktop always, mobile when expanded) -->
-      <div 
-        :class="['music-hero-content flex flex-col md:flex-row items-center gap-8 md:gap-12 max-w-5xl w-full z-10 transition-all duration-500 ease-out transform', {
-          'animate-fadeInUpSmooth': isHeroExpanded && !isDesktop && isClient,
-          'animate-fadeOutDown': !isHeroExpanded && !isDesktop && isClient,
-          'mobile-expanded': isHeroExpanded && !isDesktop
-        }]"
+      <div
+        :class="[
+          'music-hero-content flex flex-col md:flex-row items-center gap-8 md:gap-12 max-w-5xl w-full z-10 transition-all duration-500 ease-out transform',
+          {
+            'animate-fadeInUpSmooth': isHeroExpanded && !isDesktop && isClient,
+            'animate-fadeOutDown': !isHeroExpanded && !isDesktop && isClient,
+            'mobile-expanded': isHeroExpanded && !isDesktop
+          }
+        ]"
         :style="{
-          display: (!isDesktop && !isHeroExpanded && (isClient || isHydrating)) ? 'none' : ''
+          display: !isDesktop && !isHeroExpanded && (isClient || isHydrating) ? 'none' : ''
         }"
       >
-        <div class="music-album-cover relative w-44 h-44 md:w-72 md:h-72 flex-shrink-0 rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl"
-             :class="{ 
-               'modal-cover': isModal
-             }">
+        <div
+          class="music-album-cover relative w-44 h-44 md:w-72 md:h-72 flex-shrink-0 rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl"
+          :class="{
+            'modal-cover': isModal
+          }"
+        >
           <UiProgressiveImage
             :src="release.imageUrl"
             :alt="displayTitle"
@@ -153,48 +180,60 @@
           />
           <!-- Release Type Badge -->
           <div class="music-badge absolute top-4 left-4 z-10">
-            <span :class="badgeClass" class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md">
-              {{ isPreSave ? t('music.presave.card_title_fallback').toUpperCase() : displayTypeName }}
+            <span
+              :class="badgeClass"
+              class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md"
+            >
+              {{
+                isPreSave ? t('music.presave.card_title_fallback').toUpperCase() : displayTypeName
+              }}
             </span>
           </div>
         </div>
         <div class="music-info flex-1 min-w-0 text-center md:text-left">
           <!-- Mobile Collapse Button -->
           <div class="md:hidden mb-3 flex justify-center">
-            <button 
-              @click="toggleHeroExpansion"
+            <button
               class="flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 border border-white/20 text-primary-200 text-sm font-medium transition-all duration-300 md:hover:bg-white/20 md:hover:scale-105"
+              @click="toggleHeroExpansion"
             >
               <i class="pi pi-chevron-up text-sm"></i>
               <span>{{ collapseLabel }}</span>
             </button>
           </div>
-          
-          <h1 class="music-title text-4xl md:text-6xl font-extrabold leading-tight mb-3 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-lg"
-              :class="{ 'animate-titleGlow': isHighPerformanceDevice }">
+
+          <h1
+            class="music-title text-4xl md:text-6xl font-extrabold leading-tight mb-3 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-lg"
+            :class="{ 'animate-titleGlow': isHighPerformanceDevice }"
+          >
             {{ displayTitle }}
           </h1>
-          <p class="music-date text-primary-200 text-sm md:text-lg font-medium">{{ heroDateText }}</p>
+          <p class="music-date text-primary-200 text-sm md:text-lg font-medium">
+            {{ heroDateText }}
+          </p>
           <p
             v-if="preSaveCountdownText"
             class="music-countdown text-primary-200 opacity-70 text-xs md:text-sm font-normal tracking-[0.06em] mt-0.5 pb-1"
           >
             ({{ preSaveCountdownText }})
           </p>
-          <p v-if="displayDescription" class="music-description text-primary-100 text-base md:text-lg max-w-xl mx-auto md:mx-0 mt-2 mb-4">
+          <p
+            v-if="displayDescription"
+            class="music-description text-primary-100 text-base md:text-lg max-w-xl mx-auto md:mx-0 mt-2 mb-4"
+          >
             {{ displayDescription }}
           </p>
-          
+
           <!-- Desktop Share Button -->
           <div v-if="isDesktop && isClient" class="desktop-share-button mt-6">
             <Button
               id="desktop-share-button"
-              @click="showDesktopSharePopup"
               class="btn-glassmorphic"
               :class="{ 'btn-glassmorphic--optimized': shouldUseMobileFallback }"
               :aria-label="t('music.a11y.share_release')"
               unstyled
               :pt="{ ripple: { style: 'display: none !important' } }"
+              @click="showDesktopSharePopup"
             >
               <i class="pi pi-share-alt"></i>
               <span>{{ t('music.buttons.share') }}</span>
@@ -203,7 +242,7 @@
         </div>
       </div>
     </section>
-    
+
     <!-- Custom Share Popup for Desktop -->
     <CustomSharePopup
       :visible="showSharePopup"
@@ -212,13 +251,21 @@
       :target-element="shareButtonElement"
       @close="hideSharePopup"
     />
-    
+
     <!-- Music Platform Links -->
-    <section class="music-platforms flex-1 relative py-6 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/70">
+    <section
+      class="music-platforms flex-1 relative py-6 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/70"
+    >
       <div class="platforms-container max-w-3xl mx-auto rounded-xl">
-        <h2 class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-6 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md">{{ listenNowTitle }}</h2>
-        <div class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch">
-          <div 
+        <h2
+          class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-6 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md"
+        >
+          {{ listenNowTitle }}
+        </h2>
+        <div
+          class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch"
+        >
+          <div
             v-for="(url, platform) in availablePlatforms"
             :key="platform"
             class="platform-button-wrapper w-full h-full min-h-[110px] flex"
@@ -237,483 +284,509 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import Button from 'primevue/button'
-import { useScrollTo } from '~/composables/useScrollTo'
-import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
-import { useOptimizedScroll } from '~/composables/useOptimizedScroll'
-import { useShareFunctionality } from '~/composables/useShareFunctionality'
-import { getLocalizedCountdown } from '~/utils/countdown'
-import type { MusicRelease } from '~/data/musicLibrary'
-import Logo from '~/components/ui/Logo.vue'
-import CustomSharePopup from '~/components/common/CustomSharePopup.vue'
-import { useLocalePath } from '#i18n'
-import { useI18n } from 'vue-i18n'
+  import { computed, ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import Button from 'primevue/button'
+  import { useScrollTo } from '~/composables/useScrollTo'
+  import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
+  import { useOptimizedScroll } from '~/composables/useOptimizedScroll'
+  import { useShareFunctionality } from '~/composables/useShareFunctionality'
+  import { getLocalizedCountdown } from '~/utils/countdown'
+  import type { MusicRelease } from '~/data/musicLibrary'
+  import Logo from '~/components/ui/Logo.vue'
+  import CustomSharePopup from '~/components/common/CustomSharePopup.vue'
+  import { useLocalePath } from '#i18n'
+  import { useI18n } from 'vue-i18n'
 
-interface Props {
-  release: MusicRelease
-  isModal?: boolean
-  isPreSave?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  isModal: false,
-  isPreSave: false
-})
-const router = useRouter()
-const route = useRoute()
-const localePath = useLocalePath()
-// Use global composer to avoid per-component instances and keep SSR/CSR consistent
-const { t, locale } = useI18n({ useScope: 'global' })
-
-// Performance optimization system
-const {
-  isLowPerformanceDevice,
-  isMediumPerformanceDevice,
-  isHighPerformanceDevice,
-  shouldReduceAnimations,
-  isMobileFlagship,
-  shouldUseMobileFallback,
-  performanceCSSVars,
-  getPerformanceClass
-} = usePerformanceOptimization()
-
-const performanceClass = computed(() => getPerformanceClass())
-
-// Optimized scroll handling
-const { isScrolled } = useOptimizedScroll({ threshold: 60 })
-
-// Share functionality
-const { getShareContent, shareViaMobile, copyToClipboard } = useShareFunctionality()
-
-// Translation keys for the current release
-const releaseTitleKey = computed(() => props.release.titleKey || `releases.${props.release.slug}.title`)
-const countdownText = ref('')
-const preSaveCountdownText = computed(() => countdownText.value)
-const formattedReleaseDate = computed(() => formatDate(props.release.releaseDate, { includeYear: !props.isPreSave }))
-
-const displayTypeName = computed(() => {
-  const key = (props.release.type || '').toString().toLowerCase().replace(/\s+/g, '_')
-  const i18nKey = `music.types.${key}`
-  const label = t(i18nKey) as string
-  if (label !== i18nKey) return label
-  const loc = locale.value === 'ua' ? 'ua' : 'en'
-  const map: Record<string, Record<string, string>> = {
-    en: { single: 'Single', album: 'Album', ep: 'EP', 'new_release': 'New Release' },
-    ua: { single: 'Сингл', album: 'Альбом', ep: 'EP', 'new_release': 'Новий реліз' }
-  }
-  return map[loc][key] || (props.release.type || '').toString()
-})
-
-const releaseDateLabel = computed(() => {
-  if (!props.isPreSave) return formattedReleaseDate.value
-  const key = 'music.detail.release_label'
-  const translated = t(key, { date: formattedReleaseDate.value }) as string
-  if (translated !== key) return translated
-  const fallback = locale.value === 'ua' ? `Реліз ${formattedReleaseDate.value}` : `Release ${formattedReleaseDate.value}`
-  return fallback
-})
-
-const compactInfoPrimary = computed(() => {
-  if (props.isPreSave) return releaseDateLabel.value
-  return displayTypeName.value
-})
-
-const showCompactDate = computed(() => !props.isPreSave)
-
-const heroDateText = computed(() => releaseDateLabel.value)
-
-const updateCountdown = () => {
-  if (!process.client) return
-  if (!props.isPreSave) {
-    countdownText.value = ''
-    return
+  interface Props {
+    release: MusicRelease
+    isModal?: boolean
+    isPreSave?: boolean
   }
 
-  const text = getLocalizedCountdown({
-    releaseDate: props.release.releaseDate,
-    locale: locale.value,
-    t
+  const props = withDefaults(defineProps<Props>(), {
+    isModal: false,
+    isPreSave: false
+  })
+  const router = useRouter()
+  const route = useRoute()
+  const localePath = useLocalePath()
+  // Use global composer to avoid per-component instances and keep SSR/CSR consistent
+  const { t, locale } = useI18n({ useScope: 'global' })
+
+  // Performance optimization system
+  const {
+    isLowPerformanceDevice,
+    isMediumPerformanceDevice,
+    isHighPerformanceDevice,
+    shouldReduceAnimations,
+    isMobileFlagship,
+    shouldUseMobileFallback,
+    performanceCSSVars,
+    getPerformanceClass
+  } = usePerformanceOptimization()
+
+  const performanceClass = computed(() => getPerformanceClass())
+
+  // Optimized scroll handling
+  const { isScrolled } = useOptimizedScroll({ threshold: 60 })
+
+  // Share functionality
+  const { getShareContent, shareViaMobile, copyToClipboard } = useShareFunctionality()
+
+  // Translation keys for the current release
+  const releaseTitleKey = computed(
+    () => props.release.titleKey || `releases.${props.release.slug}.title`
+  )
+  const countdownText = ref('')
+  const preSaveCountdownText = computed(() => countdownText.value)
+  const formattedReleaseDate = computed(() =>
+    formatDate(props.release.releaseDate, { includeYear: !props.isPreSave })
+  )
+
+  const displayTypeName = computed(() => {
+    const key = (props.release.type || '').toString().toLowerCase().replace(/\s+/g, '_')
+    const i18nKey = `music.types.${key}`
+    const label = t(i18nKey) as string
+    if (label !== i18nKey) return label
+    const loc = locale.value === 'ua' ? 'ua' : 'en'
+    const map: Record<string, Record<string, string>> = {
+      en: { single: 'Single', album: 'Album', ep: 'EP', new_release: 'New Release' },
+      ua: { single: 'Сингл', album: 'Альбом', ep: 'EP', new_release: 'Новий реліз' }
+    }
+    return map[loc][key] || (props.release.type || '').toString()
   })
 
-  countdownText.value = text
-}
-
-watch(() => locale.value, () => updateCountdown())
-watch(() => props.release.releaseDate, () => updateCountdown())
-watch(() => props.isPreSave, () => updateCountdown())
-
-// Custom share popup state
-const showSharePopup = ref(false)
-const shareButtonElement = ref<HTMLElement>()
-const shareUrlInput = ref<HTMLInputElement>()
-const justCopied = ref(false)
-const isCopying = ref(false)
-
-// Build clean share URL without language prefix and protocol
-const shareUrlForRelease = computed(() => {
-  const config = useRuntimeConfig()
-  const base = (config.app?.baseURL || '/').replace(/\/$/, '')
-  // Use appropriate path based on pre-save mode
-  const pathPrefix = props.isPreSave ? '/pre-save/' : '/listen/'
-  // Build path without locale prefix
-  const path = `${pathPrefix}${props.release.slug}`
-  const relative = `${base}${path}`
-  
-  if (typeof window !== 'undefined') {
-    // Return full URL with protocol to avoid concatenation issues
-    return new URL(relative, window.location.origin).toString()
-  }
-  // For SSR, return relative path (will be converted to full URL on client)
-  return relative
-})
-
-// Computed share content – use appropriate text for pre-save vs regular
-const shareContent = computed(() => {
-  const cleanUrl = shareUrlForRelease.value
-  const fallbackTitle = props.release.title || props.release.slug
-  const translatedTitle = t(releaseTitleKey.value) as string
-  const title = translatedTitle !== releaseTitleKey.value && translatedTitle ? translatedTitle : fallbackTitle
-
-  // Use localized share text
-  const key = props.isPreSave ? 'music.share_popup.presave' : 'music.share_popup.check_out'
-  const displayText = t(key, { title }) as string
-  const shareMessage = `${displayText}\n\n${cleanUrl}`
-  
-  return {
-    title,
-    text: shareMessage,
-    url: cleanUrl,
-    displayText
-  }
-})
-
-// Check if back button should show back arrow or music library icon
-// Lock decision on first render to avoid flicker when query params change
-const shouldShowBackArrow = ref(route.query.from === 'music')
-
-// Track if we're on client side to avoid SSR hydration issues
-const isClient = ref(false)
-// Keep SSR fallbacks during hydration to prevent mismatches; switch to translations after mount
-const isHydrating = ref(true)
-
-// Responsive breakpoint detection - start with a safe default
-const isDesktop = ref(false)
-const updateBreakpoint = () => {
-  if (typeof window !== 'undefined') {
-    isDesktop.value = window.innerWidth >= 768 // md breakpoint
-  }
-}
-
-// Mobile hero expansion state (default collapsed on mobile)
-const isHeroExpanded = ref(false)
-const toggleHeroExpansion = () => {
-  isHeroExpanded.value = !isHeroExpanded.value
-}
-
-// Optimized back button transparency based on scroll
-const backBtnTransparent = computed(() => isScrolled.value)
-onMounted(() => {
-  // Mark as client-side and update breakpoint immediately
-  isClient.value = true
-  updateBreakpoint()
-  // Hydration finished; allow switching to localized strings without triggering hydration warnings
-  isHydrating.value = false
-  updateCountdown()
-  
-  // Resize handler for responsive breakpoint (debounced)
-  let resizeTimeout: NodeJS.Timeout
-  const resizeHandler = () => {
-    clearTimeout(resizeTimeout)
-    resizeTimeout = setTimeout(() => {
-      updateBreakpoint()
-    }, 150)
-  }
-  
-  window.addEventListener('resize', resizeHandler, { passive: true })
-  
-  // Cleanup function
-  onBeforeUnmount(() => {
-    window.removeEventListener('resize', resizeHandler)
-    if (resizeTimeout) clearTimeout(resizeTimeout)
+  const releaseDateLabel = computed(() => {
+    if (!props.isPreSave) return formattedReleaseDate.value
+    const key = 'music.detail.release_label'
+    const translated = t(key, { date: formattedReleaseDate.value }) as string
+    if (translated !== key) return translated
+    const fallback =
+      locale.value === 'ua'
+        ? `Реліз ${formattedReleaseDate.value}`
+        : `Release ${formattedReleaseDate.value}`
+    return fallback
   })
-})
 
-// Derive per-release accent colors from slug
-const stringToHue = (str: string) => {
-  let h = 0
-  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0
-  return h % 360
-}
-const hue = computed(() => stringToHue(props.release.slug || props.release.id))
-const accentVars = computed(() => ({
-  '--accent1': `hsla(${hue.value}deg, 85%, 62%, 0.24)`,
-  '--accent2': `hsla(${(hue.value + 40) % 360}deg, 85%, 60%, 0.18)`,
-  '--accent-edge': `hsla(${(hue.value + 20) % 360}deg, 90%, 55%, 0.35)`
-}))
+  const compactInfoPrimary = computed(() => {
+    if (props.isPreSave) return releaseDateLabel.value
+    return displayTypeName.value
+  })
 
-const availablePlatforms = computed(() => {
-  const platforms: Record<string, string> = {}
-  // Use pre-save links if in pre-save mode, otherwise use regular music platform links
-  const linkSource = props.isPreSave && props.release.preSaveMusicPlatformLinks 
-    ? props.release.preSaveMusicPlatformLinks 
-    : props.release.musicPlatformLinks
-  
-  const orderedPlatforms: Record<string, string> = {}
-  const priorityOrder = ['spotify', 'youtubeMusic', 'appleMusic', 'musicVideo']
-  
-  // Add priority platforms first
-  priorityOrder.forEach(platform => {
-    if (platform in linkSource && linkSource[platform as keyof typeof linkSource]) {
-      orderedPlatforms[platform] = linkSource[platform as keyof typeof linkSource] as string
+  const showCompactDate = computed(() => !props.isPreSave)
+
+  const heroDateText = computed(() => releaseDateLabel.value)
+
+  const updateCountdown = () => {
+    if (!import.meta.client) return
+    if (!props.isPreSave) {
+      countdownText.value = ''
+      return
+    }
+
+    const text = getLocalizedCountdown({
+      releaseDate: props.release.releaseDate,
+      locale: locale.value,
+      t
+    })
+
+    countdownText.value = text
+  }
+
+  watch(
+    () => locale.value,
+    () => updateCountdown()
+  )
+  watch(
+    () => props.release.releaseDate,
+    () => updateCountdown()
+  )
+  watch(
+    () => props.isPreSave,
+    () => updateCountdown()
+  )
+
+  // Custom share popup state
+  const showSharePopup = ref(false)
+  const shareButtonElement = ref<HTMLElement>()
+  const shareUrlInput = ref<HTMLInputElement>()
+  const justCopied = ref(false)
+  const isCopying = ref(false)
+
+  // Build clean share URL without language prefix and protocol
+  const shareUrlForRelease = computed(() => {
+    const config = useRuntimeConfig()
+    const base = (config.app?.baseURL || '/').replace(/\/$/, '')
+    // Use appropriate path based on pre-save mode
+    const pathPrefix = props.isPreSave ? '/pre-save/' : '/listen/'
+    // Build path without locale prefix
+    const path = `${pathPrefix}${props.release.slug}`
+    const relative = `${base}${path}`
+
+    if (typeof window !== 'undefined') {
+      // Return full URL with protocol to avoid concatenation issues
+      return new URL(relative, window.location.origin).toString()
+    }
+    // For SSR, return relative path (will be converted to full URL on client)
+    return relative
+  })
+
+  // Computed share content – use appropriate text for pre-save vs regular
+  const shareContent = computed(() => {
+    const cleanUrl = shareUrlForRelease.value
+    const fallbackTitle = props.release.title || props.release.slug
+    const translatedTitle = t(releaseTitleKey.value) as string
+    const title =
+      translatedTitle !== releaseTitleKey.value && translatedTitle ? translatedTitle : fallbackTitle
+
+    // Use localized share text
+    const key = props.isPreSave ? 'music.share_popup.presave' : 'music.share_popup.check_out'
+    const displayText = t(key, { title }) as string
+    const shareMessage = `${displayText}\n\n${cleanUrl}`
+
+    return {
+      title,
+      text: shareMessage,
+      url: cleanUrl,
+      displayText
     }
   })
-  
-  // Add remaining platforms
-  Object.entries(linkSource).forEach(([platform, url]) => {
-    if (!priorityOrder.includes(platform) && url) {
-      orderedPlatforms[platform] = url
+
+  // Check if back button should show back arrow or music library icon
+  // Lock decision on first render to avoid flicker when query params change
+  const shouldShowBackArrow = ref(route.query.from === 'music')
+
+  // Track if we're on client side to avoid SSR hydration issues
+  const isClient = ref(false)
+  // Keep SSR fallbacks during hydration to prevent mismatches; switch to translations after mount
+  const isHydrating = ref(true)
+
+  // Responsive breakpoint detection - start with a safe default
+  const isDesktop = ref(false)
+  const updateBreakpoint = () => {
+    if (typeof window !== 'undefined') {
+      isDesktop.value = window.innerWidth >= 768 // md breakpoint
     }
+  }
+
+  // Mobile hero expansion state (default collapsed on mobile)
+  const isHeroExpanded = ref(false)
+  const toggleHeroExpansion = () => {
+    isHeroExpanded.value = !isHeroExpanded.value
+  }
+
+  // Optimized back button transparency based on scroll
+  const backBtnTransparent = computed(() => isScrolled.value)
+  onMounted(() => {
+    // Mark as client-side and update breakpoint immediately
+    isClient.value = true
+    updateBreakpoint()
+    // Hydration finished; allow switching to localized strings without triggering hydration warnings
+    isHydrating.value = false
+    updateCountdown()
+
+    // Resize handler for responsive breakpoint (debounced)
+    let resizeTimeout: NodeJS.Timeout
+    const resizeHandler = () => {
+      clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(() => {
+        updateBreakpoint()
+      }, 150)
+    }
+
+    window.addEventListener('resize', resizeHandler, { passive: true })
+
+    // Cleanup function
+    onBeforeUnmount(() => {
+      window.removeEventListener('resize', resizeHandler)
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+    })
   })
-  
-  return orderedPlatforms
-})
 
-const badgeClass = computed(() => {
-  // Use pre-save badge if in pre-save mode
-  if (props.isPreSave) {
-    return 'badge-presave'
+  // Derive per-release accent colors from slug
+  const stringToHue = (str: string) => {
+    let h = 0
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0
+    return h % 360
   }
-  
-  const typeClasses = {
-    'single': 'badge-single',
-    'album': 'badge-album', 
-    'ep': 'badge-ep',
-    'new release': 'badge-new'
-  }
-  return typeClasses[props.release.type] || 'badge-default'
-})
+  const hue = computed(() => stringToHue(props.release.slug || props.release.id))
+  const accentVars = computed(() => ({
+    '--accent1': `hsla(${hue.value}deg, 85%, 62%, 0.24)`,
+    '--accent2': `hsla(${(hue.value + 40) % 360}deg, 85%, 60%, 0.18)`,
+    '--accent-edge': `hsla(${(hue.value + 20) % 360}deg, 90%, 55%, 0.35)`
+  }))
 
-const releaseDescriptionKey = computed(() => props.release.descriptionKey || `releases.${props.release.slug}.description`)
+  const availablePlatforms = computed(() => {
+    const platforms: Record<string, string> = {}
+    // Use pre-save links if in pre-save mode, otherwise use regular music platform links
+    const linkSource =
+      props.isPreSave && props.release.preSaveMusicPlatformLinks
+        ? props.release.preSaveMusicPlatformLinks
+        : props.release.musicPlatformLinks
 
-// Localized title/description from locales.releases[slug]
-// Hydration-aware: keep SSR fallbacks during hydration to avoid mismatches
-const displayTitle = computed(() => {
-  const ssrFallback = props.release.title || props.release.slug
-  if (isHydrating.value) return ssrFallback
-  const translated = t(releaseTitleKey.value) as string
-  return translated !== releaseTitleKey.value ? translated : ssrFallback
-})
+    const orderedPlatforms: Record<string, string> = {}
+    const priorityOrder = ['spotify', 'youtubeMusic', 'appleMusic', 'musicVideo']
 
-const displayDescription = computed(() => {
-  const ssrFallback = props.release.description
-  if (isHydrating.value) return ssrFallback
-  const translated = t(releaseDescriptionKey.value) as string
-  if (translated !== releaseDescriptionKey.value && translated) return translated
-  return ssrFallback
-})
+    // Add priority platforms first
+    priorityOrder.forEach((platform) => {
+      if (platform in linkSource && linkSource[platform as keyof typeof linkSource]) {
+        orderedPlatforms[platform] = linkSource[platform as keyof typeof linkSource] as string
+      }
+    })
 
-function formatDate(dateString: string, options: { includeYear?: boolean } = {}): string {
-  const date = new Date(dateString)
-  const currentLocale = locale.value === 'ua' ? 'uk-UA' : 'en-US'
-  const includeYear = options.includeYear !== false
-  const formatOptions: Intl.DateTimeFormatOptions = {
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC' // Force UTC to ensure SSR/CSR consistency
-  }
+    // Add remaining platforms
+    Object.entries(linkSource).forEach(([platform, url]) => {
+      if (!priorityOrder.includes(platform) && url) {
+        orderedPlatforms[platform] = url
+      }
+    })
 
-  if (includeYear) {
-    formatOptions.year = 'numeric'
-  }
-
-  return date.toLocaleDateString(currentLocale, formatOptions)
-}
-
-// Localized display name for release type
-// Deterministic labels for section titles/buttons to avoid SSR key rendering
-const listenNowTitle = computed(() => {
-  if (props.isPreSave) {
-    return t('music.detail.presave_title')
-  }
-  return t('music.detail.listen_now_title')
-})
-
-const collapseLabel = computed(() => {
-  return t('music.buttons.collapse')
-})
-
-// Build a robust fallback URL for CSS backgrounds (prefer JPG)
-const bgCoverUrl = computed(() => {
-  const raw = props.release.imageUrl || ''
-  let path = raw
-  if (raw.includes('/images/optimized/')) {
-    path = raw.replace(/\.(avif|webp|png)$/, '.jpg')
-  } else if (raw.startsWith('/images/')) {
-    path = raw.replace('/images/', '/images/optimized/').replace(/\.(avif|webp|png|jpg)$/, '.jpg')
-  }
-  const config = useRuntimeConfig()
-  const baseURL = config.app?.baseURL || '/'
-  if (path.startsWith('http') || path.startsWith('//')) return path
-  const finalUrl = baseURL === '/' ? path : (path.startsWith(baseURL) ? path : baseURL.replace(/\/$/, '') + path)
-  return finalUrl
-})
-
-// Back button handler: go to / and scroll to music section, or just go to music library
-const { scrollToElementWithNavigation } = useScrollTo()
-const handleBack = async () => {
-  if (shouldShowBackArrow.value) {
-    // If came from music section, go back to home and scroll to music
-    await router.push('/')
-    setTimeout(() => {
-      scrollToElementWithNavigation('music')
-    }, 100)
-  } else {
-    // If no specific origin, go to music library/home
-    await router.push('/')
-    setTimeout(() => {
-      scrollToElementWithNavigation('music')
-    }, 100)
-  }
-}
-
-// Logo click handler: scroll to hero section
-const scrollToHero = () => {
-  scrollToElementWithNavigation('hero')
-}
-
-// Share functionality - Mobile share handler (uses Web Share API)
-const handleShare = async () => {
-  await shareViaMobile({
-    title: shareContent.value.title,
-    url: shareUrlForRelease.value
+    return orderedPlatforms
   })
-}
 
-// Desktop share popup functions
-const showDesktopSharePopup = (event: Event) => {
-  const targetElement = event.currentTarget as HTMLElement
-  shareButtonElement.value = targetElement
-  showSharePopup.value = true
-}
+  const badgeClass = computed(() => {
+    // Use pre-save badge if in pre-save mode
+    if (props.isPreSave) {
+      return 'badge-presave'
+    }
 
-const hideSharePopup = () => {
-  showSharePopup.value = false
-}
+    const typeClasses = {
+      single: 'badge-single',
+      album: 'badge-album',
+      ep: 'badge-ep',
+      'new release': 'badge-new'
+    }
+    return typeClasses[props.release.type] || 'badge-default'
+  })
 
-const selectAllShareText = async () => {
-  await nextTick()
-  if (shareUrlInput.value) {
-    shareUrlInput.value.select()
+  const releaseDescriptionKey = computed(
+    () => props.release.descriptionKey || `releases.${props.release.slug}.description`
+  )
+
+  // Localized title/description from locales.releases[slug]
+  // Hydration-aware: keep SSR fallbacks during hydration to avoid mismatches
+  const displayTitle = computed(() => {
+    const ssrFallback = props.release.title || props.release.slug
+    if (isHydrating.value) return ssrFallback
+    const translated = t(releaseTitleKey.value) as string
+    return translated !== releaseTitleKey.value ? translated : ssrFallback
+  })
+
+  const displayDescription = computed(() => {
+    const ssrFallback = props.release.description
+    if (isHydrating.value) return ssrFallback
+    const translated = t(releaseDescriptionKey.value) as string
+    if (translated !== releaseDescriptionKey.value && translated) return translated
+    return ssrFallback
+  })
+
+  function formatDate(dateString: string, options: { includeYear?: boolean } = {}): string {
+    const date = new Date(dateString)
+    const currentLocale = locale.value === 'ua' ? 'uk-UA' : 'en-US'
+    const includeYear = options.includeYear !== false
+    const formatOptions: Intl.DateTimeFormatOptions = {
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC' // Force UTC to ensure SSR/CSR consistency
+    }
+
+    if (includeYear) {
+      formatOptions.year = 'numeric'
+    }
+
+    return date.toLocaleDateString(currentLocale, formatOptions)
   }
-}
 
-const handleCopyToClipboard = async () => {
-  if (isCopying.value) return
-  
-  isCopying.value = true
-  const success = await copyToClipboard(shareContent.value.url)
-  
-  if (success) {
-    justCopied.value = true
-    setTimeout(() => {
-      justCopied.value = false
-    }, 2000)
+  // Localized display name for release type
+  // Deterministic labels for section titles/buttons to avoid SSR key rendering
+  const listenNowTitle = computed(() => {
+    if (props.isPreSave) {
+      return t('music.detail.presave_title')
+    }
+    return t('music.detail.listen_now_title')
+  })
+
+  const collapseLabel = computed(() => {
+    return t('music.buttons.collapse')
+  })
+
+  // Build a robust fallback URL for CSS backgrounds (prefer JPG)
+  const bgCoverUrl = computed(() => {
+    const raw = props.release.imageUrl || ''
+    let path = raw
+    if (raw.includes('/images/optimized/')) {
+      path = raw.replace(/\.(avif|webp|png)$/, '.jpg')
+    } else if (raw.startsWith('/images/')) {
+      path = raw.replace('/images/', '/images/optimized/').replace(/\.(avif|webp|png|jpg)$/, '.jpg')
+    }
+    const config = useRuntimeConfig()
+    const baseURL = config.app?.baseURL || '/'
+    if (path.startsWith('http') || path.startsWith('//')) return path
+    const finalUrl =
+      baseURL === '/' ? path : path.startsWith(baseURL) ? path : baseURL.replace(/\/$/, '') + path
+    return finalUrl
+  })
+
+  // Back button handler: go to / and scroll to music section, or just go to music library
+  const { scrollToElementWithNavigation } = useScrollTo()
+  const handleBack = async () => {
+    if (shouldShowBackArrow.value) {
+      // If came from music section, go back to home and scroll to music
+      await router.push('/')
+      setTimeout(() => {
+        scrollToElementWithNavigation('music')
+      }, 100)
+    } else {
+      // If no specific origin, go to music library/home
+      await router.push('/')
+      setTimeout(() => {
+        scrollToElementWithNavigation('music')
+      }, 100)
+    }
   }
-  
-  isCopying.value = false
-}
+
+  // Logo click handler: scroll to hero section
+  const scrollToHero = () => {
+    scrollToElementWithNavigation('hero')
+  }
+
+  // Share functionality - Mobile share handler (uses Web Share API)
+  const handleShare = async () => {
+    await shareViaMobile({
+      title: shareContent.value.title,
+      url: shareUrlForRelease.value
+    })
+  }
+
+  // Desktop share popup functions
+  const showDesktopSharePopup = (event: Event) => {
+    const targetElement = event.currentTarget as HTMLElement
+    shareButtonElement.value = targetElement
+    showSharePopup.value = true
+  }
+
+  const hideSharePopup = () => {
+    showSharePopup.value = false
+  }
+
+  const selectAllShareText = async () => {
+    await nextTick()
+    if (shareUrlInput.value) {
+      shareUrlInput.value.select()
+    }
+  }
+
+  const handleCopyToClipboard = async () => {
+    if (isCopying.value) return
+
+    isCopying.value = true
+    const success = await copyToClipboard(shareContent.value.url)
+
+    if (success) {
+      justCopied.value = true
+      setTimeout(() => {
+        justCopied.value = false
+      }, 2000)
+    }
+
+    isCopying.value = false
+  }
 </script>
 
 <style scoped>
-/* Floating fixed container that holds both buttons */
-.floating-controls {
-  position: fixed;
-  top: 1.25rem;
-  left: 0;
-  right: 0;
-  z-index: 9999;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 1rem; /* matches left/right offsets of individual buttons */
-  pointer-events: none; /* let children handle interactions */
-}
-
-/* On desktop, only show back button on left */
-@media (min-width: 768px) {
+  /* Floating fixed container that holds both buttons */
   .floating-controls {
-    justify-content: flex-start; /* Align back button to left only */
+    position: fixed;
+    top: 1.25rem;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem; /* matches left/right offsets of individual buttons */
+    pointer-events: none; /* let children handle interactions */
   }
-}
 
-.floating-controls .back-glass-btn,
-.floating-controls .share-glass-btn {
-  pointer-events: auto;
-  position: static !important; /* override fixed when inside container */
-  top: auto; left: auto; right: auto; bottom: auto;
-}
+  /* On desktop, only show back button on left */
+  @media (min-width: 768px) {
+    .floating-controls {
+      justify-content: flex-start; /* Align back button to left only */
+    }
+  }
 
-/* Floating logo in the center */
-.floating-logo {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: auto;
-  z-index: 10;
-  transition: opacity 0.45s cubic-bezier(.4,0,.2,1);
-  opacity: 1;
-}
+  .floating-controls .back-glass-btn,
+  .floating-controls .share-glass-btn {
+    pointer-events: auto;
+    position: static !important; /* override fixed when inside container */
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+  }
 
-/* Hide mobile elements on desktop as CSS safeguard */
-@media (min-width: 768px) {
+  /* Floating logo in the center */
   .floating-logo {
-    display: none !important;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: auto;
+    z-index: 10;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
   }
-}
 
-.floating-logo--transparent { 
-  opacity: .2; 
-  pointer-events: none; 
-}
+  /* Hide mobile elements on desktop as CSS safeguard */
+  @media (min-width: 768px) {
+    .floating-logo {
+      display: none !important;
+    }
+  }
 
-/* Logo button styles (similar to header layout) */
-.logo-button {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  outline: none;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  transition: transform 0.3s ease-out;
-}
+  .floating-logo--transparent {
+    opacity: 0.2;
+    pointer-events: none;
+  }
 
-.logo-button:hover {
-  transform: scale(1.05);
-}
+  /* Logo button styles (similar to header layout) */
+  .logo-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: transform 0.3s ease-out;
+  }
 
-.logo-button:active {
-  transform: scale(0.95);
-}
+  .logo-button:hover {
+    transform: scale(1.05);
+  }
 
-.logo-button:focus {
-  outline: none;
-  box-shadow: none;
-}
+  .logo-button:active {
+    transform: scale(0.95);
+  }
 
-/* Floating logo image with scroll-responsive sizing */
-.floating-logo-img {
-  width: 45px;
-  margin-top: 12px;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
-  transition: height 0.25s cubic-bezier(.4,0,.2,1), margin-top 0.25s cubic-bezier(.4,0,.2,1);
-  cursor: pointer;
-}
+  .logo-button:focus {
+    outline: none;
+    box-shadow: none;
+  }
 
-/* Alternative blend modes (comment out difference above and uncomment one below to try different effects)
+  /* Floating logo image with scroll-responsive sizing */
+  .floating-logo-img {
+    width: 45px;
+    margin-top: 12px;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+    transition:
+      height 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      margin-top 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+
+  /* Alternative blend modes (comment out difference above and uncomment one below to try different effects)
 .floating-logo-img {
   mix-blend-mode: exclusion; // Softer inversion effect
   mix-blend-mode: overlay; // High contrast overlay  
@@ -721,1032 +794,1162 @@ const handleCopyToClipboard = async () => {
 }
 */
 
-/* Glassmorphic action buttons styles */
-.back-glass-btn,
-.share-glass-btn {
-  position: fixed !important; /* default when rendered outside container */
-  top: 1.25rem;
-  left: 1rem;
-  z-index: 9999; /* Very high z-index to ensure it stays above everything */
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: rgba(30, 30, 40, 0.32);
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.18), 0 1.5px 6px 0 rgba(0,0,0,0.10);
-  border: 1.5px solid rgba(255,255,255,0.13);
-  backdrop-filter: blur(var(--perf-blur-strength, 12px));
-  -webkit-backdrop-filter: blur(var(--perf-blur-strength, 12px));
-  color: #fff;
-  transition: background 0.25s, box-shadow 0.25s, opacity 0.45s cubic-bezier(.4,0,.2,1);
-  opacity: 1;
-  cursor: pointer;
-  /* Ensure it creates its own stacking context */
-  isolation: isolate;
-}
-
-/* Optimized version for low-performance devices */
-.back-glass-btn--optimized,
-.share-glass-btn--optimized {
-  background: rgba(30, 30, 40, 0.85);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: 1.5px solid rgba(255,255,255,0.2);
-}
-
-/* When not in container, keep back on left and share on right */
-.share-glass-btn { left: auto; right: 1rem; }
-
-/* Hide mobile share button on desktop as CSS safeguard */
-@media (min-width: 768px) {
+  /* Glassmorphic action buttons styles */
+  .back-glass-btn,
   .share-glass-btn {
-    display: none !important;
+    position: fixed !important; /* default when rendered outside container */
+    top: 1.25rem;
+    left: 1rem;
+    z-index: 9999; /* Very high z-index to ensure it stays above everything */
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(30, 30, 40, 0.32);
+    box-shadow:
+      0 4px 24px 0 rgba(0, 0, 0, 0.18),
+      0 1.5px 6px 0 rgba(0, 0, 0, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.13);
+    backdrop-filter: blur(var(--perf-blur-strength, 12px));
+    -webkit-backdrop-filter: blur(var(--perf-blur-strength, 12px));
+    color: #fff;
+    transition:
+      background 0.25s,
+      box-shadow 0.25s,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    cursor: pointer;
+    /* Ensure it creates its own stacking context */
+    isolation: isolate;
   }
-}
 
-.back-glass-btn:hover,
-.share-glass-btn:hover {
-  background: rgba(60, 60, 80, 0.44);
-  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.22), 0 2px 8px 0 rgba(0,0,0,0.13);
-}
+  /* Optimized version for low-performance devices */
+  .back-glass-btn--optimized,
+  .share-glass-btn--optimized {
+    background: rgba(30, 30, 40, 0.85);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+  }
 
-/* Optimized hover for low-performance devices */
-.back-glass-btn--optimized:hover,
-.share-glass-btn--optimized:hover {
-  background: rgba(60, 60, 80, 0.9);
-  transform: none;
-}
+  /* When not in container, keep back on left and share on right */
+  .share-glass-btn {
+    left: auto;
+    right: 1rem;
+  }
 
-/* Disable hover effects on mobile/touch devices */
-@media (hover: none) and (pointer: coarse) {
+  /* Hide mobile share button on desktop as CSS safeguard */
+  @media (min-width: 768px) {
+    .share-glass-btn {
+      display: none !important;
+    }
+  }
+
   .back-glass-btn:hover,
   .share-glass-btn:hover {
-    background: rgba(30, 30, 40, 0.32);
-    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.18), 0 1.5px 6px 0 rgba(0,0,0,0.10);
+    background: rgba(60, 60, 80, 0.44);
+    box-shadow:
+      0 8px 32px 0 rgba(0, 0, 0, 0.22),
+      0 2px 8px 0 rgba(0, 0, 0, 0.13);
+  }
+
+  /* Optimized hover for low-performance devices */
+  .back-glass-btn--optimized:hover,
+  .share-glass-btn--optimized:hover {
+    background: rgba(60, 60, 80, 0.9);
     transform: none;
   }
-}
 
-.back-glass-btn--transparent { opacity: .2; pointer-events: none; }
-.share-glass-btn--transparent { opacity: .2; pointer-events: none; }
+  /* Disable hover effects on mobile/touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    .back-glass-btn:hover,
+    .share-glass-btn:hover {
+      background: rgba(30, 30, 40, 0.32);
+      box-shadow:
+        0 4px 24px 0 rgba(0, 0, 0, 0.18),
+        0 1.5px 6px 0 rgba(0, 0, 0, 0.1);
+      transform: none;
+    }
+  }
 
-/* Preserve transitions for buttons even while modal performance classes are active */
-:global(body.modal-open) .back-glass-btn,
-:global(body.modal-open) .share-glass-btn {
-  transition: background 0.25s, box-shadow 0.25s, opacity 0.45s cubic-bezier(.4,0,.2,1) !important;
-}
-:global(body.modal-animating) .back-glass-btn,
-:global(body.modal-animating) .share-glass-btn {
-  transition: background 0.25s, box-shadow 0.25s, opacity 0.45s cubic-bezier(.4,0,.2,1) !important;
-}
+  .back-glass-btn--transparent {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+  .share-glass-btn--transparent {
+    opacity: 0.2;
+    pointer-events: none;
+  }
 
-/* Performance optimizations */
-.music-detail-content {
-  position: relative;
-  min-height: 600px;
-  color: white;
-  /* GPU acceleration for better performance */
-  transform: translateZ(0);
-  will-change: auto;
-  
-  /* Default background for high-performance devices */
-  background:
-    radial-gradient(1200px 600px at 10% 110%, rgba(120,119,198,var(--perf-opacity, 0.10)), transparent 60%),
-    radial-gradient(900px 500px at 110% -10%, rgba(255,119,198,var(--perf-opacity, 0.10)), transparent 60%),
-    linear-gradient(#020202, #030303);
-  background-size: 150% 150%, 120% 120%, 100% 100%;
-  background-attachment: fixed;
-}
+  /* Preserve transitions for buttons even while modal performance classes are active */
+  :global(body.modal-open) .back-glass-btn,
+  :global(body.modal-open) .share-glass-btn {
+    transition:
+      background 0.25s,
+      box-shadow 0.25s,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  :global(body.modal-animating) .back-glass-btn,
+  :global(body.modal-animating) .share-glass-btn {
+    transition:
+      background 0.25s,
+      box-shadow 0.25s,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
 
-/* When used in a page context with flexbox, ensure it grows to fill space */
-.music-detail-content {
-  flex: 1; /* This will make it expand to fill available space in flex container */
-}
+  /* Performance optimizations */
+  .music-detail-content {
+    position: relative;
+    min-height: 600px;
+    color: white;
+    /* GPU acceleration for better performance */
+    transform: translateZ(0);
+    will-change: auto;
 
-/* High performance devices get subtle animation */
-.music-detail-content.perf-high {
-  animation: gradientFlow 25s ease-in-out infinite alternate;
-}
+    /* Default background for high-performance devices */
+    background:
+      radial-gradient(
+        1200px 600px at 10% 110%,
+        rgba(120, 119, 198, var(--perf-opacity, 0.1)),
+        transparent 60%
+      ),
+      radial-gradient(
+        900px 500px at 110% -10%,
+        rgba(255, 119, 198, var(--perf-opacity, 0.1)),
+        transparent 60%
+      ),
+      linear-gradient(#020202, #030303);
+    background-size:
+      150% 150%,
+      120% 120%,
+      100% 100%;
+    background-attachment: fixed;
+  }
 
-/* Medium performance devices get static gradient */
-.music-detail-content.perf-medium {
-  background-size: 100% 100%, 100% 100%, 100% 100%;
-  animation: none;
-}
+  /* When used in a page context with flexbox, ensure it grows to fill space */
+  .music-detail-content {
+    flex: 1; /* This will make it expand to fill available space in flex container */
+  }
 
-/* Low performance devices get simplified background */
-.music-detail-content.perf-low,
-.music-detail-content.simple-gradients {
-  background: linear-gradient(180deg, #020202 0%, #1a1a1a 40%, #030303 100%);
-  animation: none;
-  background-attachment: initial;
-}
+  /* High performance devices get subtle animation */
+  .music-detail-content.perf-high {
+    animation: gradientFlow 25s ease-in-out infinite alternate;
+  }
 
-/* Reduced animations override */
-.music-detail-content.reduce-animations {
-  animation: none !important;
-}
+  /* Medium performance devices get static gradient */
+  .music-detail-content.perf-medium {
+    background-size:
+      100% 100%,
+      100% 100%,
+      100% 100%;
+    animation: none;
+  }
 
-.music-detail-content.reduce-animations *,
-.music-detail-content.reduce-animations *::before,
-.music-detail-content.reduce-animations *::after {
-  animation: none !important;
-  transition: opacity 0.2s ease !important;
-}
+  /* Low performance devices get simplified background */
+  .music-detail-content.perf-low,
+  .music-detail-content.simple-gradients {
+    background: linear-gradient(180deg, #020202 0%, #1a1a1a 40%, #030303 100%);
+    animation: none;
+    background-attachment: initial;
+  }
 
-/* Simplified grain overlay for better performance (only on high-performance devices) */
-.perf-high .music-detail-content::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.04;
-  mix-blend-mode: overlay;
-  background: 
-    radial-gradient(circle at 25% 25%, rgba(255,255,255,.08) 1px, transparent 1px),
-    radial-gradient(circle at 75% 75%, rgba(255,255,255,.05) 1px, transparent 1px);
-  background-size: 100px 100px, 150px 150px;
-  z-index: 0;
-}
-
-/* Disable grain overlay on medium and low performance */
-.perf-medium .music-detail-content::after,
-.perf-low .music-detail-content::after {
-  display: none;
-}
-
-/* Container optimization for better scrolling performance */
-.music-detail-content {
-  content-visibility: auto;
-  contain: layout style;
-}
-
-/* Modal-specific optimizations for smooth animations */
-.music-detail-content.modal-mode {
-  /* Simplified background for modals to reduce rendering load */
-  background: linear-gradient(180deg, #020202 0%, #1a1a1a 50%, #020202 100%) !important;
-  animation: none !important;
-  /* Force compositing layer for smoother animations */
-  transform: translateZ(0);
-  will-change: auto;
-  /* Optimize rendering performance */
-  contain: layout style paint;
-}
-
-/* Modal mode: disable grain overlay completely */
-.music-detail-content.modal-mode::after {
-  display: none;
-}
-
-/* Modal hero and background optimizations */
-.modal-hero .music-hero::before,
-.modal-hero .music-hero::after {
-  animation: none !important;
-  transform: none !important;
-  filter: blur(15px) !important;
-}
-
-.modal-bg .music-hero::before,
-.modal-bg .music-hero::after {
-  animation: none !important;
-  transform: none !important;
-}
-
-.modal-overlay {
-  animation: none !important;
-  background: 
-    radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
-    radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
-    linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.6) 100%) !important;
-  will-change: auto;
-}
-
-/* Modal album cover optimizations */
-.modal-cover {
-  animation: none !important;
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
-  will-change: auto;
-}
-
-.modal-cover::before {
-  filter: blur(10px) !important;
-  opacity: 0.3 !important;
-}
-
-.modal-cover::after {
-  display: none !important;
-}
-
-/* Disable all hover effects in modal mode */
-.modal-mode .music-album-cover:hover::after {
-  display: none !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .music-detail-content,
-  .music-hero::before,
-  .music-hero::after,
-  .music-hero-overlay {
+  /* Reduced animations override */
+  .music-detail-content.reduce-animations {
     animation: none !important;
-    transition: none !important;
-    background-attachment: initial !important;
   }
-}
 
-/* Hero Section and background animation remain in CSS for unique effects */
-
-.music-hero {
-  /* Prevent layout shift by reserving minimum space */
-  min-height: 200px;
-}
-
-/* Desktop hero section gets fixed height to prevent content shift */
-@media (min-width: 768px) {
-  .music-hero {
-    min-height: 400px;
-  }
-}
-
-/* Performance-aware hero background */
-.music-hero::before {
-  content: '';
-  position: absolute;
-  inset: -20%;
-  background:
-    radial-gradient(60% 80% at 10% 20%, var(--accent1), transparent 60%),
-    radial-gradient(80% 60% at 90% 10%, var(--accent2), transparent 60%),
-    conic-gradient(from 180deg at 50% 50%, rgba(255,255,255,.05), rgba(0,0,0,0) 20% 80%, rgba(255,255,255,.05));
-  filter: blur(40px) saturate(110%);
-  background-size: 200% 200%, 180% 180%, 150% 150%;
-  z-index: 1;
-  will-change: auto;
-  backface-visibility: hidden;
-}
-
-/* High performance gets full animations */
-.perf-high .music-hero::before {
-  animation: 
-    auroraShift 16s ease-in-out infinite alternate,
-    auroraFloat 20s ease-in-out infinite alternate,
-    auroraPulse 12s ease-in-out infinite alternate;
-  will-change: transform, filter;
-}
-
-/* Medium performance gets simplified animations */
-.perf-medium .music-hero::before {
-  animation: auroraShift 20s ease-in-out infinite alternate;
-  will-change: transform;
-}
-
-/* Low performance gets static background */
-.perf-low .music-hero::before,
-.simple-gradients .music-hero::before {
-  background: radial-gradient(60% 80% at 50% 50%, var(--accent1), transparent 70%);
-  filter: blur(20px);
-  animation: none;
-  will-change: auto;
-}
-
-.music-hero::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(120% 60% at 50% 100%, rgba(0,0,0,.75), transparent 60%),
-    radial-gradient(80% 50% at 50% -10%, rgba(0,0,0,.6), transparent 60%);
-  pointer-events: none;
-  background-size: 140% 140%, 160% 160%;
-  z-index: 2;
-  will-change: auto;
-}
-
-/* Performance-aware vignette animations */
-.perf-high .music-hero::after {
-  animation: vignetteWave 18s ease-in-out infinite alternate;
-  will-change: transform;
-}
-
-.perf-medium .music-hero::after,
-.perf-low .music-hero::after {
-  background: radial-gradient(100% 100% at 50% 50%, rgba(0,0,0,.6), transparent 70%);
-  animation: none;
-}
-
-.music-hero-overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
-    radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
-    linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%);
-  background-size: 130% 130%, 120% 120%, 100% 100%;
-  will-change: auto;
-}
-
-/* High performance gets overlay animation */
-.perf-high .music-hero-overlay {
-  animation: overlayDrift 22s ease-in-out infinite alternate;
-  will-change: transform;
-}
-
-/* Medium and low performance get static overlay */
-.perf-medium .music-hero-overlay,
-.perf-low .music-hero-overlay {
-  background:
-    radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
-    radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
-    linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%);
-  animation: none;
-}
-
-.music-hero-content {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 3rem;
-  max-width: 1100px;
-  width: 100%;
-  /* Prevent layout shift by reserving space */
-  min-height: 320px;
-}
-
-/* Mobile: hidden by default, shown only when expanded */
-@media (max-width: 767px) {
-  .music-hero-content {
-    min-height: auto;
-    display: none; /* Hidden by default on mobile */
-  }
-  
-  /* Show when mobile expanded class is applied */
-  .music-hero-content.mobile-expanded {
-    display: flex !important;
-  }
-}
-
-/* Desktop: always visible with proper sizing */
-@media (min-width: 768px) {
-  .music-hero-content {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    min-height: 320px;
-  }
-  
-  .music-hero {
-    min-height: 400px;
-  }
-  
-  /* Disable mobile animations on desktop */
-  .music-hero-content.animate-fadeInUpSmooth,
-  .music-hero-content.animate-fadeOutDown {
+  .music-detail-content.reduce-animations *,
+  .music-detail-content.reduce-animations *::before,
+  .music-detail-content.reduce-animations *::after {
     animation: none !important;
-    opacity: 1 !important;
+    transition: opacity 0.2s ease !important;
+  }
+
+  /* Simplified grain overlay for better performance (only on high-performance devices) */
+  .perf-high .music-detail-content::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    background:
+      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size:
+      100px 100px,
+      150px 150px;
+    z-index: 0;
+  }
+
+  /* Disable grain overlay on medium and low performance */
+  .perf-medium .music-detail-content::after,
+  .perf-low .music-detail-content::after {
+    display: none;
+  }
+
+  /* Container optimization for better scrolling performance */
+  .music-detail-content {
+    content-visibility: auto;
+    contain: layout style;
+  }
+
+  /* Modal-specific optimizations for smooth animations */
+  .music-detail-content.modal-mode {
+    /* Simplified background for modals to reduce rendering load */
+    background: linear-gradient(180deg, #020202 0%, #1a1a1a 50%, #020202 100%) !important;
+    animation: none !important;
+    /* Force compositing layer for smoother animations */
+    transform: translateZ(0);
+    will-change: auto;
+    /* Optimize rendering performance */
+    contain: layout style paint;
+  }
+
+  /* Modal mode: disable grain overlay completely */
+  .music-detail-content.modal-mode::after {
+    display: none;
+  }
+
+  /* Modal hero and background optimizations */
+  .modal-hero .music-hero::before,
+  .modal-hero .music-hero::after {
+    animation: none !important;
+    transform: none !important;
+    filter: blur(15px) !important;
+  }
+
+  .modal-bg .music-hero::before,
+  .modal-bg .music-hero::after {
+    animation: none !important;
     transform: none !important;
   }
-}
 
-/* Optimized album cover with performance considerations */
-.music-album-cover {
-  position: relative;
-  width: 300px;
-  height: 300px;
-  flex-shrink: 0;
-  border-radius: 22px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 25px 60px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  /* GPU acceleration for better performance */
-  transform: translateZ(0);
-  will-change: auto;
-  backface-visibility: hidden;
-  /* Prevent layout shift */
-  aspect-ratio: 1;
-  contain: layout size;
-}
-
-/* Keep shadow visible on click/focus states */
-.music-album-cover:active,
-.music-album-cover:focus,
-.music-album-cover:focus-visible {
-  box-shadow:
-    0 25px 60px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
-}
-
-/* Also keep shadow identical on hover and when children receive focus */
-.music-album-cover:hover,
-.music-album-cover:focus-within {
-  box-shadow:
-    0 25px 60px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
-}
-
-/* Remove default tap highlight that can appear as a flicker on click */
-.music-album-cover {
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-}
-
-/* Responsive sizing with fixed dimensions to prevent layout shift */
-/* Use Tailwind's sizing but add stability */
-@media (max-width: 767px) {
-  .music-album-cover {
-    /* w-44 = 176px, h-44 = 176px - keep Tailwind classes working */
-    min-width: 176px;
-    min-height: 176px;
-    aspect-ratio: 1;
-  }
-}
-
-@media (min-width: 768px) {
-  .music-album-cover {
-    /* md:w-72 = 288px, md:h-72 = 288px */
-    width: 288px !important;
-    height: 288px !important;
-    min-width: 288px !important;
-    min-height: 288px !important;
-    aspect-ratio: 1;
-  }
-}
-
-/* Floating animation only for high-performance devices */
-.perf-high .music-album-cover:not(.modal-cover) {
-  animation: float 6s ease-in-out infinite;
-  will-change: transform;
-}
-
-/* Performance-based backdrop blur via CSS variables */
-.music-album-cover {
-  backdrop-filter: blur(var(--perf-blur-strength, 0px));
-  -webkit-backdrop-filter: blur(var(--perf-blur-strength, 0px));
-}
-
-.music-album-cover::before {
-  content: '';
-  position: absolute;
-  inset: -20%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(255,255,255,.15), rgba(255,255,255,0) 60%);
-  filter: blur(30px);
-  opacity: var(--perf-opacity, 0.6);
-  will-change: auto;
-}
-
-/* Shine effect only for high-performance devices */
-.perf-high .music-album-cover::after {
-  content: '';
-  position: absolute;
-  top: -100%;
-  left: -50%;
-  width: 200%;
-  height: 300%;
-  background: linear-gradient(75deg, transparent 40%, rgba(255,255,255,.35) 50%, transparent 60%);
-  transform: rotate(8deg);
-  opacity: 0;
-  transition: opacity .3s ease, transform .4s ease;
-  will-change: opacity, transform;
-}
-
-/* Only enable hover effects on high-performance devices with hover capability */
-@media (hover: hover) and (pointer: fine) {
-  .perf-high .music-album-cover:not(.modal-cover):hover::after {
-    opacity: .7;
-    transform: rotate(8deg) translateY(10%);
-  }
-}
-
-/* Disable shine effect on low/medium-performance devices */
-.perf-medium .music-album-cover::after,
-.perf-low .music-album-cover::after {
-  display: none;
-}
-
-/* Badge */
-.music-badge {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  z-index: 10;
-}
-.music-badge span {
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(var(--perf-blur-strength, 0px));
-  -webkit-backdrop-filter: blur(var(--perf-blur-strength, 0px));
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-/* Enhanced background for low-performance devices without blur */
-.no-backdrop-blur .music-badge span {
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-/* Badge color variants */
-.badge-presave {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(236, 72, 153, 0.5)) !important;
-  border-color: rgba(255, 255, 255, 0.35) !important;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.badge-single {
-  background: rgba(59, 130, 246, 0.4) !important;
-}
-
-.badge-album {
-  background: rgba(139, 92, 246, 0.4) !important;
-}
-
-.badge-ep {
-  background: rgba(236, 72, 153, 0.4) !important;
-}
-
-.badge-new {
-  background: rgba(34, 197, 94, 0.4) !important;
-}
-
-/* Title + text animation only */
-.animate-titleGlow {
-  animation: titleGlow 5s ease-in-out infinite alternate;
-}
-@keyframes titleGlow {
-  0% { filter: drop-shadow(0 0 10px rgba(255,255,255,.28)); }
-  100% { filter: drop-shadow(0 0 22px rgba(255,255,255,.5)); }
-}
-
-/* Optimized animations with performance considerations */
-.animate-fadeInUpSmooth {
-  animation: fadeInUpSmooth 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: opacity, transform;
-}
-
-.animate-fadeOutDown {
-  animation: fadeOutDown 0.3s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
-  will-change: opacity, transform;
-}
-
-.animate-slideInCompact {
-  animation: slideInCompact 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-  will-change: opacity, transform;
-}
-
-/* Reduced motion variants */
-.reduced-animations .animate-fadeInUpSmooth,
-.reduced-animations .animate-fadeOutDown,
-.reduced-animations .animate-slideInCompact {
-  animation: none !important;
-  opacity: 1 !important;
-  transform: none !important;
-}
-
-@keyframes fadeInUpSmooth {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) scale(0.96);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes fadeOutDown {
-  0% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-}
-
-@keyframes slideInCompact {
-  0% {
-    opacity: 0;
-    transform: translateY(-15px) scale(0.95);
-  }
-  60% {
-    opacity: 0.8;
-    transform: translateY(2px) scale(1.01);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Optimized keyframe animations with performance considerations */
-
-/* Basic motion effects */
-@keyframes float { 
-  0%, 100% { transform: translateY(0); } 
-  50% { transform: translateY(-10px); } 
-}
-
-@keyframes auroraShift { 
-  0% { transform: translate3d(0,0,0) scale(1); } 
-  100% { transform: translate3d(-2%, 2%, 0) scale(1.06); } 
-}
-
-/* Background gradient animations - disabled on low-performance devices */
-@keyframes gradientFlow {
-  0%, 100% {
-    background-position: 0% 0%, 100% 100%, 0% 0%;
-  }
-  50% {
-    background-position: 100% 50%, 0% 50%, 0% 0%;
-  }
-}
-
-@keyframes auroraFloat {
-  0%, 100% {
-    background-position: 0% 0%, 100% 100%, 50% 50%;
-  }
-  25% {
-    background-position: 100% 25%, 25% 75%, 25% 75%;
-  }
-  50% {
-    background-position: 50% 100%, 75% 25%, 75% 25%;
-  }
-  75% {
-    background-position: 25% 50%, 50% 100%, 100% 50%;
-  }
-}
-
-@keyframes auroraPulse {
-  0% {
-    filter: blur(40px) saturate(110%) brightness(1);
-    opacity: 0.8;
-  }
-  50% {
-    filter: blur(35px) saturate(130%) brightness(1.1);
-    opacity: 1;
-  }
-  100% {
-    filter: blur(45px) saturate(90%) brightness(0.9);
-    opacity: 0.9;
-  }
-}
-
-@keyframes vignetteWave {
-  0%, 100% {
-    background-position: 0% 100%, 100% 0%;
-    transform: scale(1) rotate(0deg);
-  }
-  33% {
-    background-position: 50% 50%, 50% 50%;
-    transform: scale(1.02) rotate(0.5deg);
-  }
-  66% {
-    background-position: 100% 0%, 0% 100%;
-    transform: scale(0.98) rotate(-0.5deg);
-  }
-}
-
-@keyframes overlayDrift {
-  0%, 100% {
-    background-position: 30% 70%, 70% 30%, 0% 0%;
-    transform: translateZ(0);
-  }
-  25% {
-    background-position: 60% 40%, 40% 60%, 0% 0%;
-    transform: translateZ(0) scale(1.01);
-  }
-  50% {
-    background-position: 80% 20%, 20% 80%, 0% 0%;
-    transform: translateZ(0) scale(0.99);
-  }
-  75% {
-    background-position: 45% 55%, 55% 45%, 0% 0%;
-    transform: translateZ(0) scale(1.005);
-  }
-}
-
-/* Performance optimizations based on device capability detection */
-@media (prefers-reduced-motion: reduce) {
-  .music-detail-content,
-  .music-hero::before,
-  .music-hero::after,
-  .music-hero-overlay,
-  .music-album-cover {
+  .modal-overlay {
     animation: none !important;
-    transition: opacity calc(var(--perf-animation-duration, 0.2) * 1s) ease !important;
+    background:
+      radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
+      radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
+      linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.6) 100%) !important;
+    will-change: auto;
   }
-  
-  .animate-titleGlow {
+
+  /* Modal album cover optimizations */
+  .modal-cover {
     animation: none !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    will-change: auto;
   }
-}
 
-/* Mobile device optimizations */
-.mobile-device .music-detail-content {
-  background-size: 100% 100%, 100% 100%, 100% 100%;
-}
-
-.mobile-device .music-hero::before {
-  filter: blur(20px) saturate(100%);
-}
-
-.mobile-device .music-album-cover::before {
-  filter: blur(15px);
-  opacity: 0.4;
-}
-
-/* Modal specific optimizations */
-.music-detail-content:has(.music-hero) { 
-  min-height: auto; 
-}
-
-/* Performance-aware modal animations */
-:global(body.modal-open) .music-detail-content.modal-mode,
-:global(body.modal-open) .music-detail-content.modal-mode *,
-:global(body.modal-open) .music-detail-content.modal-mode *::before,
-:global(body.modal-open) .music-detail-content.modal-mode *::after {
-  animation: none !important;
-  transition: none !important;
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Exception: Keep back button transitions working */
-:global(body.modal-open) .back-glass-btn,
-:global(body.modal-open) .share-glass-btn {
-  transition: background 0.25s, box-shadow 0.25s, opacity 0.45s cubic-bezier(.4,0,.2,1) !important;
-}
-
-/* Hard drop of effects only during the short modal transition window */
-:global(body.modal-animating) .music-detail-content.modal-mode,
-:global(body.modal-animating) .music-detail-content.modal-mode *,
-:global(body.modal-animating) .music-detail-content.modal-mode *::before,
-:global(body.modal-animating) .music-detail-content.modal-mode *::after {
-  animation: none !important;
-  transition: none !important;
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Exception: Keep back button transitions working during animation */
-:global(body.modal-animating) .back-glass-btn,
-:global(body.modal-animating) .share-glass-btn {
-  transition: background 0.25s, box-shadow 0.25s, opacity 0.45s cubic-bezier(.4,0,.2,1) !important;
-}
-
-/* Lightweight image transitions in modal */
-.modal-mode .progressive-image {
-  transition: opacity 0.18s ease-out !important;
-  transform: none !important;
-}
-
-.modal-mode .progressive-image-container .gradient-placeholder { 
-  display: none !important; 
-}
-
-/* Platform buttons uniform sizing */
-.platforms-grid {
-  /* Ensure grid items stretch to fill available space */
-  align-items: stretch;
-}
-
-.platform-button-wrapper {
-  /* Ensure consistent button container dimensions */
-  display: flex;
-  align-items: stretch;
-}
-
-/* Make sure the platform buttons fill their containers uniformly */
-.platform-button-wrapper :deep(.platform-button) {
-  display: flex !important;
-  align-items: center !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 80px !important;
-  flex: 1 !important;
-}
-
-/* Ensure consistent content layout within buttons */
-.platform-button-wrapper :deep(.platform-content) {
-  flex: 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  min-width: 0 !important;
-}
-
-/* Center platform icons within their containers */
-.platform-button-wrapper :deep(.platform-icon) {
-  flex-shrink: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-/* Center platform arrow icons */
-.platform-button-wrapper :deep(.platform-arrow) {
-  flex-shrink: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-/* Responsive adjustments for mobile devices */
-@media (max-width: 640px) {
-  .platform-button-wrapper {
-    min-height: 70px;
+  .modal-cover::before {
+    filter: blur(10px) !important;
+    opacity: 0.3 !important;
   }
-  
-  .platform-button-wrapper :deep(.platform-button) {
-    min-height: 70px !important;
-  }
-}
 
-/* Desktop Share Button Container */
-.desktop-share-button {
-  display: flex;
-  justify-content: center;
-  position: relative; /* Ensure proper positioning context */
-}
-
-/* Hide desktop share button on mobile as CSS safeguard */
-@media (max-width: 767px) {
-  .desktop-share-button {
+  .modal-cover::after {
     display: none !important;
   }
-}
 
-@media (min-width: 768px) {
-  .desktop-share-button {
-    justify-content: flex-start;
+  /* Disable all hover effects in modal mode */
+  .modal-mode .music-album-cover:hover::after {
+    display: none !important;
   }
-}
 
-
-
-.share-glassmorphic-popup {
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.1) 0%, 
-    rgba(255, 255, 255, 0.05) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-  box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
-  width: 400px;
-  max-width: 90vw;
-  color: white;
-  overflow: hidden;
-}
-
-.share-popup-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.5rem 1.5rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.share-popup-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.share-popup-close {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.share-popup-close:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  transform: scale(1.05);
-}
-
-.share-popup-content {
-  padding: 1.5rem;
-}
-
-.share-popup-description {
-  margin: 0 0 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.share-popup-input-group {
-  display: flex;
-  gap: 0.5rem;
-  align-items: stretch;
-}
-
-.share-popup-input {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
-  color: white;
-  font-size: 0.9rem;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.share-popup-input:focus {
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.share-popup-copy-btn {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
-  border: none !important;
-  border-radius: 0.5rem !important;
-  padding: 0.75rem 1.25rem !important;
-  color: white !important;
-  font-size: 0.9rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.5rem !important;
-  white-space: nowrap !important;
-  height: auto !important;
-  min-height: auto !important;
-}
-
-.share-popup-copy-btn:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
-}
-
-.share-popup-copy-btn:disabled {
-  opacity: 0.7 !important;
-  cursor: not-allowed !important;
-}
-
-/* Performance optimizations for low-end devices */
-@media (prefers-reduced-motion: reduce) {
-  .share-glassmorphic-popup {
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+  @media (prefers-reduced-motion: reduce) {
+    .music-detail-content,
+    .music-hero::before,
+    .music-hero::after,
+    .music-hero-overlay {
+      animation: none !important;
+      transition: none !important;
+      background-attachment: initial !important;
+    }
   }
-  
-  .share-popup-close:hover,
-  .share-popup-copy-btn:hover {
+
+  /* Hero Section and background animation remain in CSS for unique effects */
+
+  .music-hero {
+    /* Prevent layout shift by reserving minimum space */
+    min-height: 200px;
+  }
+
+  /* Desktop hero section gets fixed height to prevent content shift */
+  @media (min-width: 768px) {
+    .music-hero {
+      min-height: 400px;
+    }
+  }
+
+  /* Performance-aware hero background */
+  .music-hero::before {
+    content: '';
+    position: absolute;
+    inset: -20%;
+    background:
+      radial-gradient(60% 80% at 10% 20%, var(--accent1), transparent 60%),
+      radial-gradient(80% 60% at 90% 10%, var(--accent2), transparent 60%),
+      conic-gradient(
+        from 180deg at 50% 50%,
+        rgba(255, 255, 255, 0.05),
+        rgba(0, 0, 0, 0) 20% 80%,
+        rgba(255, 255, 255, 0.05)
+      );
+    filter: blur(40px) saturate(110%);
+    background-size:
+      200% 200%,
+      180% 180%,
+      150% 150%;
+    z-index: 1;
+    will-change: auto;
+    backface-visibility: hidden;
+  }
+
+  /* High performance gets full animations */
+  .perf-high .music-hero::before {
+    animation:
+      auroraShift 16s ease-in-out infinite alternate,
+      auroraFloat 20s ease-in-out infinite alternate,
+      auroraPulse 12s ease-in-out infinite alternate;
+    will-change: transform, filter;
+  }
+
+  /* Medium performance gets simplified animations */
+  .perf-medium .music-hero::before {
+    animation: auroraShift 20s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  /* Low performance gets static background */
+  .perf-low .music-hero::before,
+  .simple-gradients .music-hero::before {
+    background: radial-gradient(60% 80% at 50% 50%, var(--accent1), transparent 70%);
+    filter: blur(20px);
+    animation: none;
+    will-change: auto;
+  }
+
+  .music-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(120% 60% at 50% 100%, rgba(0, 0, 0, 0.75), transparent 60%),
+      radial-gradient(80% 50% at 50% -10%, rgba(0, 0, 0, 0.6), transparent 60%);
+    pointer-events: none;
+    background-size:
+      140% 140%,
+      160% 160%;
+    z-index: 2;
+    will-change: auto;
+  }
+
+  /* Performance-aware vignette animations */
+  .perf-high .music-hero::after {
+    animation: vignetteWave 18s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  .perf-medium .music-hero::after,
+  .perf-low .music-hero::after {
+    background: radial-gradient(100% 100% at 50% 50%, rgba(0, 0, 0, 0.6), transparent 70%);
+    animation: none;
+  }
+
+  .music-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
+      radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
+      linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%);
+    background-size:
+      130% 130%,
+      120% 120%,
+      100% 100%;
+    will-change: auto;
+  }
+
+  /* High performance gets overlay animation */
+  .perf-high .music-hero-overlay {
+    animation: overlayDrift 22s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  /* Medium and low performance get static overlay */
+  .perf-medium .music-hero-overlay,
+  .perf-low .music-hero-overlay {
+    background:
+      radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
+      radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
+      linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%);
+    animation: none;
+  }
+
+  .music-hero-content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    max-width: 1100px;
+    width: 100%;
+    /* Prevent layout shift by reserving space */
+    min-height: 320px;
+  }
+
+  /* Mobile: hidden by default, shown only when expanded */
+  @media (max-width: 767px) {
+    .music-hero-content {
+      min-height: auto;
+      display: none; /* Hidden by default on mobile */
+    }
+
+    /* Show when mobile expanded class is applied */
+    .music-hero-content.mobile-expanded {
+      display: flex !important;
+    }
+  }
+
+  /* Desktop: always visible with proper sizing */
+  @media (min-width: 768px) {
+    .music-hero-content {
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      min-height: 320px;
+    }
+
+    .music-hero {
+      min-height: 400px;
+    }
+
+    /* Disable mobile animations on desktop */
+    .music-hero-content.animate-fadeInUpSmooth,
+    .music-hero-content.animate-fadeOutDown {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+
+  /* Optimized album cover with performance considerations */
+  .music-album-cover {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    flex-shrink: 0;
+    border-radius: 22px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 25px 60px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    /* GPU acceleration for better performance */
+    transform: translateZ(0);
+    will-change: auto;
+    backface-visibility: hidden;
+    /* Prevent layout shift */
+    aspect-ratio: 1;
+    contain: layout size;
+  }
+
+  /* Keep shadow visible on click/focus states */
+  .music-album-cover:active,
+  .music-album-cover:focus,
+  .music-album-cover:focus-visible {
+    box-shadow:
+      0 25px 60px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  }
+
+  /* Also keep shadow identical on hover and when children receive focus */
+  .music-album-cover:hover,
+  .music-album-cover:focus-within {
+    box-shadow:
+      0 25px 60px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  }
+
+  /* Remove default tap highlight that can appear as a flicker on click */
+  .music-album-cover {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+
+  /* Responsive sizing with fixed dimensions to prevent layout shift */
+  /* Use Tailwind's sizing but add stability */
+  @media (max-width: 767px) {
+    .music-album-cover {
+      /* w-44 = 176px, h-44 = 176px - keep Tailwind classes working */
+      min-width: 176px;
+      min-height: 176px;
+      aspect-ratio: 1;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .music-album-cover {
+      /* md:w-72 = 288px, md:h-72 = 288px */
+      width: 288px !important;
+      height: 288px !important;
+      min-width: 288px !important;
+      min-height: 288px !important;
+      aspect-ratio: 1;
+    }
+  }
+
+  /* Floating animation only for high-performance devices */
+  .perf-high .music-album-cover:not(.modal-cover) {
+    animation: float 6s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* Performance-based backdrop blur via CSS variables */
+  .music-album-cover {
+    backdrop-filter: blur(var(--perf-blur-strength, 0px));
+    -webkit-backdrop-filter: blur(var(--perf-blur-strength, 0px));
+  }
+
+  .music-album-cover::before {
+    content: '';
+    position: absolute;
+    inset: -20%;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      rgba(255, 255, 255, 0.15),
+      rgba(255, 255, 255, 0) 60%
+    );
+    filter: blur(30px);
+    opacity: var(--perf-opacity, 0.6);
+    will-change: auto;
+  }
+
+  /* Shine effect only for high-performance devices */
+  .perf-high .music-album-cover::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -50%;
+    width: 200%;
+    height: 300%;
+    background: linear-gradient(
+      75deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.35) 50%,
+      transparent 60%
+    );
+    transform: rotate(8deg);
+    opacity: 0;
+    transition:
+      opacity 0.3s ease,
+      transform 0.4s ease;
+    will-change: opacity, transform;
+  }
+
+  /* Only enable hover effects on high-performance devices with hover capability */
+  @media (hover: hover) and (pointer: fine) {
+    .perf-high .music-album-cover:not(.modal-cover):hover::after {
+      opacity: 0.7;
+      transform: rotate(8deg) translateY(10%);
+    }
+  }
+
+  /* Disable shine effect on low/medium-performance devices */
+  .perf-medium .music-album-cover::after,
+  .perf-low .music-album-cover::after {
+    display: none;
+  }
+
+  /* Badge */
+  .music-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 10;
+  }
+  .music-badge span {
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(var(--perf-blur-strength, 0px));
+    -webkit-backdrop-filter: blur(var(--perf-blur-strength, 0px));
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  /* Enhanced background for low-performance devices without blur */
+  .no-backdrop-blur .music-badge span {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* Badge color variants */
+  .badge-presave {
+    background: linear-gradient(
+      135deg,
+      rgba(168, 85, 247, 0.5),
+      rgba(236, 72, 153, 0.5)
+    ) !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .badge-single {
+    background: rgba(59, 130, 246, 0.4) !important;
+  }
+
+  .badge-album {
+    background: rgba(139, 92, 246, 0.4) !important;
+  }
+
+  .badge-ep {
+    background: rgba(236, 72, 153, 0.4) !important;
+  }
+
+  .badge-new {
+    background: rgba(34, 197, 94, 0.4) !important;
+  }
+
+  /* Title + text animation only */
+  .animate-titleGlow {
+    animation: titleGlow 5s ease-in-out infinite alternate;
+  }
+  @keyframes titleGlow {
+    0% {
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.28));
+    }
+    100% {
+      filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.5));
+    }
+  }
+
+  /* Optimized animations with performance considerations */
+  .animate-fadeInUpSmooth {
+    animation: fadeInUpSmooth 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: opacity, transform;
+  }
+
+  .animate-fadeOutDown {
+    animation: fadeOutDown 0.3s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
+    will-change: opacity, transform;
+  }
+
+  .animate-slideInCompact {
+    animation: slideInCompact 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    will-change: opacity, transform;
+  }
+
+  /* Reduced motion variants */
+  .reduced-animations .animate-fadeInUpSmooth,
+  .reduced-animations .animate-fadeOutDown,
+  .reduced-animations .animate-slideInCompact {
+    animation: none !important;
+    opacity: 1 !important;
     transform: none !important;
   }
-}
 
-/* Responsive adjustments */
-@media (max-width: 640px) {
-  .share-glassmorphic-popup {
-    width: 95vw;
-    margin: 1rem;
+  @keyframes fadeInUpSmooth {
+    0% {
+      opacity: 0;
+      transform: translateY(20px) scale(0.96);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
-  
-  .share-popup-header,
-  .share-popup-content {
-    padding: 1.25rem;
+
+  @keyframes fadeOutDown {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
   }
-  
-  .share-popup-input-group {
-    flex-direction: column;
-    gap: 0.75rem;
+
+  @keyframes slideInCompact {
+    0% {
+      opacity: 0;
+      transform: translateY(-15px) scale(0.95);
+    }
+    60% {
+      opacity: 0.8;
+      transform: translateY(2px) scale(1.01);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
-  
-  .share-popup-copy-btn {
+
+  /* Optimized keyframe animations with performance considerations */
+
+  /* Basic motion effects */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes auroraShift {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    100% {
+      transform: translate3d(-2%, 2%, 0) scale(1.06);
+    }
+  }
+
+  /* Background gradient animations - disabled on low-performance devices */
+  @keyframes gradientFlow {
+    0%,
+    100% {
+      background-position:
+        0% 0%,
+        100% 100%,
+        0% 0%;
+    }
+    50% {
+      background-position:
+        100% 50%,
+        0% 50%,
+        0% 0%;
+    }
+  }
+
+  @keyframes auroraFloat {
+    0%,
+    100% {
+      background-position:
+        0% 0%,
+        100% 100%,
+        50% 50%;
+    }
+    25% {
+      background-position:
+        100% 25%,
+        25% 75%,
+        25% 75%;
+    }
+    50% {
+      background-position:
+        50% 100%,
+        75% 25%,
+        75% 25%;
+    }
+    75% {
+      background-position:
+        25% 50%,
+        50% 100%,
+        100% 50%;
+    }
+  }
+
+  @keyframes auroraPulse {
+    0% {
+      filter: blur(40px) saturate(110%) brightness(1);
+      opacity: 0.8;
+    }
+    50% {
+      filter: blur(35px) saturate(130%) brightness(1.1);
+      opacity: 1;
+    }
+    100% {
+      filter: blur(45px) saturate(90%) brightness(0.9);
+      opacity: 0.9;
+    }
+  }
+
+  @keyframes vignetteWave {
+    0%,
+    100% {
+      background-position:
+        0% 100%,
+        100% 0%;
+      transform: scale(1) rotate(0deg);
+    }
+    33% {
+      background-position:
+        50% 50%,
+        50% 50%;
+      transform: scale(1.02) rotate(0.5deg);
+    }
+    66% {
+      background-position:
+        100% 0%,
+        0% 100%;
+      transform: scale(0.98) rotate(-0.5deg);
+    }
+  }
+
+  @keyframes overlayDrift {
+    0%,
+    100% {
+      background-position:
+        30% 70%,
+        70% 30%,
+        0% 0%;
+      transform: translateZ(0);
+    }
+    25% {
+      background-position:
+        60% 40%,
+        40% 60%,
+        0% 0%;
+      transform: translateZ(0) scale(1.01);
+    }
+    50% {
+      background-position:
+        80% 20%,
+        20% 80%,
+        0% 0%;
+      transform: translateZ(0) scale(0.99);
+    }
+    75% {
+      background-position:
+        45% 55%,
+        55% 45%,
+        0% 0%;
+      transform: translateZ(0) scale(1.005);
+    }
+  }
+
+  /* Performance optimizations based on device capability detection */
+  @media (prefers-reduced-motion: reduce) {
+    .music-detail-content,
+    .music-hero::before,
+    .music-hero::after,
+    .music-hero-overlay,
+    .music-album-cover {
+      animation: none !important;
+      transition: opacity calc(var(--perf-animation-duration, 0.2) * 1s) ease !important;
+    }
+
+    .animate-titleGlow {
+      animation: none !important;
+    }
+  }
+
+  /* Mobile device optimizations */
+  .mobile-device .music-detail-content {
+    background-size:
+      100% 100%,
+      100% 100%,
+      100% 100%;
+  }
+
+  .mobile-device .music-hero::before {
+    filter: blur(20px) saturate(100%);
+  }
+
+  .mobile-device .music-album-cover::before {
+    filter: blur(15px);
+    opacity: 0.4;
+  }
+
+  /* Modal specific optimizations */
+  .music-detail-content:has(.music-hero) {
+    min-height: auto;
+  }
+
+  /* Performance-aware modal animations */
+  :global(body.modal-open) .music-detail-content.modal-mode,
+  :global(body.modal-open) .music-detail-content.modal-mode *,
+  :global(body.modal-open) .music-detail-content.modal-mode *::before,
+  :global(body.modal-open) .music-detail-content.modal-mode *::after {
+    animation: none !important;
+    transition: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Exception: Keep back button transitions working */
+  :global(body.modal-open) .back-glass-btn,
+  :global(body.modal-open) .share-glass-btn {
+    transition:
+      background 0.25s,
+      box-shadow 0.25s,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  /* Hard drop of effects only during the short modal transition window */
+  :global(body.modal-animating) .music-detail-content.modal-mode,
+  :global(body.modal-animating) .music-detail-content.modal-mode *,
+  :global(body.modal-animating) .music-detail-content.modal-mode *::before,
+  :global(body.modal-animating) .music-detail-content.modal-mode *::after {
+    animation: none !important;
+    transition: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Exception: Keep back button transitions working during animation */
+  :global(body.modal-animating) .back-glass-btn,
+  :global(body.modal-animating) .share-glass-btn {
+    transition:
+      background 0.25s,
+      box-shadow 0.25s,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  /* Lightweight image transitions in modal */
+  .modal-mode .progressive-image {
+    transition: opacity 0.18s ease-out !important;
+    transform: none !important;
+  }
+
+  .modal-mode .progressive-image-container .gradient-placeholder {
+    display: none !important;
+  }
+
+  /* Platform buttons uniform sizing */
+  .platforms-grid {
+    /* Ensure grid items stretch to fill available space */
+    align-items: stretch;
+  }
+
+  .platform-button-wrapper {
+    /* Ensure consistent button container dimensions */
+    display: flex;
+    align-items: stretch;
+  }
+
+  /* Make sure the platform buttons fill their containers uniformly */
+  .platform-button-wrapper :deep(.platform-button) {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 80px !important;
+    flex: 1 !important;
+  }
+
+  /* Ensure consistent content layout within buttons */
+  .platform-button-wrapper :deep(.platform-content) {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+  }
+
+  /* Center platform icons within their containers */
+  .platform-button-wrapper :deep(.platform-icon) {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
     justify-content: center !important;
   }
-}
+
+  /* Center platform arrow icons */
+  .platform-button-wrapper :deep(.platform-arrow) {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Responsive adjustments for mobile devices */
+  @media (max-width: 640px) {
+    .platform-button-wrapper {
+      min-height: 70px;
+    }
+
+    .platform-button-wrapper :deep(.platform-button) {
+      min-height: 70px !important;
+    }
+  }
+
+  /* Desktop Share Button Container */
+  .desktop-share-button {
+    display: flex;
+    justify-content: center;
+    position: relative; /* Ensure proper positioning context */
+  }
+
+  /* Hide desktop share button on mobile as CSS safeguard */
+  @media (max-width: 767px) {
+    .desktop-share-button {
+      display: none !important;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .desktop-share-button {
+      justify-content: flex-start;
+    }
+  }
+
+  .share-glassmorphic-popup {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
+    width: 400px;
+    max-width: 90vw;
+    color: white;
+    overflow: hidden;
+  }
+
+  .share-popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .share-popup-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .share-popup-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .share-popup-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    transform: scale(1.05);
+  }
+
+  .share-popup-content {
+    padding: 1.5rem;
+  }
+
+  .share-popup-description {
+    margin: 0 0 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .share-popup-input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+
+  .share-popup-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    color: white;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .share-popup-input:focus {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .share-popup-copy-btn {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    border: none !important;
+    border-radius: 0.5rem !important;
+    padding: 0.75rem 1.25rem !important;
+    color: white !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    white-space: nowrap !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  .share-popup-copy-btn:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+  }
+
+  .share-popup-copy-btn:disabled {
+    opacity: 0.7 !important;
+    cursor: not-allowed !important;
+  }
+
+  /* Performance optimizations for low-end devices */
+  @media (prefers-reduced-motion: reduce) {
+    .share-glassmorphic-popup {
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .share-popup-close:hover,
+    .share-popup-copy-btn:hover {
+      transform: none !important;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .share-glassmorphic-popup {
+      width: 95vw;
+      margin: 1rem;
+    }
+
+    .share-popup-header,
+    .share-popup-content {
+      padding: 1.25rem;
+    }
+
+    .share-popup-input-group {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .share-popup-copy-btn {
+      justify-content: center !important;
+    }
+  }
 </style>

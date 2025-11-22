@@ -26,7 +26,7 @@ export class ApiCache {
    */
   private checkCacheSupport(): void {
     if (typeof window === 'undefined') return
-    
+
     if (!('caches' in window)) {
       this._useLocalStorage = true
       console.info('Cache API not supported, using localStorage fallback')
@@ -41,7 +41,7 @@ export class ApiCache {
    */
   generateCacheKey(url: string, options: any = {}): string {
     const { method = 'GET', body, params } = options
-    
+
     // Create a normalized key including URL, method, and parameters
     const keyParts = [
       method.toUpperCase(),
@@ -49,7 +49,7 @@ export class ApiCache {
       params ? JSON.stringify(params) : '',
       body ? JSON.stringify(body) : ''
     ]
-    
+
     return keyParts.filter(Boolean).join('|')
   }
 
@@ -85,7 +85,7 @@ export class ApiCache {
       // Check if cache entry has expired
       const cachedData = await response.json()
       const now = Date.now()
-      
+
       if (now - cachedData.timestamp > ttl) {
         // Remove expired entry
         await cache.delete(request)
@@ -122,7 +122,7 @@ export class ApiCache {
 
       const cache = await caches.open(this.cacheName)
       const request = new Request(this.createCacheUrl(cacheKey))
-      
+
       const cacheEntry = {
         data,
         timestamp: Date.now()
@@ -185,8 +185,8 @@ export class ApiCache {
     try {
       const keys = Object.keys(localStorage)
       const prefix = `${this.cacheName}:`
-      
-      keys.forEach(key => {
+
+      keys.forEach((key) => {
         if (key.startsWith(prefix)) {
           localStorage.removeItem(key)
         }
@@ -203,7 +203,7 @@ export class ApiCache {
       let totalSize = 0
       let entries = 0
 
-      keys.forEach(key => {
+      keys.forEach((key) => {
         if (key.startsWith(prefix)) {
           const value = localStorage.getItem(key)
           if (value) {
@@ -316,7 +316,7 @@ export class ApiCache {
 
       const cache = await caches.open(this.cacheName)
       const requests = await cache.keys()
-      
+
       let totalSize = 0
       for (const request of requests) {
         try {
@@ -353,9 +353,12 @@ export class ApiCache {
   private startAutoCleanup(): void {
     // Only start cleanup in browser environment
     if (typeof window !== 'undefined' && 'caches' in window) {
-      setInterval(() => {
-        this.cleanup()
-      }, 10 * 60 * 1000) // 10 minutes
+      setInterval(
+        () => {
+          this.cleanup()
+        },
+        10 * 60 * 1000
+      ) // 10 minutes
     }
   }
 }

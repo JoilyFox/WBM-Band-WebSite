@@ -11,6 +11,7 @@ The music release system automatically manages three distinct states for each re
 ## State Transitions
 
 The system automatically transitions between states based on:
+
 - The current date/time vs. release date/time
 - Configuration flags in `config/general.ts`
 - Presence of pre-save links
@@ -44,18 +45,21 @@ In `config/general.ts`:
 The `releaseDate` property supports ISO 8601 format with optional time:
 
 ### Date Only (releases at midnight UTC)
+
 ```typescript
 releaseDate: '2025-11-14'
 ```
 
 ### Date with Time (specific release time)
+
 ```typescript
-releaseDate: '2025-11-14T18:00:00'  // November 14, 2025 at 6:00 PM UTC
+releaseDate: '2025-11-14T18:00:00' // November 14, 2025 at 6:00 PM UTC
 ```
 
 ### Date with Time and Timezone
+
 ```typescript
-releaseDate: '2025-11-14T18:00:00Z'  // Explicit UTC
+releaseDate: '2025-11-14T18:00:00Z' // Explicit UTC
 ```
 
 ## Music Release Interface
@@ -66,17 +70,17 @@ interface MusicRelease {
   slug: string
   title: string
   type: 'single' | 'album' | 'ep' | 'new release'
-  releaseDate: string  // ISO 8601 format
-  imageUrl: string     // Optimized image for released tracks
-  blurredImageUrl?: string  // Blurred image for preview cards
-  
+  releaseDate: string // ISO 8601 format
+  imageUrl: string // Optimized image for released tracks
+  blurredImageUrl?: string // Blurred image for preview cards
+
   // Regular streaming platform links (shown after release)
   musicPlatformLinks: {
     spotify?: string
     appleMusic?: string
     // ... other platforms
   }
-  
+
   // Pre-save links (shown before release if enablePreSave=true)
   preSaveMusicPlatformLinks?: {
     spotify?: string
@@ -89,17 +93,21 @@ interface MusicRelease {
 ## Key Features
 
 ### 1. Automatic Deduplication
+
 The system ensures each release appears only once:
+
 - If showing preview/pre-save card, the release is **filtered out** from regular music cards
 - When release date passes, preview/pre-save card automatically disappears
 - Regular music card automatically appears after release date
 
 ### 2. Time-Aware Releases
+
 - Supports specific release times (hours and minutes)
 - Time comparison is precise to the minute
 - Automatic state switching at exact release time
 
 ### 3. Image Optimization
+
 - **Released tracks**: Use optimized images (`imageUrl`)
 - **Preview/Pre-save cards**: Use blurred images (`blurredImageUrl`)
 - Fallback: Automatically adds `-blurred` suffix if `blurredImageUrl` not specified
@@ -107,6 +115,7 @@ The system ensures each release appears only once:
 ## Example Workflow
 
 ### 1. Announce Upcoming Release
+
 ```typescript
 // In musicLibrary.ts
 {
@@ -127,6 +136,7 @@ The system ensures each release appears only once:
 **Result**: Shows non-clickable preview card with blurred image
 
 ### 2. Enable Pre-save
+
 ```typescript
 // Add pre-save links
 preSaveMusicPlatformLinks: {
@@ -138,7 +148,9 @@ preSaveMusicPlatformLinks: {
 **Result**: Preview card becomes clickable pre-save card
 
 ### 3. Automatic Release
+
 When `2025-12-01T18:00:00` arrives:
+
 - Pre-save card **automatically disappears**
 - Regular music card **automatically appears**
 - Uses regular `musicPlatformLinks` instead of pre-save links
@@ -147,30 +159,36 @@ When `2025-12-01T18:00:00` arrives:
 ## Components Involved
 
 ### MusicLibrarySection.vue
+
 - Manages display of music cards
 - Filters out upcoming releases from regular cards when showing preview/pre-save
 - Renders preview/pre-save card at the top
 
 ### pages/pre-save/[slug].vue
+
 - Mobile pre-save page
 - Automatically redirects to `/listen/{slug}` after release date
 
 ### pages/listen/[slug].vue
+
 - Regular music page for released tracks
 
 ### MusicDetailContent.vue
+
 - Shared component for both pre-save and regular display
 - Supports `isPreSave` prop to switch between modes
 
 ## Helper Functions
 
 ### isUpcomingRelease(dateString)
+
 ```typescript
 // Returns true if release date is in the future
 const isUpcoming = isUpcomingRelease('2025-11-14T18:00:00')
 ```
 
 ### formatReleaseDate(dateString, locale)
+
 ```typescript
 // Formats date with time if available
 const formatted = formatReleaseDate('2025-11-14T18:00:00', 'en-US')
@@ -184,11 +202,13 @@ const formatted = formatReleaseDate('2025-11-14T18:00:00', 'en-US')
    - `preSaveMusicPlatformLinks` - for pre-save period
 
 2. **Use specific times** for coordinated releases:
+
    ```typescript
-   releaseDate: '2025-11-14T18:00:00'  // Not just '2025-11-14'
+   releaseDate: '2025-11-14T18:00:00' // Not just '2025-11-14'
    ```
 
 3. **Generate blurred images** for upcoming releases:
+
    ```bash
    node scripts/generate-blurred-image.js public/images/albums-images/cover.jpg
    ```

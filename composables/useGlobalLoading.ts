@@ -44,16 +44,16 @@ export const useGlobalLoading = () => {
   ): Promise<T> => {
     try {
       showLoading()
-      
+
       if (options?.showProgress && options?.progressSteps) {
         // Simulate progress steps
         const stepSize = 90 / options.progressSteps
         for (let i = 1; i <= options.progressSteps; i++) {
-          await new Promise(resolve => setTimeout(resolve, 100))
+          await new Promise((resolve) => setTimeout(resolve, 100))
           setProgress(stepSize * i)
         }
       }
-      
+
       const result = await asyncFn()
       return result
     } finally {
@@ -73,6 +73,6 @@ export const useGlobalLoading = () => {
     loadingProgress: store.loadingProgress,
 
     // Getters
-    getLoadingState: store.getLoadingState,
+    getLoadingState: store.getLoadingState
   }
 }

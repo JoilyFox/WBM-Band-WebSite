@@ -14,7 +14,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return
   }
 
-  const hasPreSaveLinks = Boolean(release.preSaveMusicPlatformLinks && Object.values(release.preSaveMusicPlatformLinks).some(Boolean))
+  const hasPreSaveLinks = Boolean(
+    release.preSaveMusicPlatformLinks &&
+      Object.values(release.preSaveMusicPlatformLinks).some(Boolean)
+  )
   const enablePreSave = Boolean(getConfig('general.enablePreSave', { fallback: false }))
 
   if (enablePreSave && hasPreSaveLinks) {
@@ -24,17 +27,21 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   const i18nLocale = useNuxtApp()?.$i18n?.locale?.value
-  const normalizedLocale = i18nLocale === 'ua' ? 'uk-UA' : i18nLocale === 'en' ? 'en-US' : (i18nLocale || 'en-US')
+  const normalizedLocale =
+    i18nLocale === 'ua' ? 'uk-UA' : i18nLocale === 'en' ? 'en-US' : i18nLocale || 'en-US'
   const formattedDate = formatReleaseDate(release.releaseDate, normalizedLocale)
 
-  return navigateTo({
-    path: '/404',
-    query: {
-      title: 'Release Not Available',
-      message: `This track unlocks on ${formattedDate}. Please check back soon.`,
-      buttonText: 'Go to Home',
-      buttonLink: '/',
-      buttonIcon: 'pi pi-home'
-    }
-  }, { replace: true })
+  return navigateTo(
+    {
+      path: '/404',
+      query: {
+        title: 'Release Not Available',
+        message: `This track unlocks on ${formattedDate}. Please check back soon.`,
+        buttonText: 'Go to Home',
+        buttonLink: '/',
+        buttonIcon: 'pi pi-home'
+      }
+    },
+    { replace: true }
+  )
 })

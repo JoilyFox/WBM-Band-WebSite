@@ -18,16 +18,16 @@ export function useImagePreloader() {
     if (!heroImages.length) return
 
     isPreloading.value = true
-    
+
     try {
-      const imageSources = heroImages.map(img => img.src)
+      const imageSources = heroImages.map((img) => img.src)
       const preloadPromises = preloadCriticalImages(imageSources, 'high')
-      
+
       // Wait for the first image to load (critical for LCP)
       await Promise.race(preloadPromises)
-      
+
       // Continue loading others in background
-      Promise.allSettled(preloadPromises).then(results => {
+      Promise.allSettled(preloadPromises).then((results) => {
         results.forEach((result, index) => {
           if (result.status === 'fulfilled') {
             preloadedImages.value.push(imageSources[index])
@@ -55,8 +55,8 @@ export function useImagePreloader() {
     try {
       const criticalImages = albumImages.slice(0, maxImages)
       const preloadPromises = preloadCriticalImages(criticalImages, 'medium')
-      
-      Promise.allSettled(preloadPromises).then(results => {
+
+      Promise.allSettled(preloadPromises).then((results) => {
         results.forEach((result, index) => {
           if (result.status === 'fulfilled') {
             preloadedImages.value.push(criticalImages[index])

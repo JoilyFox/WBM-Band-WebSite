@@ -33,10 +33,7 @@ export const rightNavigation: NavigationItem[] = [
 ]
 
 // Combined navigation for footer (all items)
-export const footerNavigation: NavigationItem[] = [
-  ...leftNavigation,
-  ...rightNavigation
-]
+export const footerNavigation: NavigationItem[] = [...leftNavigation, ...rightNavigation]
 
 // Legacy export for backward compatibility
 export const navigationConfig = footerNavigation

@@ -10,7 +10,7 @@ export const useMusicNavigation = () => {
 
   // Detect if user is on mobile device
   const isMobile = computed(() => {
-    if (process.client) {
+    if (import.meta.client) {
       return window.innerWidth < 768 || 'ontouchstart' in window
     }
     return false
@@ -39,20 +39,23 @@ export const useMusicNavigation = () => {
    */
   const handleMusicClick = async (release: MusicRelease) => {
     const isPreSave = isReleaseInPreSaveMode(release)
-    
+
     // Check if we should redirect directly to distributor's pre-save page
     if (isPreSave && release.useDistributorPreSave && release.distributorPreSaveUrl) {
       // Direct external redirect to distributor URL
-      await navigateTo(release.distributorPreSaveUrl, { external: true, open: { target: '_blank' } })
+      await navigateTo(release.distributorPreSaveUrl, {
+        external: true,
+        open: { target: '_blank' }
+      })
       return
     }
-    
+
     const basePath = isPreSave ? '/pre-save' : '/listen'
-    
+
     if (isMobile.value) {
-    // Navigate to the locale-aware listen/pre-save page on mobile with 'from=music' parameter
-    const path = localePath({ path: `${basePath}/${release.slug}`, query: { from: 'music' } })
-    await navigateTo(path)
+      // Navigate to the locale-aware listen/pre-save page on mobile with 'from=music' parameter
+      const path = localePath({ path: `${basePath}/${release.slug}`, query: { from: 'music' } })
+      await navigateTo(path)
     } else {
       // Open modal on desktop
       selectedRelease.value = release
@@ -85,8 +88,8 @@ export const useMusicNavigation = () => {
   const handleModalKeyboard = (event: KeyboardEvent, releases: MusicRelease[]) => {
     if (!selectedRelease.value || !isModalOpen.value) return
 
-    const currentIndex = releases.findIndex(r => r.id === selectedRelease.value?.id)
-    
+    const currentIndex = releases.findIndex((r) => r.id === selectedRelease.value?.id)
+
     switch (event.key) {
       case 'ArrowLeft':
         event.preventDefault()

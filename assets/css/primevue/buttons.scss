@@ -3,28 +3,28 @@
   /* Custom button variants for PrimeVue buttons */
   .btn-primary {
     @apply bg-primary-50 text-surface-950 font-medium px-4 py-2 rounded-lg transition-all duration-200 focus:outline-none;
-    
+
     /* Focus ring only on non-touch devices */
     @media (hover: hover) and (pointer: fine) {
       &:focus {
         @apply ring-2 ring-primary-50 ring-offset-2;
       }
     }
-    
+
     /* Hover only on non-touch devices */
     @media (hover: hover) and (pointer: fine) {
       &:hover {
         @apply bg-primary-200;
       }
     }
-    
+
     /* Touch-friendly active state */
     &:active {
       @apply bg-primary-200 ring-4 ring-primary-100 ring-opacity-50;
       transform: scale(0.98);
       transition: all 0.1s ease-in-out;
     }
-    
+
     /* Prevent stuck states on mobile */
     @media (hover: none) and (pointer: coarse) {
       &:hover {
@@ -35,35 +35,35 @@
       }
     }
   }
-  
+
   .btn-primary .p-button-icon {
     @apply mr-2;
   }
-  
+
   .btn-secondary {
     @apply bg-secondary-800 text-surface-50 font-medium px-4 py-2 rounded-lg transition-all duration-200 focus:outline-none;
-    
+
     /* Focus ring only on non-touch devices */
     @media (hover: hover) and (pointer: fine) {
       &:focus {
         @apply ring-2 ring-primary-50 ring-offset-2;
       }
     }
-    
+
     /* Hover only on non-touch devices */
     @media (hover: hover) and (pointer: fine) {
       &:hover {
         @apply bg-secondary-700;
       }
     }
-    
+
     /* Touch-friendly active state */
     &:active {
       @apply bg-secondary-700 ring-4 ring-primary-100 ring-opacity-50;
       transform: scale(0.98);
       transition: all 0.1s ease-in-out;
     }
-    
+
     /* Prevent stuck states on mobile */
     @media (hover: none) and (pointer: coarse) {
       &:hover {
@@ -74,35 +74,35 @@
       }
     }
   }
-  
+
   .btn-secondary .p-button-icon {
     @apply mr-2;
   }
-  
+
   .btn-outline {
     @apply border border-primary-50 text-primary-50 font-medium px-4 py-2 rounded-lg transition-all duration-200 focus:outline-none;
-    
+
     /* Focus ring only on non-touch devices */
     @media (hover: hover) and (pointer: fine) {
       &:focus {
         @apply ring-2 ring-primary-50 ring-offset-2;
       }
     }
-    
+
     /* Hover only on non-touch devices */
     @media (hover: hover) and (pointer: fine) {
       &:hover {
         @apply bg-primary-50 text-surface-950;
       }
     }
-    
+
     /* Touch-friendly active state */
     &:active {
       @apply bg-primary-50 text-surface-950 ring-4 ring-primary-100 ring-opacity-50;
       transform: scale(0.98);
       transition: all 0.1s ease-in-out;
     }
-    
+
     /* Prevent stuck states on mobile */
     @media (hover: none) and (pointer: coarse) {
       &:hover {
@@ -113,17 +113,19 @@
       }
     }
   }
-  
+
   .btn-outline .p-button-icon {
     @apply mr-2;
   }
-  
+
   /* Glassmorphic Button Variant */
   .btn-glassmorphic {
     @apply font-medium transition-all duration-300 focus:outline-none;
-    background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.1) 0%, 
-      rgba(255, 255, 255, 0.05) 100%) !important;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 100%
+    ) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -140,25 +142,25 @@
     outline: none !important;
     position: relative !important;
     overflow: hidden !important;
-    
+
     /* Disable ripple effect completely */
     .p-ink {
       display: none !important;
     }
-    
+
     /* Prevent layout shifts from ripple */
     &::before,
     &::after {
       display: none !important;
     }
-    
+
     /* Remove PrimeVue default focus styles */
     &:focus {
       outline: none !important;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
       border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
-    
+
     /* Focus ring only on non-touch devices */
     @media (hover: hover) and (pointer: fine) {
       &:focus-visible {
@@ -166,44 +168,50 @@
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
       }
     }
-    
+
     /* Hover only on non-touch devices */
     @media (hover: hover) and (pointer: fine) {
       &:hover {
-        background: linear-gradient(135deg, 
-          rgba(255, 255, 255, 0.15) 0%, 
-          rgba(255, 255, 255, 0.08) 100%) !important;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.15) 0%,
+          rgba(255, 255, 255, 0.08) 100%
+        ) !important;
         border-color: rgba(255, 255, 255, 0.3) !important;
         color: white !important;
         transform: translateY(-2px) !important;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
       }
     }
-    
+
     /* Active state - remove weird borders */
     &:active {
-      background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.15) 0%, 
-        rgba(255, 255, 255, 0.08) 100%) !important;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0.08) 100%
+      ) !important;
       border: 1px solid rgba(255, 255, 255, 0.3) !important;
       color: white !important;
       transform: scale(0.98) !important;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
       outline: none !important;
     }
-    
+
     /* Prevent stuck states on mobile */
     @media (hover: none) and (pointer: coarse) {
       &:hover {
-        background: linear-gradient(135deg, 
-          rgba(255, 255, 255, 0.1) 0%, 
-          rgba(255, 255, 255, 0.05) 100%) !important;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1) 0%,
+          rgba(255, 255, 255, 0.05) 100%
+        ) !important;
         color: rgba(255, 255, 255, 0.9) !important;
         transform: none !important;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
       }
-      
+
       &:focus {
         @apply ring-0;
         outline: none !important;
@@ -211,45 +219,47 @@
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
       }
     }
-    
+
     /* Performance optimizations for low-end devices */
     &.btn-glassmorphic--optimized {
       backdrop-filter: blur(4px) !important;
       -webkit-backdrop-filter: blur(4px) !important;
-      transition: background-color 0.2s ease, border-color 0.2s ease !important;
+      transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease !important;
     }
-    
+
     &.btn-glassmorphic--optimized:hover {
       transform: none !important;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
     }
   }
-  
+
   /* Icon spacing - ensure proper gap */
   .btn-glassmorphic .p-button-icon {
     margin: 0 !important;
     font-size: 1rem !important;
   }
-  
+
   .btn-glassmorphic .p-button-label {
     margin: 0 !important;
   }
-  
+
   /* Remove margin for icon-only glassmorphic buttons */
   .btn-glassmorphic.p-button-icon-only {
     gap: 0 !important;
   }
-  
+
   .btn-glassmorphic.p-button-icon-only .p-button-icon {
     margin: 0 !important;
   }
-  
+
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     .btn-glassmorphic {
       transition: none !important;
     }
-    
+
     .btn-glassmorphic:hover {
       transform: none !important;
     }
@@ -262,35 +272,35 @@
       min-height: 44px; /* Touch-friendly minimum size */
       min-width: 44px;
     }
-    
+
     &.p-button-sm {
       @apply px-3 py-1.5 text-sm;
-      
+
       @media (hover: none) and (pointer: coarse) {
         min-height: 40px;
         padding: 0.5rem 0.75rem;
       }
     }
-    
+
     &.p-button-lg {
       @apply px-6 py-3 text-lg;
-      
+
       @media (hover: none) and (pointer: coarse) {
         min-height: 48px;
         padding: 0.875rem 1.5rem;
       }
     }
-    
+
     /* Icon spacing for all PrimeVue buttons */
     .p-button-icon {
       @apply mr-2;
     }
-    
+
     /* Remove margin for icon-only buttons */
     &.p-button-icon-only .p-button-icon {
       @apply mr-0;
     }
-    
+
     /* Prevent sticky hover states on mobile */
     @media (hover: none) and (pointer: coarse) {
       &:hover {
@@ -308,11 +318,11 @@
   display: none !important;
 }
 
-:deep(.btn-glassmorphic span[data-p-ink="true"]) {
+:deep(.btn-glassmorphic span[data-p-ink='true']) {
   display: none !important;
 }
 
-:deep(.btn-glassmorphic [data-pc-name="ripple"]) {
+:deep(.btn-glassmorphic [data-pc-name='ripple']) {
   display: none !important;
 }
 
@@ -331,48 +341,56 @@
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     transition: background-color 0.2s ease !important;
-    
-    &:hover, &:focus, &:active {
+
+    &:hover,
+    &:focus,
+    &:active {
       background: rgba(255, 255, 255, 0.12) !important;
       transform: none !important;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
     }
   }
-  
+
   .share-glass-btn,
   .back-glass-btn {
     background: rgba(255, 255, 255, 0.08) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     transition: background-color 0.2s ease !important;
-    
-    &:hover, &:focus, &:active {
+
+    &:hover,
+    &:focus,
+    &:active {
       background: rgba(255, 255, 255, 0.12) !important;
       transform: none !important;
     }
   }
-  
+
   /* Override for flagship mobile devices */
   .mobile-flagship {
     .btn-glassmorphic {
-      background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.1) 0%, 
-        rgba(255, 255, 255, 0.05) 100%) !important;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 100%
+      ) !important;
       backdrop-filter: blur(6px) !important;
       -webkit-backdrop-filter: blur(6px) !important;
       transition: all 0.3s ease !important;
     }
-    
+
     .share-glass-btn,
     .back-glass-btn {
       backdrop-filter: blur(6px) !important;
       -webkit-backdrop-filter: blur(6px) !important;
-      background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.1) 0%, 
-        rgba(255, 255, 255, 0.05) 100%) !important;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 100%
+      ) !important;
     }
   }
-  
+
   /* Standard mobile devices - limited effects */
   .mobile-standard {
     .btn-glassmorphic {
@@ -381,7 +399,7 @@
       background: rgba(255, 255, 255, 0.1) !important;
       transition: all 0.2s ease !important;
     }
-    
+
     .share-glass-btn,
     .back-glass-btn {
       backdrop-filter: blur(4px) !important;
@@ -389,7 +407,7 @@
       background: rgba(255, 255, 255, 0.1) !important;
     }
   }
-  
+
   /* Reduced motion respect on mobile */
   @media (prefers-reduced-motion: reduce) {
     .btn-glassmorphic,

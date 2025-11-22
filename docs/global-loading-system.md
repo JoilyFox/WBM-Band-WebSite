@@ -35,18 +35,18 @@ The global loading system is built around a **[`GlobalLoadingBar`](../components
 </template>
 
 <script setup lang="ts">
-const { showLoading, hideLoading, isLoading } = useGlobalLoading()
+  const { showLoading, hideLoading, isLoading } = useGlobalLoading()
 
-const performAction = async () => {
-  showLoading()
-  
-  try {
-    // Simulate async operation
-    await new Promise(resolve => setTimeout(resolve, 2000))
-  } finally {
-    hideLoading()
+  const performAction = async () => {
+    showLoading()
+
+    try {
+      // Simulate async operation
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+    } finally {
+      hideLoading()
+    }
   }
-}
 </script>
 ```
 
@@ -54,19 +54,19 @@ const performAction = async () => {
 
 ```vue
 <script setup lang="ts">
-const { showLoading, hideLoading, setProgress } = useGlobalLoading()
+  const { showLoading, hideLoading, setProgress } = useGlobalLoading()
 
-const uploadFile = async () => {
-  showLoading()
-  
-  // Simulate upload progress
-  for (let i = 0; i <= 100; i += 10) {
-    setProgress(i)
-    await new Promise(resolve => setTimeout(resolve, 200))
+  const uploadFile = async () => {
+    showLoading()
+
+    // Simulate upload progress
+    for (let i = 0; i <= 100; i += 10) {
+      setProgress(i)
+      await new Promise((resolve) => setTimeout(resolve, 200))
+    }
+
+    hideLoading()
   }
-  
-  hideLoading()
-}
 </script>
 ```
 
@@ -74,18 +74,21 @@ const uploadFile = async () => {
 
 ```vue
 <script setup lang="ts">
-const { withLoading } = useGlobalLoading()
+  const { withLoading } = useGlobalLoading()
 
-const fetchData = async () => {
-  await withLoading(async () => {
-    // Your async operation here
-    const response = await api.get('/api/data')
-    return response
-  }, {
-    simulateProgress: true,
-    progressDuration: 2000
-  })
-}
+  const fetchData = async () => {
+    await withLoading(
+      async () => {
+        // Your async operation here
+        const response = await api.get('/api/data')
+        return response
+      },
+      {
+        simulateProgress: true,
+        progressDuration: 2000
+      }
+    )
+  }
 </script>
 ```
 
@@ -96,14 +99,14 @@ const fetchData = async () => {
 ```typescript
 const {
   // State
-  isLoading,        // ComputedRef<boolean>
-  loadingProgress,  // ComputedRef<number>
-  
+  isLoading, // ComputedRef<boolean>
+  loadingProgress, // ComputedRef<number>
+
   // Methods
-  showLoading,      // () => void
-  hideLoading,      // () => void
-  setProgress,      // (progress: number) => void
-  withLoading       // (fn: Function, options?) => Promise<any>
+  showLoading, // () => void
+  hideLoading, // () => void
+  setProgress, // (progress: number) => void
+  withLoading // (fn: Function, options?) => Promise<any>
 } = useGlobalLoading()
 ```
 
@@ -142,13 +145,13 @@ const {
 const globalLoadingStore = useGlobalLoadingStore()
 
 // State
-globalLoadingStore.isLoading        // boolean
-globalLoadingStore.loadingProgress  // number (0-100)
+globalLoadingStore.isLoading // boolean
+globalLoadingStore.loadingProgress // number (0-100)
 
 // Actions
-globalLoadingStore.showLoading()    // Show loading
-globalLoadingStore.hideLoading()    // Hide loading
-globalLoadingStore.setProgress(n)   // Set progress
+globalLoadingStore.showLoading() // Show loading
+globalLoadingStore.hideLoading() // Hide loading
+globalLoadingStore.setProgress(n) // Set progress
 ```
 
 ## Real-World Examples
@@ -160,22 +163,25 @@ globalLoadingStore.setProgress(n)   // Set progress
 export function useApiWithLoading() {
   const { withLoading } = useGlobalLoading()
   const api = useApi()
-  
+
   const fetchUsers = async () => {
-    return await withLoading(async () => {
-      return await api.get('/api/users')
-    }, {
-      simulateProgress: true,
-      progressDuration: 1500
-    })
+    return await withLoading(
+      async () => {
+        return await api.get('/api/users')
+      },
+      {
+        simulateProgress: true,
+        progressDuration: 1500
+      }
+    )
   }
-  
+
   const saveUser = async (userData: any) => {
     return await withLoading(async () => {
       return await api.post('/api/users', userData)
     })
   }
-  
+
   return {
     fetchUsers,
     saveUser
@@ -190,10 +196,10 @@ export function useApiWithLoading() {
 export default defineNuxtRouteMiddleware((to, from) => {
   if (process.client) {
     const { showLoading, hideLoading } = useGlobalLoading()
-    
+
     // Show loading when navigating
     showLoading()
-    
+
     // Hide loading after navigation completes
     nextTick(() => {
       hideLoading()
@@ -207,44 +213,38 @@ export default defineNuxtRouteMiddleware((to, from) => {
 ```vue
 <template>
   <div>
-    <input 
-      type="file" 
-      @change="uploadFile" 
-      :disabled="isLoading"
-    />
-    <div v-if="isLoading">
-      Upload Progress: {{ loadingProgress }}%
-    </div>
+    <input type="file" @change="uploadFile" :disabled="isLoading" />
+    <div v-if="isLoading">Upload Progress: {{ loadingProgress }}%</div>
   </div>
 </template>
 
 <script setup lang="ts">
-const { showLoading, hideLoading, setProgress, isLoading, loadingProgress } = useGlobalLoading()
+  const { showLoading, hideLoading, setProgress, isLoading, loadingProgress } = useGlobalLoading()
 
-const uploadFile = async (event: Event) => {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
-  
-  showLoading()
-  
-  try {
-    // Simulate upload progress
-    const chunks = 10
-    for (let i = 0; i <= chunks; i++) {
-      const progress = (i / chunks) * 100
-      setProgress(progress)
-      
-      // Simulate chunk upload
-      await new Promise(resolve => setTimeout(resolve, 300))
+  const uploadFile = async (event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    if (!file) return
+
+    showLoading()
+
+    try {
+      // Simulate upload progress
+      const chunks = 10
+      for (let i = 0; i <= chunks; i++) {
+        const progress = (i / chunks) * 100
+        setProgress(progress)
+
+        // Simulate chunk upload
+        await new Promise((resolve) => setTimeout(resolve, 300))
+      }
+
+      snackbar.success('Upload Complete!', 'File uploaded successfully')
+    } catch (error) {
+      snackbar.error('Upload Failed', 'Please try again')
+    } finally {
+      hideLoading()
     }
-    
-    snackbar.success('Upload Complete!', 'File uploaded successfully')
-  } catch (error) {
-    snackbar.error('Upload Failed', 'Please try again')
-  } finally {
-    hideLoading()
   }
-}
 </script>
 ```
 
@@ -267,7 +267,7 @@ The GlobalLoadingBar component features:
   right: 0;
   height: 3px;
   background: linear-gradient(
-    90deg, 
+    90deg,
     theme('colors.primary.400'),
     theme('colors.primary.500'),
     theme('colors.primary.600')
@@ -286,11 +286,11 @@ The GlobalLoadingBar is automatically included in the main app layout:
 <template>
   <!-- Global Loading Bar -->
   <GlobalLoadingBar />
-  
+
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
-  
+
   <!-- Other global components -->
   <Snackbar />
 </template>

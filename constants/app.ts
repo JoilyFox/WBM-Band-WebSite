@@ -5,7 +5,8 @@
 // Core app identity
 export const APP_NAME = 'WBM Band'
 export const APP_SLUG = 'wbm-band'
-export const APP_DESCRIPTION = 'A modern Nuxt 3 application for the WBM Band with advanced features including API caching, global loading system, and notification management.'
+export const APP_DESCRIPTION =
+  'A modern Nuxt 3 application for the WBM Band with advanced features including API caching, global loading system, and notification management.'
 
 // Dynamic constants based on core identity
 export const WEBSITE_TITLE = `${APP_NAME} Website`

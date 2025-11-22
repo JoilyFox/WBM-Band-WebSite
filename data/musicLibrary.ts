@@ -54,22 +54,25 @@ export const musicLibrary: MusicRelease[] = [
     featured: true,
     musicPlatformLinks: {
       spotify: 'https://open.spotify.com/album/0pjAORRhgVsS7eP4R6JbMF?go=1',
-      appleMusic: 'https://music.apple.com/ua/album/1849021879?app=music&at=1l3vpUI&ct=LFV_42c959c7fa393b8da43ecd14d3420636&itscg=30440&itsct=catchall_p1&lId=214367132&cId=none&sr=1&src=Linkfire&ls=1',
-      youtubeMusic: 'https://music.youtube.com/playlist?list=OLAK5uy_kYiOPbe8RWJzftzhv3KjQHg6gsR_aa8HQ&src=Linkfire&lId=d0225857-ffa6-4866-94dd-63ec2394cfd0&cId=d3d58fd7-4c47-11e6-9fd0-066c3e7a8751',
+      appleMusic:
+        'https://music.apple.com/ua/album/1849021879?app=music&at=1l3vpUI&ct=LFV_42c959c7fa393b8da43ecd14d3420636&itscg=30440&itsct=catchall_p1&lId=214367132&cId=none&sr=1&src=Linkfire&ls=1',
+      youtubeMusic:
+        'https://music.youtube.com/playlist?list=OLAK5uy_kYiOPbe8RWJzftzhv3KjQHg6gsR_aa8HQ&src=Linkfire&lId=d0225857-ffa6-4866-94dd-63ec2394cfd0&cId=d3d58fd7-4c47-11e6-9fd0-066c3e7a8751',
       // tidal: 'https://tidal.com/browse/album/example1',
-      amazonMusic: 'https://music.amazon.com/albums/B0FXYHVS59?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_O0FTj6Yaw48FAewockBknpO7w',
+      amazonMusic:
+        'https://music.amazon.com/albums/B0FXYHVS59?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_O0FTj6Yaw48FAewockBknpO7w',
       deezer: 'https://link.deezer.com/s/31BimrANA5l0xTuEjk4YW',
       musicVideo: 'https://www.youtube.com/watch?v=z_uH1gA9Gwo'
     },
     // Optional: Use distributor's pre-save page instead of custom page
     useDistributorPreSave: true,
     distributorPreSaveUrl: 'https://artists.landr.com/057829908413'
-  },
+  }
 ]
 
 // Helper functions
 export const getFeaturedReleases = (): MusicRelease[] => {
-  return musicLibrary.filter(release => release.featured)
+  return musicLibrary.filter((release) => release.featured)
 }
 
 export const getLatestReleases = (limit: number = 4): MusicRelease[] => {
@@ -79,19 +82,21 @@ export const getLatestReleases = (limit: number = 4): MusicRelease[] => {
 }
 
 export const getReleasesByType = (type: MusicRelease['type']): MusicRelease[] => {
-  return musicLibrary.filter(release => release.type === type)
+  return musicLibrary.filter((release) => release.type === type)
 }
 
 export const getAllReleases = (): MusicRelease[] => {
-  return musicLibrary.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime())
+  return musicLibrary.sort(
+    (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
+  )
 }
 
 export const getReleaseBySlug = (slug: string): MusicRelease | undefined => {
-  return musicLibrary.find(release => release.slug === slug)
+  return musicLibrary.find((release) => release.slug === slug)
 }
 
 export const getReleaseById = (id: string): MusicRelease | undefined => {
-  return musicLibrary.find(release => release.id === id)
+  return musicLibrary.find((release) => release.id === id)
 }
 
 /**
@@ -102,9 +107,10 @@ export const getNearestUpcomingPreSaveRelease = (): MusicRelease | undefined => 
   const now = new Date().getTime()
 
   // Filter releases that are upcoming and have pre-save links
-  const upcomingWithPreSave = musicLibrary.filter(release => {
+  const upcomingWithPreSave = musicLibrary.filter((release) => {
     const releaseDate = new Date(release.releaseDate).getTime()
-    const hasPreSaveLinks = release.preSaveMusicPlatformLinks && Object.keys(release.preSaveMusicPlatformLinks).length > 0
+    const hasPreSaveLinks =
+      release.preSaveMusicPlatformLinks && Object.keys(release.preSaveMusicPlatformLinks).length > 0
     return releaseDate > now && hasPreSaveLinks
   })
 

@@ -56,16 +56,16 @@ if (cachedData) {
 </template>
 
 <script setup lang="ts">
-const api = useApi()
-const users = ref(null)
+  const api = useApi()
+  const users = ref(null)
 
-const { loading } = api
+  const { loading } = api
 
-const loadUsers = async () => {
-  users.value = await api.get('/api/users', {
-    cache: { enabled: true, ttl: 5 * 60 * 1000 } // 5 minutes
-  })
-}
+  const loadUsers = async () => {
+    users.value = await api.get('/api/users', {
+      cache: { enabled: true, ttl: 5 * 60 * 1000 } // 5 minutes
+    })
+  }
 </script>
 ```
 
@@ -172,8 +172,8 @@ api.getCacheStats()              // Get stats
 ```typescript
 // Custom TTL for specific requests
 const data = await api.get('/api/data', {
-  cache: { 
-    enabled: true, 
+  cache: {
+    enabled: true,
     ttl: 10 * 60 * 1000 // 10 minutes
   }
 })
@@ -184,10 +184,14 @@ const liveData = await api.get('/api/live-data', {
 })
 
 // Custom cache key
-const customData = await cachedGet('/api/custom', {}, {
-  enabled: true,
-  key: 'my-custom-cache-key'
-})
+const customData = await cachedGet(
+  '/api/custom',
+  {},
+  {
+    enabled: true,
+    key: 'my-custom-cache-key'
+  }
+)
 ```
 
 ## Real-World Examples
@@ -199,22 +203,22 @@ const customData = await cachedGet('/api/custom', {}, {
 export function useUserData() {
   const api = useApi()
   const users = ref([])
-  
+
   const fetchUsers = async () => {
     const result = await api.get('/api/users', {
       cache: { enabled: true, ttl: 2 * 60 * 1000 } // 2 minutes
     })
-    
+
     if (result?.data) {
       users.value = result.data
     }
   }
-  
+
   const refreshUsers = async () => {
     await api.clearCache('users')
     await fetchUsers()
   }
-  
+
   return {
     users: readonly(users),
     fetchUsers,
@@ -232,15 +236,15 @@ const api = useApi()
 // Update user and invalidate related cache
 const updateUser = async (userId: number, userData: any) => {
   const result = await api.put(`/api/users/${userId}`, userData)
-  
+
   if (result) {
     // Invalidate user-related cache entries
     await api.clearCache('users')
     await api.clearCache(`user-${userId}`)
-    
+
     snackbar.success('User updated!', 'Changes saved successfully')
   }
-  
+
   return result
 }
 ```

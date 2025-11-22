@@ -36,7 +36,8 @@ export const getLocalizedCountdown = ({ releaseDate, locale, t }: CountdownOptio
     return ''
   }
 
-  const releaseDateInput = typeof releaseDate === 'string' ? releaseDate : releaseDateValue.toISOString()
+  const releaseDateInput =
+    typeof releaseDate === 'string' ? releaseDate : releaseDateValue.toISOString()
 
   if (!isUpcomingRelease(releaseDateInput)) {
     return ''
@@ -116,9 +117,10 @@ export const getLocalizedCountdown = ({ releaseDate, locale, t }: CountdownOptio
     }
 
     const translated = t(selectedKey)
-    const unitWord = typeof translated === 'string' && translated !== selectedKey
-      ? translated
-      : (fallbackMap[selectedKey] || '')
+    const unitWord =
+      typeof translated === 'string' && translated !== selectedKey
+        ? translated
+        : fallbackMap[selectedKey] || ''
 
     return `${prefix} ${value} ${unitWord}`.trim()
   }
@@ -150,9 +152,10 @@ export const getLocalizedCountdown = ({ releaseDate, locale, t }: CountdownOptio
     'music.days_remaining.minutes': 'minutes'
   }
 
-  const unitWord = typeof translated === 'string' && translated !== selectedKey
-    ? translated
-    : (fallbackMap[selectedKey] || '')
+  const unitWord =
+    typeof translated === 'string' && translated !== selectedKey
+      ? translated
+      : fallbackMap[selectedKey] || ''
 
   return `${prefix} ${value} ${unitWord}`.trim()
 }

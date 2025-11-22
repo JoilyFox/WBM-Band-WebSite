@@ -64,12 +64,14 @@ Explain the main components and how they work together.
 
 \`\`\`vue
 <template>
+
   <!-- Template example -->
 </template>
 
 <script setup lang="ts">
 // Script example
 </script>
+
 \`\`\`
 
 ## API Reference

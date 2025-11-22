@@ -2,13 +2,13 @@
 
 /* GPU-accelerated transitions for low-performance devices */
 .transition-transform-gpu {
-  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateZ(0); /* Force GPU acceleration */
   will-change: transform;
 }
 
 .transition-spacing {
-  transition: padding 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Reduced motion fallbacks */
@@ -25,9 +25,9 @@
 @media (prefers-reduced-motion: no-preference) {
   /* Smooth animations for capable devices */
   .smooth-scroll-animation {
-    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   /* Simplified animations for low-performance devices */
   @media (max-width: 768px) and (max-resolution: 1.5dppx) {
     .transition-all {
@@ -48,7 +48,7 @@
 .backdrop-blur-performance {
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
-  
+
   @media (max-width: 768px) and (max-resolution: 1.5dppx) {
     /* Reduce blur on low-performance mobile devices */
     -webkit-backdrop-filter: blur(10px);
@@ -60,7 +60,9 @@
 .scroll-animation-enter {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  transition:
+    opacity 0.3s ease-out,
+    transform 0.3s ease-out;
 }
 
 .scroll-animation-enter-active {
@@ -74,7 +76,7 @@
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
   }
-  
+
   .transition-spacing {
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
@@ -85,7 +87,7 @@
 @media (min-width: 1024px) and (min-resolution: 2dppx) {
   .transition-transform-gpu {
     transition-duration: 0.4s;
-    transition-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 

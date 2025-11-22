@@ -17,7 +17,7 @@ interface UseApiOptions {
 export function useApi() {
   const loading = ref(false)
   const error = ref<string | null>(null)
-  
+
   /**
    * Generic API request wrapper with loading state
    */
@@ -26,12 +26,12 @@ export function useApi() {
     options: UseApiOptions = {}
   ): Promise<T | null> => {
     const { loading: manageLoading = true } = options
-    
+
     if (manageLoading) {
       loading.value = true
     }
     error.value = null
-    
+
     try {
       const result = await apiCall()
       return result
@@ -45,22 +45,16 @@ export function useApi() {
       }
     }
   }
-  
+
   /**
    * GET request with caching
    */
-  const get = async <T = any>(
-    url: string,
-    options: UseApiOptions = {}
-  ): Promise<T | null> => {
+  const get = async <T = any>(url: string, options: UseApiOptions = {}): Promise<T | null> => {
     const { cache = { enabled: true, ttl: 5 * 60 * 1000 } } = options
-    
-    return request(
-      () => cachedGet(url, {}, cache, options.errorHandling),
-      options
-    )
+
+    return request(() => cachedGet(url, {}, cache, options.errorHandling), options)
   }
-  
+
   /**
    * POST request
    */
@@ -70,13 +64,10 @@ export function useApi() {
     options: UseApiOptions = {}
   ): Promise<T | null> => {
     const { cache = { enabled: false } } = options
-    
-    return request(
-      () => cachedPost(url, data, {}, cache, options.errorHandling),
-      options
-    )
+
+    return request(() => cachedPost(url, data, {}, cache, options.errorHandling), options)
   }
-  
+
   /**
    * PUT request
    */
@@ -86,26 +77,17 @@ export function useApi() {
     options: UseApiOptions = {}
   ): Promise<T | null> => {
     const { cache = { enabled: false } } = options
-    
-    return request(
-      () => cachedPut(url, data, {}, cache, options.errorHandling),
-      options
-    )
+
+    return request(() => cachedPut(url, data, {}, cache, options.errorHandling), options)
   }
-  
+
   /**
    * DELETE request
    */
-  const del = async <T = any>(
-    url: string,
-    options: UseApiOptions = {}
-  ): Promise<T | null> => {
-    return request(
-      () => apiDelete(url, {}, options.errorHandling),
-      options
-    )
+  const del = async <T = any>(url: string, options: UseApiOptions = {}): Promise<T | null> => {
+    return request(() => apiDelete(url, {}, options.errorHandling), options)
   }
-  
+
   /**
    * Clear specific cache entries
    */
@@ -116,21 +98,21 @@ export function useApi() {
       await apiCache.clear()
     }
   }
-  
+
   /**
    * Get cache statistics
    */
   const getCacheStats = async () => {
     return await apiCache.getStats()
   }
-  
+
   return {
     // State
     loading: readonly(loading),
     error: readonly(error),
     isLoading: computed(() => loading.value),
     hasError: computed(() => error.value !== null),
-    
+
     // Methods
     request,
     get,

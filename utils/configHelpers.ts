@@ -8,7 +8,7 @@ import { generalConfig } from '~/config/general'
  * Registry of available configuration files
  */
 const configRegistry = {
-  general: generalConfig,
+  general: generalConfig
   // Add more config files here as needed
   // example: () => import('~/config/example')
 }
@@ -29,21 +29,23 @@ interface GetConfigOptions {
  */
 export const getConfig = (path: string, options: GetConfigOptions = {}): any => {
   const { fallback = null, errorLogging = true } = options
-  
+
   try {
     const pathParts = path.split('.')
     const configName = pathParts[0]
     const propertyPath = pathParts.slice(1)
-    
+
     // Get the config object from registry
     const config = configRegistry[configName as keyof typeof configRegistry]
     if (!config) {
       if (errorLogging) {
-        console.warn(`Config file '${configName}' not found in registry. Available configs: ${Object.keys(configRegistry).join(', ')}`)
+        console.warn(
+          `Config file '${configName}' not found in registry. Available configs: ${Object.keys(configRegistry).join(', ')}`
+        )
       }
       return fallback
     }
-    
+
     // Navigate through the property path
     let current: any = config
     for (const key of propertyPath) {
@@ -56,7 +58,7 @@ export const getConfig = (path: string, options: GetConfigOptions = {}): any => 
         return fallback
       }
     }
-    
+
     return current
   } catch (error) {
     if (errorLogging) {
@@ -72,22 +74,22 @@ export const getConfig = (path: string, options: GetConfigOptions = {}): any => 
  */
 export const formatReleaseDate = (dateString: string, locale: string = 'en-US'): string => {
   const date = new Date(dateString)
-  
+
   // Check if the release date includes time (not just date)
   const hasTime = dateString.includes('T') || dateString.includes(':')
-  
-  const options: Intl.DateTimeFormatOptions = { 
-    year: 'numeric', 
+
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
     month: 'long',
     day: 'numeric'
   }
-  
+
   // Add time formatting if time is specified
   if (hasTime) {
     options.hour = '2-digit'
     options.minute = '2-digit'
   }
-  
+
   return date.toLocaleString(locale, options)
 }
 
@@ -125,9 +127,11 @@ export const isPreSaveMode = (): boolean => {
  * This is a simple check - components should handle the actual logic
  */
 export const shouldShowNextReleasePreview = (): boolean => {
-  const enableNextReleasePreview = getConfig('general.enableNextReleasePreview', { fallback: false })
+  const enableNextReleasePreview = getConfig('general.enableNextReleasePreview', {
+    fallback: false
+  })
   const enablePreSave = getConfig('general.enablePreSave', { fallback: false })
-  
+
   // Don't show preview if pre-save is enabled
   if (enablePreSave) return false
   return enableNextReleasePreview
@@ -138,7 +142,7 @@ export const shouldShowNextReleasePreview = (): boolean => {
  */
 export const formatReleaseDateShort = (dateString: string): string => {
   const date = new Date(dateString)
-  const options: Intl.DateTimeFormatOptions = { 
+  const options: Intl.DateTimeFormatOptions = {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
@@ -154,7 +158,7 @@ export const getTimeUntilRelease = (dateString: string): string => {
   const now = new Date()
   const diffInMs = releaseDate.getTime() - now.getTime()
   const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24))
-  
+
   if (diffInDays < 0) {
     return 'Released'
   } else if (diffInDays === 0) {

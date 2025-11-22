@@ -27,7 +27,7 @@ The pre-save functionality provides three different states for upcoming music re
 {
   // Enable/disable next release preview (non-clickable card)
   enableNextReleasePreview: boolean
-  
+
   // Enable/disable pre-save functionality (overrides preview when true)
   enablePreSave: boolean
 }
@@ -47,14 +47,14 @@ Add an upcoming release with pre-save links:
   imageUrl: '/images/optimized/albums-images/example.avif',
   description: 'Our next release coming soon!',
   featured: true,
-  
+
   // Pre-save links (used when enablePreSave = true and date is in future)
   preSaveMusicPlatformLinks: {
     spotify: 'https://spotify.link/presave/example',
     appleMusic: 'https://music.apple.com/presave/example',
     youtubeMusic: 'https://youtube.com/presave/example'
   },
-  
+
   // Regular streaming links (used when date has passed)
   musicPlatformLinks: {
     spotify: 'https://open.spotify.com/track/example',
@@ -67,12 +67,14 @@ Add an upcoming release with pre-save links:
 ## Usage Scenarios
 
 ### Scenario 1: Preview Mode (No Pre-save)
+
 **Date**: Before release  
 **Config**: `enableNextReleasePreview: true`, `enablePreSave: false`  
 **Result**: Shows non-clickable preview card with "Coming {date}" text  
 **Click**: Shows snackbar notification
 
 ### Scenario 2: Pre-save Mode
+
 **Date**: Before release  
 **Config**: `enablePreSave: true`  
 **Result**: Shows clickable pre-save card with "Pre-save {date}" text  
@@ -80,6 +82,7 @@ Add an upcoming release with pre-save links:
 **Links**: Uses `preSaveMusicPlatformLinks`
 
 ### Scenario 3: Released
+
 **Date**: After release date  
 **Config**: Any  
 **Result**: Shows regular music card  
@@ -126,6 +129,7 @@ if (dateInPast) {
 ### 4. Automatic Transition
 
 When the release date arrives:
+
 - Pre-save page redirects to regular listen page
 - Pre-save links automatically switch to regular streaming links
 - Card style changes from pre-save to released
@@ -133,10 +137,12 @@ When the release date arrives:
 ## Styling
 
 ### Pre-save Badge
+
 - Color: Purple/Pink gradient (`badge-presave`)
 - Text: "PRE-SAVE" or "ПРЕСЕЙВ" (Ukrainian)
 
 ### Pre-save Card
+
 - Icon: Bookmark icon (`pi-bookmark`)
 - Hover: Purple glow effect
 - Text: "Pre-save {date}"
@@ -166,7 +172,7 @@ isUpcomingRelease(dateString: string): boolean
 interface Props {
   release: MusicRelease
   isModal?: boolean
-  isPreSave?: boolean  // Indicates pre-save mode
+  isPreSave?: boolean // Indicates pre-save mode
 }
 ```
 
@@ -196,6 +202,7 @@ interface Props {
 ## Translations
 
 ### English (`locales/en.json`)
+
 ```json
 {
   "music": {
@@ -211,6 +218,7 @@ interface Props {
 ```
 
 ### Ukrainian (`locales/uk.json`)
+
 ```json
 {
   "music": {
@@ -236,21 +244,24 @@ interface Props {
 ## Troubleshooting
 
 ### Pre-save card not showing
+
 - Check `enablePreSave: true` in `general.ts`
 - Verify release has future `releaseDate`
 - Ensure `preSaveMusicPlatformLinks` has at least one link
 - Check that release is nearest upcoming (only one shows)
 
 ### Wrong links showing
+
 - Pre-save mode uses `preSaveMusicPlatformLinks`
 - Released mode uses `musicPlatformLinks`
 - Verify correct links are in correct property
 
 ### Page redirects immediately
+
 - Release date may have passed
 - Check date is in future: `releaseDate: '2025-12-01'`
 - Verify system clock is correct
 
 ---
 
-*This documentation was created for the WBM Band website pre-save system.*
+_This documentation was created for the WBM Band website pre-save system._

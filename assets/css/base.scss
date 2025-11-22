@@ -1,70 +1,106 @@
 /* Base Styles and Global Typography */
 @layer base {
   html {
-    font-family: 'Inter', 'Manrope', 'Golos Text', 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    font-family:
+      'Inter',
+      'Manrope',
+      'Golos Text',
+      'Space Grotesk',
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      'Noto Sans',
+      'Helvetica Neue',
+      Arial,
+      'Apple Color Emoji',
+      'Segoe UI Emoji',
+      'Segoe UI Symbol',
+      sans-serif;
   }
-  
+
   body {
     @apply bg-surface-950 text-surface-50;
   }
-  
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     @apply w-2;
   }
-  
+
   ::-webkit-scrollbar-track {
     @apply bg-surface-900;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     @apply bg-surface-700 rounded-full;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-surface-600;
   }
 
   /* Typography improvements */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold leading-tight;
-    font-family: 'Space Grotesk', 'Manrope', 'Golos Text', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    font-family:
+      'Space Grotesk',
+      'Manrope',
+      'Golos Text',
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      'Noto Sans',
+      'Helvetica Neue',
+      Arial,
+      'Apple Color Emoji',
+      'Segoe UI Emoji',
+      'Segoe UI Symbol',
+      sans-serif;
   }
-  
+
   h1 {
     @apply text-4xl lg:text-5xl;
   }
-  
+
   h2 {
     @apply text-3xl lg:text-4xl;
   }
-  
+
   h3 {
     @apply text-2xl lg:text-3xl;
   }
-  
+
   h4 {
     @apply text-xl lg:text-2xl;
   }
-  
+
   h5 {
     @apply text-lg lg:text-xl;
   }
-  
+
   h6 {
     @apply text-base lg:text-lg;
   }
-  
+
   /* Focus styles */
   a {
     @apply transition-colors duration-200;
   }
-  
+
   /* Focus styles */
   *:focus {
     @apply outline-none;
   }
-  
+
   *:focus-visible {
     @apply ring-2 ring-primary-50 ring-offset-2 ring-offset-surface-950;
   }
@@ -81,65 +117,67 @@
       backdrop-filter: none !important;
       filter: none !important;
     }
-    
+
     /* Simplify glassmorphic effects */
-    .glassmorphic, 
+    .glassmorphic,
     .glass-effect,
     .btn-glassmorphic {
       background: rgba(255, 255, 255, 0.05) !important;
       backdrop-filter: none !important;
       border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
-    
+
     /* Disable hover effects on mobile */
     * {
-      &:hover, &:focus, &:active {
+      &:hover,
+      &:focus,
+      &:active {
         transform: none !important;
         box-shadow: none !important;
       }
     }
   }
-  
+
   /* Standard mobile performance - limited effects */
   .mobile-standard {
     * {
       animation-duration: 0.2s !important;
       transition-duration: 0.2s !important;
     }
-    
-    .glassmorphic, 
+
+    .glassmorphic,
     .glass-effect,
     .btn-glassmorphic {
       backdrop-filter: blur(4px) !important;
     }
-    
+
     /* Reduce particle effects */
     .floating-particles,
     .parallax-element {
       display: none !important;
     }
   }
-  
+
   /* Flagship mobile performance - full effects but optimized */
   .mobile-flagship {
     * {
       animation-duration: 0.6s !important;
       transition-duration: 0.3s !important;
     }
-    
+
     /* Enable limited glassmorphic effects */
-    .glassmorphic, 
+    .glassmorphic,
     .glass-effect,
     .btn-glassmorphic {
       backdrop-filter: blur(8px) !important;
     }
-    
+
     /* Still disable parallax for battery life */
     .parallax-element {
       transform: none !important;
     }
   }
-  
+
   /* Performance level classes */
   .perf-low {
     * {
@@ -147,36 +185,36 @@
       animation-duration: 0.2s !important;
       transition-duration: 0.2s !important;
     }
-    
-    .glassmorphic, 
+
+    .glassmorphic,
     .glass-effect,
     .btn-glassmorphic {
       backdrop-filter: none !important;
       background: rgba(255, 255, 255, 0.08) !important;
     }
   }
-  
+
   .perf-medium {
-    .glassmorphic, 
+    .glassmorphic,
     .glass-effect,
     .btn-glassmorphic {
       backdrop-filter: blur(6px) !important;
     }
   }
-  
+
   .perf-high {
     /* Full effects enabled - no restrictions */
-    .glassmorphic, 
+    .glassmorphic,
     .glass-effect,
     .btn-glassmorphic {
       backdrop-filter: var(--perf-blur-strength, blur(12px)) !important;
     }
-    
+
     .complex-animation {
       animation-duration: var(--perf-animation-duration, 1s) !important;
     }
   }
-  
+
   /* Device-specific optimizations */
   .flagship-device {
     /* Flagship devices can handle more effects */
@@ -184,7 +222,7 @@
       animation-duration: var(--perf-animation-duration, 1s) !important;
     }
   }
-  
+
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     .mobile-conservative,
@@ -197,7 +235,7 @@
       }
     }
   }
-  
+
   /* Battery optimization for mobile */
   @media screen and (max-width: 768px) {
     /* Force conservative mode for all mobile by default */
@@ -207,13 +245,13 @@
       background: rgba(255, 255, 255, 0.05) !important;
       transition: background-color 0.2s ease !important;
     }
-    
+
     /* Override only for flagship devices */
     .mobile-flagship .share-glass-btn,
     .mobile-flagship .btn-glassmorphic {
       backdrop-filter: blur(6px) !important;
     }
-    
+
     /* Disable floating animations on mobile */
     .floating-animation,
     .hover-float {

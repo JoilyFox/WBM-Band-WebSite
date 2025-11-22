@@ -47,7 +47,7 @@ function buildGradientOverlaySVG(width, height, options) {
   const {
     darken = 0.4,
     tintA = 'rgba(120,119,198,0.20)', // matches rgba(120, 119, 198, 0.2)
-    tintB = 'rgba(255,119,198,0.10)'  // matches rgba(255, 119, 198, 0.1)
+    tintB = 'rgba(255,119,198,0.10)' // matches rgba(255, 119, 198, 0.1)
   } = options || {}
 
   // Build an SVG with a semi-transparent dark layer + two radial tints
@@ -80,7 +80,9 @@ async function main() {
   const inputPath = args._[0]
   if (!inputPath) {
     console.error('Error: Input image path is required.')
-  console.error('Usage: node scripts/generate-blurred-image.js <inputPath> [--sigma=100] [--saturation=1.8] [--darken=0.4] [--suffix=-blurred]')
+    console.error(
+      'Usage: node scripts/generate-blurred-image.js <inputPath> [--sigma=100] [--saturation=1.8] [--darken=0.4] [--suffix=-blurred]'
+    )
     process.exit(1)
   }
 

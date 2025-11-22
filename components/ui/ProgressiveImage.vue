@@ -1,16 +1,11 @@
 <template>
-  <div 
-    ref="containerRef"
-    class="progressive-image-container"
-    :class="containerClass"
-  >
+  <div ref="containerRef" class="progressive-image-container" :class="containerClass">
     <!-- Simple moving gradient placeholder -->
-    <div 
+    <div
       v-if="showPlaceholder"
       class="absolute inset-0 gradient-placeholder transition-opacity duration-1000 ease-out"
       :class="{ 'opacity-0': imageLoaded }"
-    >
-    </div>
+    ></div>
 
     <!-- Main optimized image with picture element for format support -->
     <picture v-if="shouldLoadImage">
@@ -20,14 +15,14 @@
         :type="pictureSources.avifSource.type"
         :sizes="pictureSources.avifSource.sizes"
       />
-      
+
       <!-- WebP source for wider browser support -->
       <source
         :srcset="pictureSources.webpSource.srcset"
         :type="pictureSources.webpSource.type"
         :sizes="pictureSources.webpSource.sizes"
       />
-      
+
       <!-- Fallback JPEG image -->
       <img
         ref="imgRef"
@@ -37,9 +32,11 @@
           'progressive-image',
           'transition-all duration-1000 ease-out',
           // Don't control opacity for hero images - let the hero slider handle it
-          containerClass?.includes('hero-background-image') 
-            ? 'opacity-100 scale-100' 
-            : (imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'),
+          containerClass?.includes('hero-background-image')
+            ? 'opacity-100 scale-100'
+            : imageLoaded
+              ? 'opacity-100 scale-100'
+              : 'opacity-0 scale-105',
           imageClass
         ]"
         :loading="loading"
@@ -74,213 +71,228 @@
 
     <!-- Overlay content slot -->
     <div v-if="$slots.overlay" class="absolute inset-0 z-10">
-      <slot name="overlay" :loaded="imageLoaded" :loading="isImageLoading" :error="imageLoadError" />
+      <slot
+        name="overlay"
+        :loaded="imageLoaded"
+        :loading="isImageLoading"
+        :error="imageLoadError"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { useImageLoading, generateBlurPlaceholder, generatePictureSources } from '~/utils/imageHelpers'
+  import { ref, computed, onMounted, watch } from 'vue'
+  import {
+    useImageLoading,
+    generateBlurPlaceholder,
+    generatePictureSources
+  } from '~/utils/imageHelpers'
 
-interface Props {
-  src: string
-  alt: string
-  width?: number
-  height?: number
-  loading?: 'lazy' | 'eager'
-  fetchPriority?: 'high' | 'low' | 'auto'
-  preset?: string
-  quality?: number
-  sizes?: string
-  containerClass?: string
-  imageClass?: string
-  errorText?: string
-  showPlaceholder?: boolean
-  showLoadingSpinner?: boolean
-  lazyLoadOffset?: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  loading: 'lazy',
-  fetchPriority: 'auto',
-  quality: 80,
-  showPlaceholder: true,
-  showLoadingSpinner: false,
-  lazyLoadOffset: '50px'
-})
-
-// Template refs
-const containerRef = ref<HTMLElement>()
-const imgRef = ref<HTMLImageElement>()
-
-// Image loading composable
-const {
-  imageLoadError,
-  imageLoaded,
-  isImageLoading,
-  handleImageLoad,
-  handleImageError,
-  isIntersecting,
-  setIntersectionTarget,
-  resetImageStates
-} = useImageLoading()
-
-// Generate blur placeholder
-const blurPlaceholder = ref('')
-
-// Generate picture sources for different formats
-const pictureSources = computed(() => {
-  // Get base URL from Nuxt runtime config
-  const config = useRuntimeConfig()
-  
-  // Always use configured baseURL (works in dev and prod)
-  const baseURL = (config.app?.baseURL || '/')
-  
-  const sources = generatePictureSources(props.src, props.sizes, props.preset)
-  
-  // Add base URL to all sources if not already present
-  const addBaseURL = (path: string) => {
-    if (path.startsWith('http') || path.startsWith('//')) return path
-    if (baseURL === '/') return path
-    return path.startsWith(baseURL) ? path : baseURL.replace(/\/$/, '') + path
-  }
-  
-  return {
-    avifSource: {
-      ...sources.avifSource,
-      srcset: addBaseURL(sources.avifSource.srcset)
-    },
-    webpSource: {
-      ...sources.webpSource,
-      srcset: addBaseURL(sources.webpSource.srcset)
-    },
-    fallbackSrc: addBaseURL(sources.fallbackSrc)
-  }
-})
-
-// Control when to actually load the image
-const shouldLoadImage = computed(() => {
-  return props.loading === 'eager' || isIntersecting.value
-})
-
-// Component mounted lifecycle
-onMounted(() => {
-  if (!containerRef.value) return
-  
-  if (props.loading === 'lazy') {
-    setIntersectionTarget(containerRef.value)
+  interface Props {
+    src: string
+    alt: string
+    width?: number
+    height?: number
+    loading?: 'lazy' | 'eager'
+    fetchPriority?: 'high' | 'low' | 'auto'
+    preset?: string
+    quality?: number
+    sizes?: string
+    containerClass?: string
+    imageClass?: string
+    errorText?: string
+    showPlaceholder?: boolean
+    showLoadingSpinner?: boolean
+    lazyLoadOffset?: string
   }
 
-  if (imgRef.value && imgRef.value.complete && imgRef.value.naturalWidth > 0) {
-    // Image already cached/loaded before hydration completed – mark as loaded manually
-    handleImageLoad()
-  }
-})
+  const props = withDefaults(defineProps<Props>(), {
+    loading: 'lazy',
+    fetchPriority: 'auto',
+    quality: 80,
+    showPlaceholder: true,
+    showLoadingSpinner: false,
+    lazyLoadOffset: '50px'
+  })
 
-// Watch for src changes to reset states
-watch(
-  () => props.src,
-  (newSrc, oldSrc) => {
-    if (newSrc !== oldSrc) {
-      resetImageStates()
-      if (process.client) {
-        console.log('[ProgressiveImage] src change', { oldSrc, newSrc })
+  // Template refs
+  const containerRef = ref<HTMLElement>()
+  const imgRef = ref<HTMLImageElement>()
+
+  // Image loading composable
+  const {
+    imageLoadError,
+    imageLoaded,
+    isImageLoading,
+    handleImageLoad,
+    handleImageError,
+    isIntersecting,
+    setIntersectionTarget,
+    resetImageStates
+  } = useImageLoading()
+
+  // Generate blur placeholder
+  const blurPlaceholder = ref('')
+
+  // Generate picture sources for different formats
+  const pictureSources = computed(() => {
+    // Get base URL from Nuxt runtime config
+    const config = useRuntimeConfig()
+
+    // Always use configured baseURL (works in dev and prod)
+    const baseURL = config.app?.baseURL || '/'
+
+    const sources = generatePictureSources(props.src, props.sizes, props.preset)
+
+    // Add base URL to all sources if not already present
+    const addBaseURL = (path: string) => {
+      if (path.startsWith('http') || path.startsWith('//')) return path
+      if (baseURL === '/') return path
+      return path.startsWith(baseURL) ? path : baseURL.replace(/\/$/, '') + path
+    }
+
+    return {
+      avifSource: {
+        ...sources.avifSource,
+        srcset: addBaseURL(sources.avifSource.srcset)
+      },
+      webpSource: {
+        ...sources.webpSource,
+        srcset: addBaseURL(sources.webpSource.srcset)
+      },
+      fallbackSrc: addBaseURL(sources.fallbackSrc)
+    }
+  })
+
+  // Control when to actually load the image
+  const shouldLoadImage = computed(() => {
+    return props.loading === 'eager' || isIntersecting.value
+  })
+
+  // Component mounted lifecycle
+  onMounted(() => {
+    if (!containerRef.value) return
+
+    if (props.loading === 'lazy') {
+      setIntersectionTarget(containerRef.value)
+    }
+
+    if (imgRef.value && imgRef.value.complete && imgRef.value.naturalWidth > 0) {
+      // Image already cached/loaded before hydration completed – mark as loaded manually
+      handleImageLoad()
+    }
+  })
+
+  // Watch for src changes to reset states
+  watch(
+    () => props.src,
+    (newSrc, oldSrc) => {
+      if (newSrc !== oldSrc) {
+        resetImageStates()
+        if (import.meta.client) {
+          console.log('[ProgressiveImage] src change', { oldSrc, newSrc })
+        }
       }
     }
-  }
-)
+  )
 </script>
 
 <style scoped>
-.progressive-image-container {
-  position: relative;
-  overflow: hidden;
-  background-color: transparent;
-}
-
-/* Ensure hero background containers have no background */
-.progressive-image-container.hero-background-image {
-  background: transparent !important;
-}
-
-.progressive-image-container.hero-background-image .gradient-placeholder {
-  display: none !important;
-}
-
-.progressive-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-/* Cool black and grey grainy gradient placeholder */
-.gradient-placeholder {
-  background: 
-    linear-gradient(
-      135deg,
-      #000000 0%,
-      #1a1a1a 20%,
-      #333333 40%,
-      #1a1a1a 60%,
-      #000000 80%,
-      #0a0a0a 100%
-    ),
-    conic-gradient(
-      from 0deg at 30% 70%,
-      #000000 0deg,
-      #222222 60deg,
-      #111111 120deg,
-      #000000 180deg,
-      #1a1a1a 240deg,
-      #000000 360deg
-    );
-  background-size: 
-    200% 200%,
-    300% 300%;
-  filter: contrast(120%) brightness(400%);
-  animation: coolMove 10s ease-in-out infinite;
-  isolation: isolate;
-}
-
-@keyframes coolMove {
-  0% {
-    background-position: 
-      0% 0%,
-      50% 50%,
-      0 0;
+  .progressive-image-container {
+    position: relative;
+    overflow: hidden;
+    background-color: transparent;
   }
-  50% {
-    background-position: 
-      100% 100%,
-      150% 150%,
-      75px 75px;
-  }
-  100% {
-    background-position: 
-      0% 0%,
-      50% 50%,
-      0 0;
-  }
-}
 
-/* Reduce motion for users who prefer it */
-@media (prefers-reduced-motion: reduce) {
+  /* Ensure hero background containers have no background */
+  .progressive-image-container.hero-background-image {
+    background: transparent !important;
+  }
+
+  .progressive-image-container.hero-background-image .gradient-placeholder {
+    display: none !important;
+  }
+
+  .progressive-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* Cool black and grey grainy gradient placeholder */
   .gradient-placeholder {
-    animation: none !important;
-    background: 
-      linear-gradient(135deg, #000000 0%, #1a1a1a 20%, #333333 40%, #1a1a1a 60%, #000000 100%);
+    background:
+      linear-gradient(
+        135deg,
+        #000000 0%,
+        #1a1a1a 20%,
+        #333333 40%,
+        #1a1a1a 60%,
+        #000000 80%,
+        #0a0a0a 100%
+      ),
+      conic-gradient(
+        from 0deg at 30% 70%,
+        #000000 0deg,
+        #222222 60deg,
+        #111111 120deg,
+        #000000 180deg,
+        #1a1a1a 240deg,
+        #000000 360deg
+      );
+    background-size:
+      200% 200%,
+      300% 300%;
     filter: contrast(120%) brightness(400%);
+    animation: coolMove 10s ease-in-out infinite;
+    isolation: isolate;
   }
-}
 
-.progressive-image-container:where(.modal-mode *) .progressive-image,
-:global(.modal-mode) .progressive-image-container .progressive-image {
-  transition: opacity 180ms ease-out !important;
-  transform: none !important;
-}
+  @keyframes coolMove {
+    0% {
+      background-position:
+        0% 0%,
+        50% 50%,
+        0 0;
+    }
+    50% {
+      background-position:
+        100% 100%,
+        150% 150%,
+        75px 75px;
+    }
+    100% {
+      background-position:
+        0% 0%,
+        50% 50%,
+        0 0;
+    }
+  }
+
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    .gradient-placeholder {
+      animation: none !important;
+      background: linear-gradient(
+        135deg,
+        #000000 0%,
+        #1a1a1a 20%,
+        #333333 40%,
+        #1a1a1a 60%,
+        #000000 100%
+      );
+      filter: contrast(120%) brightness(400%);
+    }
+  }
+
+  .progressive-image-container:where(.modal-mode *) .progressive-image,
+  :global(.modal-mode) .progressive-image-container .progressive-image {
+    transition: opacity 180ms ease-out !important;
+    transform: none !important;
+  }
 </style>

@@ -1,14 +1,17 @@
 # Image Utilities Documentation
 
 ## Overview
+
 The `imageHelpers.ts` utility file contains composables and helper functions for handling image loading states, error management, and optimization utilities.
 
 ## Main Composables
 
 ### `useImageLoading()`
+
 A simple composable for basic image loading state management.
 
 **Returns:**
+
 - `imageLoadError`: Readonly ref indicating if image failed to load
 - `imageLoaded`: Readonly ref indicating if image loaded successfully
 - `isImageLoading`: Computed ref indicating if image is currently loading
@@ -17,22 +20,18 @@ A simple composable for basic image loading state management.
 - `resetImageStates()`: Function to reset all states to initial values
 
 **Usage:**
+
 ```vue
 <script setup>
-import { useImageLoading } from '~/utils/imageHelpers'
+  import { useImageLoading } from '~/utils/imageHelpers'
 
-const {
-  imageLoadError,
-  imageLoaded,
-  handleImageLoad,
-  handleImageError
-} = useImageLoading()
+  const { imageLoadError, imageLoaded, handleImageLoad, handleImageError } = useImageLoading()
 </script>
 
 <template>
-  <NuxtImg 
+  <NuxtImg
     src="/path/to/image.jpg"
-    :class="{ 'loaded': imageLoaded }"
+    :class="{ loaded: imageLoaded }"
     @load="handleImageLoad"
     @error="handleImageError"
   />
@@ -41,9 +40,11 @@ const {
 ```
 
 ### `useAdvancedImageLoading()`
+
 A more detailed composable with loading progress and multiple states.
 
 **Returns:**
+
 - `loadingState`: Current loading state (IDLE, LOADING, LOADED, ERROR)
 - `loadingProgress`: Loading progress percentage (0-100)
 - Various handler functions for different loading events
@@ -51,14 +52,17 @@ A more detailed composable with loading progress and multiple states.
 ## Utility Functions
 
 ### `preloadImage(src: string)`
+
 Preloads an image and returns a promise.
 
 **Parameters:**
+
 - `src`: Image source URL
 
 **Returns:** Promise<HTMLImageElement>
 
 **Usage:**
+
 ```typescript
 import { preloadImage } from '~/utils/imageHelpers'
 
@@ -71,9 +75,11 @@ try {
 ```
 
 ### `getOptimizedImageUrl(src, width?, quality?)`
+
 Generates optimized image URLs with query parameters.
 
 **Parameters:**
+
 - `src`: Original image source
 - `width`: Target width (optional)
 - `quality`: Image quality 1-100 (default: 80)
@@ -81,6 +87,7 @@ Generates optimized image URLs with query parameters.
 **Returns:** Optimized image URL string
 
 **Usage:**
+
 ```typescript
 import { getOptimizedImageUrl } from '~/utils/imageHelpers'
 
@@ -116,7 +123,7 @@ When using these utilities, pair them with CSS transitions for smooth animations
 The utilities work seamlessly with Nuxt Image component:
 
 ```vue
-<NuxtImg 
+<NuxtImg
   :src="imageSrc"
   :class="{ 'image-loaded': imageLoaded }"
   loading="eager"
@@ -129,6 +136,7 @@ The utilities work seamlessly with Nuxt Image component:
 ```
 
 This approach provides:
+
 - ✅ Separation of concerns
 - ✅ Reusable across components
 - ✅ Type safety with TypeScript

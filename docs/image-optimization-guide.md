@@ -7,12 +7,14 @@ This implementation provides a comprehensive image optimization solution for the
 ## 📊 Performance Improvements
 
 ### Before Optimization:
+
 - Hero images: **3-4MB each** (JPG format)
 - Album images: **3-5MB each** (JPG format)
 - No lazy loading or progressive enhancement
 - Total page weight: **20-30MB** for homepage
 
 ### After Optimization:
+
 - Hero images: **0.3-0.6MB each** (AVIF format with fallbacks)
 - Album images: **0.02-0.2MB each** (AVIF format with fallbacks)
 - Smart lazy loading and preloading with native HTML
@@ -23,18 +25,21 @@ This implementation provides a comprehensive image optimization solution for the
 ## 🛠️ Technologies Implemented
 
 ### 1. Modern Image Formats with Picture Elements
+
 - **AVIF**: Next-generation format with 50% better compression than WebP
 - **WebP**: Widely supported, 25-35% smaller than JPEG
 - **JPEG**: Fallback for older browsers
 - **Picture Element**: Automatic format selection based on browser support
 
 ### 2. Smart Loading Strategies
+
 - **Critical Image Preloading**: Hero images load immediately with fetchpriority="high"
 - **Lazy Loading**: Non-critical images load when needed with native loading="lazy"
 - **Progressive Enhancement**: Blur placeholders while loading
 - **Intersection Observer**: Efficient viewport detection for lazy loading
 
 ### 3. Responsive Images with Native HTML
+
 - **Picture Elements**: Multiple format support without JavaScript runtime
 - **Device-Specific Optimization**: Mobile vs desktop variants
 - **Pre-optimized Assets**: All images pre-processed for different formats
@@ -80,6 +85,7 @@ public/images/
 ### 1. ProgressiveImage Component
 
 **Features:**
+
 - Automatic format detection using HTML Picture elements (AVIF → WebP → JPEG)
 - Blur placeholder during loading with CSS animations
 - Lazy loading with native HTML loading="lazy" and intersection observer
@@ -88,6 +94,7 @@ public/images/
 - **No runtime dependencies** - works with static site generation
 
 **Usage:**
+
 ```vue
 <UiProgressiveImage
   src="/images/optimized/hero-images/hero-1"
@@ -105,12 +112,14 @@ The component automatically generates a `<picture>` element with multiple `<sour
 ### 2. Image Preloader Composable
 
 **Features:**
+
 - Prioritized loading of critical images
 - Background preloading of additional content
 - Performance tracking and error handling
 - Smart batching to avoid overwhelming the browser
 
 **Usage:**
+
 ```js
 const { preloadHeroImages, preloadAlbumCovers } = useImagePreloader()
 
@@ -122,6 +131,7 @@ preloadAlbumCovers(albumImageUrls, 6)
 ### 3. Native HTML Picture Elements
 
 **Optimizations:**
+
 - Multi-format support with automatic browser selection
 - AVIF/WebP/JPEG format cascade using `<picture>` and `<source>` elements
 - Quality settings optimized per use case during build time
@@ -130,23 +140,26 @@ preloadAlbumCovers(albumImageUrls, 6)
 - **Static file serving** - all optimized images pre-generated
 
 **Example Output:**
+
 ```html
 <picture>
-  <source srcset="/images/optimized/hero-1.avif" type="image/avif">
-  <source srcset="/images/optimized/hero-1.webp" type="image/webp">
-  <img src="/images/optimized/hero-1.jpg" alt="Hero image" loading="eager" fetchpriority="high">
+  <source srcset="/images/optimized/hero-1.avif" type="image/avif" />
+  <source srcset="/images/optimized/hero-1.webp" type="image/webp" />
+  <img src="/images/optimized/hero-1.jpg" alt="Hero image" loading="eager" fetchpriority="high" />
 </picture>
 ```
 
 ## 📱 Device-Specific Optimizations
 
 ### Mobile Devices
+
 - Smaller image dimensions (768×1024 for hero)
 - Lower quality settings (80 vs 85)
 - Reduced blur effects for better performance
 - Touch-optimized interactions
 
 ### Desktop
+
 - Higher resolution images (1920×1080 for hero)
 - Enhanced quality for large screens
 - Advanced features like hover effects
@@ -155,6 +168,7 @@ preloadAlbumCovers(albumImageUrls, 6)
 ## 🎯 Best Practices Implemented
 
 ### 1. Critical Resource Prioritization
+
 ```html
 <!-- First hero image -->
 <img loading="eager" fetchpriority="high" />
@@ -164,46 +178,56 @@ preloadAlbumCovers(albumImageUrls, 6)
 ```
 
 ### 2. Format Selection Strategy (via Picture Element)
+
 ```html
 <picture>
-  <source srcset="image.avif" type="image/avif">  <!-- Modern browsers -->
-  <source srcset="image.webp" type="image/webp">  <!-- Fallback -->
-  <img src="image.jpg" alt="Image">               <!-- Universal fallback -->
+  <source srcset="image.avif" type="image/avif" />
+  <!-- Modern browsers -->
+  <source srcset="image.webp" type="image/webp" />
+  <!-- Fallback -->
+  <img src="image.jpg" alt="Image" />
+  <!-- Universal fallback -->
 </picture>
 ```
 
 ### 3. Size Optimization Matrix
-| Use Case | AVIF | WebP | JPEG | Dimensions |
-|----------|------|------|------|------------|
-| Hero Desktop | 85% | 85% | 85% | 1920×1080 |
-| Hero Mobile | 80% | 80% | 80% | 768×1024 |
-| Album Cover | 85% | 85% | 85% | 800×800 |
-| Thumbnail | 80% | 80% | 80% | 400×400 |
+
+| Use Case     | AVIF | WebP | JPEG | Dimensions |
+| ------------ | ---- | ---- | ---- | ---------- |
+| Hero Desktop | 85%  | 85%  | 85%  | 1920×1080  |
+| Hero Mobile  | 80%  | 80%  | 80%  | 768×1024   |
+| Album Cover  | 85%  | 85%  | 85%  | 800×800    |
+| Thumbnail    | 80%  | 80%  | 80%  | 400×400    |
 
 ## 🚀 Quick Start
 
 ### 1. Run Image Compression
+
 ```bash
 npm run compress-images
 ```
 
 ### 2. Start Development Server
+
 ```bash
 npm run dev
 ```
 
 ### 3. Monitor Performance
+
 Visit `http://localhost:3000/performance` to see real-time metrics.
 
 ## 📈 Performance Monitoring
 
 ### Built-in Analytics
+
 - Image load times and file sizes
 - Format support detection
 - Core Web Vitals tracking
 - Slow image identification
 
 ### Key Metrics to Watch
+
 - **LCP (Largest Contentful Paint)**: Target < 2.5s
 - **CLS (Cumulative Layout Shift)**: Target < 0.1
 - **Total Image Weight**: Target < 5MB for full page
@@ -212,6 +236,7 @@ Visit `http://localhost:3000/performance` to see real-time metrics.
 ## 🔄 Maintenance
 
 ### Adding New Images
+
 1. Add original high-resolution image to `/public/images/`
 2. Run `npm run compress-images` to generate optimized versions
 3. Update data files to reference optimized paths (without file extensions)
@@ -219,6 +244,7 @@ Visit `http://localhost:3000/performance` to see real-time metrics.
 5. Test on multiple devices and connection speeds
 
 ### Monitoring Performance
+
 - Check `/performance` page regularly
 - Use Lighthouse for full audits
 - Monitor real user metrics in production
@@ -229,16 +255,19 @@ Visit `http://localhost:3000/performance` to see real-time metrics.
 ### Common Issues
 
 **Images not loading:**
+
 - Check that optimized images exist in `/public/images/optimized/`
 - Verify file paths in data files match generated files
 - Ensure proper fallback images are available
 
 **Performance still slow:**
+
 - Check network tab for large unoptimized images
 - Verify preloading is working correctly
 - Consider reducing image dimensions further
 
 **Browser compatibility:**
+
 - AVIF support: Chrome 85+, Firefox 93+
 - WebP support: All modern browsers
 - JPEG fallback: Universal support
@@ -246,6 +275,7 @@ Visit `http://localhost:3000/performance` to see real-time metrics.
 ## 🎉 Results
 
 The implementation provides:
+
 - **90%+ reduction** in image file sizes
 - **Faster page load times** especially on mobile
 - **Better Core Web Vitals** scores

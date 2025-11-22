@@ -13,11 +13,13 @@
 ### Step 2: Add API Key to Config
 
 Open `config/general.ts` and replace:
+
 ```typescript
 web3formsApiKey: "YOUR_WEB3FORMS_API_KEY_HERE",
 ```
 
 With your actual API key:
+
 ```typescript
 web3formsApiKey: "abc123-your-real-api-key-here",
 ```
@@ -41,6 +43,7 @@ web3formsApiKey: "abc123-your-real-api-key-here",
 ## Configuration Options
 
 In the Web3Forms dashboard you can:
+
 - Change the email where submissions are sent
 - Enable/disable spam filtering
 - Set up custom email templates
@@ -50,11 +53,13 @@ In the Web3Forms dashboard you can:
 ## Troubleshooting
 
 **Form not submitting?**
+
 - Check that you added the correct API key to `config/general.ts`
 - Make sure you verified your email address
 - Check browser console for errors
 
 **Not receiving emails?**
+
 - Check your spam folder
 - Verify the email address in Web3Forms dashboard
 - Make sure email verification is complete
@@ -62,6 +67,7 @@ In the Web3Forms dashboard you can:
 ## Alternative Configuration
 
 If you want to send to a different email than wbmbandofficial@gmail.com:
+
 1. Log in to Web3Forms dashboard
 2. Update the email address in settings
 3. Verify the new email address

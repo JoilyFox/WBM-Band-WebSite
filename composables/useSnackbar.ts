@@ -1,11 +1,11 @@
-import { useSnackbarStore } from '~/store/snackbar';
+import { useSnackbarStore } from '~/store/snackbar'
 
 /**
  * Composable for showing snackbar notifications
  * Provides a convenient API for displaying different types of notifications
  */
 export function useSnackbar() {
-  const snackbarStore = useSnackbarStore();
+  const snackbarStore = useSnackbarStore()
 
   return {
     /**
@@ -15,7 +15,7 @@ export function useSnackbar() {
      * @param timeout - Auto-hide timeout in milliseconds (default: 4000)
      */
     success: (message: string, subtitle?: string, timeout?: number) => {
-      return snackbarStore.showSuccess(message, subtitle, timeout);
+      return snackbarStore.showSuccess(message, subtitle, timeout)
     },
 
     /**
@@ -25,7 +25,7 @@ export function useSnackbar() {
      * @param timeout - Auto-hide timeout in milliseconds (default: 6000)
      */
     error: (message: string, subtitle?: string, timeout?: number) => {
-      return snackbarStore.showError(message, subtitle, timeout);
+      return snackbarStore.showError(message, subtitle, timeout)
     },
 
     /**
@@ -35,7 +35,7 @@ export function useSnackbar() {
      * @param timeout - Auto-hide timeout in milliseconds (default: 4000)
      */
     info: (message: string, subtitle?: string, timeout?: number) => {
-      return snackbarStore.showInfo(message, subtitle, timeout);
+      return snackbarStore.showInfo(message, subtitle, timeout)
     },
 
     /**
@@ -45,7 +45,7 @@ export function useSnackbar() {
      * @param timeout - Auto-hide timeout in milliseconds (default: 5000)
      */
     warning: (message: string, subtitle?: string, timeout?: number) => {
-      return snackbarStore.showWarning(message, subtitle, timeout);
+      return snackbarStore.showWarning(message, subtitle, timeout)
     },
 
     /**
@@ -53,12 +53,12 @@ export function useSnackbar() {
      * @param options - Notification options
      */
     show: (options: {
-      message: string;
-      subtitle?: string;
-      type?: 'success' | 'error' | 'info' | 'warning';
-      timeout?: number;
+      message: string
+      subtitle?: string
+      type?: 'success' | 'error' | 'info' | 'warning'
+      timeout?: number
     }) => {
-      return snackbarStore.showSnackbar(options);
+      return snackbarStore.showSnackbar(options)
     },
 
     /**
@@ -66,14 +66,14 @@ export function useSnackbar() {
      * @param id - Notification ID
      */
     hide: (id: number) => {
-      return snackbarStore.hideSnackbar(id);
+      return snackbarStore.hideSnackbar(id)
     },
 
     /**
      * Hide all notifications
      */
     hideAll: () => {
-      return snackbarStore.hideAllSnackbars();
-    },
-  };
+      return snackbarStore.hideAllSnackbars()
+    }
+  }
 }

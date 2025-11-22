@@ -17,7 +17,7 @@
 
 /* Utilities */
 @import './utilities.scss';
-  
+
 /* Tailwind CSS */
 @tailwind base;
 @tailwind components;

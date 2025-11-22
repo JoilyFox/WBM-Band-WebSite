@@ -3,7 +3,7 @@ import { defineEventHandler, sendRedirect } from 'h3'
 export default defineEventHandler((event) => {
   // In development, redirect any request starting with the production base
   // path (/WBM-Band-WebSite) to the same path without the prefix.
-  if (process.dev) {
+  if (import.meta.dev) {
     const url = event.node.req.url || '/'
     const prefix = '/WBM-Band-WebSite'
     if (url.startsWith(prefix)) {

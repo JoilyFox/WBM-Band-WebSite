@@ -11,23 +11,23 @@ interface ShareData {
 export const useShareFunctionality = () => {
   const { success: showSuccess, error: showError } = useSnackbar()
   const { t } = useI18n()
-  
+
   // Create clean URL without certain params
   const getCleanUrl = (removeParams: string[] = ['from']) => {
     if (typeof window === 'undefined') return ''
-    
+
     const url = new URL(window.location.href)
-    removeParams.forEach(param => url.searchParams.delete(param))
+    removeParams.forEach((param) => url.searchParams.delete(param))
     return url.toString()
   }
-  
+
   // Generate share text and URL
   const getShareContent = (data: ShareData) => {
     const cleanUrl = data.url || getCleanUrl()
     const title = data.title
     // Only use the URL without additional text
     const shareMessage = cleanUrl
-    
+
     return {
       title,
       text: shareMessage,
@@ -35,13 +35,13 @@ export const useShareFunctionality = () => {
       displayText: cleanUrl
     }
   }
-  
+
   // Mobile share using Web Share API
   const shareViaMobile = async (data: ShareData) => {
     try {
       const cleanUrl = data.url || getCleanUrl()
       const title = data.title
-      
+
       if (navigator.share) {
         // For Web Share API, only share the URL
         await navigator.share({
@@ -59,7 +59,7 @@ export const useShareFunctionality = () => {
       return false
     }
   }
-  
+
   // Copy to clipboard with feedback
   const copyToClipboard = async (text: string) => {
     try {
@@ -87,7 +87,7 @@ export const useShareFunctionality = () => {
       return false
     }
   }
-  
+
   return {
     getCleanUrl,
     getShareContent,

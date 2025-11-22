@@ -41,7 +41,7 @@ export default defineNuxtPlugin(() => {
 
       // Complete the progress and hide loading
       setProgress(100)
-      
+
       // Small delay to show completion before hiding
       setTimeout(() => {
         hideLoading()

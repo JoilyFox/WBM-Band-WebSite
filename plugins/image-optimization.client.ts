@@ -5,7 +5,7 @@
 
 export default defineNuxtPlugin(() => {
   // Set up global image optimization preferences
-  if (process.client) {
+  if (import.meta.client) {
     // Enable native lazy loading for supported browsers
     if ('loading' in HTMLImageElement.prototype) {
       // Native lazy loading is supported
@@ -17,7 +17,8 @@ export default defineNuxtPlugin(() => {
       return new Promise((resolve) => {
         const avif = new Image()
         avif.onload = avif.onerror = () => resolve(avif.height === 2)
-        avif.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEAwgMg8f8D///8WfhwB8+ErK42A='
+        avif.src =
+          'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEAwgMg8f8D///8WfhwB8+ErK42A='
       })
     }
 
@@ -26,17 +27,18 @@ export default defineNuxtPlugin(() => {
       return new Promise((resolve) => {
         const webp = new Image()
         webp.onload = webp.onerror = () => resolve(webp.height === 2)
-        webp.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA'
+        webp.src =
+          'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA'
       })
     }
 
     // Test format support and log results
     Promise.all([testAvif(), testWebp()]).then(([supportsAvif, supportsWebp]) => {
       console.log(`✅ Image format support - AVIF: ${supportsAvif}, WebP: ${supportsWebp}`)
-      
+
       // Store format support for optimization decisions
-      if (process.client && window) {
-        (window as any).__IMAGE_SUPPORT__ = {
+      if (import.meta.client && window) {
+        ;(window as any).__IMAGE_SUPPORT__ = {
           avif: supportsAvif,
           webp: supportsWebp
         }
@@ -49,12 +51,15 @@ export default defineNuxtPlugin(() => {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries()
         const lcpEntry = entries[entries.length - 1] as any
-        
+
         if (lcpEntry && lcpEntry.element && lcpEntry.element.tagName === 'IMG') {
-          console.log(`📊 LCP Image detected: ${lcpEntry.startTime.toFixed(2)}ms`, lcpEntry.element.src)
+          console.log(
+            `📊 LCP Image detected: ${lcpEntry.startTime.toFixed(2)}ms`,
+            lcpEntry.element.src
+          )
         }
       })
-      
+
       try {
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] })
       } catch (e) {
@@ -64,18 +69,18 @@ export default defineNuxtPlugin(() => {
       // Monitor layout shifts from images
       const clsObserver = new PerformanceObserver((list) => {
         let clsValue = 0
-        
+
         list.getEntries().forEach((entry: any) => {
           if (!entry.hadRecentInput) {
             clsValue += entry.value
           }
         })
-        
+
         if (clsValue > 0.1) {
           console.warn(`⚠️ Layout shift detected: ${clsValue.toFixed(4)}`)
         }
       })
-      
+
       try {
         clsObserver.observe({ entryTypes: ['layout-shift'] })
       } catch (e) {
