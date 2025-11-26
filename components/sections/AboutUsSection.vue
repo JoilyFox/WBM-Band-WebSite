@@ -156,7 +156,13 @@
   })
 
   // Computed slider images
-  const sliderImages = computed(() => props.images)
+  const { resolveUrl } = useAssetUrl()
+  const sliderImages = computed(() => {
+    return props.images.map((img) => ({
+      ...img,
+      src: resolveUrl(img.src)
+    }))
+  })
 
   // Swiper instance
   const swiperInstance = ref<SwiperType | null>(null)

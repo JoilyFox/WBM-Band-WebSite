@@ -59,16 +59,11 @@
   const { t } = useI18n()
 
   // Get runtime config to determine base URL
-  const config = useRuntimeConfig()
-  const baseURL = config.app.baseURL || '/'
+  const { resolveUrl } = useAssetUrl()
 
   // Helper function to resolve icon paths based on deployment target
   const getIconPath = (filename: string) => {
-    const path = `/assets/images/icons/${filename}`
-    // If baseURL is just '/', return path as-is (custom domain)
-    if (baseURL === '/') return path
-    // For GitHub Pages, prepend the base URL
-    return `${baseURL.replace(/\/$/, '')}${path}`
+    return resolveUrl(`/assets/images/icons/${filename}`)
   }
 
   const openLink = (url: string) => {

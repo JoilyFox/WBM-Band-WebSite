@@ -416,13 +416,11 @@
 
   // Build clean share URL without language prefix and protocol
   const shareUrlForRelease = computed(() => {
-    const config = useRuntimeConfig()
-    const base = (config.app?.baseURL || '/').replace(/\/$/, '')
     // Use appropriate path based on pre-save mode
     const pathPrefix = props.isPreSave ? '/pre-save/' : '/listen/'
     // Build path without locale prefix
     const path = `${pathPrefix}${props.release.slug}`
-    const relative = `${base}${path}`
+    const relative = resolveUrl(path)
 
     if (typeof window !== 'undefined') {
       // Return full URL with protocol to avoid concatenation issues
@@ -612,6 +610,7 @@
   })
 
   // Build a robust fallback URL for CSS backgrounds (prefer JPG)
+  const { resolveUrl } = useAssetUrl()
   const bgCoverUrl = computed(() => {
     const raw = props.release.imageUrl || ''
     let path = raw
@@ -620,12 +619,8 @@
     } else if (raw.startsWith('/images/')) {
       path = raw.replace('/images/', '/images/optimized/').replace(/\.(avif|webp|png|jpg)$/, '.jpg')
     }
-    const config = useRuntimeConfig()
-    const baseURL = config.app?.baseURL || '/'
-    if (path.startsWith('http') || path.startsWith('//')) return path
-    const finalUrl =
-      baseURL === '/' ? path : path.startsWith(baseURL) ? path : baseURL.replace(/\/$/, '') + path
-    return finalUrl
+
+    return resolveUrl(path)
   })
 
   // Back button handler: go to / and scroll to music section, or just go to music library

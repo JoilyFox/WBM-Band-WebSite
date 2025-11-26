@@ -333,20 +333,7 @@
   }
 
   // Helper function to resolve asset paths based on deployment target
-  const resolveAssetPath = (path: string) => {
-    // In development, use the path as-is
-    if (import.meta.dev) return path
-
-    // Get the base URL from runtime config (set via DEPLOY_TARGET env var)
-    const config = useRuntimeConfig()
-    const baseURL = config.app.baseURL || '/'
-
-    // If baseURL is just '/', return path as-is (custom domain)
-    if (baseURL === '/') return path
-
-    // For GitHub Pages, prepend the base URL
-    return `${baseURL.replace(/\/$/, '')}${path}`
-  }
+  const { resolveUrl } = useAssetUrl()
 
   // Computed properties for config values
   const bandName = computed(() => getConfig('general.bandName'))
@@ -410,7 +397,7 @@
     if (spotifyUrl) {
       platforms.push({
         name: 'Spotify',
-        icon: resolveAssetPath('/assets/images/icons/spotify-icon.svg'),
+        icon: resolveUrl('/assets/images/icons/spotify-icon.svg'),
         url: spotifyUrl
       })
     }
@@ -418,7 +405,7 @@
     if (appleMusicUrl) {
       platforms.push({
         name: 'Apple Music',
-        icon: resolveAssetPath('/assets/images/icons/apple-music-icon.svg'),
+        icon: resolveUrl('/assets/images/icons/apple-music-icon.svg'),
         url: appleMusicUrl
       })
     }
@@ -426,7 +413,7 @@
     if (youtubeMusicUrl) {
       platforms.push({
         name: 'YouTube Music',
-        icon: resolveAssetPath('/assets/images/icons/youtube-music-icon.svg'),
+        icon: resolveUrl('/assets/images/icons/youtube-music-icon.svg'),
         url: youtubeMusicUrl
       })
     }

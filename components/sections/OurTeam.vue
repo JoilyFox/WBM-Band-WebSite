@@ -86,44 +86,51 @@
   const modules = [Navigation]
 
   // Placeholder team data
-  const teamMembers = [
-    {
-      id: 1,
-      name: 'Member 1',
-      role: 'Vocals',
-      image: '/images/optimized/about-us-images/DSC02185.avif' // Using existing images for now
-    },
-    {
-      id: 2,
-      name: 'Member 2',
-      role: 'Guitar',
-      image: '/images/optimized/about-us-images/DSC02209-2.avif'
-    },
-    {
-      id: 3,
-      name: 'Member 3',
-      role: 'Bass',
-      image: '/images/optimized/about-us-images/DSC02213-2.avif'
-    },
-    {
-      id: 4,
-      name: 'Member 4',
-      role: 'Drums',
-      image: '/images/optimized/about-us-images/DSC02256.avif'
-    },
-    {
-      id: 5,
-      name: 'Member 5',
-      role: 'Keys',
-      image: '/images/optimized/about-us-images/DSC02268.avif'
-    },
-    {
-      id: 6,
-      name: 'Member 6',
-      role: 'Tech',
-      image: '/images/optimized/about-us-images/DSC02277.avif'
-    }
-  ]
+  // Placeholder team data
+  const { resolveUrl } = useAssetUrl()
+  const teamMembers = computed(() => {
+    return [
+      {
+        id: 1,
+        name: 'Member 1',
+        role: 'Vocals',
+        image: '/images/optimized/about-us-images/DSC02185.avif'
+      },
+      {
+        id: 2,
+        name: 'Member 2',
+        role: 'Guitar',
+        image: '/images/optimized/about-us-images/DSC02209-2.avif'
+      },
+      {
+        id: 3,
+        name: 'Member 3',
+        role: 'Bass',
+        image: '/images/optimized/about-us-images/DSC02213-2.avif'
+      },
+      {
+        id: 4,
+        name: 'Member 4',
+        role: 'Drums',
+        image: '/images/optimized/about-us-images/DSC02256.avif'
+      },
+      {
+        id: 5,
+        name: 'Member 5',
+        role: 'Keys',
+        image: '/images/optimized/about-us-images/DSC02268.avif'
+      },
+      {
+        id: 6,
+        name: 'Member 6',
+        role: 'Tech',
+        image: '/images/optimized/about-us-images/DSC02277.avif'
+      }
+    ].map((member) => ({
+      ...member,
+      image: resolveUrl(member.image)
+    }))
+  })
 </script>
 
 <style scoped lang="scss">

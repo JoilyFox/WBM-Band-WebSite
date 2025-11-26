@@ -7,7 +7,7 @@
     <!-- Background Images Slider -->
     <div class="hero-slider-container">
       <div
-        v-for="(image, index) in heroImages"
+        v-for="(image, index) in resolvedHeroImages"
         :key="image.src"
         class="hero-slide"
         :class="{
@@ -187,6 +187,15 @@
     slideChange: [index: number]
   }>()
 
+  // Resolve hero image URLs
+  const { resolveUrl } = useAssetUrl()
+  const resolvedHeroImages = computed(() => {
+    return props.heroImages.map((img) => ({
+      ...img,
+      src: resolveUrl(img.src)
+    }))
+  })
+
   // Hero slider functionality
   const {
     currentIndex,
@@ -200,7 +209,7 @@
     transition,
     interval,
     progressKey
-  } = useHeroSlider(props.heroImages, {
+  } = useHeroSlider(resolvedHeroImages.value, {
     autoPlay: props.autoPlay,
     interval: props.interval,
     transition: props.transition,

@@ -136,32 +136,20 @@
   const blurPlaceholder = ref('')
 
   // Generate picture sources for different formats
+  const { resolveUrl } = useAssetUrl()
   const pictureSources = computed(() => {
-    // Get base URL from Nuxt runtime config
-    const config = useRuntimeConfig()
-
-    // Always use configured baseURL (works in dev and prod)
-    const baseURL = config.app?.baseURL || '/'
-
     const sources = generatePictureSources(props.src, props.sizes, props.preset)
-
-    // Add base URL to all sources if not already present
-    const addBaseURL = (path: string) => {
-      if (path.startsWith('http') || path.startsWith('//')) return path
-      if (baseURL === '/') return path
-      return path.startsWith(baseURL) ? path : baseURL.replace(/\/$/, '') + path
-    }
 
     return {
       avifSource: {
         ...sources.avifSource,
-        srcset: addBaseURL(sources.avifSource.srcset)
+        srcset: resolveUrl(sources.avifSource.srcset)
       },
       webpSource: {
         ...sources.webpSource,
-        srcset: addBaseURL(sources.webpSource.srcset)
+        srcset: resolveUrl(sources.webpSource.srcset)
       },
-      fallbackSrc: addBaseURL(sources.fallbackSrc)
+      fallbackSrc: resolveUrl(sources.fallbackSrc)
     }
   })
 

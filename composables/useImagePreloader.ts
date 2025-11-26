@@ -2,13 +2,15 @@
  * Composable for managing image preloading and performance optimization
  */
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, readonly } from 'vue'
 import { preloadCriticalImages } from '~/utils/imageHelpers'
+import { useAssetUrl } from './useAssetUrl'
 
 export function useImagePreloader() {
   const isPreloading = ref(false)
   const preloadedImages = ref<string[]>([])
   const preloadErrors = ref<string[]>([])
+  const { resolveUrl } = useAssetUrl()
 
   /**
    * Preload hero images for immediate display
@@ -20,7 +22,7 @@ export function useImagePreloader() {
     isPreloading.value = true
 
     try {
-      const imageSources = heroImages.map((img) => img.src)
+      const imageSources = heroImages.map((img) => resolveUrl(img.src))
       const preloadPromises = preloadCriticalImages(imageSources, 'high')
 
       // Wait for the first image to load (critical for LCP)
@@ -53,7 +55,7 @@ export function useImagePreloader() {
     if (!albumImages.length) return
 
     try {
-      const criticalImages = albumImages.slice(0, maxImages)
+      const criticalImages = albumImages.slice(0, maxImages).map((src) => resolveUrl(src))
       const preloadPromises = preloadCriticalImages(criticalImages, 'medium')
 
       Promise.allSettled(preloadPromises).then((results) => {
