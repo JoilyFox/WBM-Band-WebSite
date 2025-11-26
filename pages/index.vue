@@ -10,14 +10,16 @@
       @show-more="handleShowAllMusic"
     />
 
-    <!-- About Us Section -->
-    <SectionsAboutUsSection />
+    <CommonGradientSectionWrapper>
+      <!-- About Us Section -->
+      <SectionsAboutUsSection />
 
-    <!-- Contacts Section -->
-    <SectionsContactsSection />
+      <!-- Our Team Section (Subsection of About Us) -->
+      <SectionsOurTeam />
 
-    <!-- Team Background Section (placeholder) -->
-    <!-- <SectionsTeamSection /> -->
+      <!-- Contacts Section -->
+      <SectionsContactsSection />
+    </CommonGradientSectionWrapper>
 
     <!-- Music Detail Modal -->
     <MusicDetailModal

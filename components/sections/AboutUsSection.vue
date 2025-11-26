@@ -76,9 +76,6 @@
         </div>
       </div>
     </CommonContainer>
-
-    <!-- Background Grain Layer -->
-    <div class="grain-layer" aria-hidden="true"></div>
   </section>
 </template>
 
@@ -225,48 +222,15 @@
 </script>
 
 <style scoped lang="scss">
-  /* Copy background styles from TeamSection */
+  @use '~/assets/css/components/swiper-navigation.scss' as swp;
+
   .about-bg-section {
     min-height: 75vh;
     display: block;
     position: relative;
     isolation: isolate;
-    /* Extended vertical gradient: lengthened intermediate stops for smoother ramp */
-    background:
-      linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.95) 0%,
-        rgba(8, 8, 9, 0.88) 120px,
-        rgba(16, 16, 17, 0.78) 280px,
-        rgba(24, 24, 26, 0.68) 480px,
-        rgba(32, 32, 35, 0.58) 680px,
-        rgba(38, 38, 42, 0.5) 100%
-      ),
-      /* vertical fade starting from top */
-        linear-gradient(
-          140deg,
-          rgba(14, 14, 15, 0.95) 0%,
-          rgba(18, 18, 20, 0.85) 40%,
-          rgba(24, 24, 26, 0.78) 75%,
-          rgba(30, 30, 32, 0.72) 100%
-        ),
-      /* diagonal depth */
-        radial-gradient(circle at 24% 30%, rgba(255, 255, 255, 0.07), transparent 62%),
-      radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.055), transparent 68%),
-      #070707;
-    background-blend-mode: normal, overlay, overlay, overlay, normal;
     overflow: hidden;
-  }
-
-  /* Static fine grain texture */
-  .grain-layer {
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.028'/%3E%3C/svg%3E");
-    pointer-events: none;
-    opacity: 0.5;
-    mix-blend-mode: overlay;
-    z-index: 1;
+    overflow: hidden;
   }
 
   /* Swiper Container Styling */
@@ -310,15 +274,7 @@
   /* Custom Navigation Buttons */
   :deep(.swiper-button-prev),
   :deep(.swiper-button-next) {
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-    opacity: 0;
+    @include swp.swiper-nav-button;
   }
 
   :deep(.swiper-button-prev) {
@@ -334,31 +290,16 @@
     height: 16px !important;
   }
 
+  /* Show buttons on hover */
   .about-swiper:hover :deep(.swiper-button-prev),
   .about-swiper:hover :deep(.swiper-button-next) {
     opacity: 1;
   }
 
-  :deep(.swiper-button-prev:hover),
-  :deep(.swiper-button-next:hover) {
-    background: rgba(255, 255, 255, 0.95);
-    color: #000;
-    border-color: rgba(255, 255, 255, 0.8);
-    transform: scale(1.15);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  }
-
-  :deep(.swiper-button-disabled) {
-    opacity: 0.2 !important;
-    cursor: not-allowed;
-  }
-
-  :deep(.swiper-button-prev:hover:disabled),
-  :deep(.swiper-button-next:hover:disabled) {
-    transform: scale(1);
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    box-shadow: none;
+  /* Dim disabled buttons on hover */
+  .about-swiper:hover :deep(.swiper-button-prev.swiper-button-disabled),
+  .about-swiper:hover :deep(.swiper-button-next.swiper-button-disabled) {
+    opacity: 0.2;
   }
 
   /* Custom Pagination Dots */
