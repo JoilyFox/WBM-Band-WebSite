@@ -397,6 +397,7 @@
     color: white;
     font-size: 1.25rem;
     font-weight: 700;
+    line-height: 1.35;
     margin-bottom: 0.25rem;
     transform: translateY(10px);
     transition: transform 0.3s ease 0.1s;
