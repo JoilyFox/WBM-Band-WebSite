@@ -2,7 +2,7 @@
   <section id="contacts" class="contacts-bg-section relative overflow-hidden">
     <CommonContainer size="xl" padding="md">
       <!-- Header -->
-      <div class="relative z-10 mt-20 mb-8 md:mb-10 text-center">
+      <div class="relative z-10 mt-12 md:mt-24 mb-8 md:mb-10 text-center">
         <CommonSectionTitle :level="2" size="xl" align="center">
           {{ t('contacts.section_title') }}
         </CommonSectionTitle>
