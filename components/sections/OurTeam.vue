@@ -53,6 +53,8 @@
               :member="member"
               :index="index"
               :initial-image="member.image"
+              :data-index="index"
+              class="team-card-animate"
             />
           </SwiperSlide>
         </Swiper>
@@ -124,10 +126,39 @@
   // Use auto-rotation control composable
   const { setupObserver } = useAutoRotationControl(sectionRef, memberCardRefs)
 
+  /**
+   * Setup animation observer for scroll-based fade-in effects
+   */
+  const setupAnimationObserver = () => {
+    if (!import.meta.client) return
+
+    const cards = document.querySelectorAll('.team-card-animate')
+    if (!cards.length) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-in')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      }
+    )
+
+    cards.forEach((card) => observer.observe(card))
+  }
+
   // Lifecycle hooks
   onMounted(() => {
     sectionRef.value = document.getElementById('our-team')
     setupObserver()
+    // Small delay to ensure DOM is ready
+    setTimeout(() => setupAnimationObserver(), 100)
   })
 </script>
 
@@ -240,6 +271,27 @@
     .swiper-button-prev-custom,
     .swiper-button-next-custom {
       display: none;
+    }
+  }
+
+  /* Scroll animations for team cards */
+  .team-card-animate {
+    opacity: 0;
+    transform: translateY(15px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease;
+
+    &.animate-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Staggered animation delays based on index */
+    @for $i from 0 through 10 {
+      &[data-index='#{$i}'] {
+        transition-delay: #{$i * 0.1}s;
+      }
     }
   }
 </style>
