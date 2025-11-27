@@ -296,7 +296,13 @@
   },
   "team": {
     "section_title": "Our Team",
-    "section_subtitle": "The creative people shaping the WBM sound."
+    "section_subtitle": "The creative people shaping the WBM sound.",
+    "members": {
+      "bohdan": {
+        "name": "Bohdan",
+        "role": "Solo Guitarist"
+      }
+    }
   },
   "about": {
     "section_title": "About Us",

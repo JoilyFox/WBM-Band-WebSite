@@ -4,7 +4,7 @@
       <!-- Current visible image -->
       <img
         :src="currentImage"
-        :alt="member.name"
+        :alt="$t(member.nameKey)"
         class="member-image image-visible"
         loading="lazy"
       />
@@ -12,15 +12,15 @@
       <img
         v-if="nextImage"
         :src="nextImage"
-        :alt="member.name"
+        :alt="$t(member.nameKey)"
         class="member-image member-image-next"
         :class="{ 'image-visible': isTransitioning }"
         loading="lazy"
       />
       <div class="member-overlay">
         <div class="member-info">
-          <h4 class="member-name">{{ member.name }}</h4>
-          <p class="member-role">{{ member.role }}</p>
+          <h3 class="member-name">{{ $t(member.nameKey) }}</h3>
+          <p class="member-role">{{ $t(member.roleKey) }}</p>
         </div>
       </div>
     </div>

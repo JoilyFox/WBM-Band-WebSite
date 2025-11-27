@@ -299,7 +299,13 @@
   },
   "team": {
     "section_title": "Наша команда",
-    "section_subtitle": "Творчі люди, які формують звучання WBM."
+    "section_subtitle": "Творчі люди, які формують звучання WBM.",
+    "members": {
+      "bohdan": {
+        "name": "Богдан",
+        "role": "Соло-гітарист"
+      }
+    }
   },
   "about": {
     "section_title": "Про нас",
