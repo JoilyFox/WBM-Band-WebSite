@@ -36,6 +36,12 @@ const COMPRESSION_SETTINGS = {
     quality: 85,
     formats: ['avif', 'webp', 'jpg']
   },
+  team: {
+    width: 800,
+    height: 800,
+    quality: 85,
+    formats: ['avif', 'webp', 'jpg']
+  },
   meta: {
     width: 1200,
     height: 630,
@@ -56,6 +62,7 @@ async function createOptimizedDir() {
     await fs.mkdir(path.join(OUTPUT_DIR, 'hero-images'), { recursive: true })
     await fs.mkdir(path.join(OUTPUT_DIR, 'albums-images'), { recursive: true })
     await fs.mkdir(path.join(OUTPUT_DIR, 'about-us-images'), { recursive: true })
+    await fs.mkdir(path.join(OUTPUT_DIR, 'our-team'), { recursive: true })
     await fs.mkdir(path.join(OUTPUT_DIR, 'meta-images'), { recursive: true })
   } catch (error) {
     console.error('Error creating directories:', error)
@@ -161,6 +168,34 @@ async function processImages() {
     }
   } catch (error) {
     console.log('No about-us images found or error processing:', error.message)
+  }
+
+  // Process team images (with subdirectories for each member)
+  console.log('\n👥 Processing team member images...')
+  const teamDir = path.join(INPUT_DIR, 'our-team')
+  try {
+    const teamMembers = await fs.readdir(teamDir)
+
+    for (const member of teamMembers) {
+      const memberPath = path.join(teamDir, member)
+      const stats = await fs.stat(memberPath)
+
+      if (stats.isDirectory()) {
+        console.log(`  Processing ${member}...`)
+        const memberFiles = await fs.readdir(memberPath)
+        const outputMemberDir = path.join(OUTPUT_DIR, 'our-team', member)
+        await fs.mkdir(outputMemberDir, { recursive: true })
+
+        for (const file of memberFiles) {
+          if (file.match(/\.(jpg|jpeg|png)$/i)) {
+            const inputPath = path.join(memberPath, file)
+            await compressImage(inputPath, outputMemberDir, file, COMPRESSION_SETTINGS.team)
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.log('No team images found or error processing:', error.message)
   }
 
   // Process meta images

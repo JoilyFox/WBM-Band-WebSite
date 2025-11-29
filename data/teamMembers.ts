@@ -15,11 +15,11 @@ export const teamMembers: TeamMember[] = [
     id: 1,
     nameKey: 'team.members.bohdan.name',
     roleKey: 'team.members.bohdan.role',
-    mainImages: ['/images/our-team/bohdan/main-1.jpg'],
+    mainImages: ['/images/optimized/our-team/bohdan/main-1.jpg'],
     hoverImages: [
-      '/images/our-team/bohdan/hover-1.jpg',
-      '/images/our-team/bohdan/hover-2.jpg',
-      '/images/our-team/bohdan/hover-3.jpg'
+      '/images/optimized/our-team/bohdan/hover-1.jpg',
+      '/images/optimized/our-team/bohdan/hover-2.jpg',
+      '/images/optimized/our-team/bohdan/hover-3.jpg'
     ]
   }
 ]
