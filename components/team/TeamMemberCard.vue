@@ -139,9 +139,13 @@
         return
       }
 
-      const hoverImage = resolveUrl(
-        selectRandomImage(props.member.hoverImages, lastHoverImage.value || undefined)
-      )
+      // Resolve all hover images first
+      const resolvedHoverImages = Array.isArray(props.member.hoverImages)
+        ? props.member.hoverImages.map((img) => resolveUrl(img))
+        : [resolveUrl(props.member.hoverImages)]
+
+      // Select random image, excluding the last one shown
+      const hoverImage = selectRandomImage(resolvedHoverImages, lastHoverImage.value || undefined)
 
       lastHoverImage.value = hoverImage
       changeImage(hoverImage)
