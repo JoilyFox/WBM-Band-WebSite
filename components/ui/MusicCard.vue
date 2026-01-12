@@ -124,7 +124,8 @@
 
     /* Smaller text on mobile */
     .music-card h3 {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
+      margin-bottom: -0.1rem;
     }
 
     .music-card p {

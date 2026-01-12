@@ -39,20 +39,16 @@
 
                 <!-- Custom Pre-save Badge (override the default type badge) -->
                 <div v-if="shouldShowPreSaveCard" class="absolute top-2 left-2 z-40">
-                  <span
-                    class="badge-presave px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md"
-                  >
+                  <UiAppBadge variant="glass">
                     {{ t('music.presave.card_title_fallback').toUpperCase() }}
-                  </span>
+                  </UiAppBadge>
                 </div>
 
                 <!-- New Release Badge for preview mode -->
                 <div v-else class="absolute top-2 left-2 z-40">
-                  <span
-                    class="badge-glass px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md"
-                  >
+                  <UiAppBadge variant="glass">
                     {{ t('music.new_release.card_title_fallback').toUpperCase() }}
-                  </span>
+                  </UiAppBadge>
                 </div>
               </div>
 
@@ -61,7 +57,12 @@
 
               <!-- Text content layered above overlay -->
               <div :class="shouldShowPreSaveCard ? 'presave-info' : 'new-release-info'">
-                <div :class="shouldShowPreSaveCard ? 'presave-icon' : 'new-release-icon'">
+                <div
+                  :class="[
+                    shouldShowPreSaveCard ? 'presave-icon' : 'new-release-icon',
+                    { 'has-date': !!upcomingReleaseData?.releaseDate }
+                  ]"
+                >
                   <i :class="shouldShowPreSaveCard ? 'pi pi-bookmark' : 'pi pi-calendar'"></i>
                 </div>
                 <h3 :class="shouldShowPreSaveCard ? 'presave-title' : 'new-release-title'">
@@ -789,8 +790,11 @@
     transition: all $hover-duration $hover-easing;
 
     @media (max-width: 767px) {
-      margin-top: 8px;
       font-size: 1.6rem !important;
+
+      &.has-date {
+        margin-top: 1rem;
+      }
     }
   }
 
@@ -803,8 +807,12 @@
     @include text-shadow-medium;
     transition: all $hover-duration $hover-easing;
     line-height: 1.5;
-    margin-bottom: 0.1rem;
+    margin-bottom: 0.2rem;
     white-space: nowrap;
+
+    @media (max-width: 767px) {
+      font-size: 1rem !important;
+    }
   }
 
   /* Keep title static on hover */
@@ -812,9 +820,13 @@
   .new-release-date {
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.875rem;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.1rem;
     @include text-shadow-light;
     transition: all $hover-duration $hover-easing;
+
+    @media (max-width: 767px) {
+      font-size: 0.8rem !important;
+    }
   }
 
   .new-release-days {
@@ -824,6 +836,10 @@
     margin-bottom: 0.5rem;
     @include text-shadow-light;
     transition: all $hover-duration $hover-easing;
+
+    @media (max-width: 767px) {
+      font-size: 0.725rem !important;
+    }
   }
 
   /* Keep date static on hover */
@@ -957,6 +973,12 @@
     font-size: 1.875rem;
     transition: all $hover-duration $hover-easing;
     filter: drop-shadow(0 4px 12px rgba(168, 85, 247, 0.3));
+
+    @media (max-width: 767px) {
+      &.has-date {
+        margin-top: 1rem;
+      }
+    }
   }
 
   .presave-title {
@@ -1081,22 +1103,5 @@
     .presave-content:active {
       transform: none !important;
     }
-  }
-
-  /* Badge styles for pre-save and new release cards */
-  .badge-presave {
-    background: rgba(0, 0, 0, 0.7) !important;
-    color: white !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  }
-
-  .badge-glass {
-    background: rgba(0, 0, 0, 0.7) !important;
-    color: white !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   }
 </style>

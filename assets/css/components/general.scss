@@ -1,5 +1,6 @@
 /* General Component Styles */
 @layer components {
+
   /* Card component */
   .card {
     @apply bg-surface-900 rounded-xl shadow-sm border border-surface-800 p-6;

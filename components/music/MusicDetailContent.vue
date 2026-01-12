@@ -180,14 +180,11 @@
           />
           <!-- Release Type Badge -->
           <div class="music-badge absolute top-4 left-4 z-10">
-            <span
-              :class="badgeClass"
-              class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md"
-            >
+            <UiAppBadge :variant="badgeVariant">
               {{
                 isPreSave ? t('music.presave.card_title_fallback').toUpperCase() : displayTypeName
               }}
-            </span>
+            </UiAppBadge>
           </div>
         </div>
         <div class="music-info flex-1 min-w-0 text-center md:text-left">
@@ -543,19 +540,13 @@
     return orderedPlatforms
   })
 
-  const badgeClass = computed(() => {
-    // Use pre-save badge if in pre-save mode
-    if (props.isPreSave) {
-      return 'badge-presave'
-    }
-
-    const typeClasses = {
-      single: 'badge-single',
-      album: 'badge-album',
-      ep: 'badge-ep',
-      'new release': 'badge-new'
-    }
-    return typeClasses[props.release.type] || 'badge-default'
+  const badgeVariant = computed(() => {
+    if (props.isPreSave) return 'presave'
+    const type = props.release.type.toLowerCase()
+    if (type === 'single') return 'single'
+    if (type === 'album') return 'album'
+    if (type === 'ep') return 'ep'
+    return 'glass'
   })
 
   const releaseDescriptionKey = computed(
@@ -579,7 +570,11 @@
     return ssrFallback
   })
 
-  function formatDate(dateString: string, options: { includeYear?: boolean } = {}): string {
+  function formatDate(
+    dateString: string | undefined,
+    options: { includeYear?: boolean } = {}
+  ): string {
+    if (!dateString) return ''
     const date = new Date(dateString)
     const currentLocale = locale.value === 'ua' ? 'uk-UA' : 'en-US'
     const includeYear = options.includeYear !== false
@@ -1369,56 +1364,6 @@
     left: 1rem;
     z-index: 10;
   }
-  .music-badge span {
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(var(--perf-blur-strength, 0px));
-    -webkit-backdrop-filter: blur(var(--perf-blur-strength, 0px));
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow:
-      0 4px 12px rgba(0, 0, 0, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  }
-
-  /* Enhanced background for low-performance devices without blur */
-  .no-backdrop-blur .music-badge span {
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-
-  /* Badge color variants */
-  .badge-presave {
-    background: linear-gradient(
-      135deg,
-      rgba(168, 85, 247, 0.5),
-      rgba(236, 72, 153, 0.5)
-    ) !important;
-    border-color: rgba(255, 255, 255, 0.35) !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  }
-
-  .badge-single {
-    background: rgba(59, 130, 246, 0.4) !important;
-  }
-
-  .badge-album {
-    background: rgba(139, 92, 246, 0.4) !important;
-  }
-
-  .badge-ep {
-    background: rgba(236, 72, 153, 0.4) !important;
-  }
-
-  .badge-new {
-    background: rgba(34, 197, 94, 0.4) !important;
-  }
-
   /* Title + text animation only */
   .animate-titleGlow {
     animation: titleGlow 5s ease-in-out infinite alternate;

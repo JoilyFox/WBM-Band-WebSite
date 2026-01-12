@@ -39,10 +39,10 @@
     </div>
 
     <!-- Release Type Badge -->
-    <div v-if="showBadge" class="absolute top-2 left-2 z-30">
-      <span :class="badgeClass" class="badge-glass">
+    <div v-if="showBadge" class="absolute top-2 left-2 z-20">
+      <UiAppBadge :variant="badgeVariant">
         {{ displayTypeName }}
-      </span>
+      </UiAppBadge>
     </div>
   </div>
 </template>
@@ -67,10 +67,12 @@
 
   const imageError = ref(false)
 
-  const badgeClass = computed(() => {
-    // For now, using dark badge (works well on most album covers)
-    // Could be enhanced later with image analysis for smart contrast
-    return 'badge-contrast'
+  const badgeVariant = computed(() => {
+    const type = (props.releaseType || '').toString().toLowerCase()
+    if (type === 'single') return 'single'
+    if (type === 'album') return 'album'
+    if (type === 'ep') return 'ep'
+    return 'glass'
   })
 
   const displayTypeName = computed(() => {
@@ -100,36 +102,6 @@
 </script>
 
 <style scoped>
-  /* Glass morphism badge styles */
-  .badge-glass {
-    padding: 0.375rem 0.75rem;
-    border-radius: 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow:
-      0 4px 12px rgba(0, 0, 0, 0.25),
-      0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Badge type specific styles - smart contrast */
-  .badge-contrast {
-    background: rgba(0, 0, 0, 0.7);
-    color: rgba(255, 255, 255, 0.95);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  }
-
-  /* Alternative light badge for dark backgrounds (future enhancement) */
-  .badge-light {
-    background: rgba(255, 255, 255, 0.9);
-    color: rgba(0, 0, 0, 0.9);
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
-  }
-
   /* Ensure perfect circle for play button */
   .rounded-full {
     border-radius: 50%;
