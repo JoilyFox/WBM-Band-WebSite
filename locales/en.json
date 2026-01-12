@@ -258,7 +258,8 @@
     },
     "new_release": {
       "card_title_fallback": "New Release",
-      "coming_prefix": "Release {date}"
+      "coming_prefix": "Release {date}",
+      "coming_soon": "Coming Soon!"
     },
     "presave": {
       "card_title_fallback": "Pre-save",
@@ -292,6 +293,10 @@
     "mania": {
       "title": "Mania",
       "description": "This is a song about the thin line between love and obsession, between real feelings and the destructive urge to possess an abstract image."
+    },
+    "chorni_ptahy": {
+      "title": "Chorni Ptahy",
+      "description": "Our upcoming single. Stay tuned for more details!"
     }
   },
   "team": {

@@ -97,7 +97,8 @@ export const formatReleaseDate = (dateString: string, locale: string = 'en-US'):
  * Helper function to check if release date is in the future
  * Supports ISO 8601 format with optional time: 'YYYY-MM-DD', 'YYYY-MM-DDTHH:mm:ss', 'YYYY-MM-DDTHH:mm:ssZ'
  */
-export const isUpcomingRelease = (dateString: string): boolean => {
+export const isUpcomingRelease = (dateString?: string): boolean => {
+  if (!dateString) return true // No date means it's coming (TBA)
   const releaseDate = new Date(dateString)
   const now = new Date()
   return releaseDate > now

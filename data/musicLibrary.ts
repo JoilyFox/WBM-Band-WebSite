@@ -5,7 +5,7 @@ export interface MusicRelease {
   /** i18n key for localized title; falls back to slug-based default when omitted */
   titleKey?: string
   type: 'single' | 'album' | 'ep' | 'new release'
-  releaseDate: string // ISO 8601 format: 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:mm:ss' or 'YYYY-MM-DDTHH:mm:ssZ'
+  releaseDate?: string // ISO 8601 format: 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:mm:ss' or 'YYYY-MM-DDTHH:mm:ssZ'
   imageUrl: string
   blurredImageUrl?: string
   description?: string
@@ -42,13 +42,28 @@ export interface MusicRelease {
 export const musicLibrary: MusicRelease[] = [
   {
     id: '2',
+    slug: 'chorni-ptahy',
+    title: 'Чорні Птахи',
+    titleKey: 'releases.chorni_ptahy.title',
+    type: 'single',
+    // releaseDate: '2026-02-06T00:00:00Z',
+    imageUrl: '/images/optimized/albums-images/chorni-ptahy/cover.avif',
+    blurredImageUrl: '/images/albums-images/chorni-ptahy/cover-blurred.jpg',
+    description: 'New upcoming single.',
+    descriptionKey: 'releases.chorni_ptahy.description',
+    featured: true,
+    musicPlatformLinks: {},
+    preSaveMusicPlatformLinks: {} // No links yet, just preview
+  },
+  {
+    id: '1',
     slug: 'mania',
     title: 'Mania',
     titleKey: 'releases.mania.title',
     type: 'single',
     releaseDate: '2025-11-14T12:00:00Z',
-    imageUrl: '/images/optimized/albums-images/mania-cover.avif',
-    blurredImageUrl: '/images/albums-images/mania-cover-blurred.jpg',
+    imageUrl: '/images/optimized/albums-images/mania/cover.avif',
+    blurredImageUrl: '/images/albums-images/mania/cover-blurred.jpg',
     description: 'A high-voltage single blending modern rock energy with cinematic synth layers.',
     descriptionKey: 'releases.mania.description',
     featured: true,
@@ -75,9 +90,14 @@ export const getFeaturedReleases = (): MusicRelease[] => {
   return musicLibrary.filter((release) => release.featured)
 }
 
+// Releases without a date should be considered "newest" / far future
+const getReleaseTime = (date?: string) => {
+  return date ? new Date(date).getTime() : 8640000000000000 // Max safe timestamp
+}
+
 export const getLatestReleases = (limit: number = 4): MusicRelease[] => {
   return musicLibrary
-    .sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime())
+    .sort((a, b) => getReleaseTime(b.releaseDate) - getReleaseTime(a.releaseDate))
     .slice(0, limit)
 }
 
@@ -86,9 +106,7 @@ export const getReleasesByType = (type: MusicRelease['type']): MusicRelease[] =>
 }
 
 export const getAllReleases = (): MusicRelease[] => {
-  return musicLibrary.sort(
-    (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
-  )
+  return musicLibrary.sort((a, b) => getReleaseTime(b.releaseDate) - getReleaseTime(a.releaseDate))
 }
 
 export const getReleaseBySlug = (slug: string): MusicRelease | undefined => {
@@ -108,16 +126,17 @@ export const getNearestUpcomingPreSaveRelease = (): MusicRelease | undefined => 
 
   // Filter releases that are upcoming and have pre-save links
   const upcomingWithPreSave = musicLibrary.filter((release) => {
-    const releaseDate = new Date(release.releaseDate).getTime()
+    // If no release date, it's definitely in future, but we check if it has links
+    const releaseTime = getReleaseTime(release.releaseDate)
     const hasPreSaveLinks =
       release.preSaveMusicPlatformLinks && Object.keys(release.preSaveMusicPlatformLinks).length > 0
-    return releaseDate > now && hasPreSaveLinks
+    return releaseTime > now && hasPreSaveLinks
   })
 
   // Sort by release date (nearest first) and return the first one
   if (upcomingWithPreSave.length === 0) return undefined
 
   return upcomingWithPreSave.sort((a, b) => {
-    return new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime()
+    return getReleaseTime(a.releaseDate) - getReleaseTime(b.releaseDate)
   })[0]
 }

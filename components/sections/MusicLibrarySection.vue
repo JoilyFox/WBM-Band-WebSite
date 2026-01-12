@@ -231,6 +231,10 @@
     if (upcoming.length === 0) return null
 
     return upcoming.reduce((nearest, current) => {
+      // If one has date and other doesn't, the one without date is "further" in future (TBA)
+      if (!nearest.releaseDate) return nearest
+      if (!current.releaseDate) return current
+
       const nearestDate = new Date(nearest.releaseDate)
       const currentDate = new Date(current.releaseDate)
       return currentDate < nearestDate ? current : nearest
@@ -258,6 +262,14 @@
   const upcomingReleaseData = computed(() => {
     const release = upcomingRelease.value
     if (!release) return null
+
+    // If no release date, return release data with empty formatted date
+    if (!release.releaseDate) {
+      return {
+        ...release,
+        formattedDate: ''
+      }
+    }
 
     const date = new Date(release.releaseDate)
     const currentLocale = locale.value === 'ua' ? 'uk-UA' : 'en-US'
@@ -290,6 +302,11 @@
 
   // Build a stable "Coming {date}" label with fallback for SSR
   const upcomingReleaseComingText = computed(() => {
+    // If no date, show generic "Coming Soon" text
+    if (!upcomingReleaseData.value?.releaseDate) {
+      return t('music.new_release.coming_soon')
+    }
+
     const dateStr = upcomingReleaseData.value?.formattedDate || ''
     const key = shouldShowPreSaveCard.value
       ? 'music.presave.coming_prefix'
@@ -791,8 +808,13 @@
 
   .new-release-icon {
     color: rgba(255, 255, 255, 0.9);
-    font-size: 1.875rem;
+    font-size: 2rem;
     transition: all $hover-duration $hover-easing;
+
+    @media (max-width: 767px) {
+      margin-top: 8px;
+      font-size: 1.6rem !important;
+    }
   }
 
   /* No icon size/color change on hover to match other items */
@@ -803,6 +825,9 @@
     font-weight: 600;
     @include text-shadow-medium;
     transition: all $hover-duration $hover-easing;
+    line-height: 1.5;
+    margin-bottom: 0.1rem;
+    white-space: nowrap;
   }
 
   /* Keep title static on hover */

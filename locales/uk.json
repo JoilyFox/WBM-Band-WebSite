@@ -258,7 +258,8 @@
     },
     "new_release": {
       "card_title_fallback": "Новий реліз",
-      "coming_prefix": "Реліз {date}"
+      "coming_prefix": "Реліз {date}",
+      "coming_soon": "Незабаром!"
     },
     "presave": {
       "card_title_fallback": "Пресейв",
@@ -295,6 +296,10 @@
     "mania": {
       "title": "Манія",
       "description": "Це пісня про тонку межу між любов’ю та обсесією, між справжніми почуттями й руйнівним прагненням володіти вигаданим образом."
+    },
+    "chorni_ptahy": {
+      "title": "Чорні Птахи",
+      "description": "Наш майбутній сингл. Слідкуйте за новинами!"
     }
   },
   "team": {

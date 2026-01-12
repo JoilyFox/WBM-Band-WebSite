@@ -138,20 +138,30 @@ async function processImages() {
   // Process album images
   console.log('\n🎵 Processing album images...')
   const albumDir = path.join(INPUT_DIR, 'albums-images')
-  const albumFiles = await fs.readdir(albumDir)
 
-  for (const file of albumFiles) {
-    if (file.match(/\.(jpg|jpeg|png)$/i)) {
-      const inputPath = path.join(albumDir, file)
-      const outputDir = path.join(OUTPUT_DIR, 'albums-images')
-      await compressImage(inputPath, outputDir, file, COMPRESSION_SETTINGS.album)
+  async function processAlbumDirectory(dirPath, relativePath = '') {
+    const items = await fs.readdir(dirPath)
 
-      // Also create thumbnails
-      const thumbDir = path.join(OUTPUT_DIR, 'albums-images', 'thumbs')
-      await fs.mkdir(thumbDir, { recursive: true })
-      await compressImage(inputPath, thumbDir, file, COMPRESSION_SETTINGS.thumbnail)
+    for (const item of items) {
+      const itemPath = path.join(dirPath, item)
+      const stats = await fs.stat(itemPath)
+
+      if (stats.isDirectory()) {
+        await processAlbumDirectory(itemPath, path.join(relativePath, item))
+      } else if (item.match(/\.(jpg|jpeg|png)$/i)) {
+        const outputDir = path.join(OUTPUT_DIR, 'albums-images', relativePath)
+        await fs.mkdir(outputDir, { recursive: true })
+        await compressImage(itemPath, outputDir, item, COMPRESSION_SETTINGS.album)
+
+        // Also create thumbnails
+        const thumbDir = path.join(OUTPUT_DIR, 'albums-images', relativePath, 'thumbs')
+        await fs.mkdir(thumbDir, { recursive: true })
+        await compressImage(itemPath, thumbDir, item, COMPRESSION_SETTINGS.thumbnail)
+      }
     }
   }
+
+  await processAlbumDirectory(albumDir)
 
   // Process about-us images
   console.log('\n👥 Processing about-us images...')
