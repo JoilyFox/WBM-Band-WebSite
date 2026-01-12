@@ -107,7 +107,6 @@
               </div>
               <h3 class="coming-soon-title">{{ comingSoonTitle }}</h3>
               <p class="coming-soon-text">{{ comingSoonText }}</p>
-              <div class="coming-soon-shimmer"></div>
             </div>
           </div>
         </div>
@@ -472,18 +471,14 @@
   $fade-in-easing: ease-out;
   $hover-duration: 0.2s;
   $hover-easing: ease;
-  $shimmer-duration: 8s;
-  $shimmer-easing: ease-in-out;
 
   // Reusable mixins for common patterns
   @mixin card-fade-animation {
     opacity: 0;
-    transform: translateY(1rem) scale(0.98);
-    transition: all $fade-in-duration $fade-in-easing;
+    transition: opacity $fade-in-duration $fade-in-easing;
 
     &.show {
       opacity: 1;
-      transform: translateY(0) scale(1);
     }
   }
 
@@ -549,9 +544,7 @@
 
     &:hover {
       transform: translateY(-0.125rem);
-      box-shadow:
-        0 12px 40px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
     }
   }
 
@@ -676,22 +669,6 @@
     line-height: 1.5;
     max-width: 85%;
     @include text-shadow-light;
-  }
-
-  .coming-soon-shimmer {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(
-      45deg,
-      transparent 30%,
-      rgba(255, 255, 255, 0.1) 50%,
-      transparent 70%
-    );
-    transform: translateX(-100%) translateY(-100%) rotate(45deg);
-    animation: shimmer $shimmer-duration $shimmer-easing infinite;
   }
 
   /* New Release Preview */
@@ -869,18 +846,6 @@
   }
 
   /* Keep label static on hover */
-
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-100%) translateY(-100%) rotate(45deg);
-    }
-    10% {
-      transform: translateX(100%) translateY(100%) rotate(45deg);
-    }
-    100% {
-      transform: translateX(-100%) translateY(-100%) rotate(45deg);
-    }
-  }
 
   /* Pre-save Card (clickable, similar to new-release-preview but with different styling) */
   .presave-card {
@@ -1092,10 +1057,6 @@
     .card-base {
       transition-duration: ($fade-in-duration * 0.5);
       transform: translateY(0.5rem);
-    }
-
-    .coming-soon-shimmer {
-      animation: none;
     }
 
     .coming-soon-content:hover,

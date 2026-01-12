@@ -1,10 +1,5 @@
 <template>
   <div class="relative overflow-hidden rounded-xl bg-surface-800 aspect-square shadow-lg">
-    <!-- Hover Overlay (Desktop only) -->
-    <div
-      class="absolute inset-0 bg-gradient-to-br from-primary-600/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 hidden md:block"
-    ></div>
-
     <!-- Album Cover Image with Progressive Loading -->
     <UiProgressiveImage
       v-if="!imageError"
@@ -119,14 +114,6 @@
     box-shadow:
       0 4px 12px rgba(0, 0, 0, 0.25),
       0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .badge-glass:hover {
-    transform: scale(1.05);
-    box-shadow:
-      0 6px 16px rgba(0, 0, 0, 0.3),
-      0 3px 6px rgba(0, 0, 0, 0.15);
   }
 
   /* Badge type specific styles - smart contrast */
