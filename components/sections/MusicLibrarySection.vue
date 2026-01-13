@@ -38,14 +38,14 @@
                 />
 
                 <!-- Custom Pre-save Badge (override the default type badge) -->
-                <div v-if="shouldShowPreSaveCard" class="absolute top-2 left-2 z-40">
+                <div v-if="shouldShowPreSaveCard" class="absolute top-2 left-2 z-30">
                   <UiAppBadge variant="glass">
                     {{ t('music.presave.card_title_fallback').toUpperCase() }}
                   </UiAppBadge>
                 </div>
 
                 <!-- New Release Badge for preview mode -->
-                <div v-else class="absolute top-2 left-2 z-40">
+                <div v-else class="absolute top-2 left-2 z-30">
                   <UiAppBadge variant="glass">
                     {{ t('music.new_release.card_title_fallback').toUpperCase() }}
                   </UiAppBadge>
