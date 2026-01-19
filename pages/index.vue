@@ -15,7 +15,7 @@
       <SectionsAboutUsSection />
 
       <!-- Our Team Section (Subsection of About Us) -->
-      <SectionsOurTeam />
+      <!-- <SectionsOurTeam /> -->
 
       <!-- Contacts Section -->
       <SectionsContactsSection />
@@ -35,7 +35,6 @@
 <script setup lang="ts">
   import { onMounted, computed } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import { useLocalePath } from '#i18n'
   import { useSnackbar } from '~/composables/useSnackbar'
   import { useScrollTo } from '~/composables/useScrollTo'
   import { useImagePreloader } from '~/composables/useImagePreloader'
@@ -238,17 +237,8 @@
 
   // Event handlers for hero section
   const handleListenNow = () => {
-    // Check if device is mobile (screen width <= 768px)
-    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
-
-    if (isMobile && latestRelease.value) {
-      // On mobile, navigate to the latest release listen page
-      const localePath = useLocalePath()
-      navigateTo(localePath(`/listen/${latestRelease.value.slug}`))
-    } else {
-      // On desktop, scroll to music section
-      scrollToElement('music')
-    }
+    // Always scroll to music section on all devices
+    scrollToElement('music')
   }
 
   const handleTourDates = () => {
