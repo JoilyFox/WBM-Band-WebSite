@@ -46,7 +46,7 @@ export const musicLibrary: MusicRelease[] = [
     title: 'Чорні Птахи',
     titleKey: 'releases.chorni_ptahy.title',
     type: 'single',
-    // releaseDate: '2026-02-06T00:00:00Z',
+    releaseDate: '2026-02-06T00:00:00Z',
     imageUrl: '/images/optimized/albums-images/chorni-ptahy/cover.avif',
     blurredImageUrl: '/images/albums-images/chorni-ptahy/cover-blurred.jpg',
     description: 'New upcoming single.',
