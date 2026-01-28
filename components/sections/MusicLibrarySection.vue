@@ -972,11 +972,13 @@
 
   .presave-icon {
     color: rgba(255, 255, 255, 0.9);
-    font-size: 1.875rem;
+    font-size: 2rem;
     transition: all $hover-duration $hover-easing;
     filter: drop-shadow(0 4px 12px rgba(168, 85, 247, 0.3));
 
     @media (max-width: 767px) {
+      font-size: 1.6rem !important;
+
       &.has-date {
         margin-top: 1rem;
       }
@@ -987,16 +989,28 @@
     color: rgba(255, 255, 255, 0.95);
     font-size: 1.125rem;
     font-weight: 600;
+    white-space: nowrap;
     @include text-shadow-medium;
     transition: all $hover-duration $hover-easing;
+    line-height: 1.5;
+    margin-bottom: 0.2rem;
+
+    @media (max-width: 767px) {
+      font-size: 1rem !important;
+    }
   }
 
   .presave-date {
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.875rem;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.1rem;
     @include text-shadow-light;
+    white-space: nowrap;
     transition: all $hover-duration $hover-easing;
+
+    @media (max-width: 767px) {
+      font-size: 0.8rem !important;
+    }
   }
 
   .presave-days {
@@ -1006,6 +1020,10 @@
     margin-bottom: 0.5rem;
     @include text-shadow-light;
     transition: all $hover-duration $hover-easing;
+
+    @media (max-width: 767px) {
+      font-size: 0.725rem !important;
+    }
   }
 
   /* Show More Button */
