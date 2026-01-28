@@ -49,11 +49,11 @@ export const musicLibrary: MusicRelease[] = [
     releaseDate: '2026-02-06T00:00:00Z',
     imageUrl: '/images/optimized/albums-images/chorni-ptahy/cover.avif',
     blurredImageUrl: '/images/albums-images/chorni-ptahy/cover-blurred.jpg',
-    description: 'New upcoming single.',
     descriptionKey: 'releases.chorni_ptahy.description',
     featured: true,
     musicPlatformLinks: {},
-    preSaveMusicPlatformLinks: {} // No links yet, just preview
+    useDistributorPreSave: true,
+    distributorPreSaveUrl: 'https://artists.landr.com/057914578996'
   },
   {
     id: '1',
@@ -64,7 +64,6 @@ export const musicLibrary: MusicRelease[] = [
     releaseDate: '2025-11-14T12:00:00Z',
     imageUrl: '/images/optimized/albums-images/mania/cover.avif',
     blurredImageUrl: '/images/albums-images/mania/cover-blurred.jpg',
-    description: 'A high-voltage single blending modern rock energy with cinematic synth layers.',
     descriptionKey: 'releases.mania.description',
     featured: true,
     musicPlatformLinks: {
@@ -73,13 +72,11 @@ export const musicLibrary: MusicRelease[] = [
         'https://music.apple.com/ua/album/1849021879?app=music&at=1l3vpUI&ct=LFV_42c959c7fa393b8da43ecd14d3420636&itscg=30440&itsct=catchall_p1&lId=214367132&cId=none&sr=1&src=Linkfire&ls=1',
       youtubeMusic:
         'https://music.youtube.com/playlist?list=OLAK5uy_kYiOPbe8RWJzftzhv3KjQHg6gsR_aa8HQ&src=Linkfire&lId=d0225857-ffa6-4866-94dd-63ec2394cfd0&cId=d3d58fd7-4c47-11e6-9fd0-066c3e7a8751',
-      // tidal: 'https://tidal.com/browse/album/example1',
       amazonMusic:
         'https://music.amazon.com/albums/B0FXYHVS59?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_O0FTj6Yaw48FAewockBknpO7w',
       deezer: 'https://link.deezer.com/s/31BimrANA5l0xTuEjk4YW',
       musicVideo: 'https://www.youtube.com/watch?v=z_uH1gA9Gwo'
     },
-    // Optional: Use distributor's pre-save page instead of custom page
     useDistributorPreSave: true,
     distributorPreSaveUrl: 'https://artists.landr.com/057829908413'
   }
@@ -129,7 +126,9 @@ export const getNearestUpcomingPreSaveRelease = (): MusicRelease | undefined => 
     // If no release date, it's definitely in future, but we check if it has links
     const releaseTime = getReleaseTime(release.releaseDate)
     const hasPreSaveLinks =
-      release.preSaveMusicPlatformLinks && Object.keys(release.preSaveMusicPlatformLinks).length > 0
+      (release.preSaveMusicPlatformLinks &&
+        Object.keys(release.preSaveMusicPlatformLinks).length > 0) ||
+      !!release.distributorPreSaveUrl
     return releaseTime > now && hasPreSaveLinks
   })
 

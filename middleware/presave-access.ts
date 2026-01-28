@@ -34,14 +34,17 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   const hasPreSaveLinks = Boolean(
-    release.preSaveMusicPlatformLinks &&
-      Object.values(release.preSaveMusicPlatformLinks).some(Boolean)
+    (release.preSaveMusicPlatformLinks &&
+      Object.values(release.preSaveMusicPlatformLinks).some(Boolean)) ||
+      release.distributorPreSaveUrl
   )
   if (!hasPreSaveLinks) {
     const i18nLocale = useNuxtApp()?.$i18n?.locale?.value
     const normalizedLocale =
       i18nLocale === 'ua' ? 'uk-UA' : i18nLocale === 'en' ? 'en-US' : i18nLocale || 'en-US'
-    const formattedDate = formatReleaseDate(release.releaseDate, normalizedLocale)
+    const formattedDate = release.releaseDate
+      ? formatReleaseDate(release.releaseDate, normalizedLocale)
+      : 'TBA'
     return navigateTo(
       {
         path: '/404',

@@ -20,7 +20,10 @@ export const useMusicNavigation = () => {
    * Determine if a release is in pre-save mode
    */
   const isReleaseInPreSaveMode = (release: MusicRelease): boolean => {
-    return isUpcomingRelease(release.releaseDate) && !!release.preSaveMusicPlatformLinks
+    return (
+      isUpcomingRelease(release.releaseDate) &&
+      (!!release.preSaveMusicPlatformLinks || !!release.distributorPreSaveUrl)
+    )
   }
 
   /**

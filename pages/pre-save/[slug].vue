@@ -54,8 +54,9 @@
   }
 
   if (
-    !release.preSaveMusicPlatformLinks ||
-    Object.keys(release.preSaveMusicPlatformLinks).length === 0
+    (!release.preSaveMusicPlatformLinks ||
+      Object.keys(release.preSaveMusicPlatformLinks).length === 0) &&
+    !release.distributorPreSaveUrl
   ) {
     throw createError({
       statusCode: 404,

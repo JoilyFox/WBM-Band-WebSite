@@ -247,8 +247,9 @@
     const release = upcomingRelease.value
     return (
       release !== null &&
-      release.preSaveMusicPlatformLinks &&
-      Object.keys(release.preSaveMusicPlatformLinks).length > 0
+      ((release.preSaveMusicPlatformLinks &&
+        Object.keys(release.preSaveMusicPlatformLinks).length > 0) ||
+        !!release.distributorPreSaveUrl)
     )
   })
 
