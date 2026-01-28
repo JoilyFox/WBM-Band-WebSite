@@ -244,7 +244,11 @@ export default defineNuxtConfig({
         '/ua/pre-save/mania',
         '/en/pre-save/mania',
         '/ua/listen/mania',
-        '/en/listen/mania'
+        '/en/listen/mania',
+        '/ua/pre-save/chorni-ptahy',
+        '/en/pre-save/chorni-ptahy',
+        '/ua/listen/chorni-ptahy',
+        '/en/listen/chorni-ptahy'
       ],
       failOnError: false // Allow build to succeed even when maintenance mode returns 503 errors
     }
