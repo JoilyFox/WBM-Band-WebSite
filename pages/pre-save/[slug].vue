@@ -40,8 +40,12 @@
     })
   }
 
+  // Check if bypass parameter is present to show custom page instead of distributor redirect
+  const bypassDistributor = route.query.bypass === 'true'
+
   // Check if we should redirect to distributor's pre-save page
-  if (release.useDistributorPreSave && release.distributorPreSaveUrl) {
+  // Only redirect if bypass parameter is NOT set
+  if (release.useDistributorPreSave && release.distributorPreSaveUrl && !bypassDistributor) {
     // Redirect to distributor's pre-save URL without loading the page
     await navigateTo(release.distributorPreSaveUrl, { external: true, redirectCode: 302 })
   }

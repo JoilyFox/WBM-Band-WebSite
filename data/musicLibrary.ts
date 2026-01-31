@@ -53,7 +53,11 @@ export const musicLibrary: MusicRelease[] = [
     featured: true,
     musicPlatformLinks: {},
     useDistributorPreSave: true,
-    distributorPreSaveUrl: 'https://artists.landr.com/057914578996'
+    distributorPreSaveUrl: 'https://artists.landr.com/057914578996',
+    preSaveMusicPlatformLinks: {
+      spotify:
+        'https://accounts.spotify.com/authorize?response_type=code&client_id=5a14783d79444ee9babd9176b256979e&scope=user-follow-modify+user-library-modify+playlist-modify-public+playlist-modify-private+user-read-email+user-read-private&redirect_uri=https%3A%2F%2Flnk.to%2F~%2Fprerelease%2Fspotify&state=bFVybD1hcnRpc3RzLmxhbmRyLmNvbSUyRjA1NzkxNDU3ODk5NiZzSWQ9ZjBlYjk2NTUtYjFkZS00OWE2LWI4OGQtN2ZlNGFlMTFhYTU1JnRJZD01NzdhMGYwMi00OWVlLTRhNzgtYjdlOS1mNTA1Yzk1ZjUxOGQmdT1odHRwcyUzQSUyRiUyRmFydGlzdHMubGFuZHIuY29tJTJGMDU3OTE0NTc4OTk2JnZ0PWM0ZjkxMzQzOTdmM2U0NjAzOTk4MTQ2NDBmYjg0ZTg3JnZ1PTY5MDFlNTkwYjdhNTM3LjM1Mjk0MDk3JnJmPWh0dHBzJTNBJTJGJTJGd3d3LndibWJhbmQuY29tJTJG'
+    }
   },
   {
     id: '1',
