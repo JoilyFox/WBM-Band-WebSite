@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   // GitHub Pages Configuration (only when DEPLOY_TARGET=github)
   app: {
     baseURL: process.env.DEPLOY_TARGET === 'github' ? '/WBM-Band-WebSite/' : '/',
+    buildAssetsDir: '/_nuxt/', // Ensure consistent asset path
     head: {
       // Favicon and App Icon Configuration
       link: [
@@ -252,6 +253,11 @@ export default defineNuxtConfig({
       ],
       failOnError: false // Allow build to succeed even when maintenance mode returns 503 errors
     }
+  },
+
+  // Experimental features configuration
+  experimental: {
+    appManifest: false // Disable app manifest to prevent 404 errors for build metadata in static sites
   },
 
   modules: [
