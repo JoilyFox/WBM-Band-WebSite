@@ -17,29 +17,32 @@
   // Get the nearest upcoming release with pre-save links
   const nearestRelease = getNearestUpcomingPreSaveRelease()
 
-  // Check if bypass parameter is present to show custom page instead of distributor redirect
-  const bypassDistributor = route.query.bypass === 'true'
+  // Perform redirect on client side (after mount) to properly read query parameters
+  onMounted(() => {
+    // Check if bypass parameter is present to show custom page instead of distributor redirect
+    const bypassDistributor = route.query.bypass === 'true'
 
-  // Perform redirect based on conditions
-  if (!enablePreSave || !nearestRelease) {
-    // Pre-save is disabled or no upcoming releases, redirect to home
-    await navigateTo(localePath('/'), { redirectCode: 301, replace: true })
-  } else if (
-    nearestRelease.useDistributorPreSave &&
-    nearestRelease.distributorPreSaveUrl &&
-    !bypassDistributor
-  ) {
-    // Redirect to distributor's pre-save URL (only if bypass is not set)
-    await navigateTo(nearestRelease.distributorPreSaveUrl, { external: true, redirectCode: 302 })
-  } else {
-    // Redirect to the release's pre-save page
-    // Preserve bypass parameter if it was set
-    const query = bypassDistributor ? { bypass: 'true' } : {}
-    await navigateTo(localePath({ path: `/pre-save/${nearestRelease.slug}`, query }), {
-      redirectCode: 302,
-      replace: true
-    })
-  }
+    // Perform redirect based on conditions
+    if (!enablePreSave || !nearestRelease) {
+      // Pre-save is disabled or no upcoming releases, redirect to home
+      navigateTo(localePath('/'), { redirectCode: 301, replace: true })
+    } else if (
+      nearestRelease.useDistributorPreSave &&
+      nearestRelease.distributorPreSaveUrl &&
+      !bypassDistributor
+    ) {
+      // Redirect to distributor's pre-save URL (only if bypass is not set)
+      navigateTo(nearestRelease.distributorPreSaveUrl, { external: true, redirectCode: 302 })
+    } else {
+      // Redirect to the release's pre-save page
+      // Preserve bypass parameter if it was set
+      const query = bypassDistributor ? { bypass: 'true' } : {}
+      navigateTo(localePath({ path: `/pre-save/${nearestRelease.slug}`, query }), {
+        redirectCode: 302,
+        replace: true
+      })
+    }
+  })
 </script>
 
 <template>

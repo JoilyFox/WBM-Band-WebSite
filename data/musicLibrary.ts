@@ -46,12 +46,19 @@ export const musicLibrary: MusicRelease[] = [
     title: 'Чорні Птахи',
     titleKey: 'releases.chorni_ptahy.title',
     type: 'single',
-    releaseDate: '2026-02-06T00:00:00Z',
+    releaseDate: '2026-02-06T00:00:00Z', // Midnight Ukraine time (EET/UTC+2)
     imageUrl: '/images/optimized/albums-images/chorni-ptahy/cover.avif',
     blurredImageUrl: '/images/albums-images/chorni-ptahy/cover-blurred.jpg',
     descriptionKey: 'releases.chorni_ptahy.description',
     featured: true,
-    musicPlatformLinks: {},
+    musicPlatformLinks: {
+      spotify: 'https://open.spotify.com/track/2hujOwcGE21eCQHMz61y75?si=4VZFobFORxWvdNGEgYbzjg',
+      youtubeMusic: 'https://music.youtube.com/watch?v=R6mQB60MUuI&si=TPuJo7qYlrI73Z2R',
+      appleMusic:
+        'https://music.apple.com/us/song/%D1%87%D0%BE%D1%80%D0%BD%D1%96-%D0%BF%D1%82%D0%B0%D1%85%D0%B8/1868500237',
+      amazonMusic:
+        'https://music.amazon.com/tracks/B0GGDZGYMF?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_jczvFMarQXoSYTGIbtHUMZ10W'
+    },
     useDistributorPreSave: true,
     distributorPreSaveUrl: 'https://artists.landr.com/057914578996',
     preSaveMusicPlatformLinks: {

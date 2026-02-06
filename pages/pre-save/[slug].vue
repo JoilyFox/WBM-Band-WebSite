@@ -40,15 +40,18 @@
     })
   }
 
-  // Check if bypass parameter is present to show custom page instead of distributor redirect
-  const bypassDistributor = route.query.bypass === 'true'
+  // Perform redirect on client side to properly read query parameters in static builds
+  onMounted(() => {
+    // Check if bypass parameter is present to show custom page instead of distributor redirect
+    const bypassDistributor = route.query.bypass === 'true'
 
-  // Check if we should redirect to distributor's pre-save page
-  // Only redirect if bypass parameter is NOT set
-  if (release.useDistributorPreSave && release.distributorPreSaveUrl && !bypassDistributor) {
-    // Redirect to distributor's pre-save URL without loading the page
-    await navigateTo(release.distributorPreSaveUrl, { external: true, redirectCode: 302 })
-  }
+    // Check if we should redirect to distributor's pre-save page
+    // Only redirect if bypass parameter is NOT set
+    if (release.useDistributorPreSave && release.distributorPreSaveUrl && !bypassDistributor) {
+      // Redirect to distributor's pre-save URL without loading the page
+      navigateTo(release.distributorPreSaveUrl, { external: true, redirectCode: 302 })
+    }
+  })
 
   // Check if this release is actually upcoming and has pre-save links
   if (!isUpcomingRelease(release.releaseDate)) {
