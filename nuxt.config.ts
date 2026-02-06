@@ -223,18 +223,6 @@ export default defineNuxtConfig({
               "(function(){try{var h=Math.floor((window.visualViewport&&window.visualViewport.height)||window.innerHeight);document.documentElement.style.setProperty('--app-svh',h+'px');document.documentElement.setAttribute('data-svh-ready','1');}catch(e){}})();"
             ),
           defer: false
-        },
-        // Google Analytics - gtag.js
-        {
-          key: 'google-analytics',
-          src: 'https://www.googletagmanager.com/gtag/js?id=G-Z8QRF6TWC2',
-          async: true
-        },
-        {
-          key: 'google-analytics-config',
-          children:
-            "window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-Z8QRF6TWC2');",
-          type: 'text/javascript'
         }
       ]
     }
@@ -299,8 +287,14 @@ export default defineNuxtConfig({
       }
     ],
     '@vueuse/nuxt',
-    '@nuxt/eslint'
+    '@nuxt/eslint',
+    'nuxt-gtag'
   ],
+
+  // Google Analytics Configuration
+  gtag: {
+    id: 'G-Z8QRF6TWC2'
+  },
 
   // PrimeVue Configuration
   primevue: {

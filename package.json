@@ -60,6 +60,7 @@
     "imagemin-avif": "^0.1.6",
     "imagemin-webp": "^8.0.0",
     "lint-staged": "^16.2.7",
+    "nuxt-gtag": "^4.1.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "sass": "^1.89.2",
