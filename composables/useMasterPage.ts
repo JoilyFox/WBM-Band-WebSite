@@ -192,13 +192,15 @@ export function useMasterPage(options: UseMasterPageOptions): UseMasterPageRetur
     (Object.keys(SOURCE_PREFIXES) as SourcePrefix[]).includes(sourcePrefix as SourcePrefix)
   ) {
     resolvedSource = SOURCE_PREFIXES[sourcePrefix as SourcePrefix]
+    // Lock in attribution synchronously in setup (client side only) so
+    // any subsequent code — including the page's own onMounted hooks
+    // that fire trackReleaseView — reads the right source.
+    if (import.meta.client) {
+      setExplicitSourcePlatform(resolvedSource)
+    }
   }
 
   onMounted(() => {
-    if (resolvedSource) {
-      setExplicitSourcePlatform(resolvedSource)
-    }
-
     if (import.meta.client) {
       // Reset body overflow that the modal route may have set.
       document.body.style.overflow = ''

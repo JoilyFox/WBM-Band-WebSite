@@ -6,8 +6,9 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
+  import { computed, onMounted } from 'vue'
   import { useMasterPage } from '~/composables/useMasterPage'
+  import { useAnalytics } from '~/composables/useAnalytics'
 
   definePageMeta({
     layout: 'empty',
@@ -19,6 +20,9 @@
 
   const { release, localizedTitle, localizedDescription, metaImageUrl, pageUrl, keywords } =
     useMasterPage({ slug, pageType: 'listen' })
+
+  const { trackReleaseView } = useAnalytics()
+  onMounted(() => trackReleaseView({ releaseSlug: slug, pageType: 'listen' }))
 
   const pageTitle = computed(() => `${localizedTitle.value} | WBM Band`)
 

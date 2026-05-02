@@ -271,6 +271,8 @@
               :platform="platform"
               :url="url"
               :is-pre-save="isPreSave"
+              :release-slug="release.slug"
+              :page-type="pageType"
               class="w-full h-full flex-1"
             />
           </div>
@@ -324,6 +326,7 @@
   } = usePerformanceOptimization()
 
   const performanceClass = computed(() => getPerformanceClass())
+  const pageType = computed<'listen' | 'pre-save'>(() => (props.isPreSave ? 'pre-save' : 'listen'))
 
   // Optimized scroll handling
   const { isScrolled } = useOptimizedScroll({ threshold: 60 })

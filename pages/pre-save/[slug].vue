@@ -8,6 +8,7 @@
 <script setup lang="ts">
   import { onMounted } from 'vue'
   import { useMasterPage } from '~/composables/useMasterPage'
+  import { useAnalytics } from '~/composables/useAnalytics'
   import { isUpcomingRelease } from '~/utils/configHelpers'
 
   definePageMeta({
@@ -22,6 +23,8 @@
     slug,
     pageType: 'pre-save'
   })
+
+  const { trackReleaseView, trackPlatformClick } = useAnalytics()
 
   if (!isUpcomingRelease(release.releaseDate)) {
     const localePath = useLocalePath()
@@ -42,8 +45,13 @@
 
   // Distributor redirect runs client-side so query params are reachable in static builds.
   onMounted(() => {
+    trackReleaseView({ releaseSlug: slug, pageType: 'pre-save' })
     const bypassDistributor = route.query.bypass === 'true'
     if (release.useDistributorPreSave && release.distributorPreSaveUrl && !bypassDistributor) {
+      // Fire the conversion event before navigation tears down the page.
+      // transport_type: 'beacon' inside trackPlatformClick keeps the
+      // request alive past unload.
+      trackPlatformClick({ platformName: 'distributor', releaseSlug: slug, pageType: 'pre-save' })
       navigateTo(release.distributorPreSaveUrl, { external: true, redirectCode: 302 })
     }
   })

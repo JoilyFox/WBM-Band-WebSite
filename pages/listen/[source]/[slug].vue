@@ -6,8 +6,9 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
+  import { computed, onMounted } from 'vue'
   import { useMasterPage } from '~/composables/useMasterPage'
+  import { useAnalytics } from '~/composables/useAnalytics'
   import { SOURCE_PREFIXES, type SourcePrefix } from '~/utils/sourceAttribution'
 
   definePageMeta({
@@ -31,6 +32,9 @@
 
   const pageTitle = computed(() => `${localizedTitle.value} | WBM Band`)
   const platformLabel = SOURCE_PREFIXES[sourcePrefix as SourcePrefix]
+
+  const { trackReleaseView } = useAnalytics()
+  onMounted(() => trackReleaseView({ releaseSlug: slug, pageType: 'listen' }))
 
   useHead({
     title: pageTitle,

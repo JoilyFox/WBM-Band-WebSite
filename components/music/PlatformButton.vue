@@ -26,14 +26,20 @@
   import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
   import { useI18n } from 'vue-i18n'
 
+  import { useAnalytics } from '~/composables/useAnalytics'
+
   interface Props {
     platform: string
     url: string
     isPreSave?: boolean
+    releaseSlug?: string
+    pageType?: 'listen' | 'pre-save'
   }
 
   const props = withDefaults(defineProps<Props>(), {
-    isPreSave: false
+    isPreSave: false,
+    releaseSlug: '',
+    pageType: 'listen'
   })
   const { t, locale } = useI18n({ useScope: 'global' })
 
@@ -149,9 +155,15 @@
     return t('music.buttons.listen_now')
   })
 
+  const { trackPlatformClick } = useAnalytics()
+
   const handleClick = () => {
-    // Optional: Add analytics tracking here
-    console.log(`Clicked ${platformName.value} link`)
+    if (!props.releaseSlug) return
+    trackPlatformClick({
+      platformName: props.platform,
+      releaseSlug: props.releaseSlug,
+      pageType: props.pageType
+    })
   }
 </script>
 

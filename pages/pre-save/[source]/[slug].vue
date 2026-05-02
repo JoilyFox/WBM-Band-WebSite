@@ -8,6 +8,7 @@
 <script setup lang="ts">
   import { onMounted } from 'vue'
   import { useMasterPage } from '~/composables/useMasterPage'
+  import { useAnalytics } from '~/composables/useAnalytics'
   import { isUpcomingRelease } from '~/utils/configHelpers'
   import { SOURCE_PREFIXES } from '~/utils/sourceAttribution'
 
@@ -51,9 +52,13 @@
     })
   }
 
+  const { trackReleaseView, trackPlatformClick } = useAnalytics()
+
   onMounted(() => {
+    trackReleaseView({ releaseSlug: slug, pageType: 'pre-save' })
     const bypassDistributor = route.query.bypass === 'true'
     if (release.useDistributorPreSave && release.distributorPreSaveUrl && !bypassDistributor) {
+      trackPlatformClick({ platformName: 'distributor', releaseSlug: slug, pageType: 'pre-save' })
       navigateTo(release.distributorPreSaveUrl, { external: true, redirectCode: 302 })
     }
   })

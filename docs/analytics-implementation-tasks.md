@@ -87,28 +87,18 @@ Goal: serve `/listen/<prefix>/<slug>` and `/pre-save/<prefix>/<slug>` for every 
 
 ## Phase 3 — Analytics composable + plugin
 
-- [ ] **3.1** — Create `plugins/analytics.client.ts`:
-  - Runs once on app mount.
-  - Calls `getOrPersistSourcePlatform()` and pushes it via `gtag('set', 'user_properties', { source_platform })`.
-  - Also enriches the very first `page_view`.
-- [ ] **3.2** — Create `composables/useAnalytics.ts`:
-  - `useSourceAttribution()` → `{ getCurrent(), setExplicit(platform), reset() }` for path-aware pages to lock in the prefix-derived source.
-  - `trackReleaseView({ releaseSlug, pageType })` — fires `release_view` with `source_platform`. Dedupes per session per slug+type.
-  - `trackPlatformClick({ platformName, releaseSlug, pageType })` — fires `platform_click` with `source_platform`. Skips if `isLikelyBot()`.
-  - All methods are SSR-safe no-ops on the server.
-- [ ] **3.3** — Verify the `nuxt-gtag` SPA navigation page-view tracking is on (DevTools → Network → check `collect?...&en=page_view` fires on route change).
+- [x] **3.1** — Created `plugins/analytics.client.ts`. Hooks `app:mounted`, calls `getOrPersistSourcePlatform()`, then `gtag('set', 'user_properties', { source_platform })` so all subsequent events inherit the source.
+- [x] **3.2** — Created `composables/useAnalytics.ts` with `getSourcePlatform()`, `trackReleaseView()`, and `trackPlatformClick()`. The latter is bot-filtered via `isLikelyBot()` and uses `transport_type: 'beacon'` to survive the page-tear-down that follows external navigation. All methods are SSR-safe no-ops.
+- [ ] **3.3** — Verify nuxt-gtag SPA-navigation page-view tracking after deploy: open DevTools → Network → filter `collect`, navigate between pages, confirm `en=page_view` request fires.
 
 ---
 
 ## Phase 4 — Wire into UI
 
-- [ ] **4.1** — Edit `components/music/PlatformButton.vue`:
-  - Add props: `releaseSlug: string`, `pageType: 'listen' | 'pre-save'`.
-  - Replace the `console.log` in `handleClick` with `useAnalytics().trackPlatformClick({ platformName: props.platform, releaseSlug: props.releaseSlug, pageType: props.pageType })`.
-  - Don't preventDefault — the `gtag('event', ...)` call uses `sendBeacon` and survives navigation.
-- [ ] **4.2** — Plumb `releaseSlug` + `pageType` from `MusicDetailContent.vue` down to each `<PlatformButton>`. Read `pageType` from a new prop or detect from `useRoute().path`.
-- [ ] **4.3** — Call `trackReleaseView()` in `onMounted` from `pages/listen/[slug].vue`, `pages/listen/[source]/[slug].vue`, `pages/pre-save/[slug].vue`, `pages/pre-save/[source]/[slug].vue` (or once from `useMasterPage()` so it's centralized).
-- [ ] **4.4** — For pre-save pages that auto-redirect to a distributor URL (`useDistributorPreSave === true`, see `pages/pre-save/[slug].vue:50`), fire `platform_click` with `platformName: 'distributor'` _before_ `navigateTo`, using `transport_type: 'beacon'`.
+- [x] **4.1** — Edited `components/music/PlatformButton.vue`: added `releaseSlug` and `pageType` props, replaced the `console.log` with `useAnalytics().trackPlatformClick()`. Default link navigation untouched (beacon survives unload).
+- [x] **4.2** — `MusicDetailContent.vue` derives `pageType` from `props.isPreSave` and passes both `release-slug` and `page-type` to every `<MusicPlatformButton>`.
+- [x] **4.3** — All four master pages call `trackReleaseView()` in `onMounted`. Path-prefix pages benefit from synchronous source lock-in: `useMasterPage()` calls `setExplicitSourcePlatform()` in setup (not onMounted) so the source is in sessionStorage before any analytics fires.
+- [x] **4.4** — Both pre-save pages call `trackPlatformClick({ platformName: 'distributor', ... })` immediately before `navigateTo(distributorUrl)`. The composable adds `transport_type: 'beacon'` so the event survives the redirect.
 
 ---
 
