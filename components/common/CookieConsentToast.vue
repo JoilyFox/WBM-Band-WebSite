@@ -147,14 +147,9 @@
     color: white;
   }
 
-  /* Mobile: stack the link on its own line so buttons get full width */
-  @media (max-width: 480px) {
-    .cookie-toast__link {
-      flex-basis: 100%;
-      margin-left: 0;
-      margin-top: 0.25rem;
-    }
-  }
+  /* No forced wrap — flex-wrap on the actions row handles it naturally
+     when (and only when) the link genuinely doesn't fit alongside the
+     buttons. */
 
   .cookie-toast-enter-active,
   .cookie-toast-leave-active {
