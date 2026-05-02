@@ -58,7 +58,9 @@
     position: fixed;
     left: 1rem;
     bottom: 1rem;
-    z-index: 9998;
+    /* Below the mobile burger-menu overlay (z-50) so the menu can cover
+       the toast cleanly when active. Above page content. */
+    z-index: 40;
     width: min(20rem, calc(100vw - 2rem));
     padding: 1rem 1.1rem;
     border-radius: 0.9rem;
@@ -71,6 +73,15 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.06);
     color: rgba(255, 255, 255, 0.92);
     font-family: inherit;
+  }
+
+  /* Phones: stretch full width with a symmetric 1rem margin so the toast
+     uses the available room properly. */
+  @media (max-width: 640px) {
+    .cookie-toast {
+      right: 1rem;
+      width: auto;
+    }
   }
 
   .cookie-toast__message {
