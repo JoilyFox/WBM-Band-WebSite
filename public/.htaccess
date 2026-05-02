@@ -5,34 +5,35 @@
   # Disable automatic directory slash redirect
   DirectorySlash Off
 
-  # Internal rewrite for /pre-save/* without trailing slash to index.html
+  # Internal rewrite for /pre-save/<slug> AND /pre-save/<source>/<slug> to index.html.
+  # The optional group matches the source-prefix attribution paths (e.g. /pre-save/i/<slug>).
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/pre-save/[^/]+$
+  RewriteCond %{REQUEST_URI} ^/pre-save/[^/]+(/[^/]+)?$
   RewriteRule ^pre-save/(.*)$ /ua/pre-save/$1/index.html [L]
 
-  # Internal rewrite for /listen/* without trailing slash to index.html
+  # Internal rewrite for /listen/<slug> AND /listen/<source>/<slug> to index.html.
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/listen/[^/]+$
+  RewriteCond %{REQUEST_URI} ^/listen/[^/]+(/[^/]+)?$
   RewriteRule ^listen/(.*)$ /ua/listen/$1/index.html [L]
 
-  # Internal rewrite for /ua/pre-save/* without trailing slash to index.html
+  # Internal rewrite for /ua/pre-save/<slug> AND /ua/pre-save/<source>/<slug> to index.html
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/ua/pre-save/[^/]+$
+  RewriteCond %{REQUEST_URI} ^/ua/pre-save/[^/]+(/[^/]+)?$
   RewriteRule ^ua/pre-save/(.*)$ /ua/pre-save/$1/index.html [L]
 
-  # Internal rewrite for /ua/listen/* without trailing slash to index.html
+  # Internal rewrite for /ua/listen/<slug> AND /ua/listen/<source>/<slug> to index.html
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/ua/listen/[^/]+$
+  RewriteCond %{REQUEST_URI} ^/ua/listen/[^/]+(/[^/]+)?$
   RewriteRule ^ua/listen/(.*)$ /ua/listen/$1/index.html [L]
 
-  # Internal rewrite for /en/pre-save/* without trailing slash to index.html
+  # Internal rewrite for /en/pre-save/<slug> AND /en/pre-save/<source>/<slug> to index.html
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/en/pre-save/[^/]+$
+  RewriteCond %{REQUEST_URI} ^/en/pre-save/[^/]+(/[^/]+)?$
   RewriteRule ^en/pre-save/(.*)$ /en/pre-save/$1/index.html [L]
 
-  # Internal rewrite for /en/listen/* without trailing slash to index.html
+  # Internal rewrite for /en/listen/<slug> AND /en/listen/<source>/<slug> to index.html
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/en/listen/[^/]+$
+  RewriteCond %{REQUEST_URI} ^/en/listen/[^/]+(/[^/]+)?$
   RewriteRule ^en/listen/(.*)$ /en/listen/$1/index.html [L]
 
   # Internal rewrite (not redirect) for /pre-save/* to serve /ua/pre-save/* content
