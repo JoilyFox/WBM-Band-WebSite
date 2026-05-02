@@ -19,6 +19,7 @@
     "deploy:github": "DEPLOY_TARGET=github nuxt generate",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "test:attribution": "node --experimental-strip-types --no-warnings=ExperimentalWarning scripts/test-source-attribution.ts",
     "format": "prettier --write .",
     "prepare": "husky"
   },
