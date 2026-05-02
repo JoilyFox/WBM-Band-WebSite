@@ -312,9 +312,27 @@ export default defineNuxtConfig({
     'nuxt-gtag'
   ],
 
-  // Google Analytics Configuration
+  // Google Analytics Configuration with Consent Mode v2 default-deny.
+  // The CookieConsentToast updates consent on user choice; until then GA4
+  // collects only modeled (anonymous, aggregated) data. wait_for_update
+  // gives the toast a 500ms head-start to call gtag('consent', 'update')
+  // before the first event fires, so users who accept immediately don't
+  // pollute the modeled-data path.
   gtag: {
-    id: 'G-Z8QRF6TWC2'
+    id: 'G-Z8QRF6TWC2',
+    initCommands: [
+      [
+        'consent',
+        'default',
+        {
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          analytics_storage: 'denied',
+          wait_for_update: 500
+        }
+      ]
+    ]
   },
 
   // PrimeVue Configuration

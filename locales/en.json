@@ -337,5 +337,18 @@
   },
   "listen": {
     "meta_description": "{songName} - listen on all platforms!"
+  },
+  "cookies": {
+    "banner": {
+      "aria": "Cookie consent",
+      "message": "We use analytics cookies to see where listeners find our music. No ads.",
+      "accept": "Accept",
+      "decline": "Decline",
+      "details": "Details",
+      "reset_title": "Cookie preferences",
+      "reset_description": "You can change your mind any time. Resetting clears your stored choice and reopens the consent banner on the next page load.",
+      "reset_button": "Reset cookie preferences",
+      "reset_done": "Reset done — refresh the page to see the banner again."
+    }
   }
 }

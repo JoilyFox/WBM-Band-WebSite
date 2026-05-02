@@ -130,6 +130,25 @@
           </div>
         </div>
 
+        <!-- Reset Cookie Preferences -->
+        <div class="content-card">
+          <div class="card-header">
+            <h2 class="section-title">{{ t('cookies.banner.reset_title') }}</h2>
+          </div>
+          <div class="card-content">
+            <p class="text-content">{{ t('cookies.banner.reset_description') }}</p>
+            <button
+              type="button"
+              class="cookie-reset-btn"
+              :disabled="!isUndecided && resetJustDone"
+              @click="onResetConsent"
+            >
+              <i class="pi pi-refresh"></i>
+              {{ t('cookies.banner.reset_button') }}
+            </button>
+          </div>
+        </div>
+
         <!-- Updates to Policy -->
         <div class="content-card">
           <div class="card-header">
@@ -182,7 +201,18 @@
   import { ref, onMounted, onUnmounted, computed } from 'vue'
   import { getConfig } from '~/utils/configHelpers'
   import { useI18n } from 'vue-i18n'
+  import { useCookieConsent } from '~/composables/useCookieConsent'
+  import { useSnackbar } from '~/composables/useSnackbar'
   const { t } = useI18n()
+  const { reset: resetConsent, isUndecided } = useCookieConsent()
+  const snackbar = useSnackbar()
+  const resetJustDone = ref(false)
+
+  const onResetConsent = () => {
+    resetConsent()
+    resetJustDone.value = true
+    snackbar.success(t('cookies.banner.reset_done'))
+  }
 
   // Meta tags for SEO
   useHead({
@@ -909,6 +939,42 @@
 
   .response-text i {
     color: rgba(120, 119, 198, 0.8);
+  }
+
+  /* Reset cookie preferences button */
+  .cookie-reset-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.25rem;
+    border-radius: 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+    font-family: inherit;
+  }
+
+  @media (hover: hover) {
+    .cookie-reset-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .cookie-reset-btn:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .cookie-reset-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   /* Back to Top Button */

@@ -147,6 +147,9 @@
 
     <!-- Footer -->
     <SectionsFooterSection />
+
+    <!-- Cookie consent (Consent Mode v2 default-deny) -->
+    <CommonCookieConsentToast />
   </div>
 </template>
 

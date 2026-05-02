@@ -106,19 +106,11 @@ Goal: serve `/listen/<prefix>/<slug>` and `/pre-save/<prefix>/<slug>` for every 
 
 Approach: tiny ~320×140px card in the bottom-left corner. Three buttons: Accept / Decline / Manage. While undecided **and** when declined, GA4 runs in Consent Mode v2 — collects only modeled, anonymized data so you still get aggregate timeline numbers. When accepted, full data flows.
 
-- [ ] **5.1** — Configure `nuxt-gtag` for default-deny + Consent Mode v2 in `nuxt.config.ts`. The module has `initialConsent: false` plus `config.consent_mode` options. Reference: https://nuxt.com/modules/gtag (check version 4.x docs).
-- [ ] **5.2** — Build `components/common/CookieConsentToast.vue`:
-  - Fixed bottom-left, ~320px wide, max ~140px tall, dark glass-morphism background matching site aesthetic.
-  - Slides in 1-2s after first paint to avoid LCP penalty.
-  - Localized text via `locales/en.json` + `locales/uk.json` (short — one sentence).
-  - Three buttons: **Accept** · **Decline** · **Details** (links to `/cookies-policy`).
-  - Persists choice in `localStorage` under key `wbm_cookie_consent` = `'accepted' | 'declined'`.
-  - On Accept → `gtag('consent', 'update', { ad_storage: 'granted', analytics_storage: 'granted' })`.
-  - On Decline → `gtag('consent', 'update', { ad_storage: 'denied', analytics_storage: 'denied' })`.
-  - Small × in the corner = treat as decline (or as "remind me later" if you prefer; we'll go with "decline" for simplicity).
-- [ ] **5.3** — Mount `<CookieConsentToast />` in `layouts/default.vue` (and `layouts/empty.vue` if it's used by master pages — check, since `pages/listen/[slug].vue` uses `layout: 'empty'`).
-- [ ] **5.4** — Add a "Reset cookie preferences" link/button to the `pages/cookies-policy.vue` so users can change their mind.
-- [ ] **5.5** — Smoke test: with the toast undecided, verify in DevTools that GA `collect` requests have `gcs=G100` (denied) or modeled-data flag; after accept, `gcs=G111` (granted).
+- [x] **5.1** — `nuxt.config.ts` `gtag.initCommands` now ships a default-deny Consent Mode v2 block (ad_storage, ad_user_data, ad_personalization, analytics_storage all `denied`) with `wait_for_update: 500` so the toast can update consent before the first event fires.
+- [x] **5.2** — Built `components/common/CookieConsentToast.vue`. Fixed bottom-left, glass-morphism, slides in 1.2s after mount (post-LCP), three actions: Accept · Decline · Details. SSR-safe (renders nothing until mounted).
+- [x] **5.3** — Mounted `<CommonCookieConsentToast />` in both `layouts/default.vue` and `layouts/empty.vue` so the master pages with `layout: 'empty'` show the banner too.
+- [x] **5.4** — Added a "Reset cookie preferences" content card on `pages/cookies-policy.vue` that calls `useCookieConsent().reset()` and shows a snackbar confirmation.
+- [ ] **5.5** — Smoke test on production: undecided → GA `collect` requests should carry `gcs=G100` (denied) and `gcr=1` (modeled). After Accept → `gcs=G111` (granted). Verify in DevTools after deploy.
 
 ---
 
