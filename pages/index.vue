@@ -15,7 +15,7 @@
       <SectionsAboutUsSection />
 
       <!-- Our Team Section (Subsection of About Us) -->
-      <!-- <SectionsOurTeam /> -->
+      <SectionsOurTeam />
 
       <!-- Contacts Section -->
       <SectionsContactsSection />
@@ -208,19 +208,17 @@
   const { selectedRelease, isModalOpen, isSelectedReleasePreSave, handleMusicClick, closeModal } =
     useMusicNavigation()
 
-  // Hero images for preloading - using computed to properly reference config values
+  // Hero images for preloading — first slide of each orientation set so the
+  // LCP image is warm regardless of device orientation. The hero slider
+  // (orientation-aware) will pick whichever matches the viewport.
   const heroImages = computed(() => [
     {
-      src: '/images/optimized/hero-images/hero-1.avif',
+      src: '/images/optimized/hero-images/horizontal/hero-1.avif',
       alt: `${bandName.value} performing live on stage`
     },
     {
-      src: '/images/optimized/hero-images/hero-2.avif',
-      alt: `${bandName.value} in recording studio`
-    },
-    {
-      src: '/images/optimized/hero-images/hero-3.avif',
-      alt: `${bandName.value} concert crowd`
+      src: '/images/optimized/hero-images/vertical/hero-1.avif',
+      alt: `${bandName.value} performing live on stage`
     }
   ])
 

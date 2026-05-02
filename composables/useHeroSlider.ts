@@ -3,7 +3,8 @@
  * Handles automatic image sliding with smooth transitions
  */
 
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, toValue, watch } from 'vue'
+import type { MaybeRefOrGetter } from 'vue'
 
 export interface HeroImage {
   src: string
@@ -20,7 +21,10 @@ export interface SliderOptions {
   transitionDuration?: number // Duration in ms for slide transitions
 }
 
-export function useHeroSlider(images: HeroImage[], options: SliderOptions = {}) {
+export function useHeroSlider(
+  imagesSource: MaybeRefOrGetter<HeroImage[]>,
+  options: SliderOptions = {}
+) {
   const {
     autoPlay = true,
     interval = 5000,
@@ -40,19 +44,33 @@ export function useHeroSlider(images: HeroImage[], options: SliderOptions = {}) 
   // Timer reference
   let timer: NodeJS.Timeout | null = null
 
+  // Reactive image list — recomputes when the source ref/getter changes
+  const images = computed(() => toValue(imagesSource))
+
   // Computed properties
-  const currentImage = computed(() => images[currentIndex.value])
-  const nextImage = computed(() => images[(currentIndex.value + 1) % images.length])
+  const currentImage = computed(() => images.value[currentIndex.value])
+  const nextImage = computed(() => images.value[(currentIndex.value + 1) % images.value.length])
   const previousImage = computed(
-    () => images[currentIndex.value === 0 ? images.length - 1 : currentIndex.value - 1]
+    () => images.value[currentIndex.value === 0 ? images.value.length - 1 : currentIndex.value - 1]
   )
 
-  const totalImages = computed(() => images.length)
-  const canSlide = computed(() => images.length > 1)
+  const totalImages = computed(() => images.value.length)
+  const canSlide = computed(() => images.value.length > 1)
+
+  // Reset index + restart autoplay when the underlying image set changes
+  // (e.g. user rotates device and we swap horizontal ↔ vertical arrays)
+  watch(
+    () => images.value.length,
+    () => {
+      currentIndex.value = 0
+      progressKey.value++
+      if (isPlaying.value) startAutoPlay()
+    }
+  )
 
   // Navigation methods
   const goToSlide = (index: number) => {
-    if (index >= 0 && index < images.length && index !== currentIndex.value) {
+    if (index >= 0 && index < images.value.length && index !== currentIndex.value) {
       isTransitioning.value = true
       currentIndex.value = index
 
@@ -72,12 +90,12 @@ export function useHeroSlider(images: HeroImage[], options: SliderOptions = {}) 
   }
 
   const nextSlide = () => {
-    const nextIndex = (currentIndex.value + 1) % images.length
+    const nextIndex = (currentIndex.value + 1) % images.value.length
     goToSlide(nextIndex)
   }
 
   const previousSlide = () => {
-    const prevIndex = currentIndex.value === 0 ? images.length - 1 : currentIndex.value - 1
+    const prevIndex = currentIndex.value === 0 ? images.value.length - 1 : currentIndex.value - 1
     goToSlide(prevIndex)
   }
 

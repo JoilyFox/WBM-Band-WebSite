@@ -4,11 +4,11 @@
     ref="heroEl"
     class="hero-section relative w-full flex items-center justify-center px-4 overflow-hidden"
   >
-    <!-- Background Images Slider -->
+    <!-- Background Images Slider (orientation-adaptive) -->
     <div class="hero-slider-container">
       <div
-        v-for="(image, index) in resolvedHeroImages"
-        :key="image.src"
+        v-for="(image, index) in activeImages"
+        :key="index"
         class="hero-slide"
         :class="{
           active: currentIndex === index,
@@ -17,11 +17,13 @@
         }"
       >
         <UiProgressiveImage
-          :src="image.src"
+          :src="index === 0 ? lcpLandscapeSrc : image.src"
+          :src-portrait="index === 0 ? lcpPortraitSrc : undefined"
           :alt="image.alt"
           loading="eager"
           :fetch-priority="index === 0 ? 'high' : 'auto'"
-          preset="hero"
+          :preset="isPortrait ? 'heroVertical' : 'hero'"
+          portrait-preset="heroVertical"
           container-class="hero-background-image"
           image-class="hero-image"
           :show-placeholder="true"
@@ -126,7 +128,8 @@
     primaryButtonIcon?: string
     secondaryButtonLabel?: string
     secondaryButtonIcon?: string
-    heroImages?: HeroImage[]
+    horizontalImages?: HeroImage[]
+    verticalImages?: HeroImage[]
     autoPlay?: boolean
     interval?: number
     transition?: 'fade' | 'slide' | 'zoom'
@@ -142,39 +145,28 @@
     autoPlay: true,
     interval: 6000,
     transition: 'fade',
-    heroImages: () => [
-      {
-        src: '/images/optimized/hero-images/hero-1.avif',
-        alt: 'Hero Image - WBM Band'
-      },
-      {
-        src: '/images/optimized/hero-images/hero-2.avif',
-        alt: 'Hero Image - WBM Band'
-      },
-      {
-        src: '/images/optimized/hero-images/hero-3.avif',
-        alt: 'Hero Image - WBM Band'
-      },
-      {
-        src: '/images/optimized/hero-images/hero-5.avif',
-        alt: 'Hero Image - WBM Band'
-      },
-      {
-        src: '/images/optimized/hero-images/hero-6.avif',
-        alt: 'Hero Image - WBM Band'
-      },
-      {
-        src: '/images/optimized/hero-images/hero-7.avif',
-        alt: 'Hero Image - WBM Band'
-      },
-      {
-        src: '/images/optimized/hero-images/hero-8.avif',
-        alt: 'Hero Image - WBM Band'
-      },
-      {
-        src: '/images/optimized/hero-images/hero-9.avif',
-        alt: 'Hero Image - WBM Band'
-      }
+    horizontalImages: () => [
+      { src: '/images/hero-images/horizontal/hero-1.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/horizontal/hero-2.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/horizontal/hero-4.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/horizontal/hero-5.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/horizontal/hero-6.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/horizontal/hero-7.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/horizontal/hero-3.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/horizontal/hero-8.jpg', alt: 'WBM Band' }
+    ],
+    verticalImages: () => [
+      { src: '/images/hero-images/vertical/hero-6.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/vertical/hero-2.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/vertical/hero-1.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/vertical/hero-3.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/vertical/hero-8.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/vertical/hero-4.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/vertical/hero-5.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/vertical/hero-7.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/vertical/hero-9.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/vertical/hero-10.jpg', alt: 'WBM Band' },
+      { src: '/images/hero-images/vertical/hero-11.jpg', alt: 'WBM Band' }
     ]
   })
 
@@ -191,27 +183,43 @@
 
   // Resolve hero image URLs
   const { resolveUrl } = useAssetUrl()
-  const resolvedHeroImages = computed(() => {
-    return props.heroImages.map((img) => ({
-      ...img,
-      src: resolveUrl(img.src)
-    }))
+
+  // Orientation-adaptive image set: pick portrait array on portrait viewports,
+  // landscape array otherwise. SSR/SSG default = landscape (matches most
+  // crawlers and desktop visitors); portrait users swap once on hydration.
+  // We use an explicit matchMedia setup in onMounted (instead of useMediaQuery)
+  // because some setups skip the initial value update during hydration, leaving
+  // the slider stuck on the SSR-default landscape set until a resize event.
+  const isPortrait = ref(false)
+  const activeImages = computed<HeroImage[]>(() => {
+    const source =
+      isPortrait.value && props.verticalImages.length > 0
+        ? props.verticalImages
+        : props.horizontalImages
+    return source.map((img) => ({ ...img, src: resolveUrl(img.src) }))
   })
+
+  // LCP slide (index 0): emit BOTH landscape and portrait sources inside one
+  // <picture> so the browser picks the orientation-matched image at HTML
+  // parse time. This avoids the brief horizontal-image flash on portrait
+  // devices that the JS-driven swap can't prevent.
+  const lcpLandscapeSrc = computed(() => props.horizontalImages[0]?.src ?? '')
+  const lcpPortraitSrc = computed(() =>
+    props.verticalImages.length > 0 ? props.verticalImages[0].src : undefined
+  )
 
   // Hero slider functionality
   const {
     currentIndex,
     isPlaying,
     isTransitioning,
-    currentImage,
     canSlide,
-    goToSlide,
     nextSlide,
     previousSlide,
     transition,
     interval,
     progressKey
-  } = useHeroSlider(resolvedHeroImages.value, {
+  } = useHeroSlider(activeImages, {
     autoPlay: props.autoPlay,
     interval: props.interval,
     transition: props.transition,
@@ -219,14 +227,7 @@
   })
 
   // Image loading utilities
-  const {
-    imageLoadError,
-    imageLoaded,
-    isImageLoading,
-    handleImageLoad,
-    handleImageError,
-    resetImageStates
-  } = useImageLoading()
+  const { imageLoadError, handleImageLoad, handleImageError } = useImageLoading()
 
   // Scroll functionality
   const { scrollToElement } = useScrollTo()
@@ -262,14 +263,28 @@
 
   onMounted(() => {
     setFixedSVH()
-    // Recalculate on orientation change only (not on scroll) to avoid jank
+
+    // Detect orientation immediately (post-hydration) and react to changes.
+    // Reading mql.matches synchronously here guarantees portrait devices
+    // swap to the vertical image set on first paint after hydration —
+    // no resize required.
+    const orientationMql = window.matchMedia('(orientation: portrait)')
+    isPortrait.value = orientationMql.matches
+    const handleOrientationMatch = (e: MediaQueryListEvent) => {
+      isPortrait.value = e.matches
+    }
+    orientationMql.addEventListener('change', handleOrientationMatch)
+
+    // Recalculate svh on orientation change only (not on scroll) to avoid jank
     const handleOrientation = () => {
       // Wait a tick for viewport to settle
       setTimeout(setFixedSVH, 300)
     }
     window.addEventListener('orientationchange', handleOrientation)
+
     onBeforeUnmount(() => {
       window.removeEventListener('orientationchange', handleOrientation)
+      orientationMql.removeEventListener('change', handleOrientationMatch)
     })
   })
 </script>

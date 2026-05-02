@@ -24,6 +24,12 @@ const COMPRESSION_SETTINGS = {
     quality: 85,
     formats: ['avif', 'webp', 'jpg']
   },
+  heroVertical: {
+    width: 1080,
+    height: 1920,
+    quality: 85,
+    formats: ['avif', 'webp', 'jpg']
+  },
   album: {
     width: 800,
     height: 800,
@@ -59,7 +65,8 @@ const COMPRESSION_SETTINGS = {
 async function createOptimizedDir() {
   try {
     await fs.mkdir(OUTPUT_DIR, { recursive: true })
-    await fs.mkdir(path.join(OUTPUT_DIR, 'hero-images'), { recursive: true })
+    await fs.mkdir(path.join(OUTPUT_DIR, 'hero-images', 'horizontal'), { recursive: true })
+    await fs.mkdir(path.join(OUTPUT_DIR, 'hero-images', 'vertical'), { recursive: true })
     await fs.mkdir(path.join(OUTPUT_DIR, 'albums-images'), { recursive: true })
     await fs.mkdir(path.join(OUTPUT_DIR, 'about-us-images'), { recursive: true })
     await fs.mkdir(path.join(OUTPUT_DIR, 'our-team'), { recursive: true })
@@ -122,16 +129,36 @@ async function processImages() {
 
   await createOptimizedDir()
 
-  // Process hero images
+  // Process hero images (split into horizontal + vertical subfolders so each
+  // orientation can be compressed with art-direction-appropriate dimensions)
   console.log('\n📸 Processing hero images...')
-  const heroDir = path.join(INPUT_DIR, 'hero-images')
-  const heroFiles = await fs.readdir(heroDir)
 
-  for (const file of heroFiles) {
-    if (file.match(/\.(jpg|jpeg|png)$/i)) {
-      const inputPath = path.join(heroDir, file)
-      const outputDir = path.join(OUTPUT_DIR, 'hero-images')
-      await compressImage(inputPath, outputDir, file, COMPRESSION_SETTINGS.hero)
+  const heroVariants = [
+    { dir: 'horizontal', settings: COMPRESSION_SETTINGS.hero },
+    { dir: 'vertical', settings: COMPRESSION_SETTINGS.heroVertical }
+  ]
+
+  for (const variant of heroVariants) {
+    const inputVariantDir = path.join(INPUT_DIR, 'hero-images', variant.dir)
+    const outputVariantDir = path.join(OUTPUT_DIR, 'hero-images', variant.dir)
+
+    try {
+      const files = await fs.readdir(inputVariantDir)
+      await fs.mkdir(outputVariantDir, { recursive: true })
+      console.log(`  ${variant.dir}/ (${variant.settings.width}x${variant.settings.height})`)
+
+      for (const file of files) {
+        if (file.match(/\.(jpg|jpeg|png)$/i)) {
+          const inputPath = path.join(inputVariantDir, file)
+          await compressImage(inputPath, outputVariantDir, file, variant.settings)
+        }
+      }
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        console.log(`  No hero-images/${variant.dir}/ folder, skipping.`)
+      } else {
+        console.error(`Error processing hero-images/${variant.dir}:`, error)
+      }
     }
   }
 

@@ -9,6 +9,26 @@
 
     <!-- Main optimized image with picture element for format support -->
     <picture v-if="shouldLoadImage">
+      <!--
+        Optional portrait-orientation variants. Listed FIRST so the browser
+        picks them when (orientation: portrait) matches — native art-direction,
+        no JS, no flash on devices that boot in portrait.
+      -->
+      <template v-if="portraitSources">
+        <source
+          media="(orientation: portrait)"
+          :srcset="portraitSources.avifSource.srcset"
+          :type="portraitSources.avifSource.type"
+          :sizes="portraitSources.avifSource.sizes"
+        />
+        <source
+          media="(orientation: portrait)"
+          :srcset="portraitSources.webpSource.srcset"
+          :type="portraitSources.webpSource.type"
+          :sizes="portraitSources.webpSource.sizes"
+        />
+      </template>
+
       <!-- AVIF source for modern browsers -->
       <source
         :srcset="pictureSources.avifSource.srcset"
@@ -91,6 +111,14 @@
 
   interface Props {
     src: string
+    /**
+     * Optional portrait-orientation variant. When set, an additional pair of
+     * <source media="(orientation: portrait)"> elements is emitted so the
+     * browser picks the right image natively at HTML parse time — no JS swap.
+     */
+    srcPortrait?: string
+    /** Preset to use when generating the portrait variant URLs (defaults to `preset`). */
+    portraitPreset?: string
     alt: string
     width?: number
     height?: number
@@ -150,6 +178,26 @@
         srcset: resolveUrl(sources.webpSource.srcset)
       },
       fallbackSrc: resolveUrl(sources.fallbackSrc)
+    }
+  })
+
+  // Optional portrait-orientation sources — emitted only when srcPortrait is set.
+  const portraitSources = computed(() => {
+    if (!props.srcPortrait) return null
+    const sources = generatePictureSources(
+      props.srcPortrait,
+      props.sizes,
+      props.portraitPreset || props.preset
+    )
+    return {
+      avifSource: {
+        ...sources.avifSource,
+        srcset: resolveUrl(sources.avifSource.srcset)
+      },
+      webpSource: {
+        ...sources.webpSource,
+        srcset: resolveUrl(sources.webpSource.srcset)
+      }
     }
   })
 
