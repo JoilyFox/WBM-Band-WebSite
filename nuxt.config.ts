@@ -293,7 +293,7 @@ export default defineNuxtConfig({
 
   // Google Analytics Configuration
   gtag: {
-    id: 'G-T4G4XTP2QZ'
+    id: 'G-Z8QRF6TWC2'
   },
 
   // PrimeVue Configuration
