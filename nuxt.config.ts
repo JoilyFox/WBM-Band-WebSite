@@ -1,4 +1,41 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { musicLibrary } from './data/musicLibrary'
+import { SOURCE_PREFIXES, assertNoSlugCollisions } from './utils/sourceAttribution'
+
+const LOCALES = ['ua', 'en'] as const
+const RELEASE_SLUGS = musicLibrary.map((r) => r.slug)
+
+// Fail the build loudly if a song slug shadows a reserved source prefix.
+assertNoSlugCollisions(RELEASE_SLUGS)
+
+const STATIC_ROUTES = [
+  '/',
+  '/ua',
+  '/en',
+  '/ua/privacy-policy',
+  '/en/privacy-policy',
+  '/ua/terms-of-service',
+  '/en/terms-of-service',
+  '/ua/cookies-policy',
+  '/en/cookies-policy'
+]
+
+const masterPageRoutes = (): string[] => {
+  const routes: string[] = []
+  const prefixes = Object.keys(SOURCE_PREFIXES)
+  for (const locale of LOCALES) {
+    for (const slug of RELEASE_SLUGS) {
+      for (const pageType of ['listen', 'pre-save']) {
+        routes.push(`/${locale}/${pageType}/${slug}`)
+        for (const prefix of prefixes) {
+          routes.push(`/${locale}/${pageType}/${prefix}/${slug}`)
+        }
+      }
+    }
+  }
+  return routes
+}
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: false },
@@ -228,29 +265,13 @@ export default defineNuxtConfig({
     }
   },
 
-  // Static Site Generation
+  // Static Site Generation. Master-page routes are derived from
+  // data/musicLibrary.ts × LOCALES × SOURCE_PREFIXES so adding a new
+  // release or a new attribution prefix is a one-line change there
+  // rather than dozens of entries here.
   nitro: {
     prerender: {
-      routes: [
-        '/',
-        '/ua',
-        '/en',
-        '/ua/privacy-policy',
-        '/en/privacy-policy',
-        '/ua/terms-of-service',
-        '/en/terms-of-service',
-        '/ua/cookies-policy',
-        '/en/cookies-policy',
-        // Pre-save and listen routes (only with locale prefix - non-localized routes handled by .htaccess)
-        '/ua/pre-save/mania',
-        '/en/pre-save/mania',
-        '/ua/listen/mania',
-        '/en/listen/mania',
-        '/ua/pre-save/chorni-ptahy',
-        '/en/pre-save/chorni-ptahy',
-        '/ua/listen/chorni-ptahy',
-        '/en/listen/chorni-ptahy'
-      ],
+      routes: [...STATIC_ROUTES, ...masterPageRoutes()],
       failOnError: false // Allow build to succeed even when maintenance mode returns 503 errors
     }
   },

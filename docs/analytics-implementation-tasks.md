@@ -75,16 +75,13 @@ Goal: ship a pure, test-friendly module that decides where a visitor came from, 
 
 Goal: serve `/listen/<prefix>/<slug>` and `/pre-save/<prefix>/<slug>` for every release × every prefix × every locale, without duplicating the page logic.
 
-- [ ] **2.1** — Extract the shared SEO/meta/render logic from `pages/listen/[slug].vue` into `composables/useMasterPage.ts`. Returns `{ release, pageMeta, pageTitle, ... }` given a slug + page type. Both the existing `[slug].vue` files and the new prefix-aware files use it.
-- [ ] **2.2** — Create `pages/listen/[source]/[slug].vue`:
-  - Reads `route.params.source` (one of `SOURCE_PREFIXES` keys); if not a known prefix, redirect to clean `/listen/[slug]` (404 fallback if slug also bad).
-  - Calls `useSourceAttribution().setExplicit(SOURCE_PREFIXES[source])` before render so the source is locked in for any subsequent click events.
-  - Renders the same `<MusicDetailContent>` + footer as `[slug].vue` via the shared composable.
-- [ ] **2.3** — Mirror for `pages/pre-save/[source]/[slug].vue`.
-- [ ] **2.4** — Generate the prerender list dynamically. Replace the hardcoded array in `nuxt.config.ts` `nitro.prerender.routes` with a function that reads `data/musicLibrary.ts` and emits, for each release: `/{locale}/listen/{slug}`, `/{locale}/pre-save/{slug}`, plus `/{locale}/listen/{prefix}/{slug}` and `/{locale}/pre-save/{prefix}/{slug}` for each prefix in `SOURCE_PREFIXES`. For 2 releases × 2 locales × 12 prefixes = 96 prerender entries (still totally fine for SSG).
-- [ ] **2.5** — Update `scripts/create-nonlocalized-aliases.js` to also copy `ua/listen/<prefix>/` and `ua/pre-save/<prefix>/` directories into root, so `wbmband.com/listen/i/chorni-ptahy` works without locale prefix (matching the current behavior for plain `/listen/<slug>`).
-- [ ] **2.6** — Update `middleware/listen-access.ts` and `middleware/presave-access.ts` to handle the new `/listen/[source]/[slug]` path shape (most likely just a path-pattern adjustment).
-- [ ] **2.7** — Optional: emit a tidy bio-link list at build time → `dist/bio-links.txt` (just for your reference) listing every prefixed URL for every release. Saves you copy-pasting them into IG/TikTok bios.
+- [x] **2.1** — Extracted shared SEO/meta/render logic from `pages/listen/[slug].vue` into `composables/useMasterPage.ts`. Both the existing `[slug].vue` files and the new prefix-aware files use it. The composable handles release lookup, i18n title/description, OG meta image, canonical URL, and SEO keyword list (with Cyrillic transliteration).
+- [x] **2.2** — Created `pages/listen/[source]/[slug].vue`. Unknown prefixes redirect (302) to the clean `/listen/[slug]`. Uses `useMasterPage({ sourcePrefix })` which calls `setExplicitSourcePlatform()` on mount.
+- [x] **2.3** — Mirror created at `pages/pre-save/[source]/[slug].vue`. When the release date passes, redirects to `/listen/[source]/[slug]` so attribution survives the listen↔pre-save transition.
+- [x] **2.4** — Replaced the hardcoded `nitro.prerender.routes` array with a generator that derives routes from `data/musicLibrary.ts × LOCALES × SOURCE_PREFIXES`. Build verified: **192 routes prerendered** (144 master-page HTML files counting the non-localized aliases), no errors.
+- [x] **2.5** — `scripts/create-nonlocalized-aliases.js` already does a recursive `ua/listen` → `listen` copy, so prefix paths `/listen/i/<slug>/` are automatically aliased without modifying the script.
+- [x] **2.6** — Updated `middleware/listen-access.ts` and `middleware/presave-access.ts` to read the optional `source` route param and preserve it across listen↔pre-save redirects. Otherwise a user landing on `/listen/i/<slug>` whose release was still pre-save would lose their Instagram attribution during the redirect.
+- [ ] **2.7** — Optional bio-link list emitter — deferred. Easy to add later as a build hook that writes `.output/public/bio-links.txt`.
 
 ---
 

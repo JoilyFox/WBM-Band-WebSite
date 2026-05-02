@@ -1,11 +1,16 @@
 import { useLocalePath } from '#i18n'
 import { getReleaseBySlug } from '~/data/musicLibrary'
 import { formatReleaseDate, getConfig, isUpcomingRelease } from '~/utils/configHelpers'
+import { SOURCE_PREFIXES } from '~/utils/sourceAttribution'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const slugParam = to.params?.slug
   const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam
   if (!slug) return
+
+  const sourceParam = to.params?.source
+  const sourceRaw = Array.isArray(sourceParam) ? sourceParam[0] : sourceParam
+  const sourcePrefix = sourceRaw && sourceRaw in SOURCE_PREFIXES ? sourceRaw : undefined
 
   const release = getReleaseBySlug(slug)
   if (!release) return
@@ -22,8 +27,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (enablePreSave && hasPreSaveLinks) {
     const localePath = useLocalePath()
-    const redirectPath = localePath(`/pre-save/${slug}`)
-    return navigateTo(redirectPath, { redirectCode: 302 })
+    const target = sourcePrefix ? `/pre-save/${sourcePrefix}/${slug}` : `/pre-save/${slug}`
+    return navigateTo(localePath(target), { redirectCode: 302 })
   }
 
   const i18nLocale = useNuxtApp()?.$i18n?.locale?.value
