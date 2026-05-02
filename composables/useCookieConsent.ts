@@ -19,6 +19,10 @@ const STORAGE_KEY = 'wbm_cookie_consent'
 // Module-level ref so every component that calls useCookieConsent()
 // shares the same reactive state.
 const state = ref<ConsentState>('undecided')
+// In-memory only: a swipe-to-snooze hides the toast for the rest of
+// this page-render but, unlike accept/decline, doesn't write to
+// localStorage — so a full reload resurfaces the banner.
+const sessionSnoozed = ref(false)
 let initialized = false
 
 function safeWriteStorage(value: ConsentState | null): void {
@@ -82,6 +86,15 @@ export function useCookieConsent() {
   }
 
   /**
+   * Soft-dismiss the banner for this session only. Does NOT persist —
+   * the toast reappears on the next full page reload. Used by the
+   * mobile swipe-to-dismiss gesture.
+   */
+  function snooze(): void {
+    sessionSnoozed.value = true
+  }
+
+  /**
    * Wipe the stored decision and revert state to undecided so the
    * toast reappears on next page load. We don't push a new consent
    * update to gtag here — the existing in-memory grant remains until
@@ -94,9 +107,10 @@ export function useCookieConsent() {
 
   return {
     state: computed(() => state.value),
-    isUndecided: computed(() => state.value === 'undecided'),
+    isUndecided: computed(() => state.value === 'undecided' && !sessionSnoozed.value),
     accept,
     decline,
+    snooze,
     reset,
     hydrate
   }
