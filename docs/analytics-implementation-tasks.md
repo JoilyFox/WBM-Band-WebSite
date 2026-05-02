@@ -124,13 +124,9 @@ Approach: tiny ~320×140px card in the bottom-left corner. Three buttons: Accept
 
 ## Phase 6 — GA4 admin: custom dimensions + key events
 
-- [ ] **6.1** — `Admin → Custom definitions → Create custom dimension`. Register all four as **Event-scoped**:
-  - `source_platform` (event param `source_platform`)
-  - `release_slug` (event param `release_slug`)
-  - `page_type` (event param `page_type`)
-  - `platform_name` (event param `platform_name`)
+- [x] **6.1** — Registered all four custom dimensions as **Event-scoped** in GA4 Admin → Custom definitions: `source_platform`, `release_slug`, `page_type`, `platform_name`. (Done by Bohdan, session 1 2026-05-02.)
 - [ ] **6.2** — Wait 24-48h for dimensions to populate (GA4 backfills slowly). Expected.
-- [ ] **6.3** — `Admin → Events → Mark as key event` for `platform_click` (and optionally `release_view`).
+- [x] **6.3** — Marked `platform_click` (and optionally `release_view`) as Key Events via Admin → Events → star icon. GA4 surfaced the events in the admin list within hours rather than the usual 24h.
 - [ ] **6.4** — Optionally create a calculated metric "conversion rate" = `platform_click / page_view` for quick dashboards.
 
 ---
