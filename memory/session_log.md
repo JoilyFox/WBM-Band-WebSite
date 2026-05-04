@@ -1,0 +1,63 @@
+# Session Memory Log
+
+---
+
+## Session: 2026-05-02 → 2026-05-04 — Analytics initiative end-to-end (phases 0–7)
+
+### Accomplished
+
+- ✅ Phase 0 — Fixed wrong GA4 measurement ID in `nuxt.config.ts` (`G-T4G4XTP2QZ` → `G-Z8QRF6TWC2`); GA4 confirmed live, Realtime + DebugView showing real events.
+- ✅ Phase 1 — Hybrid source-attribution layer at `utils/sourceAttribution.ts` (path prefix > referrer hostname > UA fingerprint > 'direct'/'other' fallback). Bot heuristic at `utils/isLikelyBot.ts`. Manual test harness at `scripts/test-source-attribution.ts` runnable via `npm run test:attribution` (Node 22 `--experimental-strip-types`). 34/34 tests pass.
+- ✅ Phase 2 — Path-prefix routes: `pages/listen/[source]/[slug].vue` + `pages/pre-save/[source]/[slug].vue`. 12 prefixes (`i tt yt fb x sc ln th tg pin qr em`). Shared `composables/useMasterPage.ts` keeps SEO/i18n/keyword logic in one place. Prerender list now derived from `musicLibrary × LOCALES × SOURCE_PREFIXES` — 192 routes built. Middlewares preserve source prefix on listen↔pre-save redirects. `.htaccess` regex widened from `[^/]+$` to `[^/]+(/[^/]+)?$` to rewrite the 2-segment paths. Build-time guard `assertNoSlugCollisions` prevents song slugs shadowing reserved prefixes.
+- ✅ Phase 3+4 — `composables/useAnalytics.ts` (single GA4 surface), `plugins/analytics.client.ts` (locks first-touch source as `gtag('set', 'user_properties')`). `PlatformButton.vue` fires `platform_click` (bot-filtered, `transport_type: 'beacon'` to survive nav). `MusicDetailContent.vue` plumbs `releaseSlug` + `pageType` to every button. Master pages call `trackReleaseView` on mount. Pre-save distributor redirect fires `platform_click('distributor')` before `navigateTo`.
+- ✅ Phase 5 — Cookie consent: small bottom-left toast (`components/common/CookieConsentToast.vue`) + Google Consent Mode v2 default-deny in `nuxt.config.ts gtag.initCommands` with `wait_for_update: 500`. `composables/useCookieConsent.ts` is the single source of truth; persists Accept/Decline in localStorage, has a session-only `snooze()` for the swipe gesture. Mobile swipe-left/right past 80px snoozes the toast (reappears on full reload, not on SPA nav). `pages/cookies-policy.vue` has a "Reset cookie preferences" card.
+- ✅ Phase 6 — In GA4 admin: 4 custom event-scoped dimensions registered (`source_platform`, `release_slug`, `page_type`, `platform_name`); `platform_click` and `release_view` marked as Key Events.
+- ✅ Phase 7 — Four Explorations live in GA4: (1) Master Pages: Visitors vs Conversions — line chart with two series; (2) Source Attribution Breakdown — table source × event; (3) Per-platform timeline — line per source filtered to `platform_click`, with a duplicate tab for `release_view`; (4) Pre-save per-song breakdown — table release_slug × event filtered to `page_type = pre-save`.
+- ✅ Created `/save-context` slash command at `.claude/commands/save-context.md` (adapted from the user's other repo).
+- ✅ Created `docs/analytics-implementation-tasks.md` — multi-phase plan, source of truth.
+- ✅ Persistent memory under `~/.claude/projects/-Users-bohdan-Documents--Repositories-WBM-Band-WebSite/memory/` (user profile, project context, references).
+
+### Key decisions
+
+- **Hybrid source attribution beats UTM**: path-prefix gives 100% accuracy where Bohdan controls the link (bio); referrer + UA fingerprint covers organic shares. Compromised on URL "beauty" by keeping prefixes short (`i`/`tt`/`yt`/etc.) — still clean.
+- **Single composable, multiple consumers**: `useMasterPage` + `useAnalytics` + `useCookieConsent` each have one job; pages and components are thin. No direct `gtag()` calls outside the composable.
+- **Consent Mode v2 default-deny over hard-block**: declined users still ping anonymously, so timeline charts don't go to zero. `wait_for_update: 500` lets the toast race the first event fire so accepters get full data immediately.
+- **Per-prefix non-localized aliases handled by recursive `cp`**: `scripts/create-nonlocalized-aliases.js` already does `ua/listen` → `listen` recursively, so prefix subdirs come along for free. No script change needed.
+- **Snooze (swipe) ≠ Decline**: swipe is in-memory only; reload resurfaces the toast. Accept/Decline persist via localStorage.
+
+### Technical findings
+
+- GA4's stated "24-48h backfill for custom dimensions" applies to **report inclusion**, not to Explorations dimension availability. Explorations could query `Source platform` within hours.
+- `platform_click` appeared in GA4 Admin → Events list within hours of first firing, faster than Google's documented lag.
+- Combining a user-scoped metric (`Active users`) with a custom event-scoped dimension (`Source platform`) throws "Incompatible with currently applied dimensions and metrics" in Explorations. Drop `Active users` and use `Event count` only.
+- Filter chips in GA4 Explorations are AND'd by default; for OR semantics on the same dimension use the `matches regex` operator with `^(a|b)$`.
+- `nuxt-gtag@4.1.0` exposes `useGtag().gtag` typed as `Gtag<keyof GtagCommands>`. Custom event names go through `(string & {})` branch — fully usable.
+- Apache `DirectorySlash Off` + a directory existing at the requested path → 404 unless a rewrite rule maps it to the inner `index.html`. Source: investigating `/listen/i/<slug>` 404 on production.
+- Setting `transport_type: 'beacon'` on `gtag('event', ...)` keeps the request alive past `pagehide`, which is what makes `platform_click` survive the click-to-external-platform navigation.
+- iOS Instagram in-app browser sets `Instagram` in UA; TikTok sets `TikTok` AND `musical_ly` AND `Bytedance`; Facebook IAB sets `FBAN`/`FBAV`/`FB_IAB`. All confirmed by manual testing.
+
+### Credentials & IDs obtained
+
+- GA4 Measurement ID `G-Z8QRF6TWC2` — committed in `nuxt.config.ts` (public by design).
+- ⚠️ User briefly had a Google service account JSON open in IDE (`wbm-social-publisher-56d79459a37a.json`, key id `56d79459a37a767c550c8bdeed33e88ea9134244`). Agent flagged for rotation if exposed; user did not confirm whether revoked.
+
+### Blockers & open questions
+
+- Phase 7.6 (pin Explorations to Reports → Library) — partially deferred; GA4's Library is for Reports not Explorations, so the equivalent is sharing/starring. Open: build a Reports → Library Collection with Overview report or use Looker Studio? Resolved next session.
+- Phase 6.4 (calculated metric for conversion rate) — not done yet.
+- Phase 8.1 (bio-link cheat sheet at build time) — not done yet.
+- Phase 8.3 (consolidated `docs/analytics-system.md`) — not done.
+
+### Next session: start here
+
+1. Build Phase 8.1 — `scripts/generate-bio-links.js` emitting `.output/bio-links.md` so Bohdan has a printable list of every prefixed URL × every release.
+2. Walk Bohdan through Phase 6.4 (calculated metric in GA4 Admin → Custom definitions → Calculated metrics: `platform_click / release_view * 100`, formatted as percent).
+3. Build the unified analytics dashboard (user-requested "main page with all graphics"). Recommendation: Looker Studio connected to GA4 — way more powerful than GA4's built-in custom Reports. Plan a single dashboard with KPI scorecards + the four chart types from the Explorations.
+
+### Important IDs & links discovered this session
+
+- GA4 Measurement ID: `G-Z8QRF6TWC2` (public)
+- GA4 property: WBM Band web stream — accessed via https://analytics.google.com
+- Reminder agent (one-time, fires Mon 2026-05-04 07:00 UTC) — `trig_0154gW6VTTBswN4Vi7LWwZfc` — disabled after the GA4 events appeared in the admin list ahead of schedule.
+- Docs: `docs/analytics-implementation-tasks.md` is the per-phase plan; `memory/session_log.md` (this file) is the chronological log.
+- Latest commit: `270e108` — phase 7 complete.

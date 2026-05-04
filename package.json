@@ -6,7 +6,7 @@
     "build": "nuxt build",
     "dev": "HOST=0.0.0.0 nuxt dev",
     "generate:base": "nuxt generate",
-    "generate": "npm run generate:base && node scripts/create-nonlocalized-aliases.js",
+    "generate": "npm run generate:base && node scripts/create-nonlocalized-aliases.js && node scripts/generate-bio-links.js",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "compress-images": "node scripts/compress-images.js",

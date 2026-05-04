@@ -136,7 +136,7 @@ Approach: tiny ~320×140px card in the bottom-left corner. Three buttons: Accept
 
 ## Phase 8 — Polish (optional, can defer)
 
-- [ ] **8.1** — Generate a printable bio-link cheat sheet at build time (a markdown file listing every prefixed URL for each release).
+- [x] **8.1** — `scripts/generate-bio-links.js` runs at the end of `npm run generate` and emits `.output/bio-links.md` — a markdown table of every prefixed URL × every release × {listen, pre-save}. File lives outside `.output/public` so it's not deployed; open it locally after each build.
 - [ ] **8.2** — Add `engagement_time_msec` enrichment on `platform_click` (how long was the user on the page before clicking?).
 - [ ] **8.3** — Document everything in `docs/analytics-system.md` and link it from `docs/README.md`.
 
