@@ -125,14 +125,12 @@ Approach: tiny ~320×140px card in the bottom-left corner. Three buttons: Accept
 
 ## Phase 7 — Dashboards & explorations
 
-- [ ] **7.1** — Site Overview: use the default Reports → Acquisition / Engagement; nothing custom needed.
-- [ ] **7.2** — **Master Pages: Visitors vs Conversions** Exploration:
-  - Free form. Rows = date. Values = `page_view` count + `platform_click` count. Filter `page_type IN (listen, pre-save)`. Line chart, two series.
-- [ ] **7.3** — **Source Attribution Breakdown** Exploration:
-  - Free form. Rows = date · `source_platform`. Values = `page_view`, `platform_click`, conversion rate. Filter `page_type IN (listen, pre-save)`.
-- [ ] **7.4** — **Per-platform timeline** Explorations: clone for each major source (Instagram, TikTok, YouTube).
-- [ ] **7.5** — **Per-song pre-save analytics** Exploration (requested feature): rows = date · `release_slug`. Values = `page_view`, `platform_click`. Filter `page_type = pre-save`. One row per release, individually filterable.
-- [ ] **7.6** — Pin all to the Reports library.
+- [x] **7.1** — Site Overview is the default Reports → Acquisition / Engagement; no custom build needed.
+- [x] **7.2** — **Master Pages: Visitors vs Conversions** Exploration built. Line chart, X-axis = day, two lines (release_view + platform_click) via Event-name breakdown, regex filter `^(release_view|platform_click)$`.
+- [x] **7.3** — **Source Attribution Breakdown** Exploration built. Free-form table with rows = `Source platform`, columns = `Event name`, values = `Event count`. Reads as visitors vs conversions per platform; conversion rate is platform_click ÷ release_view.
+- [x] **7.4** — **Per-platform timeline** Exploration built. Single line chart with `Source platform` as Breakdowns and an `Event name = platform_click` filter — one line per platform, conversions over time. Duplicate tab covers visitors over time (`Event name = release_view`).
+- [x] **7.5** — **Pre-save per-song breakdown** Exploration built. Rows = `Release slug`, columns = `Event name`, filtered to `Page type = pre-save` plus the regex filter on Event name. One row per upcoming song.
+- [ ] **7.6** — Pin all four explorations to the Reports library (Reports → Library → Add). Optional finishing touch — they're already accessible from Explore.
 
 ---
 
