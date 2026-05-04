@@ -119,7 +119,7 @@ Approach: tiny ~320×140px card in the bottom-left corner. Three buttons: Accept
 - [x] **6.1** — Registered all four custom dimensions as **Event-scoped** in GA4 Admin → Custom definitions: `source_platform`, `release_slug`, `page_type`, `platform_name`. (Done by Bohdan, session 1 2026-05-02.)
 - [ ] **6.2** — Wait 24-48h for dimensions to populate (GA4 backfills slowly). Expected.
 - [x] **6.3** — Marked `platform_click` (and optionally `release_view`) as Key Events via Admin → Events → star icon. GA4 surfaced the events in the admin list within hours rather than the usual 24h.
-- [ ] **6.4** — Optionally create a calculated metric "conversion rate" = `platform_click / page_view` for quick dashboards.
+- [~] **6.4** — Won't do via GA4 calculated metrics. The feature only supports arithmetic on whole metrics, not inline event-name filtering — confirmed by attempting `{eventCount,eventName=platform_click}/{eventCount,eventName=release_view}` and getting "metrics invalid or do not exist". Conversion rate will be computed in Looker Studio (where filters work in formulas) and is also visible out of the box in **Reports → Acquisition → Traffic acquisition** as the "Key event rate" column since `platform_click` is a Key Event.
 
 ---
 
