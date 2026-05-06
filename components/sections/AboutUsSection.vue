@@ -109,47 +109,39 @@
     interval: 30000, // 30 seconds
     images: () => [
       {
-        src: '/images/optimized/about-us-images/DSC02185.avif',
+        src: '/images/optimized/about-us-images/1.avif',
         alt: 'About us image'
       },
       {
-        src: '/images/optimized/about-us-images/DSC02209-2.avif',
+        src: '/images/optimized/about-us-images/2.avif',
         alt: 'About us image'
       },
       {
-        src: '/images/optimized/about-us-images/DSC02213-2.avif',
+        src: '/images/optimized/about-us-images/3.avif',
         alt: 'About us image'
       },
       {
-        src: '/images/optimized/about-us-images/DSC02256.avif',
+        src: '/images/optimized/about-us-images/4.avif',
         alt: 'About us image'
       },
       {
-        src: '/images/optimized/about-us-images/DSC02268.avif',
+        src: '/images/optimized/about-us-images/5.avif',
         alt: 'About us image'
       },
       {
-        src: '/images/optimized/about-us-images/DSC02277.avif',
+        src: '/images/optimized/about-us-images/6.avif',
         alt: 'About us image'
       },
       {
-        src: '/images/optimized/about-us-images/DSC02287.avif',
+        src: '/images/optimized/about-us-images/7.avif',
         alt: 'About us image'
       },
       {
-        src: '/images/optimized/about-us-images/DSC02291.avif',
+        src: '/images/optimized/about-us-images/8.avif',
         alt: 'About us image'
       },
       {
-        src: '/images/optimized/about-us-images/DSC02299.avif',
-        alt: 'About us image'
-      },
-      {
-        src: '/images/optimized/about-us-images/DSC02323.avif',
-        alt: 'About us image'
-      },
-      {
-        src: '/images/optimized/about-us-images/DSC02356.avif',
+        src: '/images/optimized/about-us-images/9.avif',
         alt: 'About us image'
       }
     ]

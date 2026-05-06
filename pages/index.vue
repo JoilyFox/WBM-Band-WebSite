@@ -14,8 +14,8 @@
       <!-- About Us Section -->
       <SectionsAboutUsSection />
 
-      <!-- Our Team Section (Subsection of About Us) -->
-      <SectionsOurTeam />
+      <!-- Our Team Section (Subsection of About Us) *STILL IN PRODUCTION* -->
+      <!-- <SectionsOurTeam /> -->
 
       <!-- Contacts Section -->
       <SectionsContactsSection />
