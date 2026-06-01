@@ -941,6 +941,15 @@
     align-items: center;
     justify-content: center;
     @include absolute-overlay;
+    /* Always-on darkening behind the centered text so it stays legible over
+       bright cover art. The .presave-overlay above only fades in on hover, which
+       left the text low-contrast at rest and on touch devices. */
+    background: radial-gradient(
+      120% 95% at 50% 55%,
+      rgba(0, 0, 0, 0.42) 0%,
+      rgba(0, 0, 0, 0.2) 55%,
+      transparent 82%
+    );
   }
 
   @media (hover: hover) and (pointer: fine) {

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": ["Bash(npx eslint *)", "Bash(npx --no-install eslint *)"]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git -C \"$CLAUDE_PROJECT_DIR\" status -sb"
+          }
+        ]
+      }
+    ]
+  }
+}

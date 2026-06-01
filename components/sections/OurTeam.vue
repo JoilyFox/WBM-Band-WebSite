@@ -55,6 +55,7 @@
               :initial-image="member.image"
               :data-index="index"
               class="team-card-animate"
+              @click="handleMemberClick"
             />
           </SwiperSlide>
         </Swiper>
@@ -68,6 +69,12 @@
         </div>
       </div>
     </CommonContainer>
+
+    <TeamMemberModal
+      :member="selectedMember"
+      :is-visible="isMemberModalOpen"
+      @close="closeMemberModal"
+    />
   </section>
 </template>
 
@@ -78,7 +85,8 @@
   import CommonContainer from '~/components/common/Container.vue'
   import CommonSmallSectionTitle from '~/components/common/SmallSectionTitle.vue'
   import TeamMemberCard from '~/components/team/TeamMemberCard.vue'
-  import { teamMembers as teamMembersData } from '~/data/teamMembers'
+  import TeamMemberModal from '~/components/team/TeamMemberModal.vue'
+  import { teamMembers as teamMembersData, type TeamMember } from '~/data/teamMembers'
   import {
     useAutoRotationControl,
     type TeamMemberCardInstance
@@ -125,6 +133,19 @@
 
   // Use auto-rotation control composable
   const { setupObserver } = useAutoRotationControl(sectionRef, memberCardRefs)
+
+  // Modal state
+  const selectedMember = ref<TeamMember | null>(null)
+  const isMemberModalOpen = ref(false)
+
+  const handleMemberClick = (member: TeamMember) => {
+    selectedMember.value = member
+    isMemberModalOpen.value = true
+  }
+
+  const closeMemberModal = () => {
+    isMemberModalOpen.value = false
+  }
 
   /**
    * Setup animation observer for scroll-based fade-in effects

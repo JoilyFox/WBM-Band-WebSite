@@ -162,7 +162,9 @@ This command will:
    https://wbmband.com
 
 📊 Summary:
-   Files uploaded: 245
+   Uploaded:   245
+   Skipped (unchanged): 0
+   Total files: 245
    Remote path: /home/wbmband/
 
 ═══════════════════════════════════════════
@@ -215,13 +217,17 @@ DELETE_REMOTE=false
 
 ### [`scripts/deploy-production.js`](../scripts/deploy-production.js)
 
-Deployment script features:
+Deployment script features (uploader built on [`basic-ftp`](https://www.npmjs.com/package/basic-ftp)):
 
 - ✅ Validates build exists
 - ✅ Checks FTP credentials
 - ✅ Shows upload progress
 - ✅ Colored terminal output
 - ✅ Error handling with troubleshooting tips
+- ✅ **Idle-socket timeout** — a hung passive data connection fails fast instead of stalling the whole run forever (the old `ftp-deploy`-based script had no timeout and would freeze mid-upload)
+- ✅ **Per-file retry with reconnect** — transient drops recover automatically (default 8 attempts, tune via `FTP_RETRIES`)
+- ✅ **Resumable** — files already on the server with a matching size are skipped, so re-running after an interruption doesn't re-upload everything
+- ✅ **No pre-wipe** — files are uploaded in place (no downtime window); with `DELETE_REMOTE=true`, orphaned remote files are cleaned up only _after_ a fully successful upload
 
 ---
 
@@ -276,8 +282,9 @@ Error: ETIMEDOUT
 
 1. Check your internet connection
 2. Verify `FTP_HOST` is correct in `.env.production`
-3. Check if your hosting firewall allows FTP connections
-4. Try again later (server might be temporarily down)
+3. Check if your hosting firewall allows **passive** FTP data connections
+4. Just **re-run `npm run deploy:production`** — the deploy resumes and skips files already uploaded, so an interrupted run continues instead of starting over
+5. If transfers stall often, raise `FTP_TIMEOUT` / `FTP_RETRIES` in `.env.production`
 
 ---
 
@@ -398,19 +405,15 @@ Before major deployments:
 # Option 3: Keep old builds locally
 ```
 
-### 3. Incremental Updates
+### 3. Incremental & Resumable Updates
 
-For small changes, set `DELETE_REMOTE=false` in `.env.production` to:
+Every deploy is now incremental: the uploader skips any file already on the server with a matching size, so unchanged files cost nothing and an interrupted run can simply be re-run to **resume where it left off** (no need to start over).
 
-- ✅ Upload only changed files
-- ✅ Faster deployments
-- ✅ Less bandwidth usage
+Set `DELETE_REMOTE=false` (default) to leave stale/orphaned remote files in place — harmless for a static site (old hashed `_nuxt/*` chunks just sit unused) and the fastest, safest option.
 
-For major updates, set `DELETE_REMOTE=true` to:
+Set `DELETE_REMOTE=true` to also remove orphaned remote files (those no longer present in the local build). This cleanup runs **after** a fully successful upload — the live site is never wiped first, so there's no downtime window even on a clean-slate deploy.
 
-- ✅ Remove old files
-- ✅ Clean slate deployment
-- ⚠️ Use with caution!
+> Tuning: if your network is flaky you can raise `FTP_RETRIES` or `FTP_TIMEOUT` in `.env.production` (see the Environment Variables Reference). For an FTPS server, set `FTP_SECURE=true`.
 
 ### 4. Monitor Deployment
 
@@ -436,14 +439,17 @@ After deployment:
 
 ### `.env.production`
 
-| Variable        | Required | Description                       | Example                |
-| --------------- | -------- | --------------------------------- | ---------------------- |
-| `FTP_HOST`      | ✅ Yes   | FTP server hostname               | `wbmband.ftp.tools`    |
-| `FTP_USERNAME`  | ✅ Yes   | FTP login username                | `wbmband_ftp`          |
-| `FTP_PASSWORD`  | ✅ Yes   | FTP password                      | `your_secure_password` |
-| `FTP_PORT`      | ❌ No    | FTP port (default: 21)            | `21`                   |
-| `FTP_ROOT`      | ✅ Yes   | Remote directory path             | `/home/wbmband/`       |
-| `DELETE_REMOTE` | ❌ No    | Delete old files (default: false) | `false`                |
+| Variable        | Required | Description                                                                     | Example                |
+| --------------- | -------- | ------------------------------------------------------------------------------- | ---------------------- |
+| `FTP_HOST`      | ✅ Yes   | FTP server hostname                                                             | `wbmband.ftp.tools`    |
+| `FTP_USERNAME`  | ✅ Yes   | FTP login username                                                              | `wbmband_ftp`          |
+| `FTP_PASSWORD`  | ✅ Yes   | FTP password                                                                    | `your_secure_password` |
+| `FTP_PORT`      | ❌ No    | FTP port (default: 21)                                                          | `21`                   |
+| `FTP_ROOT`      | ✅ Yes   | Remote directory path                                                           | `/home/wbmband/`       |
+| `DELETE_REMOTE` | ❌ No    | Remove orphaned remote files after a successful upload (default: false)         | `false`                |
+| `FTP_SECURE`    | ❌ No    | Use FTPS over TLS (default: false)                                              | `false`                |
+| `FTP_TIMEOUT`   | ❌ No    | Idle-socket timeout in ms before a stalled transfer is retried (default: 30000) | `30000`                |
+| `FTP_RETRIES`   | ❌ No    | Per-file retry attempts before giving up (default: 8)                           | `8`                    |
 
 ---
 

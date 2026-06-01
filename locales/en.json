@@ -263,7 +263,8 @@
     },
     "presave": {
       "card_title_fallback": "Pre-save",
-      "coming_prefix": "Release {date}"
+      "coming_prefix": "Release {date}",
+      "redirecting": "Taking you to pre-save…"
     },
     "days_remaining": {
       "prefix": "in",
@@ -297,6 +298,10 @@
     "chorni_ptahy": {
       "title": "Chorni Ptahy",
       "description": "This song is a confession of alienation and trauma from a painful encounter with an indifferent society."
+    },
+    "alina": {
+      "title": "Alina",
+      "description": "A satirical song about the dangers of teenage online acquaintances, told through the eyes of an antagonist hiding behind a fake identity."
     }
   },
   "team": {
@@ -306,6 +311,26 @@
       "bohdan": {
         "name": "Bohdan",
         "role": "Solo Guitarist"
+      },
+      "anna": {
+        "name": "Anna",
+        "role": "Lead Vocals"
+      },
+      "maksym": {
+        "name": "Maksym",
+        "role": "Bass Guitarist"
+      },
+      "yulia": {
+        "name": "Yulia",
+        "role": "Drummer"
+      },
+      "oleksandr": {
+        "name": "Oleksandr",
+        "role": "Rhythm Guitarist"
+      },
+      "iryna": {
+        "name": "Iryna",
+        "role": "Keyboardist"
       }
     }
   },

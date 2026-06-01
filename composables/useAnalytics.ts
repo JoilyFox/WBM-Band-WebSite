@@ -6,6 +6,13 @@ export type MasterPageType = 'listen' | 'pre-save'
 export interface ReleaseViewParams {
   releaseSlug: string
   pageType: MasterPageType
+  /**
+   * Set to 'beacon' when an external navigation follows immediately (the
+   * pre-save distributor auto-redirect). sendBeacon survives page teardown,
+   * so the view isn't lost in the hop to the distributor. Omit on normal
+   * pages — the default transport is fine when nothing tears the page down.
+   */
+  transport?: 'beacon'
 }
 
 export interface PlatformClickParams {
@@ -54,7 +61,7 @@ export function useAnalytics() {
     return getOrPersistSourcePlatform()
   }
 
-  function trackReleaseView({ releaseSlug, pageType }: ReleaseViewParams): void {
+  function trackReleaseView({ releaseSlug, pageType, transport }: ReleaseViewParams): void {
     if (typeof window === 'undefined') return
     const key = `${pageType}:${releaseSlug}`
     if (getSeenViews().includes(key)) return
@@ -62,7 +69,8 @@ export function useAnalytics() {
     gtag('event', 'release_view', {
       release_slug: releaseSlug,
       page_type: pageType,
-      source_platform: getSourcePlatform()
+      source_platform: getSourcePlatform(),
+      ...(transport ? { transport_type: transport } : {})
     })
   }
 

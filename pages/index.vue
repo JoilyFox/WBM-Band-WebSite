@@ -14,7 +14,8 @@
       <!-- About Us Section -->
       <SectionsAboutUsSection />
 
-      <!-- Our Team Section (Subsection of About Us) *STILL IN PRODUCTION* -->
+      <!-- Our Team Section (Subsection of About Us) — STILL IN DEVELOPMENT, hidden on prod.
+           Re-enable by uncommenting the line below once the team section is ready. -->
       <!-- <SectionsOurTeam /> -->
 
       <!-- Contacts Section -->

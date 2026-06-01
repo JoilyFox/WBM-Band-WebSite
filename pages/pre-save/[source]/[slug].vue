@@ -1,12 +1,15 @@
 <template>
   <div class="music-page">
-    <MusicDetailContent :release="release" :is-modal="false" :is-pre-save="true" />
-    <SectionsFooterSection :minimized="true" />
+    <MusicPreSaveRedirectScreen v-if="showRedirectScreen" :release="release" />
+    <template v-else>
+      <MusicDetailContent :release="release" :is-modal="false" :is-pre-save="true" />
+      <SectionsFooterSection :minimized="true" />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { onMounted } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useMasterPage } from '~/composables/useMasterPage'
   import { useAnalytics } from '~/composables/useAnalytics'
   import { isUpcomingRelease } from '~/utils/configHelpers'
@@ -54,11 +57,41 @@
 
   const { trackReleaseView, trackPlatformClick } = useAnalytics()
 
+  // Whether this page auto-redirects to a distributor smart-link. Known at
+  // build time from static release data, so the prerendered HTML can show the
+  // redirect screen instead of the (link-less) pre-save body — no flash.
+  const willAutoRedirect = computed(() =>
+    Boolean(release.useDistributorPreSave && release.distributorPreSaveUrl)
+  )
+  // ?bypass=true reveals the full pre-save body and cancels the redirect. It's
+  // query-only, so it's unknowable at prerender time: start false so SSR + first
+  // hydration render the redirect screen, then flip on mount if bypass is set.
+  const bypassDistributor = ref(false)
+  const showRedirectScreen = computed(() => willAutoRedirect.value && !bypassDistributor.value)
+
   onMounted(() => {
-    trackReleaseView({ releaseSlug: slug, pageType: 'pre-save' })
-    const bypassDistributor = route.query.bypass === 'true'
-    if (release.useDistributorPreSave && release.distributorPreSaveUrl && !bypassDistributor) {
-      trackPlatformClick({ platformName: 'distributor', releaseSlug: slug, pageType: 'pre-save' })
+    const bypass = route.query.bypass === 'true'
+    if (willAutoRedirect.value && bypass) {
+      // Debug escape hatch: show the body, don't redirect, don't log a conversion.
+      bypassDistributor.value = true
+      trackReleaseView({ releaseSlug: slug, pageType: 'pre-save' })
+      return
+    }
+    // 'beacon' keeps the per-source view alive past the external navigation below —
+    // that view is the whole point of the /pre-save/<source>/<slug> link.
+    trackReleaseView({
+      releaseSlug: slug,
+      pageType: 'pre-save',
+      transport: willAutoRedirect.value ? 'beacon' : undefined
+    })
+    if (willAutoRedirect.value) {
+      // Releases flagged skipDistributorConversionEvent (distributor smart-links that
+      // complete the save off-site) opt out of the synthetic conversion event so the
+      // auto-redirect isn't logged as a 100% conversion; release_view still counts the
+      // per-source visit (the whole point of the /pre-save/<source>/<slug> link).
+      if (!release.skipDistributorConversionEvent) {
+        trackPlatformClick({ platformName: 'distributor', releaseSlug: slug, pageType: 'pre-save' })
+      }
       navigateTo(release.distributorPreSaveUrl, { external: true, redirectCode: 302 })
     }
   })

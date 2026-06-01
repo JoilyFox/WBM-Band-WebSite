@@ -37,9 +37,37 @@ export interface MusicRelease {
   useDistributorPreSave?: boolean
   /** Direct link to distributor's pre-save page (e.g., DistroKid, TuneCore, etc.) */
   distributorPreSaveUrl?: string
+  /**
+   * When true, suppress the synthetic `platform_click` (platform_name: 'distributor')
+   * conversion event fired on the automatic distributor redirect. Use for distributor
+   * smart-links (e.g. feature.fm/ffm.to) where the real save happens off-site and can't
+   * be measured here — an auto-redirect click would just record a meaningless 100%
+   * conversion. `release_view` still fires, so per-source visits are still counted.
+   * See the pre-save pages' onMounted hook.
+   */
+  skipDistributorConversionEvent?: boolean
 }
 
 export const musicLibrary: MusicRelease[] = [
+  {
+    id: '3',
+    slug: 'alina',
+    title: 'Аліна',
+    titleKey: 'releases.alina.title',
+    type: 'single',
+    releaseDate: '2026-06-11T21:00:00Z', // Midnight Kyiv time (EEST/UTC+3) → 00:00 on 2026-06-12
+    imageUrl: '/images/optimized/albums-images/alina/cover.avif',
+    descriptionKey: 'releases.alina.description',
+    featured: true,
+    // Released-state streaming links are filled in closer to release; the pre-save
+    // flow uses the distributor smart-link below, not these.
+    musicPlatformLinks: {},
+    useDistributorPreSave: true,
+    distributorPreSaveUrl: 'https://id.ffm.to/alina',
+    // feature.fm handles the actual save off-site, so skip the synthetic distributor
+    // conversion event — only the per-source `release_view` is meaningful here.
+    skipDistributorConversionEvent: true
+  },
   {
     id: '2',
     slug: 'chorni-ptahy',

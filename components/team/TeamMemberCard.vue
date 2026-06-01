@@ -1,5 +1,14 @@
 <template>
-  <div class="team-member-card" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
+  <div
+    class="team-member-card"
+    role="button"
+    tabindex="0"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
+    @click="emit('click', member)"
+    @keydown.enter.prevent="emit('click', member)"
+    @keydown.space.prevent="emit('click', member)"
+  >
     <div class="member-image-container">
       <!-- Current visible image -->
       <img
@@ -43,6 +52,11 @@
   }
 
   const props = defineProps<Props>()
+
+  const emit = defineEmits<{
+    click: [member: TeamMember]
+  }>()
+
   const { resolveUrl } = useAssetUrl()
 
   // Configuration
@@ -283,17 +297,26 @@
     aspect-ratio: 1;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     margin: 0.5rem;
+  }
+
+  .team-member-card:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 2px;
   }
 
   /* Hover effects only for devices with hover capability (desktop) */
   @media (hover: hover) and (pointer: fine) {
     .team-member-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
       border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .team-member-card:active {
+      transform: translateY(-4px) scale(0.98);
     }
 
     .team-member-card:hover .member-overlay {
@@ -309,8 +332,8 @@
   /* Active/tap effects for touchscreen devices */
   @media (hover: none) and (pointer: coarse) {
     .team-member-card:active {
-      transform: scale(0.98);
-      transition-duration: 0.15s;
+      transform: scale(0.95);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* Make overlay always visible on mobile */
