@@ -21,9 +21,44 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Mirror SOURCE_PREFIXES from utils/sourceAttribution.ts. Keep in sync
-// when you add/remove prefixes there.
-const SOURCE_PREFIXES = {
+const repoRoot = path.resolve(__dirname, '..')
+const musicLibPath = path.join(repoRoot, 'data', 'musicLibrary.ts')
+const outDir = path.join(repoRoot, '.output')
+const outFile = path.join(outDir, 'bio-links.md')
+
+// This script runs under plain `node`, so it can't import the typed TS modules
+// directly. To avoid drift, derive the reserved prefixes and the site URL from
+// their canonical source files by text-parsing them (same approach used for
+// releases below) — a single source of truth, no hand-maintained copies.
+function readRepoFile(...segments) {
+  return fs.readFileSync(path.join(repoRoot, ...segments), 'utf8')
+}
+
+function extractSourcePrefixes() {
+  const src = readRepoFile('utils', 'sourceAttribution.ts')
+  const block = src.match(/export const SOURCE_PREFIXES = \{([\s\S]*?)\} as const/)
+  if (!block) {
+    throw new Error(
+      'generate-bio-links: could not locate SOURCE_PREFIXES in utils/sourceAttribution.ts'
+    )
+  }
+  // -> [ [prefix, platform], ... ] in declaration order
+  return [...block[1].matchAll(/(\w+):\s*'([^']+)'/g)].map((m) => [m[1], m[2]])
+}
+
+function extractSiteUrl() {
+  const src = readRepoFile('constants', 'app.ts')
+  const m = src.match(/export const SITE_URL = '([^']+)'/)
+  if (!m) {
+    throw new Error('generate-bio-links: could not locate SITE_URL in constants/app.ts')
+  }
+  return m[1]
+}
+
+// Pretty display names per prefix. Any prefix without an entry falls back to a
+// humanized form of its canonical platform value, so a newly-added prefix still
+// renders correctly without touching this script.
+const PREFIX_LABELS = {
   i: 'Instagram',
   tt: 'TikTok',
   yt: 'YouTube',
@@ -38,12 +73,11 @@ const SOURCE_PREFIXES = {
   em: 'Email'
 }
 
-const SITE_BASE_URL = 'https://www.wbmband.com'
+const humanize = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 
-const repoRoot = path.resolve(__dirname, '..')
-const musicLibPath = path.join(repoRoot, 'data', 'musicLibrary.ts')
-const outDir = path.join(repoRoot, '.output')
-const outFile = path.join(outDir, 'bio-links.md')
+// [ [prefix, platform], ... ] derived from the canonical map
+const SOURCE_PREFIXES = extractSourcePrefixes()
+const SITE_BASE_URL = extractSiteUrl()
 
 function extractReleases() {
   const src = fs.readFileSync(musicLibPath, 'utf8')
@@ -80,7 +114,8 @@ function buildSheet(releases) {
     lines.push('')
     lines.push('| Platform | Listen URL | Pre-save URL |')
     lines.push('|---|---|---|')
-    for (const [prefix, name] of Object.entries(SOURCE_PREFIXES)) {
+    for (const [prefix, platform] of SOURCE_PREFIXES) {
+      const name = PREFIX_LABELS[prefix] || humanize(platform)
       const listen = `${SITE_BASE_URL}/listen/${prefix}/${release.slug}`
       const presave = `${SITE_BASE_URL}/pre-save/${prefix}/${release.slug}`
       lines.push(`| ${name} | ${listen} | ${presave} |`)
@@ -91,7 +126,7 @@ function buildSheet(releases) {
   lines.push('---')
   lines.push('')
   lines.push(
-    `_Reserved prefixes (must not collide with song slugs): ${Object.keys(SOURCE_PREFIXES).join(', ')}_`
+    `_Reserved prefixes (must not collide with song slugs): ${SOURCE_PREFIXES.map(([prefix]) => prefix).join(', ')}_`
   )
   lines.push('')
 

@@ -1,1 +1,9 @@
+# WBM Band — https://www.wbmband.com
+# Allow everything. Source-attribution variants (/listen/<prefix>/<slug>) are
+# intentionally left crawlable so their per-page `noindex, follow` + canonical
+# tags are honoured (a Disallow would hide those signals).
 
+User-agent: *
+Allow: /
+
+Sitemap: https://www.wbmband.com/sitemap.xml

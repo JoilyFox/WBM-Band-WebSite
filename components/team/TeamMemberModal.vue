@@ -1,5 +1,9 @@
 <template>
-  <CommonBaseModal :is-visible="isVisible" @close="emit('close')">
+  <CommonBaseModal
+    :is-visible="isVisible"
+    :aria-label="member ? $t(member.nameKey) : 'Team member'"
+    @close="emit('close')"
+  >
     <div class="member-modal-body">
       <h2 class="member-modal-name">{{ member ? $t(member.nameKey) : '' }}</h2>
     </div>

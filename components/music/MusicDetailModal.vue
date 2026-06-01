@@ -2,6 +2,7 @@
   <CommonBaseModal
     :is-visible="isVisible"
     :preload-image-url="release?.imageUrl"
+    :aria-label="release?.title || 'Release details'"
     @close="emit('close')"
   >
     <MusicDetailContent :release="release" :is-modal="true" :is-pre-save="isPreSave" />

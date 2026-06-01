@@ -1,6 +1,7 @@
 import { computed, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getReleaseBySlug, type MusicRelease } from '~/data/musicLibrary'
+import { SITE_URL } from '~/constants/app'
 import {
   SOURCE_PREFIXES,
   setExplicitSourcePlatform,
@@ -28,7 +29,7 @@ export interface UseMasterPageReturn {
   resolvedSource: SourcePlatform | null
 }
 
-const SITE_BASE_URL = 'https://www.wbmband.com'
+const SITE_BASE_URL = SITE_URL
 
 const CYRILLIC_TRANSLIT_MAP: Record<string, string> = {
   а: 'a',

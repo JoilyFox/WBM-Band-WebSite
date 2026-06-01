@@ -14,7 +14,15 @@
         :class="{ 'is-animating': isAnimating }"
         @click="handleBackdropClick"
       >
-        <div class="modal-container" @click.stop>
+        <div
+          ref="dialogRef"
+          class="modal-container"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="ariaLabel"
+          tabindex="-1"
+          @click.stop
+        >
           <div
             class="modal-content"
             :class="{ 'is-animating': isAnimating, 'content-ready': contentReady }"
@@ -34,11 +42,13 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 
   interface Props {
     isVisible: boolean
     preloadImageUrl?: string
+    /** Accessible name for the dialog (screen readers announce it on open). */
+    ariaLabel?: string
   }
 
   interface Emits {
@@ -46,12 +56,42 @@
   }
 
   const props = withDefaults(defineProps<Props>(), {
-    preloadImageUrl: undefined
+    preloadImageUrl: undefined,
+    ariaLabel: 'Dialog'
   })
   const emit = defineEmits<Emits>()
 
   const isAnimating = ref(false)
   const contentReady = ref(false)
+
+  // --- Accessibility: focus management + trap ---
+  const dialogRef = ref<HTMLElement>()
+  // The element focused before the modal opened, so we can restore it on close.
+  let previouslyFocused: HTMLElement | null = null
+
+  const FOCUSABLE_SELECTOR = [
+    'a[href]',
+    'button:not([disabled])',
+    'textarea:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])'
+  ].join(',')
+
+  const getFocusable = (): HTMLElement[] => {
+    if (!dialogRef.value) return []
+    return Array.from(dialogRef.value.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+      (el) => el.offsetParent !== null || el === document.activeElement
+    )
+  }
+
+  // Move focus into the dialog once it's shown (after the v-show paint).
+  const focusDialog = () => {
+    nextTick(() => {
+      const focusable = getFocusable()
+      ;(focusable[0] ?? dialogRef.value)?.focus()
+    })
+  }
 
   const decodeImage = (url?: string) => {
     return new Promise<void>((resolve) => {
@@ -127,9 +167,36 @@
     emit('close')
   }
 
-  const handleEscapeKey = (event: KeyboardEvent) => {
+  const handleKeydown = (event: KeyboardEvent) => {
+    if (!props.isVisible) return
+
     if (event.key === 'Escape') {
       emit('close')
+      return
+    }
+
+    // Focus trap: keep Tab within the dialog so keyboard/screen-reader users
+    // can't tab into the page behind the open modal.
+    if (event.key !== 'Tab') return
+
+    const focusable = getFocusable()
+    if (focusable.length === 0) {
+      event.preventDefault()
+      dialogRef.value?.focus()
+      return
+    }
+
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    const active = document.activeElement as HTMLElement | null
+    const inDialog = !!active && !!dialogRef.value?.contains(active)
+
+    if (event.shiftKey && (active === first || !inDialog)) {
+      event.preventDefault()
+      last.focus()
+    } else if (!event.shiftKey && (active === last || !inDialog)) {
+      event.preventDefault()
+      first.focus()
     }
   }
 
@@ -156,24 +223,35 @@
   }
 
   onMounted(() => {
-    document.addEventListener('keydown', handleEscapeKey)
+    document.addEventListener('keydown', handleKeydown)
     if (props.isVisible) {
+      previouslyFocused = document.activeElement as HTMLElement | null
       preventBodyScroll()
+      focusDialog()
     }
   })
 
   onUnmounted(() => {
-    document.removeEventListener('keydown', handleEscapeKey)
+    document.removeEventListener('keydown', handleKeydown)
     restoreBodyScroll()
+    // Restore focus if the modal is torn down while open.
+    previouslyFocused?.focus?.()
+    previouslyFocused = null
   })
 
   watch(
     () => props.isVisible,
     (visible) => {
       if (visible) {
+        // Remember the trigger so focus can return there on close.
+        previouslyFocused = document.activeElement as HTMLElement | null
         preventBodyScroll()
+        focusDialog()
       } else {
         restoreBodyScroll()
+        // Return focus to whatever opened the modal (keyboard a11y).
+        previouslyFocused?.focus?.()
+        previouslyFocused = null
       }
     }
   )

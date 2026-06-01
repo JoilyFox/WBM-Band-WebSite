@@ -268,25 +268,13 @@ export function checkImageFormatSupport() {
   }
 }
 
-/**
- * Get responsive image srcset for different screen sizes
- * @param src - Original image source
- * @param sizes - Array of width sizes
- * @param quality - Image quality
- * @returns Optimized srcset string
- */
-export function getResponsiveImageSrcSet(
-  src: string,
-  sizes: number[] = [400, 800, 1200, 1600],
-  quality: number = 80
-): string {
-  return sizes
-    .map((size) => {
-      const optimizedUrls = getOptimizedImageUrl(src, size, undefined, quality)
-      return `${optimizedUrls.jpg} ${size}w`
-    })
-    .join(', ')
-}
+// NOTE: a width-descriptor `getResponsiveImageSrcSet()` helper used to live here.
+// It was removed because the build pipeline emits a single size per image
+// (`getOptimizedImageUrl()` ignores width), so every descriptor pointed at the
+// same file — a misleading "responsive" srcset. `<ProgressiveImage>` uses
+// `generatePictureSources()` (format fallbacks: AVIF → WebP → JPEG) instead.
+// If real width variants are added later, reintroduce a srcset that maps each
+// width to a distinct generated file.
 
 /**
  * Generate simple gradient placeholder for progressive loading

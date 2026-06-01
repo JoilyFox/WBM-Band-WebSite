@@ -55,9 +55,13 @@ export const generateId = (length = 8): string => {
     .substring(2, length + 2)
 }
 
-// Validate email
+// Validate email.
+// Rejects consecutive dots and a leading/trailing dot in either the local part
+// or the domain (the previous `[^\s@]+\.[^\s@]+` regex accepted `a@b..c`).
 export const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  // local part: dot-separated atoms of non-space/@/dot chars
+  // domain: dot-separated labels, TLD ≥ 2 letters
+  const emailRegex = /^[^\s@.]+(?:\.[^\s@.]+)*@[^\s@.]+(?:\.[^\s@.]+)*\.[a-zA-Z]{2,}$/
   return emailRegex.test(email)
 }
 

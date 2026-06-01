@@ -225,13 +225,24 @@ export async function invalidateCache(pattern: string | RegExp): Promise<void> {
     const requests = await cache.keys()
 
     for (const request of requests) {
-      const url = request.url
+      // Match against the decoded cache KEY, not the raw request URL. createCacheUrl()
+      // stores keys as `cache://<name>/<encodeURIComponent(key)>`, so the URL has
+      // `|`/`/` percent-encoded — matching the pattern against it would behave
+      // differently from the localStorage backend (which matches the raw key) and
+      // miss any pattern containing those characters.
+      const encodedKey = request.url.split('/').pop() || ''
+      let cacheKey: string
+      try {
+        cacheKey = decodeURIComponent(encodedKey)
+      } catch {
+        cacheKey = encodedKey
+      }
       const shouldInvalidate =
-        typeof pattern === 'string' ? url.includes(pattern) : pattern.test(url)
+        typeof pattern === 'string' ? cacheKey.includes(pattern) : pattern.test(cacheKey)
 
       if (shouldInvalidate) {
         await cache.delete(request)
-        console.log(`Invalidated cache for: ${url}`)
+        console.log(`Invalidated cache for: ${cacheKey}`)
       }
     }
   } catch (error) {

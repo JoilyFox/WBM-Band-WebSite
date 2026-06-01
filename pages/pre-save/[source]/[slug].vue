@@ -13,6 +13,7 @@
   import { useMasterPage } from '~/composables/useMasterPage'
   import { useAnalytics } from '~/composables/useAnalytics'
   import { isUpcomingRelease } from '~/utils/configHelpers'
+  import { SITE_URL } from '~/constants/app'
   import { SOURCE_PREFIXES } from '~/utils/sourceAttribution'
 
   definePageMeta({
@@ -111,7 +112,7 @@
   })
 
   useHead({
-    link: [{ rel: 'canonical', href: `https://www.wbmband.com/pre-save/${slug}` }]
+    link: [{ rel: 'canonical', href: `${SITE_URL}/pre-save/${slug}` }]
   })
 </script>
 

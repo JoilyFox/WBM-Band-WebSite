@@ -5,6 +5,15 @@
 // Core app identity
 export const APP_NAME = 'WBM Band'
 export const APP_SLUG = 'wbm-band'
+
+/**
+ * Canonical production origin (no trailing slash). Single source of truth for
+ * absolute URLs in canonical/og:url tags, SEO helpers and the sitemap. NOT
+ * DEPLOY_TARGET-aware on purpose — canonical/OG must always point at the real
+ * production domain, even on the GitHub Pages staging mirror.
+ */
+export const SITE_URL = 'https://www.wbmband.com'
+
 export const APP_DESCRIPTION =
   'A modern Nuxt 3 application for the WBM Band with advanced features including API caching, global loading system, and notification management.'
 

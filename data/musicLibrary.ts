@@ -175,7 +175,10 @@ const getReleaseTime = (date?: string) => {
 }
 
 export const getLatestReleases = (limit: number = 4): MusicRelease[] => {
-  return musicLibrary
+  // Copy before sorting — Array.prototype.sort mutates in place, and sorting the
+  // shared module-level `musicLibrary` would corrupt its order for every other
+  // consumer (and across repeated calls).
+  return [...musicLibrary]
     .sort((a, b) => getReleaseTime(b.releaseDate) - getReleaseTime(a.releaseDate))
     .slice(0, limit)
 }
@@ -185,7 +188,10 @@ export const getReleasesByType = (type: MusicRelease['type']): MusicRelease[] =>
 }
 
 export const getAllReleases = (): MusicRelease[] => {
-  return musicLibrary.sort((a, b) => getReleaseTime(b.releaseDate) - getReleaseTime(a.releaseDate))
+  // Copy before sorting (see getLatestReleases) so the shared array isn't mutated.
+  return [...musicLibrary].sort(
+    (a, b) => getReleaseTime(b.releaseDate) - getReleaseTime(a.releaseDate)
+  )
 }
 
 export const getReleaseBySlug = (slug: string): MusicRelease | undefined => {

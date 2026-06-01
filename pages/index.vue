@@ -40,7 +40,7 @@
   import { useScrollTo } from '~/composables/useScrollTo'
   import { useImagePreloader } from '~/composables/useImagePreloader'
   import { useMusicNavigation } from '~/composables/useMusicNavigation'
-  import { createPageTitle } from '~/constants/app'
+  import { createPageTitle, SITE_URL } from '~/constants/app'
   import { musicLibrary } from '~/data/musicLibrary'
   import { getConfig } from '~/utils/configHelpers'
   import type { MusicRelease } from '~/data/musicLibrary'
@@ -92,19 +92,17 @@
 
   // Meta image URL
   const metaImageUrl = computed(() => {
-    const baseUrl = 'https://www.wbmband.com'
-    return `${baseUrl}/images/optimized/meta-images/meta-cover.jpg`
+    return `${SITE_URL}/images/optimized/meta-images/meta-cover.jpg`
   })
 
   // Page URL for og:url - handles root URL (wbmband.com) to show Ukrainian
   const pageUrl = computed(() => {
-    const baseUrl = 'https://www.wbmband.com'
     // For Ukrainian locale, use root URL or /ua
     if (locale.value === 'ua') {
-      return baseUrl
+      return SITE_URL
     }
     // For other locales, include the locale prefix
-    return `${baseUrl}/${locale.value}`
+    return `${SITE_URL}/${locale.value}`
   })
 
   // Comprehensive keywords for SEO
