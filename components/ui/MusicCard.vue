@@ -70,7 +70,9 @@
     const formatted = date.toLocaleDateString(currentLocale, {
       year: 'numeric',
       month: 'long',
-      timeZone: 'UTC'
+      // Match the release pages: display in the authored Kyiv zone (fixed, so
+      // SSR/CSR stay consistent).
+      timeZone: 'Europe/Kyiv'
     })
 
     if (!formatted) return formatted

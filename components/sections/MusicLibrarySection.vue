@@ -279,8 +279,9 @@
     const formatOptions: Intl.DateTimeFormatOptions = {
       month: 'long',
       day: 'numeric',
-      // Force UTC to keep SSR/CSR consistent regardless of server/client timezones
-      timeZone: 'UTC'
+      // Release times are authored in Kyiv time — display in that fixed zone so a
+      // midnight-Kyiv release shows the right day, and SSR/CSR stay consistent.
+      timeZone: 'Europe/Kyiv'
     }
 
     const formatted = date.toLocaleString(currentLocale, formatOptions)

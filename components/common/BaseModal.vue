@@ -243,12 +243,18 @@
   .modal-content.content-ready {
     transition:
       transform 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1),
+      /* Ease the shadow + blur back in when the lightweight animating state is
+         dropped (onAfterEnter), instead of snapping the big bottom shadow on. */
+        box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      backdrop-filter 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      -webkit-backdrop-filter 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .modal-content.is-animating {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    /* blur(0) (not `none`) so backdrop-filter can interpolate smoothly on revert */
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
     pointer-events: none;
   }

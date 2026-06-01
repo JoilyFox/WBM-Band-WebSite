@@ -621,7 +621,10 @@
     const formatOptions: Intl.DateTimeFormatOptions = {
       month: 'long',
       day: 'numeric',
-      timeZone: 'UTC' // Force UTC to ensure SSR/CSR consistency
+      // Release times are authored in Kyiv time, so display the date in that
+      // fixed zone (e.g. 2026-06-11T21:00Z = 00:00 Kyiv → "12 June", not "11").
+      // A fixed zone also keeps SSR and client renders identical.
+      timeZone: 'Europe/Kyiv'
     }
 
     if (includeYear) {
