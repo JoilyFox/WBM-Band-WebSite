@@ -50,6 +50,7 @@
                 loading="eager"
                 :fetch-priority="index === 0 ? 'high' : 'auto'"
                 preset="about"
+                :sizes="IMAGE_SIZES.about"
                 container-class="slider-image-container"
                 image-class="slider-image"
                 :show-placeholder="true"
@@ -85,6 +86,7 @@
   import { Swiper, SwiperSlide } from 'swiper/vue'
   import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules'
   import type { Swiper as SwiperType } from 'swiper'
+  import { IMAGE_SIZES } from '~/utils/imageHelpers'
 
   // Import Swiper styles
   import 'swiper/css'

@@ -213,11 +213,13 @@
   const heroImages = computed(() => [
     {
       src: '/images/optimized/hero-images/horizontal/hero-1.avif',
-      alt: `${bandName.value} performing live on stage`
+      alt: `${bandName.value} performing live on stage`,
+      preset: 'hero'
     },
     {
       src: '/images/optimized/hero-images/vertical/hero-1.avif',
-      alt: `${bandName.value} performing live on stage`
+      alt: `${bandName.value} performing live on stage`,
+      preset: 'heroVertical'
     }
   ])
 

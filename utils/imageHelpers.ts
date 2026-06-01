@@ -4,6 +4,30 @@
  */
 
 import { ref, computed } from 'vue'
+import imagePresets from '~/constants/imagePresets.json'
+
+/**
+ * Per-preset responsive width descriptors, shared with the build pipeline via
+ * `constants/imagePresets.json` so the generated files and the <source srcset>
+ * can never drift. Single-width presets (meta/team/thumbnail) are treated as
+ * non-responsive (a single-URL srcset, i.e. the old behaviour).
+ */
+const RESPONSIVE_WIDTHS: Record<string, number[]> = Object.fromEntries(
+  Object.entries(imagePresets as Record<string, { widths?: number[] }>)
+    .filter(([, v]) => v && Array.isArray(v.widths))
+    .map(([k, v]) => [k, v.widths as number[]])
+)
+
+/**
+ * Recommended `sizes` per usage. The rendered <img> and the preloader MUST pass
+ * the same value so the browser picks — and reuses — the same variant (no
+ * double-fetch). Tune to how each image is actually laid out.
+ */
+export const IMAGE_SIZES = {
+  hero: '100vw',
+  album: '(max-width: 640px) 60vw, (max-width: 1024px) 40vw, 360px',
+  about: '(min-width: 1024px) 960px, 92vw'
+} as const
 
 /**
  * Composable for handling image loading states and events with performance optimizations
@@ -231,21 +255,44 @@ function getPresetConfig(preset: string) {
  * @param preset - Preset name for predefined configurations
  * @returns Object with source elements for picture tag
  */
+/**
+ * Build a width-descriptor srcset from a base path. The largest width points at
+ * the base file (`name.ext`); smaller widths at `name-<w>.ext` — exactly the
+ * files `scripts/compress-images.js` emits for the same preset.
+ */
+function buildSrcSet(baseNoExt: string, ext: string, widths: number[]): string {
+  const max = Math.max(...widths)
+  return widths
+    .map((w) => (w === max ? `${baseNoExt}.${ext} ${w}w` : `${baseNoExt}-${w}.${ext} ${w}w`))
+    .join(', ')
+}
+
 export function generatePictureSources(src: string, sizes?: string, preset?: string) {
   const optimizedUrls = getOptimizedImageUrl(src, undefined, undefined, 80, preset)
+  const widths = preset ? RESPONSIVE_WIDTHS[preset] : undefined
+  const responsive = !!widths && widths.length > 1
+  const sizesValue = sizes || '100vw'
+
+  const avifBase = optimizedUrls.avif.replace(/\.avif$/, '')
+  const webpBase = optimizedUrls.webp.replace(/\.webp$/, '')
+  const jpgBase = optimizedUrls.jpg.replace(/\.jpg$/, '')
 
   return {
     avifSource: {
-      srcset: optimizedUrls.avif,
+      srcset: responsive ? buildSrcSet(avifBase, 'avif', widths as number[]) : optimizedUrls.avif,
       type: 'image/avif',
-      sizes: sizes || '100vw'
+      sizes: sizesValue
     },
     webpSource: {
-      srcset: optimizedUrls.webp,
+      srcset: responsive ? buildSrcSet(webpBase, 'webp', widths as number[]) : optimizedUrls.webp,
       type: 'image/webp',
-      sizes: sizes || '100vw'
+      sizes: sizesValue
     },
-    fallbackSrc: optimizedUrls.jpg
+    fallbackSrc: optimizedUrls.jpg,
+    fallbackSrcset: responsive
+      ? buildSrcSet(jpgBase, 'jpg', widths as number[])
+      : optimizedUrls.jpg,
+    sizes: sizesValue
   }
 }
 
@@ -268,13 +315,24 @@ export function checkImageFormatSupport() {
   }
 }
 
-// NOTE: a width-descriptor `getResponsiveImageSrcSet()` helper used to live here.
-// It was removed because the build pipeline emits a single size per image
-// (`getOptimizedImageUrl()` ignores width), so every descriptor pointed at the
-// same file — a misleading "responsive" srcset. `<ProgressiveImage>` uses
-// `generatePictureSources()` (format fallbacks: AVIF → WebP → JPEG) instead.
-// If real width variants are added later, reintroduce a srcset that maps each
-// width to a distinct generated file.
+/**
+ * Build a real responsive srcset (width descriptors → distinct generated files)
+ * for a given preset, e.g. for a hand-rolled <img srcset>/<source>. Widths come
+ * from constants/imagePresets.json, the same set the build pipeline emits.
+ * Returns the JPEG srcset by default (widest support); pass 'avif'/'webp' for
+ * those. Most call sites should prefer <ProgressiveImage>, which wires all three
+ * formats plus the gradient placeholder and load-in fade.
+ */
+export function getResponsiveImageSrcSet(
+  src: string,
+  preset: string,
+  format: 'avif' | 'webp' | 'jpg' = 'jpg'
+): string {
+  const sources = generatePictureSources(src, undefined, preset)
+  if (format === 'avif') return sources.avifSource.srcset
+  if (format === 'webp') return sources.webpSource.srcset
+  return sources.fallbackSrcset
+}
 
 /**
  * Generate simple gradient placeholder for progressive loading
@@ -320,7 +378,8 @@ export function generateBlurPlaceholder(width: number = 40, height: number = 40)
  */
 export function preloadCriticalImages(
   images: string[],
-  priority: 'high' | 'medium' | 'low' = 'high'
+  priority: 'high' | 'medium' | 'low' = 'high',
+  options: { preset?: string; sizes?: string } = {}
 ): Promise<HTMLImageElement>[] {
   return images.map((src) => {
     return new Promise((resolve, reject) => {
@@ -340,9 +399,17 @@ export function preloadCriticalImages(
       img.onload = () => resolve(img)
       img.onerror = () => reject(new Error(`Failed to preload image: ${src}`))
 
-      // Use AVIF format as primary, with fallback to original src
-      const optimizedUrls = getOptimizedImageUrl(src, 1920, 1080, 85, 'hero')
-      img.src = optimizedUrls.avif || src
+      // Preload via the SAME AVIF srcset + sizes the rendered <img> uses, so the
+      // browser warms (and then reuses) the exact variant it will display — no
+      // double-fetch of the full-size base on small screens. Falls back to a
+      // single URL for non-responsive presets.
+      const sources = generatePictureSources(src, options.sizes, options.preset)
+      if (sources.avifSource.srcset.includes(' ')) {
+        img.srcset = sources.avifSource.srcset
+        img.sizes = sources.avifSource.sizes
+      } else {
+        img.src = sources.avifSource.srcset || src
+      }
     })
   })
 }

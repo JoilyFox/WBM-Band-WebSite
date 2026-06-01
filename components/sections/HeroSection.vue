@@ -24,6 +24,7 @@
           :fetch-priority="index === 0 ? 'high' : 'auto'"
           :preset="isPortrait ? 'heroVertical' : 'hero'"
           portrait-preset="heroVertical"
+          :sizes="IMAGE_SIZES.hero"
           container-class="hero-background-image"
           image-class="hero-image"
           :show-placeholder="true"
@@ -108,7 +109,7 @@
   import { watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   import Button from 'primevue/button'
-  import { useImageLoading } from '~/utils/imageHelpers'
+  import { useImageLoading, IMAGE_SIZES } from '~/utils/imageHelpers'
   import { useHeroSlider, type HeroImage } from '~/composables/useHeroSlider'
   import { useScrollTo } from '~/composables/useScrollTo'
   import { getConfig } from '~/utils/configHelpers'

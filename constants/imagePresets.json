@@ -1,0 +1,35 @@
+{
+  "_comment": "Single source of truth for the image pipeline AND the runtime srcset builder. `scripts/compress-images.js` (Node) generates one file per width; `utils/imageHelpers.ts` (Vite) builds the matching <source srcset> from the same widths. Keep them here so the two can never drift. widths: descriptors emitted (largest is also written as the base `name.ext`, smaller ones as `name-<w>.ext`). aspect: [w,h] crop ratio (unchanged from the previous fixed dimensions). Add a width and both the build and the runtime pick it up.",
+  "hero": {
+    "widths": [768, 1280, 1920],
+    "aspect": [16, 9],
+    "quality": 85,
+    "formats": ["avif", "webp", "jpg"]
+  },
+  "heroVertical": {
+    "widths": [720, 1080],
+    "aspect": [9, 16],
+    "quality": 85,
+    "formats": ["avif", "webp", "jpg"]
+  },
+  "album": {
+    "widths": [200, 400, 640, 800],
+    "aspect": [1, 1],
+    "quality": 85,
+    "formats": ["avif", "webp", "jpg"]
+  },
+  "about": {
+    "widths": [768, 1280, 1920],
+    "aspect": [16, 9],
+    "quality": 85,
+    "formats": ["avif", "webp", "jpg"]
+  },
+  "team": { "widths": [800], "aspect": [1, 1], "quality": 85, "formats": ["avif", "webp", "jpg"] },
+  "thumbnail": {
+    "widths": [400],
+    "aspect": [1, 1],
+    "quality": 80,
+    "formats": ["avif", "webp", "jpg"]
+  },
+  "meta": { "widths": [1200], "aspect": [1200, 630], "quality": 85, "formats": ["jpg", "png"] }
+}

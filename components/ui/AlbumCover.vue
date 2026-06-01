@@ -12,6 +12,7 @@
       image-class="md:group-hover:scale-105"
       loading="lazy"
       preset="album"
+      :sizes="IMAGE_SIZES.album"
       :show-placeholder="true"
       :error-text="t('music.album_cover.unavailable')"
       @error="handleImageError"
@@ -54,6 +55,7 @@
   import { ref, computed } from 'vue'
   import type { MusicRelease } from '~/data/musicLibrary'
   import { useI18n } from 'vue-i18n'
+  import { IMAGE_SIZES } from '~/utils/imageHelpers'
 
   interface Props {
     imageUrl: string

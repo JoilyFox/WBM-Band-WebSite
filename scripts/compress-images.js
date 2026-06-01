@@ -9,6 +9,8 @@ import sharp from 'sharp'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+// Shared with utils/imageHelpers.ts (runtime srcset builder) so widths can't drift.
+import imagePresets from '../constants/imagePresets.json' with { type: 'json' }
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -16,51 +18,8 @@ const __dirname = path.dirname(__filename)
 const INPUT_DIR = path.join(__dirname, '../public/images')
 const OUTPUT_DIR = path.join(__dirname, '../public/images/optimized')
 
-// Compression settings
-const COMPRESSION_SETTINGS = {
-  hero: {
-    width: 1920,
-    height: 1080,
-    quality: 85,
-    formats: ['avif', 'webp', 'jpg']
-  },
-  heroVertical: {
-    width: 1080,
-    height: 1920,
-    quality: 85,
-    formats: ['avif', 'webp', 'jpg']
-  },
-  album: {
-    width: 800,
-    height: 800,
-    quality: 85,
-    formats: ['avif', 'webp', 'jpg']
-  },
-  about: {
-    width: 1920,
-    height: 1080,
-    quality: 85,
-    formats: ['avif', 'webp', 'jpg']
-  },
-  team: {
-    width: 800,
-    height: 800,
-    quality: 85,
-    formats: ['avif', 'webp', 'jpg']
-  },
-  meta: {
-    width: 1200,
-    height: 630,
-    quality: 85,
-    formats: ['jpg', 'png']
-  },
-  thumbnail: {
-    width: 400,
-    height: 400,
-    quality: 80,
-    formats: ['avif', 'webp', 'jpg']
-  }
-}
+// Compression settings (widths/aspect/quality/formats per preset).
+const COMPRESSION_SETTINGS = imagePresets
 
 async function createOptimizedDir() {
   try {
@@ -80,44 +39,49 @@ async function compressImage(inputPath, outputDir, filename, settings) {
   console.log(`Compressing ${filename}...`)
 
   const baseFilename = path.parse(filename).name
+  const widths = settings.widths || [settings.width]
+  const [arW, arH] = settings.aspect || [1, 1]
+  const maxWidth = Math.max(...widths)
 
   try {
     for (const format of settings.formats) {
-      const outputPath = path.join(outputDir, `${baseFilename}.${format}`)
+      for (const width of widths) {
+        const height = Math.round((width * arH) / arW)
+        // Largest width → base file (`name.ext`) so existing references (album
+        // imageUrl, blurred placeholders) keep resolving. Smaller widths →
+        // `name-<w>.ext`, which the responsive srcset points at.
+        const suffix = width === maxWidth ? '' : `-${width}`
+        const outputPath = path.join(outputDir, `${baseFilename}${suffix}.${format}`)
 
-      let pipeline = sharp(inputPath).resize(settings.width, settings.height, {
-        fit: 'cover',
-        position: 'center'
-      })
+        let pipeline = sharp(inputPath).resize(width, height, {
+          fit: 'cover',
+          position: 'center'
+        })
 
-      switch (format) {
-        case 'avif':
-          pipeline = pipeline.avif({ quality: settings.quality })
-          break
-        case 'webp':
-          pipeline = pipeline.webp({ quality: settings.quality })
-          break
-        case 'jpg':
-          pipeline = pipeline.jpeg({
-            quality: settings.quality,
-            progressive: true,
-            mozjpeg: true
-          })
-          break
+        switch (format) {
+          case 'avif':
+            pipeline = pipeline.avif({ quality: settings.quality })
+            break
+          case 'webp':
+            pipeline = pipeline.webp({ quality: settings.quality })
+            break
+          case 'jpg':
+            pipeline = pipeline.jpeg({
+              quality: settings.quality,
+              progressive: true,
+              mozjpeg: true
+            })
+            break
+          case 'png':
+            pipeline = pipeline.png({ quality: settings.quality })
+            break
+        }
+
+        await pipeline.toFile(outputPath)
+
+        const newStats = await fs.stat(outputPath)
+        console.log(`  ${format.toUpperCase()} ${width}w: ${(newStats.size / 1024).toFixed(0)}KB`)
       }
-
-      await pipeline.toFile(outputPath)
-
-      // Log file size reduction
-      const originalStats = await fs.stat(inputPath)
-      const newStats = await fs.stat(outputPath)
-      const reduction = (((originalStats.size - newStats.size) / originalStats.size) * 100).toFixed(
-        1
-      )
-
-      console.log(
-        `  ${format.toUpperCase()}: ${(newStats.size / 1024 / 1024).toFixed(2)}MB (${reduction}% reduction)`
-      )
     }
   } catch (error) {
     console.error(`Error compressing ${filename}:`, error)

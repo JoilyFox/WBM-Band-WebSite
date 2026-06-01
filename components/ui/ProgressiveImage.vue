@@ -47,6 +47,8 @@
       <img
         ref="imgRef"
         :src="pictureSources.fallbackSrc"
+        :srcset="pictureSources.fallbackSrcset"
+        :sizes="pictureSources.sizes"
         :alt="alt"
         :class="[
           'progressive-image',
@@ -166,20 +168,22 @@
   const blurPlaceholder = ref('')
 
   // Generate picture sources for different formats
-  const { resolveUrl } = useAssetUrl()
+  const { resolveUrl, resolveSrcSet } = useAssetUrl()
   const pictureSources = computed(() => {
     const sources = generatePictureSources(props.src, props.sizes, props.preset)
 
     return {
       avifSource: {
         ...sources.avifSource,
-        srcset: resolveUrl(sources.avifSource.srcset)
+        srcset: resolveSrcSet(sources.avifSource.srcset)
       },
       webpSource: {
         ...sources.webpSource,
-        srcset: resolveUrl(sources.webpSource.srcset)
+        srcset: resolveSrcSet(sources.webpSource.srcset)
       },
-      fallbackSrc: resolveUrl(sources.fallbackSrc)
+      fallbackSrc: resolveUrl(sources.fallbackSrc),
+      fallbackSrcset: resolveSrcSet(sources.fallbackSrcset),
+      sizes: sources.sizes
     }
   })
 
@@ -194,11 +198,11 @@
     return {
       avifSource: {
         ...sources.avifSource,
-        srcset: resolveUrl(sources.avifSource.srcset)
+        srcset: resolveSrcSet(sources.avifSource.srcset)
       },
       webpSource: {
         ...sources.webpSource,
-        srcset: resolveUrl(sources.webpSource.srcset)
+        srcset: resolveSrcSet(sources.webpSource.srcset)
       }
     }
   })

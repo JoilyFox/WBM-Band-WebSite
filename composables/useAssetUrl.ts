@@ -28,7 +28,28 @@ export const useAssetUrl = () => {
     return `${prefix}${path}`
   }
 
+  /**
+   * Resolves every URL inside a `srcset` string ("url 400w, url 800w, …"),
+   * prefixing each URL with the base path while leaving the width/density
+   * descriptors intact. Applying resolveUrl() to the whole string would only
+   * (wrongly) prefix the first URL.
+   */
+  const resolveSrcSet = (srcset: string) => {
+    if (!srcset || typeof srcset !== 'string') return srcset
+    return srcset
+      .split(',')
+      .map((part) => {
+        const trimmed = part.trim()
+        if (!trimmed) return trimmed
+        const spaceIdx = trimmed.indexOf(' ')
+        if (spaceIdx === -1) return resolveUrl(trimmed) // single URL, no descriptor
+        return `${resolveUrl(trimmed.slice(0, spaceIdx))} ${trimmed.slice(spaceIdx + 1)}`
+      })
+      .join(', ')
+  }
+
   return {
-    resolveUrl
+    resolveUrl,
+    resolveSrcSet
   }
 }

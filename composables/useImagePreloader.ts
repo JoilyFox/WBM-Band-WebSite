@@ -3,7 +3,7 @@
  */
 
 import { ref, onMounted, readonly } from 'vue'
-import { preloadCriticalImages } from '~/utils/imageHelpers'
+import { preloadCriticalImages, IMAGE_SIZES } from '~/utils/imageHelpers'
 import { useAssetUrl } from './useAssetUrl'
 
 export function useImagePreloader() {
@@ -16,14 +16,21 @@ export function useImagePreloader() {
    * Preload hero images for immediate display
    * @param heroImages - Array of hero image objects
    */
-  const preloadHeroImages = async (heroImages: Array<{ src: string }>) => {
+  const preloadHeroImages = async (
+    heroImages: Array<{ src: string; preset?: string }>,
+    sizes: string = IMAGE_SIZES.hero
+  ) => {
     if (!heroImages.length) return
 
     isPreloading.value = true
 
     try {
       const imageSources = heroImages.map((img) => resolveUrl(img.src))
-      const preloadPromises = preloadCriticalImages(imageSources, 'high')
+      // Build per image so each carries its own preset (hero vs heroVertical) →
+      // the preloaded srcset matches the orientation-specific rendered <img>.
+      const preloadPromises = heroImages.flatMap((img) =>
+        preloadCriticalImages([resolveUrl(img.src)], 'high', { preset: img.preset, sizes })
+      )
 
       // Wait for the first image to load (critical for LCP)
       await Promise.race(preloadPromises)
@@ -56,7 +63,10 @@ export function useImagePreloader() {
 
     try {
       const criticalImages = albumImages.slice(0, maxImages).map((src) => resolveUrl(src))
-      const preloadPromises = preloadCriticalImages(criticalImages, 'medium')
+      const preloadPromises = preloadCriticalImages(criticalImages, 'medium', {
+        preset: 'album',
+        sizes: IMAGE_SIZES.album
+      })
 
       Promise.allSettled(preloadPromises).then((results) => {
         results.forEach((result, index) => {
