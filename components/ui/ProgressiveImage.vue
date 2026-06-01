@@ -50,7 +50,9 @@
         :alt="alt"
         :class="[
           'progressive-image',
-          'transition-all duration-1000 ease-out',
+          // NB: the fade transition lives in the scoped `.progressive-image` rule
+          // below (not as a `transition-*` utility here) so a consumer's
+          // `image-class` transform transition can't strip opacity from the fade.
           // Don't control opacity for hero images - let the hero slider handle it
           containerClass?.includes('hero-background-image')
             ? 'opacity-100 scale-100'
@@ -215,8 +217,11 @@
     }
 
     if (imgRef.value && imgRef.value.complete && imgRef.value.naturalWidth > 0) {
-      // Image already cached/loaded before hydration completed – mark as loaded manually
-      handleImageLoad()
+      // Image already cached/decoded before hydration completed. Defer two frames
+      // so the opacity-0 start state paints first, then the fade transition can
+      // animate in — otherwise a cached image "pops" with no transition. (Same
+      // double-rAF guard the team-card crossfade uses.)
+      requestAnimationFrame(() => requestAnimationFrame(() => handleImageLoad()))
     }
   })
 
@@ -258,6 +263,15 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
+    /* Smooth load-in fade. Defined here (with the scoped [data-v] specificity)
+       rather than as a utility on the <img> so an `image-class` transform
+       transition can never override the opacity fade. Opacity and the subtle
+       entrance zoom get independent, per-consumer-tunable durations: covers set
+       --pi-zoom-duration: 300ms for a snappy hover/zoom while opacity still
+       fades over the full second, matching the About Us slider. */
+    transition:
+      opacity var(--pi-fade-duration, 1000ms) ease-out,
+      transform var(--pi-zoom-duration, 1000ms) ease-out;
   }
 
   /* Cool black and grey grainy gradient placeholder */

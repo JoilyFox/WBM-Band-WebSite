@@ -12,10 +12,13 @@
     <div class="member-image-container">
       <!-- Current visible image -->
       <img
+        ref="currentImgRef"
         :src="currentImage"
         :alt="$t(member.nameKey)"
-        class="member-image image-visible"
+        class="member-image"
+        :class="{ 'image-visible': initialLoaded }"
         loading="lazy"
+        @load="initialLoaded = true"
       />
       <!-- Next image for crossfade transition -->
       <img
@@ -72,6 +75,11 @@
   const autoRotationTimer = ref<NodeJS.Timeout | null>(null)
   const debounceTimer = ref<NodeJS.Timeout | null>(null)
   const isHovering = ref(false)
+
+  // Initial portrait fade-in (mirrors ProgressiveImage): starts hidden, fades in
+  // on @load. The crossfade between current/next images is handled separately.
+  const currentImgRef = ref<HTMLImageElement>()
+  const initialLoaded = ref(false)
 
   // Computed CSS value for transition duration
   const transitionDurationCss = computed(() => `${TRANSITION_DURATION}ms`)
@@ -234,6 +242,13 @@
 
   onMounted(() => {
     detectMobile()
+
+    // Portrait may already be cached before hydration — its @load won't re-fire,
+    // so flip on the next frame (after the opacity-0 state paints) to fade it in
+    // rather than leaving it stuck invisible. Uncached portraits fade via @load.
+    if (currentImgRef.value?.complete && currentImgRef.value.naturalWidth > 0) {
+      requestAnimationFrame(() => requestAnimationFrame(() => (initialLoaded.value = true)))
+    }
 
     // Randomize initial image on client side (if not mobile, as mobile rotates anyway)
     // This avoids hydration mismatch by letting server/client init with same image (index 0)

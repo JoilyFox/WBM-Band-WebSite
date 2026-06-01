@@ -1,12 +1,15 @@
 <template>
-  <div class="relative overflow-hidden rounded-xl bg-surface-800 aspect-square shadow-lg">
+  <div
+    class="relative overflow-hidden rounded-xl bg-surface-800 aspect-square shadow-lg"
+    style="--pi-zoom-duration: 300ms"
+  >
     <!-- Album Cover Image with Progressive Loading -->
     <UiProgressiveImage
       v-if="!imageError"
       :src="imageUrl"
       :alt="alt"
       container-class="w-full h-full"
-      image-class="transition-transform duration-300 md:group-hover:scale-105"
+      image-class="md:group-hover:scale-105"
       loading="lazy"
       preset="album"
       :show-placeholder="true"
