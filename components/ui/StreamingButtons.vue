@@ -83,8 +83,10 @@
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .streaming-button:hover {
-    transform: scale(1.1);
+  @media (hover: hover) and (pointer: fine) {
+    .streaming-button:hover {
+      transform: scale(1.1);
+    }
   }
 
   .streaming-button:active {

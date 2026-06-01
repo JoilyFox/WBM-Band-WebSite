@@ -258,18 +258,22 @@
     transition: all 0.2s ease;
   }
 
-  .share-popup-close:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    transform: scale(1.05);
+  @media (hover: hover) and (pointer: fine) {
+    .share-popup-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      transform: scale(1.05);
+    }
   }
 
   .share-popup-close--optimized {
     transition: background-color 0.2s ease;
   }
 
-  .share-popup-close--optimized:hover {
-    transform: none;
+  @media (hover: hover) and (pointer: fine) {
+    .share-popup-close--optimized:hover {
+      transform: none;
+    }
   }
 
   /* Content */
@@ -330,9 +334,11 @@
       transition: background 0.2s ease;
     }
 
-    &::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.25);
-      border-color: rgba(255, 255, 255, 0.2);
+    @media (hover: hover) and (pointer: fine) {
+      &::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
     }
 
     &::-webkit-scrollbar-thumb:active {
@@ -367,8 +373,10 @@
     background: linear-gradient(135deg, #10b981, #059669) !important;
   }
 
-  .btn-glassmorphic--copied:hover {
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+  @media (hover: hover) and (pointer: fine) {
+    .btn-glassmorphic--copied:hover {
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+    }
   }
 
   /* Animations */
@@ -438,8 +446,10 @@
       animation: none;
     }
 
-    .share-popup-close:hover {
-      transform: none;
+    @media (hover: hover) and (pointer: fine) {
+      .share-popup-close:hover {
+        transform: none;
+      }
     }
   }
 </style>

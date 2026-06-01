@@ -105,6 +105,7 @@ This file is a high-level map. Every feature area below has a deep-dive doc that
 - [`docs/favicon-setup.md`](docs/favicon-setup.md) — multi-platform favicon set, PWA icons, `npm run generate-favicons`, `DEPLOY_TARGET`-aware href prefixing.
 - [`docs/presave-functionality.md`](docs/presave-functionality.md) — pre-save page, distributor redirect flow, `preSaveMusicPlatformLinks`, `middleware/presave-access.ts`.
 - [`docs/release-states-system.md`](docs/release-states-system.md) — preview / pre-save / released state derivation, feature flags, automatic transitions when `releaseDate` passes.
+- [`docs/release-page-theming.md`](docs/release-page-theming.md) — cover-driven "Ambient Bloom" atmosphere on release pages: build-time palette extraction (`npm run extract-colors` → `data/coverColors.generated.ts`), `useReleaseTheme` resolver, per-release `theme` override, and the performance-tiered layer stack (heavy blur is high-perf-desktop only).
 - [`docs/web3forms-setup.md`](docs/web3forms-setup.md) — contact form integration via Web3Forms, env keys, submission flow.
 
 ## Other pointers

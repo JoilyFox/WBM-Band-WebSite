@@ -411,10 +411,12 @@
     backdrop-filter: blur(10px);
   }
 
-  .slider-control:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: scale(1.1);
+  @media (hover: hover) and (pointer: fine) {
+    .slider-control:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.1);
+    }
   }
 
   .slider-control:disabled {

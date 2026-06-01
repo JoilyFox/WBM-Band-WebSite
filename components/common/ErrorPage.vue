@@ -405,17 +405,19 @@
     overflow: hidden;
     margin-top: 2rem;
 
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
 
-      .button-bg {
-        transform: scale(1);
-        opacity: 1;
-      }
+        .button-bg {
+          transform: scale(1);
+          opacity: 1;
+        }
 
-      .button-content {
-        color: #000000;
+        .button-content {
+          color: #000000;
+        }
       }
     }
 
@@ -434,17 +436,19 @@
       opacity: 0.6;
       border-color: rgba(255, 255, 255, 0.4);
 
-      &:hover {
-        transform: none;
-        box-shadow: none;
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          transform: none;
+          box-shadow: none;
 
-        .button-bg {
-          transform: scale(0);
-          opacity: 0;
-        }
+          .button-bg {
+            transform: scale(0);
+            opacity: 0;
+          }
 
-        .button-content {
-          color: #ffffff;
+          .button-content {
+            color: #ffffff;
+          }
         }
       }
 
@@ -576,8 +580,10 @@
       animation: none;
     }
 
-    .error-button:hover {
-      transform: none;
+    @media (hover: hover) and (pointer: fine) {
+      .error-button:hover {
+        transform: none;
+      }
     }
   }
 </style>

@@ -74,8 +74,10 @@
     font-size: 0.8125rem; /* ~13px */
     padding: 8px 12px; /* ~1.33x height, ~1.2x width */
   }
-  .lang-btn:hover {
-    color: #fff;
+  @media (hover: hover) and (pointer: fine) {
+    .lang-btn:hover {
+      color: #fff;
+    }
   }
   .lang-btn.active {
     color: #000;

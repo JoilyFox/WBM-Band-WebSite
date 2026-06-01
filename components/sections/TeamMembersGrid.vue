@@ -125,20 +125,22 @@
       transform 1.2s ease;
   }
 
-  .member-block:hover::after {
-    opacity: 0.45;
-    transform: scale(1.02);
-  }
-  .member-block:hover::before {
-    opacity: 1;
-  }
-  .member-block:hover {
-    box-shadow:
-      0 6px 26px -4px rgba(0, 0, 0, 0.65),
-      0 0 0 1px rgba(255, 255, 255, 0.07) inset;
-  }
-  .member-block:hover .inner {
-    letter-spacing: 0.35em;
+  @media (hover: hover) and (pointer: fine) {
+    .member-block:hover::after {
+      opacity: 0.45;
+      transform: scale(1.02);
+    }
+    .member-block:hover::before {
+      opacity: 1;
+    }
+    .member-block:hover {
+      box-shadow:
+        0 6px 26px -4px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(255, 255, 255, 0.07) inset;
+    }
+    .member-block:hover .inner {
+      letter-spacing: 0.35em;
+    }
   }
 
   .member-block .inner {

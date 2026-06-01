@@ -1,5 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  // Only apply `hover:` utilities on devices that actually support hover, so a
+  // tap on a touchscreen never sticks a hover state (the classic mobile
+  // "stuck hover" bug). Desktop is unaffected.
+  future: {
+    hoverOnlyWhenSupported: true
+  },
   content: [
     './components/**/*.{js,vue,ts}',
     './layouts/**/*.vue',

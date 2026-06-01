@@ -544,9 +544,13 @@
   @mixin hover-lift {
     transition: all $hover-duration $hover-easing;
 
-    &:hover {
-      transform: translateY(-0.125rem);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    /* Hover lift only on hover-capable devices, so a tap never sticks the
+       lifted state on touchscreens (incl. tablets ≥768px). */
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        transform: translateY(-0.125rem);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      }
     }
   }
 
@@ -627,9 +631,11 @@
       0 8px 32px rgba(0, 0, 0, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.15);
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.15);
+      }
     }
 
     &::before {
@@ -690,9 +696,12 @@
     transform-origin: center;
   }
 
-  /* Desktop-like hover/active effects to match UiMusicCard */
-  .new-release-content:hover {
-    transform: translateY(-8px);
+  /* Desktop-like hover/active effects to match UiMusicCard.
+     Hover only on hover-capable devices to avoid stuck-hover on touch. */
+  @media (hover: hover) and (pointer: fine) {
+    .new-release-content:hover {
+      transform: translateY(-8px);
+    }
   }
   .new-release-content:active {
     transform: translateY(-4px) scale(0.98);
@@ -890,8 +899,10 @@
     }
   }
 
-  .presave-content:hover {
-    transform: translateY(-8px);
+  @media (hover: hover) and (pointer: fine) {
+    .presave-content:hover {
+      transform: translateY(-8px);
+    }
   }
 
   .presave-content:active {

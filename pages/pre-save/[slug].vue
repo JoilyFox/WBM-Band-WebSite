@@ -105,10 +105,9 @@
   .music-page {
     min-height: 100vh;
     width: 100%;
-    background:
-      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.08) 0%, transparent 50%),
-      linear-gradient(to bottom, #0f0f0f, #000000);
+    /* Neutral near-black base; the cover-driven colour lives in the
+       .release-atmosphere layers inside MusicDetailContent. */
+    background: #050505;
     position: relative;
     overflow-x: hidden;
     display: flex;

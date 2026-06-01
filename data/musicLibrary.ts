@@ -1,3 +1,34 @@
+/**
+ * Optional per-release theming override for the cover-driven release page
+ * atmosphere (see composables/useReleaseTheme.ts). Every field is optional and
+ * falls back, field by field, to the auto-extracted palette in
+ * `data/coverColors.generated.ts` (run `npm run extract-colors`), then to a
+ * deterministic hash fallback. Use this to hand-tune covers that extract to a
+ * muddy/monochrome palette, or to give a special drop a bespoke treatment.
+ */
+export interface ReleaseTheme {
+  /** Most vibrant dominant colour (hex). */
+  primary?: string
+  /** Second hue-separated colour for the aura mesh (hex). */
+  secondary?: string
+  /** Third accent colour (hex). */
+  accent?: string
+  /** Tinted near-black base for the page background (hex). */
+  dark?: string
+  /** Light tint for highlights / title glow (hex). */
+  light?: string
+  /** Explicit colour list for the aura blobs (primary first); defaults to [primary, secondary, accent]. */
+  palette?: string[]
+  /**
+   * Atmosphere treatment. 'bloom' (default) = ambient blurred cover + palette
+   * aura. 'liquid' = animated displacement distortion (high-perf desktop only,
+   * gracefully falls back to bloom elsewhere). Reserved for bespoke drops.
+   */
+  variant?: 'bloom' | 'liquid'
+  /** 0–1 multiplier on effect intensity (bloom opacity / aura strength). Default 1. */
+  intensity?: number
+}
+
 export interface MusicRelease {
   id: string
   slug: string
@@ -8,6 +39,8 @@ export interface MusicRelease {
   releaseDate?: string // ISO 8601 format: 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:mm:ss' or 'YYYY-MM-DDTHH:mm:ssZ'
   imageUrl: string
   blurredImageUrl?: string
+  /** Optional cover-driven theme override; see ReleaseTheme. */
+  theme?: ReleaseTheme
   description?: string
   /** i18n key for localized description; falls back to slug-based default when omitted */
   descriptionKey?: string
@@ -77,6 +110,16 @@ export const musicLibrary: MusicRelease[] = [
     releaseDate: '2026-02-06T00:00:00Z', // Midnight Ukraine time (EET/UTC+2)
     imageUrl: '/images/optimized/albums-images/chorni-ptahy/cover.avif',
     blurredImageUrl: '/images/albums-images/chorni-ptahy/cover-blurred.jpg',
+    // The cover is near-monochrome, so auto-extraction lands on a dull mauve
+    // (`#7e5858`). Override with a cold, cinematic steel-blue palette that suits
+    // the stark "Black Birds" mood and reads as intentional rather than muddy.
+    theme: {
+      primary: '#4f6d8a',
+      secondary: '#5d6b80',
+      accent: '#7d93ab',
+      dark: '#0b0e12',
+      light: '#d4dde6'
+    },
     descriptionKey: 'releases.chorni_ptahy.description',
     featured: true,
     musicPlatformLinks: {

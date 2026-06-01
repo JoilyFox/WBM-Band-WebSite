@@ -327,8 +327,10 @@
     transition: transform 0.3s ease-out;
   }
 
-  .logo-button:hover {
-    transform: scale(1.05);
+  @media (hover: hover) and (pointer: fine) {
+    .logo-button:hover {
+      transform: scale(1.05);
+    }
   }
 
   .logo-button:active {
@@ -340,9 +342,11 @@
     box-shadow: none;
   }
 
-  .nav-link-desktop:hover {
-    color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  @media (hover: hover) and (pointer: fine) {
+    .nav-link-desktop:hover {
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
   }
 
   .nav-link-desktop:focus {
@@ -361,11 +365,13 @@
     transition: all 0.3s;
   }
 
-  .nav-link-desktop:hover::after {
-    width: 100%;
+  @media (hover: hover) and (pointer: fine) {
+    .nav-link-desktop:hover::after {
+      width: 100%;
+    }
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
     .nav-link-desktop:hover {
       transform: scale(1.05);
     }
@@ -435,8 +441,10 @@
     border-radius: 0.5rem;
   }
 
-  .mobile-menu-button:hover {
-    color: white;
+  @media (hover: hover) and (pointer: fine) {
+    .mobile-menu-button:hover {
+      color: white;
+    }
   }
 
   .mobile-menu-button:active {
@@ -483,8 +491,10 @@
   }
 
   /* Enhanced underline animation for desktop */
-  .group:hover::after {
-    animation: slideIn 0.3s ease-out forwards;
+  @media (hover: hover) and (pointer: fine) {
+    .group:hover::after {
+      animation: slideIn 0.3s ease-out forwards;
+    }
   }
 
   @keyframes slideIn {

@@ -3,11 +3,12 @@
     class="music-detail-content flex flex-col min-h-screen text-primary-50 font-space-grotesk bg-surface-950 relative"
     :class="[
       performanceClass,
+      ...(!isModal ? atmosphereClass : []),
       {
         'modal-mode': isModal
       }
     ]"
-    :style="{ ...accentVars, ...performanceCSSVars }"
+    :style="{ ...themeVars, ...performanceCSSVars }"
   >
     <!-- Back/Share Buttons (only on page, not modal) -->
     <!-- Teleport to body to avoid ancestor transforms/containment breaking fixed positioning -->
@@ -61,6 +62,46 @@
         </template>
       </div>
     </Teleport>
+
+    <!--
+      Cover-driven "Ambient Bloom" atmosphere — bathes the whole page in the
+      artwork's colours. Layers (cheap → expensive):
+        • atmo-aura  : static palette-gradient mesh (all devices, GPU-cheap)
+        • atmo-bloom : blurred cover image (high-perf DESKTOP only — see CSS)
+        • atmo-veil  : transparent vignette for text contrast (all devices)
+      Hidden entirely in modal mode (the modal keeps its flat background).
+    -->
+    <div v-if="!isModal" class="release-atmosphere" aria-hidden="true">
+      <div class="atmo-aura"></div>
+      <div class="atmo-bloom"></div>
+      <div class="atmo-veil"></div>
+      <!-- Liquid-distortion filter: only emitted for the bespoke 'liquid' variant. -->
+      <svg
+        v-if="isLiquid"
+        class="atmo-liquid-defs"
+        width="0"
+        height="0"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <filter id="release-liquid-distort" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.006 0.01" numOctaves="2" seed="4">
+            <animate
+              attributeName="baseFrequency"
+              dur="28s"
+              values="0.006 0.01; 0.012 0.016; 0.006 0.01"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap
+            in="SourceGraphic"
+            scale="60"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      </svg>
+    </div>
 
     <!-- Hero Section with Album Cover -->
     <section
@@ -251,7 +292,7 @@
 
     <!-- Music Platform Links -->
     <section
-      class="music-platforms flex-1 relative py-6 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/80 to-surface-950/70"
+      class="music-platforms flex-1 relative z-10 py-6 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/70 to-surface-950/60"
     >
       <div class="platforms-container max-w-3xl mx-auto rounded-xl">
         <h2
@@ -290,6 +331,7 @@
   import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
   import { useOptimizedScroll } from '~/composables/useOptimizedScroll'
   import { useShareFunctionality } from '~/composables/useShareFunctionality'
+  import { useReleaseTheme } from '~/composables/useReleaseTheme'
   import { getLocalizedCountdown } from '~/utils/countdown'
   import type { MusicRelease } from '~/data/musicLibrary'
   import Logo from '~/components/ui/Logo.vue'
@@ -502,18 +544,13 @@
     })
   })
 
-  // Derive per-release accent colors from slug
-  const stringToHue = (str: string) => {
-    let h = 0
-    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0
-    return h % 360
-  }
-  const hue = computed(() => stringToHue(props.release.slug || props.release.id))
-  const accentVars = computed(() => ({
-    '--accent1': `hsla(${hue.value}deg, 85%, 62%, 0.24)`,
-    '--accent2': `hsla(${(hue.value + 40) % 360}deg, 85%, 60%, 0.18)`,
-    '--accent-edge': `hsla(${(hue.value + 20) % 360}deg, 90%, 55%, 0.35)`
-  }))
+  // Cover-driven release theme: resolves an override → auto-extracted palette →
+  // hash fallback, and emits the CSS variables that paint the Ambient Bloom
+  // atmosphere. Replaces the old slug-hash accent guess with the real artwork
+  // colours. (The expensive photographic layer is gated to high-perf desktop in
+  // CSS; mobile/low tiers get the cheap palette-gradient mesh only.)
+  const { themeVars, atmosphereClass, variant } = useReleaseTheme(() => props.release)
+  const isLiquid = computed(() => variant.value === 'liquid')
 
   const availablePlatforms = computed(() => {
     const platforms: Record<string, string> = {}
@@ -755,8 +792,12 @@
     transition: transform 0.3s ease-out;
   }
 
-  .logo-button:hover {
-    transform: scale(1.05);
+  /* Hover only on devices that support it — the floating logo is shown on
+     mobile, so an unguarded :hover would stick after a tap. */
+  @media (hover: hover) and (pointer: fine) {
+    .logo-button:hover {
+      transform: scale(1.05);
+    }
   }
 
   .logo-button:active {
@@ -901,24 +942,9 @@
     transform: translateZ(0);
     will-change: auto;
 
-    /* Default background for high-performance devices */
-    background:
-      radial-gradient(
-        1200px 600px at 10% 110%,
-        rgba(120, 119, 198, var(--perf-opacity, 0.1)),
-        transparent 60%
-      ),
-      radial-gradient(
-        900px 500px at 110% -10%,
-        rgba(255, 119, 198, var(--perf-opacity, 0.1)),
-        transparent 60%
-      ),
-      linear-gradient(#020202, #030303);
-    background-size:
-      150% 150%,
-      120% 120%,
-      100% 100%;
-    background-attachment: fixed;
+    /* Palette-driven near-black base; the cover colours live in the
+       .release-atmosphere layers painted on top. Flat fill = no repaint cost. */
+    background: var(--bloom-dark, #060606);
   }
 
   /* When used in a page context with flexbox, ensure it grows to fill space */
@@ -926,26 +952,138 @@
     flex: 1; /* This will make it expand to fill available space in flex container */
   }
 
-  /* High performance devices get subtle animation */
-  .music-detail-content.perf-high {
-    animation: gradientFlow 25s ease-in-out infinite alternate;
-  }
-
-  /* Medium performance devices get static gradient */
+  /* Motion now lives in the atmosphere layers, not the page base. */
+  .music-detail-content.perf-high,
   .music-detail-content.perf-medium {
-    background-size:
-      100% 100%,
-      100% 100%,
-      100% 100%;
     animation: none;
   }
 
-  /* Low performance devices get simplified background */
+  /* Low performance devices get a plain dark base (no colour cast cost) */
   .music-detail-content.perf-low,
   .music-detail-content.simple-gradients {
-    background: linear-gradient(180deg, #020202 0%, #1a1a1a 40%, #030303 100%);
+    background: linear-gradient(180deg, #050505 0%, #0d0d0f 45%, #050505 100%);
     animation: none;
     background-attachment: initial;
+  }
+
+  /* =========================================================================
+     Cover-driven "Ambient Bloom" atmosphere (whole page, behind all content)
+
+     Performance budget — the cheap path is the default; the expensive path is
+     opt-in for hardware that can afford it:
+       • atmo-aura  → static radial-gradient palette mesh. EVERY device. No blur,
+                      no image, ~4 gradients painted once. Drifts (transform) only
+                      on high-perf DESKTOP.
+       • atmo-bloom → blurred cover image. HIGH-PERF DESKTOP ONLY. The
+                      background-image + blur live solely inside the media query
+                      below, so phones and low/medium tiers never fetch the image
+                      or run a blur filter at all.
+       • atmo-veil  → static contrast gradients. EVERY device.
+     All motion is transform-based, gated to perf-high, and killed by
+     reduce-animations / prefers-reduced-motion.
+     ========================================================================= */
+  .release-atmosphere {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    /* Isolate paint + layout so the colour layers never invalidate content. */
+    contain: layout paint;
+  }
+
+  .release-atmosphere > div {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* --- Aura: palette mesh (all devices, GPU-cheap) ------------------------- */
+  .atmo-aura {
+    background:
+      radial-gradient(46% 38% at 18% 16%, var(--bloom-primary, transparent), transparent 62%),
+      radial-gradient(52% 44% at 84% 12%, var(--bloom-secondary, transparent), transparent 64%),
+      radial-gradient(58% 50% at 72% 86%, var(--bloom-accent, transparent), transparent 66%),
+      radial-gradient(72% 62% at 26% 94%, var(--bloom-primary, transparent), transparent 70%);
+    opacity: calc(0.9 * var(--bloom-intensity, 1));
+  }
+
+  /* --- Bloom: blurred cover image (high-perf DESKTOP only) ----------------- */
+  /* Default state carries no image and no filter — nothing to pay for. */
+  .atmo-bloom {
+    opacity: 0;
+  }
+
+  /* --- Veil: readability vignette (all devices) --------------------------- */
+  .atmo-veil {
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, transparent 22%),
+      linear-gradient(0deg, var(--bloom-dark, #060606) 1%, transparent 32%),
+      radial-gradient(125% 82% at 50% 42%, transparent 44%, rgba(0, 0, 0, 0.46) 100%);
+  }
+
+  /* Muted (near-monochrome) covers: ease the mesh back so it reads intentional. */
+  .atmo-muted .atmo-aura {
+    opacity: calc(0.78 * var(--bloom-intensity, 1));
+  }
+
+  .atmo-liquid-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+
+  /* The expensive layers + motion: high-perf, wide viewport only. */
+  @media (min-width: 768px) {
+    .perf-high .atmo-bloom {
+      background-image: var(--bloom-image);
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.25) translateZ(0);
+      filter: blur(56px) saturate(1.4) brightness(0.92);
+      opacity: calc(0.5 * var(--bloom-intensity, 1));
+    }
+
+    .perf-high .atmo-aura {
+      animation: atmoDrift 28s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+
+    /* Bespoke 'liquid' variant: flowing displacement instead of a still bloom. */
+    .perf-high.atmo-variant-liquid .atmo-bloom {
+      filter: url(#release-liquid-distort) blur(26px) saturate(1.45) brightness(0.92);
+      transform: scale(1.35) translateZ(0);
+      opacity: calc(0.5 * var(--bloom-intensity, 1));
+    }
+  }
+
+  /* Hard stops for reduced motion / low tier. */
+  .reduce-animations .atmo-aura,
+  .reduce-animations .atmo-bloom {
+    animation: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .atmo-aura,
+    .atmo-bloom {
+      animation: none !important;
+    }
+  }
+
+  @keyframes atmoDrift {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1.02);
+    }
+    100% {
+      transform: translate3d(2.5%, -2%, 0) scale(1.08);
+    }
+  }
+
+  /* The old hero aurora/vignette pseudo-layers are superseded by the page-wide
+     atmosphere on real pages — disable them (this also REMOVES a blur that used
+     to run on low-end mobile). Kept intact for the modal preview. */
+  .music-detail-content:not(.modal-mode) .music-hero::before,
+  .music-detail-content:not(.modal-mode) .music-hero::after {
+    display: none;
   }
 
   /* Reduced animations override */
@@ -1314,12 +1452,14 @@
     position: absolute;
     inset: -20%;
     border-radius: 50%;
+    /* Halo tinted with the cover's accent so the artwork lifts off a glow of
+       its own colour (falls back to a soft white glow if no palette). */
     background: radial-gradient(
       closest-side,
-      rgba(255, 255, 255, 0.15),
+      var(--accent-edge, rgba(255, 255, 255, 0.15)),
       rgba(255, 255, 255, 0) 60%
     );
-    filter: blur(30px);
+    filter: blur(34px);
     opacity: var(--perf-opacity, 0.6);
     will-change: auto;
   }
@@ -1793,10 +1933,12 @@
     transition: all 0.2s ease;
   }
 
-  .share-popup-close:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    transform: scale(1.05);
+  @media (hover: hover) and (pointer: fine) {
+    .share-popup-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      transform: scale(1.05);
+    }
   }
 
   .share-popup-content {
@@ -1851,9 +1993,11 @@
     min-height: auto !important;
   }
 
-  .share-popup-copy-btn:hover {
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+  @media (hover: hover) and (pointer: fine) {
+    .share-popup-copy-btn:hover {
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+    }
   }
 
   .share-popup-copy-btn:disabled {

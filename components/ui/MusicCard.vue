@@ -88,8 +88,10 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .music-card:hover {
-    transform: translateY(-8px);
+  @media (hover: hover) and (pointer: fine) {
+    .music-card:hover {
+      transform: translateY(-8px);
+    }
   }
 
   .music-card:active {
@@ -98,8 +100,10 @@
 
   /* Mobile-specific touch handling */
   @media (max-width: 767px) {
-    .music-card:hover {
-      transform: none;
+    @media (hover: hover) and (pointer: fine) {
+      .music-card:hover {
+        transform: none;
+      }
     }
 
     .music-card:active {
@@ -163,8 +167,10 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .music-card:hover :deep(.aspect-square) {
-      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
+    @media (hover: hover) and (pointer: fine) {
+      .music-card:hover :deep(.aspect-square) {
+        box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
+      }
     }
   }
 </style>

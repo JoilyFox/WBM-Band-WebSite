@@ -288,16 +288,18 @@
     height: 16px !important;
   }
 
-  /* Show buttons on hover */
-  .about-swiper:hover :deep(.swiper-button-prev),
-  .about-swiper:hover :deep(.swiper-button-next) {
-    opacity: 1;
-  }
+  @media (hover: hover) and (pointer: fine) {
+    /* Show buttons on hover */
+    .about-swiper:hover :deep(.swiper-button-prev),
+    .about-swiper:hover :deep(.swiper-button-next) {
+      opacity: 1;
+    }
 
-  /* Dim disabled buttons on hover */
-  .about-swiper:hover :deep(.swiper-button-prev.swiper-button-disabled),
-  .about-swiper:hover :deep(.swiper-button-next.swiper-button-disabled) {
-    opacity: 0.2;
+    /* Dim disabled buttons on hover */
+    .about-swiper:hover :deep(.swiper-button-prev.swiper-button-disabled),
+    .about-swiper:hover :deep(.swiper-button-next.swiper-button-disabled) {
+      opacity: 0.2;
+    }
   }
 
   /* Custom Pagination Dots */
@@ -314,10 +316,12 @@
     transition: all 0.3s ease;
   }
 
-  :deep(.swiper-pagination-bullet:hover) {
-    background: rgba(255, 255, 255, 0.6);
-    border-color: rgba(255, 255, 255, 0.8);
-    transform: scale(1.2);
+  @media (hover: hover) and (pointer: fine) {
+    :deep(.swiper-pagination-bullet:hover) {
+      background: rgba(255, 255, 255, 0.6);
+      border-color: rgba(255, 255, 255, 0.8);
+      transform: scale(1.2);
+    }
   }
 
   :deep(.swiper-pagination-bullet-active) {

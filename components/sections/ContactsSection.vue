@@ -334,11 +334,13 @@
     transition: all 0.3s ease;
   }
 
-  .form-card:hover {
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow:
-      0 12px 48px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  @media (hover: hover) and (pointer: fine) {
+    .form-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow:
+        0 12px 48px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
   }
 
   .form-group {

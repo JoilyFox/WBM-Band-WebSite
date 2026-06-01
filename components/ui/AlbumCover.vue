@@ -119,7 +119,9 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .group:hover .pi-play {
-    transform: scale(1.1);
+  @media (hover: hover) and (pointer: fine) {
+    .group:hover .pi-play {
+      transform: scale(1.1);
+    }
   }
 </style>

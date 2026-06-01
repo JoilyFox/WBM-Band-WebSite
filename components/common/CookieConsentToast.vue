@@ -231,9 +231,11 @@
     font-family: inherit;
   }
 
-  .cookie-toast__btn:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.28);
+  @media (hover: hover) and (pointer: fine) {
+    .cookie-toast__btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
   }
 
   .cookie-toast__btn:active {
@@ -246,8 +248,10 @@
     border-color: transparent;
   }
 
-  .cookie-toast__btn--accept:hover {
-    background: white;
+  @media (hover: hover) and (pointer: fine) {
+    .cookie-toast__btn--accept:hover {
+      background: white;
+    }
   }
 
   .cookie-toast__link {
@@ -259,8 +263,10 @@
     transition: color 0.18s ease;
   }
 
-  .cookie-toast__link:hover {
-    color: white;
+  @media (hover: hover) and (pointer: fine) {
+    .cookie-toast__link:hover {
+      color: white;
+    }
   }
 
   /* No forced wrap — flex-wrap on the actions row handles it naturally

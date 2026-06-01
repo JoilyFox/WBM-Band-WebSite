@@ -178,11 +178,13 @@
     }
   }
 
-  .snackbar-item:hover {
-    transform: translateY(-2px);
-    box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.25),
-      0 0 0 1px rgba(255, 255, 255, 0.1);
+  @media (hover: hover) and (pointer: fine) {
+    .snackbar-item:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
   }
 
   .snackbar-base {
@@ -274,10 +276,12 @@
     color: rgb(148, 163, 184);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      color: rgb(248, 250, 252);
-      transform: scale(1.05);
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: rgb(248, 250, 252);
+        transform: scale(1.05);
+      }
     }
 
     &:active {
