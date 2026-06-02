@@ -443,7 +443,7 @@
   // `@supports (hover: hover)` (tailwind.config.js → hoverOnlyWhenSupported), so
   // the hover never sticks after a tap on touch devices.
   const heroPillClass =
-    'inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-1 text-sm font-medium text-primary-200/55 bg-white/5 border border-white/10 backdrop-blur-md transition-all duration-100 ease-in-out hover:bg-white/10 hover:border-white/20 active:scale-[0.98] active:bg-white/15 active:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25'
+    'inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-1 text-sm font-medium text-primary-200/70 bg-white/5 border border-white/15 backdrop-blur-md transition-all duration-100 ease-in-out hover:bg-white/10 hover:border-white/20 active:scale-[0.98] active:bg-white/15 active:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25'
 
   // Optimized scroll handling
   const { isScrolled } = useOptimizedScroll({ threshold: 60 })
