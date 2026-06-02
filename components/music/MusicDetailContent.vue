@@ -294,11 +294,11 @@
           :href="musicVideoUrl"
           target="_blank"
           rel="noopener noreferrer"
-          :class="[heroPillClass, { 'flex-1 justify-center': bothActions }]"
+          :class="[heroPillClass, 'hero-pill--video', { 'flex-1 justify-center': bothActions }]"
           :aria-label="t('music.buttons.watch_video')"
           @click="handleMusicVideoClick"
         >
-          <i class="pi pi-play-circle text-base" aria-hidden="true"></i>
+          <i class="fab fa-youtube text-base" aria-hidden="true"></i>
           <span>{{ t('music.buttons.music_video') }}</span>
         </a>
         <!-- Lyrics: visual placeholder for now — behaviour wired up later.
@@ -803,6 +803,25 @@
 </script>
 
 <style scoped>
+  /* Music Video quick-action pill: a faint YouTube-red hint over the neutral
+     glass — a soft red gradient wash + a lightly red-tinted border + the brand
+     play logo — just enough to mark it as the video without shouting. The
+     scoped selector (data-v specificity) reliably overrides heroPillClass's
+     white border. */
+  .hero-pill--video {
+    background-image: linear-gradient(
+      135deg,
+      rgba(255, 0, 0, 0.14) 0%,
+      rgba(255, 68, 68, 0.05) 45%,
+      transparent 75%
+    );
+    border-color: rgba(255, 68, 68, 0.3);
+  }
+
+  .hero-pill--video > i {
+    color: #ef4444;
+  }
+
   /* Floating fixed container that holds both buttons */
   .floating-controls {
     position: fixed;
