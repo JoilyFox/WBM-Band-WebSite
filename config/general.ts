@@ -104,11 +104,13 @@ export const generalConfig: GeneralConfig = {
     youtube: 'wbmbandofficial'
   },
 
-  // Streaming platforms (placeholder - add actual links when available)
+  // Streaming platforms — artist-level profile URLs (no tracking params). These
+  // surface the footer "Listen on" section AND feed the MusicGroup JSON-LD
+  // `sameAs`, so the schema's external profiles match visible on-page links.
   streamingPlatforms: {
-    spotify: '',
-    appleMusic: '',
-    youtubeMusic: ''
+    spotify: 'https://open.spotify.com/artist/0HAHqBJrbpBocXeVJ90NoO',
+    appleMusic: 'https://music.apple.com/us/artist/woman-based-mechanics/1849021570',
+    youtubeMusic: 'https://music.youtube.com/@wbmbandofficial'
   },
 
   // External entity profiles (Phase 3 — fill after creating the records; empty
