@@ -87,6 +87,11 @@ interface MusicRelease {
     appleMusic?: string
     // ... other platforms
   }
+
+  // Released-state fallback CTA target, used when musicPlatformLinks is still
+  // empty (a distributor smart-link, e.g. feature.fm). See "Released-state
+  // smart-link fallback CTA" below.
+  releaseSmartLink?: string
 }
 ```
 
@@ -111,6 +116,22 @@ The system ensures each release appears only once:
 - **Released tracks**: Use optimized images (`imageUrl`)
 - **Preview/Pre-save cards**: Use blurred images (`blurredImageUrl`)
 - Fallback: Automatically adds `-blurred` suffix if `blurredImageUrl` not specified
+
+### 4. Released-state smart-link fallback CTA
+
+Per-platform DSP links (`musicPlatformLinks`) often only become available _after_
+release. To avoid an empty platform grid on `/listen/{slug}` at release, set an
+optional `releaseSmartLink` (a distributor smart-link, e.g. feature.fm). When the
+release is in the **Released** state and `musicPlatformLinks` is still empty,
+`MusicDetailContent.vue` renders a single **"Listen on all platforms"** CTA to that
+smart-link instead of an empty grid. As soon as any `musicPlatformLinks` entry is
+added, the normal platform grid replaces the CTA automatically.
+
+Unlike the pre-save `distributorPreSaveUrl` (which _redirects_ the transient
+pre-save page), `releaseSmartLink` does **not** redirect: `/listen/{slug}` is an
+indexed SEO surface (self-canonical + JSON-LD), so it stays a real page and links
+out via the button. A manual CTA click is tracked as a `platform_click`
+(`platform_name: 'smartlink'`).
 
 ## Example Workflow
 

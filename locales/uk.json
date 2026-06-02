@@ -234,7 +234,8 @@
       "watch_video": "Дивитись кліп",
       "music_video": "Дивитись Кліп",
       "lyrics": "Текст",
-      "song_lyrics": "Текст Пісні"
+      "song_lyrics": "Текст Пісні",
+      "stream_all": "Слухати на всіх платформах"
     },
     "detail": {
       "listen_now_title": "Слухати зараз",

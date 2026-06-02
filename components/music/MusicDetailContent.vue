@@ -340,6 +340,7 @@
           {{ listenNowTitle }}
         </h2>
         <div
+          v-if="hasPlatformLinks"
           class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch"
         >
           <div
@@ -357,6 +358,23 @@
               class="w-full h-full flex-1"
             />
           </div>
+        </div>
+
+        <!-- Released-state fallback: no individual platform links yet → a single
+             "Listen on all platforms" CTA to the distributor smart-link. The
+             moment real musicPlatformLinks are added, the grid above replaces it.
+             No redirect, so /listen stays a real, indexable page. -->
+        <div v-else-if="showSmartLinkCta" class="flex justify-center">
+          <a
+            :href="releaseSmartLink"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="smart-link-cta inline-flex items-center justify-center gap-2.5 rounded-2xl px-8 py-4 text-base font-bold text-surface-950 bg-gradient-to-br from-primary-50 to-primary-200 shadow-lg shadow-black/30 transition-transform duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 sm:text-lg"
+            @click="handleSmartLinkClick"
+          >
+            <i class="pi pi-play text-sm leading-none" aria-hidden="true"></i>
+            <span>{{ t('music.buttons.stream_all') }}</span>
+          </a>
         </div>
       </div>
     </section>
@@ -654,6 +672,30 @@
 
     return orderedPlatforms
   })
+
+  const hasPlatformLinks = computed(() => Object.keys(availablePlatforms.value).length > 0)
+
+  // Released-state fallback CTA. Per-platform DSP links often only exist after
+  // release, so when the listen page has none yet we surface a single
+  // "Listen on all platforms" button pointing at the distributor smart-link
+  // (release.releaseSmartLink). Listen page only, and only while there are no
+  // real links — adding any musicPlatformLinks entry swaps the grid back in.
+  // No redirect: the /listen page stays a real, indexable page (canonical + JSON-LD).
+  const releaseSmartLink = computed(() =>
+    !props.isPreSave && !hasPlatformLinks.value ? props.release.releaseSmartLink || '' : ''
+  )
+  const showSmartLinkCta = computed(() => Boolean(releaseSmartLink.value))
+
+  const handleSmartLinkClick = () => {
+    if (!props.release?.slug) return
+    // Manual click = real listen intent (unlike the pre-save auto-redirect), so
+    // this conversion IS tracked regardless of skipDistributorConversionEvent.
+    trackPlatformClick({
+      platformName: 'smartlink',
+      releaseSlug: props.release.slug,
+      pageType: pageType.value
+    })
+  }
 
   const badgeVariant = computed(() => {
     if (props.isPreSave) return 'presave'

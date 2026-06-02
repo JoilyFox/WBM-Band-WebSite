@@ -79,6 +79,16 @@ export interface MusicRelease {
    * See the pre-save pages' onMounted hook.
    */
   skipDistributorConversionEvent?: boolean
+  /**
+   * Released-state distributor smart-link (e.g. feature.fm) shown as a single
+   * "Listen on all platforms" CTA on the /listen page when `musicPlatformLinks`
+   * is still empty — per-platform DSP links often only become available after
+   * release. Unlike `distributorPreSaveUrl` this does NOT redirect: the listen
+   * page stays a real, indexable page (canonical + JSON-LD) and links out via the
+   * button. The moment any `musicPlatformLinks` entry is added, the normal
+   * platform grid replaces the CTA automatically.
+   */
+  releaseSmartLink?: string
 }
 
 export const musicLibrary: MusicRelease[] = [
@@ -99,7 +109,11 @@ export const musicLibrary: MusicRelease[] = [
     distributorPreSaveUrl: 'https://id.ffm.to/alina',
     // feature.fm handles the actual save off-site, so skip the synthetic distributor
     // conversion event — only the per-source `release_view` is meaningful here.
-    skipDistributorConversionEvent: true
+    skipDistributorConversionEvent: true,
+    // After release, the same feature.fm link flips to a streaming chooser. Used
+    // as the "Listen on all platforms" CTA on /listen/alina until the individual
+    // platform links are filled in (then the grid replaces the CTA).
+    releaseSmartLink: 'https://id.ffm.to/alina'
   },
   {
     id: '2',
