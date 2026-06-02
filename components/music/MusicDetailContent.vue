@@ -106,11 +106,11 @@
     <!-- Hero Section with Album Cover -->
     <section
       :class="[
-        'music-hero flex items-center justify-center relative overflow-hidden',
+        'music-hero flex flex-col items-center justify-center relative overflow-hidden',
         {
           'pt-20 pb-4 px-4 md:py-16 md:px-8': !isHeroExpanded && !isDesktop && !isModal,
           'py-4 px-4': !isHeroExpanded && !isDesktop && isModal,
-          'py-16 px-4 md:px-8': isHeroExpanded || isDesktop,
+          'pt-16 pb-8 px-4 md:px-8': isHeroExpanded || isDesktop,
           'modal-hero': isModal
         }
       ]"
@@ -279,6 +279,45 @@
           </div>
         </div>
       </div>
+      <!-- Mobile/tablet quick actions under the hero header: optional Music
+           Video + Lyrics. Kept INSIDE .music-hero so they sit on the hero's
+           darkened background (no seam against the page). Always rendered <md
+           (md:hidden) so the music video stays reachable whether the hero is
+           collapsed or expanded — it is removed from the platform grid below at
+           this breakpoint, while desktop keeps it in the grid and hides this row. -->
+      <div
+        v-if="!isModal && showHeroActions"
+        class="hero-quick-actions md:hidden relative z-10 mt-3 flex w-full max-w-[500px] mx-auto items-center gap-3"
+      >
+        <a
+          v-if="musicVideoUrl"
+          :href="musicVideoUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          :class="[heroPillClass, { 'flex-1 justify-center': bothActions }]"
+          :aria-label="t('music.buttons.watch_video')"
+          @click="handleMusicVideoClick"
+        >
+          <i class="pi pi-play-circle text-base" aria-hidden="true"></i>
+          <span>{{ t('music.buttons.music_video') }}</span>
+        </a>
+        <!-- Lyrics: visual placeholder for now — behaviour wired up later.
+             ml-auto pins it to the right edge (and right-aligns it when it is the
+             only button). Label swaps short↔long at 440px via UiResponsiveText
+             (always, whether paired or alone). -->
+        <button
+          v-if="lyricsAvailable"
+          type="button"
+          :class="[heroPillClass, bothActions ? 'flex-1 justify-center' : 'ml-auto']"
+        >
+          <i class="pi pi-align-left text-base" aria-hidden="true"></i>
+          <UiResponsiveText
+            :narrow="t('music.buttons.lyrics')"
+            :wide="t('music.buttons.song_lyrics')"
+            :breakpoint="440"
+          />
+        </button>
+      </div>
     </section>
 
     <!-- Custom Share Popup for Desktop -->
@@ -307,6 +346,7 @@
             v-for="(url, platform) in availablePlatforms"
             :key="platform"
             class="platform-button-wrapper w-full h-full min-h-[110px] flex"
+            :class="{ 'max-md:!hidden': platform === 'musicVideo' }"
           >
             <MusicPlatformButton
               :platform="platform"
@@ -332,6 +372,7 @@
   import { useOptimizedScroll } from '~/composables/useOptimizedScroll'
   import { useShareFunctionality } from '~/composables/useShareFunctionality'
   import { useReleaseTheme } from '~/composables/useReleaseTheme'
+  import { useAnalytics } from '~/composables/useAnalytics'
   import { getLocalizedCountdown } from '~/utils/countdown'
   import type { MusicRelease } from '~/data/musicLibrary'
   import Logo from '~/components/ui/Logo.vue'
@@ -369,6 +410,40 @@
 
   const performanceClass = computed(() => getPerformanceClass())
   const pageType = computed<'listen' | 'pre-save'>(() => (props.isPreSave ? 'pre-save' : 'listen'))
+
+  // Mobile/tablet hero quick-actions (Music Video + Lyrics pills).
+  const { trackPlatformClick } = useAnalytics()
+
+  // Optional Music Video pill — only on the released listen page (pre-save mode
+  // uses preSave links, which never include a music video). On <md it stands in
+  // for the music-video cell that is removed from the platform grid there.
+  const musicVideoUrl = computed(() =>
+    props.isPreSave ? '' : props.release?.musicPlatformLinks?.musicVideo || ''
+  )
+
+  const handleMusicVideoClick = () => {
+    if (!props.release?.slug) return
+    trackPlatformClick({
+      platformName: 'musicVideo',
+      releaseSlug: props.release.slug,
+      pageType: pageType.value
+    })
+  }
+
+  // Lyrics button is a placeholder (no behaviour yet) and is always shown for
+  // now. When it becomes data-driven, gate `lyricsAvailable` and the whole row
+  // collapses cleanly (no leftover margin) when neither action is present.
+  const lyricsAvailable = ref(true)
+  const showHeroActions = computed(() => Boolean(musicVideoUrl.value) || lyricsAvailable.value)
+  // With both pills present they grow to share the row equally; a lone pill
+  // keeps its natural content width (left for video, right for lyrics).
+  const bothActions = computed(() => Boolean(musicVideoUrl.value) && lyricsAvailable.value)
+
+  // Shared glass-pill styling. Tailwind `hover:` is auto-wrapped in
+  // `@supports (hover: hover)` (tailwind.config.js → hoverOnlyWhenSupported), so
+  // the hover never sticks after a tap on touch devices.
+  const heroPillClass =
+    'inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-1 text-sm font-medium text-primary-200/55 bg-white/5 border border-white/10 backdrop-blur-md transition-all duration-100 ease-in-out hover:bg-white/10 hover:border-white/20 active:scale-[0.98] active:bg-white/15 active:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25'
 
   // Optimized scroll handling
   const { isScrolled } = useOptimizedScroll({ threshold: 60 })

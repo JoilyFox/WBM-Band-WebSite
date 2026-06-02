@@ -231,7 +231,10 @@
       "listen_now": "Listen Now",
       "copy": "Copy",
       "copied": "Copied!",
-      "watch_video": "Watch music video"
+      "watch_video": "Watch music video",
+      "music_video": "Music Video",
+      "lyrics": "Lyrics",
+      "song_lyrics": "Song Lyrics"
     },
     "detail": {
       "listen_now_title": "Listen Now",

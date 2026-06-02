@@ -112,3 +112,96 @@
 - GA4 Measurement ID: `G-Z8QRF6TWC2` (public, unchanged)
 - Test plan source of truth: `docs/testing-strategy.md` (status: Waves 0–5 implemented)
 - Suite commands: `npm run test` (unit+nuxt), `npm run test:e2e` (build+e2e), `npm run coverage` (ratchet floor)
+
+---
+
+## Session: 2026-06-02 16:01 Europe/Kiev — Shipped test suite to staging; fixed the recurring "modal collapses to a line" bug (2 root causes); deployed to production
+
+### Accomplished
+
+- ✅ Committed + pushed the whole test suite to `main` → staging (GitHub Pages): commit `f463b05` (5 source bug fixes) + `d79df96` (Vitest+Playwright suite, CI, coverage). Pre-push hook + CI test-gate + deploy all green.
+- ✅ Root-caused & fixed the long-standing "modal not showing, just a line of container borders" bug — it was TWO distinct bugs, both only visible on the GitHub Pages sub-path (commit `57fc510`):
+  - 404: `BaseModal` pre-decoded `props.preloadImageUrl` via `new Image(); img.src = url` with the RAW `/images/...cover.avif` (no base prefix) → 404 on `/WBM-Band-WebSite/`. Fixed by routing through `useAssetUrl().resolveUrl`. The visible cover was always fine (ProgressiveImage resolves it) — this was a stray pre-decode request.
+  - Collapse: `MusicDetailContent` had `content-visibility: auto` (full-page scroll perf) with NO `contain-intrinsic-size`, so the browser skip-rendered the always-visible modal body → 0 height. Fixed by forcing `content-visibility: visible` in `.modal-mode`.
+- ✅ Verified BOTH fixes live on staging (cover.avif + cover-640.avif now 200 prefixed, modal body 832px, content-visibility:visible, no console errors).
+- ✅ Added regression guards: `test/nuxt/base-modal-preload.nuxt.spec.ts` (pins preload prefixing) + an e2e browser test that opens a release modal and asserts non-zero body height. Suite now 1107 unit/nuxt + 18 e2e.
+- ✅ Deployed to PRODUCTION wbmband.com via FTP (`npm run deploy:production`): 770 uploaded, 363 unchanged, 193 orphans removed, 1133 total. Verified live — modal opens 832px, content-visibility:visible, no console errors.
+
+### Key decisions
+
+- Diagnosed with a parallel approach: a 2-agent Workflow traced the code (confirmed BaseModal preload is the SOLE unprefixed emitter + the content-visibility collapse) while I reproduced live via chrome-devtools-mcp (network log showed only the BaseModal preload 404'd; everything else prefixed/200).
+- The collapse is intermittent because `content-visibility:auto` is viewport/timing-dependent — explains why the user hit it and fresh loads usually didn't.
+- Fixed at the source (BaseModal, the generic component doing the raw `new Image()`), not the call site, so any future caller is safe.
+
+### Technical findings
+
+- A bare `new Image().src = '/path'` resolves against the ORIGIN ROOT, not the app baseURL — so any JS-driven image preload on a sub-path deploy must go through `resolveUrl` (the established pattern in `useImagePreloader.ts`).
+  - Source: live network log on joilyfox.github.io + composables/useAssetUrl.ts.
+- `content-visibility: auto` without `contain-intrinsic-size` reports 0 intrinsic height while "skipped"; harmful for always-visible modal bodies. `.music-detail-content` min-height is 0 in modal mode by design (so it fits content + scrolls), so it depends entirely on content height.
+  - Source: components/music/MusicDetailContent.vue:1128-1143 + live computed styles.
+
+### Credentials & IDs obtained
+
+- — none new. FTP creds already in `.env.production` (6 keys, untouched, not read).
+
+### Blockers & open questions
+
+- Open findings still un-actioned (maintainer's call): placeholder team members (ids 101–105, pravatar.cc); dev pages `/test`+`/performance-test` shipped to prod output (confirmed again: `ua/test/index.html` uploaded in this prod deploy); duplicate `MasterPageType` export; AlbumCover dead fallback maps.
+- GitHub Actions still on Node 20 action RUNTIME (checkout@v4 etc.) — force-migrates to Node 24 on 2026-06-16; action major-version bump still pending (offered, not done).
+
+### Next session: start here
+
+1. If desired, action the open findings (remove placeholders, exclude dev pages from `nitro.prerender.routes`, dedupe `MasterPageType` export, bump GH Action majors before 2026-06-16).
+2. Optionally grow coverage on the untested perf/scroll composables and raise the ratchet thresholds.
+
+### Important IDs & links discovered this session
+
+- Commits on `main`: `f463b05` (5 fixes), `d79df96` (test suite), `57fc510` (modal 404 + content-visibility)
+- Staging: https://joilyfox.github.io/WBM-Band-WebSite/ua · Production: https://wbmband.com (FTP, `/wbmband.com/www`)
+- GA4 Measurement ID: `G-Z8QRF6TWC2` (public, unchanged)
+
+---
+
+## Session: 2026-06-02 18:44 Europe/Kiev — Built the mobile/tablet hero "Music Video / Lyrics" quick-action buttons (feature + full UI/UX iteration); pushed to staging
+
+### Accomplished
+
+- ✅ New feature on `/listen/*` release pages: mobile/tablet-only (`md:hidden`) quick-action pills INSIDE `section.music-hero` (on the cover's Ambient-Bloom bg) — **Music Video** (optional; only when `musicPlatformLinks.musicVideo` is set; `<a>` opens YouTube + fires the same `platform_click` GA4 event as the grid via `useAnalytics().trackPlatformClick`) and **Lyrics** (placeholder, no behaviour yet). Music Video is removed from the platform grid on `<md` (`max-md:!hidden`) but kept on desktop.
+- ✅ Created reusable `components/ui/ResponsiveText.vue` (`<UiResponsiveText>`): CSS-only narrow↔wide label swap, SSR-safe / no hydration flash; the breakpoint is a `:breakpoint` prop (default 440) implemented by injecting a per-instance `@media` rule into `<head>` via `useHead`, keyed by a `useId()` class.
+- ✅ i18n (both locales): `music.buttons.music_video` (Music Video / Дивитись Кліп), `music.buttons.lyrics` (Lyrics / Текст), `music.buttons.song_lyrics` (Song Lyrics / Текст Пісні).
+- ✅ Layout: row full-width capped 500px; BOTH pills grow to equal halves (`flex-1`), a LONE pill is content-width (video left / lyrics right via `ml-auto`); Lyrics label shortens at 440 in all cases; row only renders when an action exists (no empty margin).
+- ✅ UI/UX pass (after a multi-agent design review): pills dimmed to read as secondary — text/icon **55% alpha** (`text-primary-200/55`), `font-medium`, no shadow (kept fill/border for legibility; avoided blanket opacity). `py-1`, `mt-3`, `gap-3`. Active press = `scale(0.98)` + glass brighten, smooth symmetric **0.1s ease-in-out**.
+- ✅ Reduced expanded-hero bottom padding `py-16` → `pt-16 pb-8`.
+- ✅ Saved two persistent memories: `feedback_touch_hover_safe.md` (hover desktop/fine-pointer only) and `reference_responsive_text_component.md` (use `<UiResponsiveText>` for width label swaps).
+
+### Key decisions
+
+- Kept the buttons in the hero (user preference) rather than redesign; ran a 9-agent UI/UX critique + 5 alternative directions (segmented capsule / card footer / Watch&Read grid cards / tab switcher / quiet links) — documented, not adopted.
+- Responsive label stays CSS / flash-free even with a runtime breakpoint via `useHead`-injected media rule (CSS `@media` can't read a CSS var; Tailwind JIT can't build dynamic `min-[..]:` classes).
+
+### Technical findings
+
+- In this theme `primary-200` ≈ `rgb(253,253,253)` (near-white) — secondary-text dimness elsewhere comes from `opacity-70`, not the colour. Dimming the pills required an alpha colour (`text-primary-200/55`), not a darker token. Source: live computed style.
+- `active:duration-100` alone felt "rough": press snapped at 100ms but release used the 300ms base (asymmetric). Fixed with a symmetric `duration-100 ease-in-out`.
+- Vue 3.5.18 → `useId()` available (SSR-stable) for per-instance style scoping. unhead 1.11.20; `useHead({ style: [{ innerHTML }] })` works.
+
+### Credentials & IDs obtained
+
+- — none this session.
+
+### Blockers & open questions
+
+- **Lyrics** is still a no-op placeholder (awaiting the user's decision on what it opens) — a11y lens flags it as a dead control; left as-is per user.
+- `pt-16 pb-8` also shrinks DESKTOP hero bottom padding — confirm acceptable or split to mobile-only.
+- Prior open findings still un-actioned: placeholder team members, dev pages in `nitro.prerender.routes`, GH Action Node-20→24 migration before 2026-06-16.
+
+### Next session: start here
+
+1. Wire up the Lyrics button once its behaviour is defined.
+2. Deploy to PRODUCTION (wbmband.com via `npm run deploy:production`) when ready — this session pushed to STAGING only.
+
+### Important IDs & links discovered this session
+
+- Staging: https://joilyfox.github.io/WBM-Band-WebSite/ua (push to `main` → GitHub Pages)
+- New reusable component: `components/ui/ResponsiveText.vue` (`<UiResponsiveText>`)
+- GA4 Measurement ID: `G-Z8QRF6TWC2` (public, unchanged)

@@ -231,7 +231,10 @@
       "listen_now": "Слухати зараз",
       "copy": "Копіювати",
       "copied": "Скопійовано!",
-      "watch_video": "Дивитись кліп"
+      "watch_video": "Дивитись кліп",
+      "music_video": "Дивитись Кліп",
+      "lyrics": "Текст",
+      "song_lyrics": "Текст Пісні"
     },
     "detail": {
       "listen_now_title": "Слухати зараз",
