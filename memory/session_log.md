@@ -61,3 +61,54 @@
 - Reminder agent (one-time, fires Mon 2026-05-04 07:00 UTC) — `trig_0154gW6VTTBswN4Vi7LWwZfc` — disabled after the GA4 events appeared in the admin list ahead of schedule.
 - Docs: `docs/analytics-implementation-tasks.md` is the per-phase plan; `memory/session_log.md` (this file) is the chronological log.
 - Latest commit: `270e108` — phase 7 complete.
+
+---
+
+## Session: 2026-06-02 11:16 Europe/Kiev — Implemented the whole test suite (Waves 0–5): 1,123 tests + CI + coverage; fixed 5 more latent bugs
+
+### Accomplished
+
+- ✅ Stood up the Vitest harness: `vitest.config.ts` (node `unit` + `nuxt` projects via defineVitestProject; `~`/`@` alias for the node project), `test/setup.nuxt.ts` (stub useGtag, shim Cache API), ported `scripts/test-source-attribution.ts` → `test/unit/` and deleted the bespoke harness.
+- ✅ Authored **1,106 unit/nuxt tests across 44 specs** + **17 e2e tests** (2 specs) — all green. Source of truth: `docs/testing-strategy.md` (status banner now says Waves 0–5 done).
+- ✅ Waves: 0 harness(18) · 1 P0 pure logic(251) · 2 integration/middleware/analytics(226) · 3a data+locale-parity+drift(103) · 3b components(179) · 5a a11y+composables+stores(329) · 4 e2e(17).
+- ✅ E2e: `vitest.e2e.config.ts` + `test:e2e`/`test:e2e:run` scripts; node static-output assertions on `.output/public` (prerender completeness matrix, aliases, robots/sitemap, distributor redirect-screen regression) + a real-browser chromium smoke (hydration, cookie-consent accept/decline persistence, deep-link) served over a self-hosted static server with external nav blocked.
+- ✅ Fixed 5 latent bugs (each pinned by a test): `helpers.formatDate` invalid-date guard; `getMusicPlatform` prototype-pollution (`Object.hasOwn`); `useReleaseTheme.hslHex` malformed-hex (normalize s/l + clamp channel); `ErrorPage` UA maintenance keyword → stem `обслуговуванн`; `MusicLibrarySection` TBA-vs-dated reduce guards swapped.
+- ✅ CI/infra: `.github/workflows/test.yml` (lint+unit/nuxt → gated e2e); `deploy.yml` build now `needs: test`; husky `.husky/pre-push` runs `test:unit && test:nuxt`; Node 20→22; coverage ratchet thresholds in vitest.config.ts (lines 54/stmts 53/funcs 52/branches 50, baseline ~57%); `coverage/` gitignored.
+
+### Key decisions
+
+- Built tests via multi-agent Workflow fan-out (1 self-verifying agent per target, each runs `npx vitest run` on its own file before returning); verified each wave together afterward to catch cross-file pollution.
+- Used Workflow for authoring (parallel) but did harness setup, bug fixes, CI, and coverage myself (need real-output verification / judgment).
+- E2e split into robust node static-output assertions (zero flake) + a small chromium smoke; correct MIME static server so the app truly hydrates; blocked non-localhost nav so the distributor hop never hits the network.
+- Did NOT commit (awaiting user) and did NOT remove dev pages / placeholder team members from the production build (outward-facing — surfaced for the user's decision).
+
+### Technical findings
+
+- `@nuxt/test-utils@4.0.3` REJECTS `projects` inside `defineVitestConfig`; the supported multi-project shape is plain `defineConfig` (vitest/config) + `defineVitestProject` per nuxt project. The doc's example (c) mock of `getConfig` via mockNuxtImport is WRONG for this codebase — getConfig is an EXPLICIT import (needs `vi.mock`).
+  - Source: node_modules/@nuxt/test-utils/dist/config.mjs + middleware import lines.
+- Nuxt mocking rule: AUTO-imports (navigateTo/useRoute/useGtag…) → `mockNuxtImport`; EXPLICIT `import {x} from '~/…'`/`#i18n`/`vue-i18n` → `vi.mock` with `vi.hoisted`. Do NOT globally mock `useNuxtApp`/`useRouter` (crashes the test-utils bootstrap — needs `.afterEach()`); flip the global i18n locale via the writable `useNuxtApp().$i18n.locale.value` and reset in beforeEach.
+  - Source: this session's agent runs (presave/listen/error-page).
+- The bare nuxt vitest runtime resolves vue-i18n to ENGLISH by default (not the configured `ua`); `@nuxtjs/i18n` precompiles locale messages to AST objects (don't dot-path them as strings).
+- `npm run generate` prerenders `/test` + `/performance-test` (dev pages) into production output, and ships them. Distributor pre-save HTML correctly contains the `PreSaveRedirect`/`role="status"` redirect screen.
+  - Source: `.output/public` inspection.
+
+### Credentials & IDs obtained
+
+- — none this session.
+
+### Blockers & open questions
+
+- Awaiting user: commit/PR the work? Fix any open findings?
+- Open findings (not fixed): `data/teamMembers.ts` ships 5 placeholder members (ids 101–105, pravatar.cc, "remove before production"); dev pages `/test`+`/performance-test` shipped to prod output; `AlbumCover` dead per-locale fallback maps; `BaseModal` document-level keydown listener (multi-modal a11y); duplicate `MasterPageType` export (useAnalytics vs useMasterPage — the warning printed every test run).
+
+### Next session: start here
+
+1. If user approves: commit the suite (logical per-wave commits or one squash) + the 5 source bug fixes; optionally open a PR. Untracked: `test/`, `vitest.config.ts`, `vitest.e2e.config.ts`, `.github/workflows/test.yml`, `.husky/pre-push`. Modified: ErrorPage, MusicLibrarySection, useReleaseTheme, helpers, musicPlatforms, deploy.yml, package.json, .gitignore, docs/testing-strategy.md.
+2. Optionally address open findings (remove placeholder team members + exclude dev pages from `nitro.prerender.routes` / dedupe `MasterPageType`).
+3. Optionally raise coverage by testing the untested perf/scroll composables (usePerformanceOptimization, useScrollAnimation, useImagePerformance, useImagePreloader) and bump the ratchet thresholds toward ~70%.
+
+### Important IDs & links discovered this session
+
+- GA4 Measurement ID: `G-Z8QRF6TWC2` (public, unchanged)
+- Test plan source of truth: `docs/testing-strategy.md` (status: Waves 0–5 implemented)
+- Suite commands: `npm run test` (unit+nuxt), `npm run test:e2e` (build+e2e), `npm run coverage` (ratchet floor)

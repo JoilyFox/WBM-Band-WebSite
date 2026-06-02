@@ -1,9 +1,25 @@
 # Testing Strategy — WBM Band Website
 
-> Status: **proposal / not yet implemented.** This is a prioritized map of where to add tests
-> across the whole app, plus the recommended tooling + CI wiring. Produced from a full-codebase
-> audit (June 2026). Nothing here is wired up yet — the only existing "test" is the bespoke node
-> script `scripts/test-source-attribution.ts` (`npm run test:attribution`).
+> Status: **Waves 0–5 implemented (2026-06-02).** Full suite green: **1106 unit/nuxt tests** (44 specs)
+>
+> - **17 e2e tests** (static-output + real-browser). `npm run test` (unit+nuxt), `npm run test:e2e`
+>   (build + prerender assertions + chromium smoke), and `npm run coverage` (ratchet floor: lines 54 /
+>   stmts 53 / funcs 52 / branches 50; baseline ~57% on utils/composables/middleware/config) all pass.
+>   CI: `.github/workflows/test.yml` (lint + unit/nuxt, then e2e); `deploy.yml` build now `needs: test`;
+>   husky `pre-push` runs the fast suites. Node bumped to 22.
+>
+> **Bugs fixed during implementation (beyond the original 9):** `helpers.formatDate` invalid-date
+> guard; `getMusicPlatform` prototype-pollution leak (`Object.hasOwn`); `useReleaseTheme.hslHex`
+> malformed-hex (normalize + clamp); `ErrorPage` UA maintenance keyword (stem match);
+> `MusicLibrarySection` TBA-release ordering (reduce guards). Each is pinned by a test.
+>
+> **Open findings (surfaced, not fixed — maintainer's call):** `data/teamMembers.ts` ships 5
+> placeholder members (ids 101–105, pravatar.cc URLs) marked "remove before production"; dev pages
+> `/test` + `/performance-test` are prerendered into production output; `AlbumCover` per-locale
+> fallback maps are dead code; `BaseModal` attaches its keydown listener to `document` (only an issue
+> if multiple modals mount at once); duplicate `MasterPageType` export (useAnalytics vs useMasterPage).
+>
+> The rest of this doc is the original prioritized audit map (June 2026), kept for reference.
 
 **Legend** — Priority: `P0` critical (money / analytics data integrity / core domain), `P1` important,
 `P2` nice-to-have, `P3` low. Effort: `S` <30 min, `M` ~1–2 h, `L` half-day+.
