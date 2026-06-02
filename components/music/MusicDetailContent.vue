@@ -298,7 +298,7 @@
           :aria-label="t('music.buttons.watch_video')"
           @click="handleMusicVideoClick"
         >
-          <i class="fab fa-youtube text-base" aria-hidden="true"></i>
+          <i class="fab fa-youtube text-base leading-none" aria-hidden="true"></i>
           <span>{{ t('music.buttons.music_video') }}</span>
         </a>
         <!-- Lyrics: visual placeholder for now — behaviour wired up later.
@@ -310,7 +310,7 @@
           type="button"
           :class="[heroPillClass, bothActions ? 'flex-1 justify-center' : 'ml-auto']"
         >
-          <i class="pi pi-align-left text-base" aria-hidden="true"></i>
+          <i class="pi pi-align-left text-base leading-none" aria-hidden="true"></i>
           <UiResponsiveText
             :narrow="t('music.buttons.lyrics')"
             :wide="t('music.buttons.song_lyrics')"
