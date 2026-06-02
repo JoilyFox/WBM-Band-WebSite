@@ -117,7 +117,9 @@
     if (
       titleValue.includes('construction') ||
       titleValue.includes('maintenance') ||
-      titleValue.includes('обслуговування')
+      // Stem (not 'обслуговування') so it matches every case form, incl. the
+      // locative 'обслуговуванні' used in the uk.json maintenance title.
+      titleValue.includes('обслуговуванн')
     ) {
       return '503'
     }

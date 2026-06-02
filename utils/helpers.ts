@@ -2,13 +2,16 @@
  * Utility helper functions
  */
 
-// Format date to readable string
+// Format date to readable string. Returns '' for an unparseable date rather
+// than letting Intl.DateTimeFormat.format() throw a RangeError on the caller.
 export const formatDate = (date: Date | string): string => {
+  const parsed = new Date(date)
+  if (Number.isNaN(parsed.getTime())) return ''
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
-  }).format(new Date(date))
+  }).format(parsed)
 }
 
 // Format currency

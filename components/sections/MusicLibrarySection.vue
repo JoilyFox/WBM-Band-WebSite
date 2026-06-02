@@ -231,9 +231,10 @@
     if (upcoming.length === 0) return null
 
     return upcoming.reduce((nearest, current) => {
-      // If one has date and other doesn't, the one without date is "further" in future (TBA)
-      if (!nearest.releaseDate) return nearest
-      if (!current.releaseDate) return current
+      // A release without a date is "further" in the future (TBA), so the DATED
+      // release wins as the nearest upcoming one.
+      if (!nearest.releaseDate) return current
+      if (!current.releaseDate) return nearest
 
       const nearestDate = new Date(nearest.releaseDate)
       const currentDate = new Date(current.releaseDate)

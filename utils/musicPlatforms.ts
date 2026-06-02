@@ -125,5 +125,10 @@ export const getDefaultPlatform = (): MusicPlatform => ({
 })
 
 export const getMusicPlatform = (platformKey: string): MusicPlatform => {
-  return musicPlatforms[platformKey] || getDefaultPlatform()
+  // Own-property check so prototype-named keys ('constructor', '__proto__',
+  // 'hasOwnProperty', …) fall through to the default instead of leaking
+  // inherited Object.prototype members.
+  return Object.hasOwn(musicPlatforms, platformKey)
+    ? musicPlatforms[platformKey]
+    : getDefaultPlatform()
 }

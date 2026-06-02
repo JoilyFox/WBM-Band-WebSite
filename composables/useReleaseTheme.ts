@@ -47,12 +47,15 @@ const stringToHue = (str: string) => {
 }
 
 const hslHex = (h: number, s: number, l: number) => {
-  // minimal HSL→hex for the fallback path
-  const a = (s * Math.min(l, 1 - l)) / 100
+  // minimal HSL→hex for the fallback path (s and l given in 0–100)
+  const sN = s / 100
+  const lN = l / 100
+  const a = sN * Math.min(lN, 1 - lN)
   const f = (n: number) => {
     const k = (n + h / 30) % 12
-    const c = l / 100 - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)
-    return Math.round(255 * c)
+    const c = lN - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)
+    // Clamp the channel to [0,255] so toString(16) always yields exactly 2 hex digits.
+    return Math.round(255 * Math.max(0, Math.min(1, c)))
       .toString(16)
       .padStart(2, '0')
   }
