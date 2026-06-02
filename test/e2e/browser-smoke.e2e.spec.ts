@@ -161,3 +161,22 @@ describe('deep-link render', () => {
     await ctx.close()
   })
 })
+
+describe('release modal renders (collapse regression guard)', () => {
+  it('opens a release modal with a non-zero-height body', async () => {
+    const ctx = await freshContext()
+    const page = await ctx.newPage()
+    await page.goto(`${origin}/en`, { waitUntil: 'load' })
+    // Desktop click on a release card opens the modal (mobile navigates instead).
+    await page.locator('.music-card').first().click()
+    const content = page.locator('.modal-content')
+    await content.waitFor({ state: 'visible', timeout: 8000 })
+    // Guards the content-visibility collapse: the modal body must have real height,
+    // not collapse to a thin line.
+    const box = await content.boundingBox()
+    expect(box?.height ?? 0).toBeGreaterThan(200)
+    const detail = await page.locator('.music-detail-content').boundingBox()
+    expect(detail?.height ?? 0).toBeGreaterThan(200)
+    await ctx.close()
+  })
+})

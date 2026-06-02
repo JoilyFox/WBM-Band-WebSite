@@ -1140,6 +1140,12 @@
     will-change: auto;
     /* Optimize rendering performance */
     contain: layout style paint;
+    /* Never skip-render the open modal body. The base rule sets
+       `content-visibility: auto` (a scroll perf win on the full page), but with no
+       contain-intrinsic-size the browser can report this element as 0 height while
+       it's "skipped" — collapsing the modal to a thin line. The modal body is always
+       fully visible when open, so the optimization only hurts here. */
+    content-visibility: visible;
   }
 
   /* Modal mode: disable grain overlay completely */

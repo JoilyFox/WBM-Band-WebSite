@@ -93,11 +93,16 @@
     })
   }
 
+  // Resolve the preload URL through the app base path — otherwise on a sub-path
+  // deploy (GitHub Pages, baseURL=/WBM-Band-WebSite/) the pre-decode Image()
+  // requests the unprefixed /images/... and 404s.
+  const { resolveUrl } = useAssetUrl()
+
   const decodeImage = (url?: string) => {
     return new Promise<void>((resolve) => {
       if (!url) return resolve()
       const img = new Image()
-      img.src = url
+      img.src = resolveUrl(url)
       // soft timeout so we don't block animation indefinitely
       const t = setTimeout(() => resolve(), 160)
       if ((img as any).decode) {
