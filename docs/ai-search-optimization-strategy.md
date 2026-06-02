@@ -96,7 +96,22 @@ Implemented (see [§6](#6-phase-1-changelog)):
 - Branded 1200×630 social-card fallback + `summary_large_image`.
 - Removed the dead `useLocaleHead` import in `privacy-policy.vue`.
 
-### Phase 2 — Structural (in-repo)
+### Phase 2 — Structural (in-repo) — JSON-LD + hreflang ✅ DONE
+
+**Done** (commit `12a01fa`): `composables/useStructuredData.ts` — `MusicGroup` +
+`WebSite` on the home page and `MusicRecording` + `BreadcrumbList` per release,
+all with a single stable `@id`, `sameAs` filtered to real URLs only, and **no**
+`member`/`Review`; reciprocal `hreflang` (`uk-UA`/`en-US`/`x-default`) on the
+home + policy pages (release pages keep their single non-localized canonical, so
+no hreflang there — canonical and hreflang stay consistent). Phase 3 prep:
+`config.entityProfiles { musicbrainz, wikidata }` (empty, filtered out of
+`sameAs` until the off-site records exist).
+
+**Deferred — need real data / first-hand content (NOT to be fabricated):**
+replacing the `i.pravatar.cc` placeholder band members (then add `member`
+schema), and writing the per-song story prose.
+
+Remaining detail (for reference):
 
 - **Reciprocal `hreflang`** (`uk-UA` / `en-US` / `x-default`). Coupled to the
   canonical-localization decision and the sitemap — do holistically, not
@@ -234,4 +249,4 @@ Music entity / Knowledge Graph:
 
 ---
 
-_Last updated: 2026-06-02. Phase 1 implemented; Phases 2–3 pending._
+_Last updated: 2026-06-02. Phases 1–2 implemented (lang/canonicals/keyword-cleanup + JSON-LD/hreflang, live on staging). Deferred for real data: band-member schema + per-song stories. Phase 3 (off-site entity graph) pending._
