@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { musicLibrary } from './data/musicLibrary'
 import { SOURCE_PREFIXES, assertNoSlugCollisions } from './utils/sourceAttribution'
+import { SITE_URL } from './constants/app'
 
 const LOCALES = ['ua', 'en'] as const
 const RELEASE_SLUGS = musicLibrary.map((r) => r.slug)
@@ -220,34 +221,38 @@ export default defineNuxtConfig({
             '/browserconfig.xml'
         },
 
-        // SEO and Social Media
+        // SEO and Social Media. Fallback description for any route that doesn't
+        // set its own via useHead/useSeoMeta. Leads with the full, unambiguous
+        // name (the "WBM" acronym collides with unrelated entities) and matches
+        // the real band positioning from about.content. The legacy `keywords`
+        // meta was removed — Google has ignored it for over a decade and an
+        // auto-generated list reads as a low-quality signal.
         {
           name: 'description',
           content:
-            'Official website of WBM Band - Discover our music, latest releases, and upcoming shows.'
+            'Woman Based Mechanics (WBM Band) — a Kyiv-based alternative rock band. Listen to our latest singles and releases.'
         },
-        { name: 'keywords', content: 'WBM Band, music, band, rock, alternative, concerts, albums' },
-        { name: 'author', content: 'WBM Band' },
+        { name: 'author', content: 'Woman Based Mechanics' },
 
         // Open Graph
         { property: 'og:type', content: 'website' },
         { property: 'og:site_name', content: 'WBM Band' },
+        // Branded 1200×630 social card (absolute URL so crawlers/unfurlers
+        // resolve it off the real domain, not the GitHub Pages mirror). Pages
+        // that share square cover art (release pages) override this with their
+        // own square image + `summary` card.
         {
           property: 'og:image',
-          content:
-            (process.env.DEPLOY_TARGET === 'github' ? '/WBM-Band-WebSite' : '') +
-            '/android-chrome-512x512.png'
+          content: `${SITE_URL}/images/optimized/meta-images/meta-cover.jpg`
         },
-        { property: 'og:image:width', content: '512' },
-        { property: 'og:image:height', content: '512' },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
 
         // Twitter Card
-        { name: 'twitter:card', content: 'summary' },
+        { name: 'twitter:card', content: 'summary_large_image' },
         {
           name: 'twitter:image',
-          content:
-            (process.env.DEPLOY_TARGET === 'github' ? '/WBM-Band-WebSite' : '') +
-            '/android-chrome-512x512.png'
+          content: `${SITE_URL}/images/optimized/meta-images/meta-cover.jpg`
         }
       ],
       script: [
@@ -290,6 +295,9 @@ export default defineNuxtConfig({
       '@nuxtjs/i18n',
       {
         vueI18n: './i18n/i18n.config.ts',
+        // Absolute origin so the module can emit correct-host hreflang/canonical
+        // alternates (prerequisite for the Phase 2 reciprocal hreflang work).
+        baseUrl: SITE_URL,
         lazy: true,
         langDir: 'locales',
         defaultLocale: 'ua',

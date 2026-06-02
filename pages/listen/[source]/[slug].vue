@@ -28,8 +28,11 @@
     await navigateTo(localePath(`/listen/${slug}`), { redirectCode: 302 })
   }
 
-  const { release, localizedTitle, localizedDescription, metaImageUrl, pageUrl, keywords } =
-    useMasterPage({ slug, pageType: 'listen', sourcePrefix })
+  const { release, localizedTitle, localizedDescription, metaImageUrl, pageUrl } = useMasterPage({
+    slug,
+    pageType: 'listen',
+    sourcePrefix
+  })
 
   const pageTitle = computed(() => `${localizedTitle.value} | WBM Band`)
   const platformLabel = SOURCE_PREFIXES[sourcePrefix as SourcePrefix]
@@ -41,7 +44,6 @@
     title: pageTitle,
     meta: [
       { name: 'description', content: localizedDescription },
-      { name: 'keywords', content: keywords },
       // Discourage search-engine indexing of attribution variants — the
       // canonical clean URL is what should rank.
       { name: 'robots', content: 'noindex, follow' },

@@ -9,9 +9,8 @@ import { SITE_URL } from '~/constants/app'
 // useMasterPage is the shared setup for the listen + pre-save "master" release
 // pages. It looks the release up in data/musicLibrary, builds localized
 // title/description via the GLOBAL vue-i18n scope, normalizes the OG image URL,
-// builds the canonical page URL rooted at SITE_URL, derives the SEO keyword
-// list (with Cyrillic→Latin transliteration), and — when a source prefix is
-// present — locks in source attribution. It needs setup() context (useI18n,
+// builds the canonical page URL rooted at SITE_URL, and — when a source prefix
+// is present — locks in source attribution. It needs setup() context (useI18n,
 // onMounted, createError), so every test drives it through a tiny harness
 // component. The bare nuxt runtime resolves i18n to ENGLISH by default; tests
 // that need Ukrainian flip the shared locale and reset it in beforeEach so the
@@ -40,7 +39,6 @@ async function run(options: UseMasterPageOptions) {
     description: master.localizedDescription.value,
     metaImageUrl: master.metaImageUrl.value,
     pageUrl: master.pageUrl.value,
-    keywords: master.keywords.value,
     resolvedSource: master.resolvedSource
   }
 }
@@ -197,70 +195,6 @@ describe('useMasterPage', () => {
     })
   })
 
-  describe('SEO keyword building', () => {
-    it('starts with the release title and title+brand permutations', async () => {
-      const { keywords } = await run({ slug: 'mania', pageType: 'listen' })
-      const list = keywords.split(', ')
-      expect(list.slice(0, 7)).toEqual([
-        'Mania',
-        'Mania WBM',
-        'Mania WBM Band',
-        'Mania Woman Based Mechanics',
-        'Mania ВМБ',
-        'Mania ВБМ',
-        'Mania Вуман Бейсд Меканікс'
-      ])
-    })
-
-    it('appends the shared BASE_KEYWORDS brand/genre terms', async () => {
-      const { keywords } = await run({ slug: 'mania', pageType: 'listen' })
-      const list = keywords.split(', ')
-      for (const base of ['WBM', 'WBM Band', 'Woman Based Mechanics', 'rock', 'punk', 'гурт']) {
-        expect(list).toContain(base)
-      }
-    })
-
-    it('does NOT emit transliteration entries for a Latin (English) title', async () => {
-      const { keywords } = await run({ slug: 'mania', pageType: 'listen' })
-      // English 'Mania' has no Cyrillic, so no transliterated keyword group.
-      expect(keywords).not.toContain('maniya')
-    })
-
-    it('transliterates a Cyrillic title (Манія → maniya) when locale is ua', async () => {
-      setLocale('ua')
-      const { keywords } = await run({ slug: 'mania', pageType: 'listen' })
-      const list = keywords.split(', ')
-      expect(list).toContain('maniya')
-      expect(list).toContain('maniya WBM')
-      expect(list).toContain('maniya WBM Band')
-      // The Cyrillic title itself still leads the list.
-      expect(list[0]).toBe('Манія')
-    })
-
-    it('transliterates multi-char Cyrillic clusters and preserves spaces (Чорні Птахи → chorni ptakhy)', async () => {
-      setLocale('ua')
-      const { keywords } = await run({ slug: 'chorni-ptahy', pageType: 'pre-save' })
-      const list = keywords.split(', ')
-      // х→kh, и→y, space kept between words; whole phrase lowercased.
-      expect(list).toContain('chorni ptakhy')
-      expect(list).toContain('chorni ptakhy WBM')
-    })
-
-    it('produces a de-duplicated keyword list (no repeated entries)', async () => {
-      setLocale('ua')
-      const { keywords } = await run({ slug: 'mania', pageType: 'listen' })
-      const list = keywords.split(', ')
-      expect(new Set(list).size).toBe(list.length)
-    })
-
-    it('reuses the same title-derived keywords across page types for the same slug', async () => {
-      const listen = await run({ slug: 'mania', pageType: 'listen' })
-      const presaveKeywords = (await run({ slug: 'mania', pageType: 'pre-save' })).keywords
-      // Keywords depend on the localized title, not the page type.
-      expect(presaveKeywords).toBe(listen.keywords)
-    })
-  })
-
   describe('source-prefix attribution', () => {
     it('resolves a known prefix to its canonical platform (i → instagram)', async () => {
       const { resolvedSource } = await run({
@@ -322,7 +256,6 @@ describe('useMasterPage', () => {
           'localizedDescription',
           'metaImageUrl',
           'pageUrl',
-          'keywords',
           'resolvedSource'
         ].sort()
       )

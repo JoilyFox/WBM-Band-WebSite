@@ -305,8 +305,9 @@
   import { ref, onMounted, onUnmounted, computed } from 'vue'
   import { getConfig } from '~/utils/configHelpers'
   import { useI18n } from 'vue-i18n'
-  import { useLocaleHead, useLocalePath } from '#i18n'
-  const { t } = useI18n()
+  import { useLocalePath } from '#i18n'
+  import { SITE_URL } from '~/constants/app'
+  const { t, locale } = useI18n()
   const localePath = useLocalePath()
 
   // Meta tags for SEO
@@ -318,10 +319,6 @@
         content: `${t('pages.privacy.subtitle')} ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).`
       },
       {
-        name: 'keywords',
-        content: `privacy policy, ${getConfig('general.bandName')}, ${getConfig('general.fullBandName')}, data protection, privacy rights`
-      },
-      {
         property: 'og:title',
         content: `${t('pages.privacy.title')} - ${getConfig('general.bandName')}`
       },
@@ -330,7 +327,8 @@
         content: `${t('pages.privacy.subtitle')} ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).`
       },
       { property: 'og:type', content: 'website' }
-    ]
+    ],
+    link: [{ rel: 'canonical', href: `${SITE_URL}/${locale.value}/privacy-policy` }]
   })
 
   // Reactive data

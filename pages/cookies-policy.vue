@@ -203,7 +203,8 @@
   import { useI18n } from 'vue-i18n'
   import { useCookieConsent } from '~/composables/useCookieConsent'
   import { useSnackbar } from '~/composables/useSnackbar'
-  const { t } = useI18n()
+  import { SITE_URL } from '~/constants/app'
+  const { t, locale } = useI18n()
   const { reset: resetConsent, isUndecided } = useCookieConsent()
   const snackbar = useSnackbar()
   const resetJustDone = ref(false)
@@ -223,10 +224,6 @@
         content: `${t('pages.cookies.title')} - ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).`
       },
       {
-        name: 'keywords',
-        content: `cookies policy, ${getConfig('general.bandName')}, ${getConfig('general.fullBandName')}, website cookies, tracking, privacy`
-      },
-      {
         property: 'og:title',
         content: `${t('pages.cookies.title')} - ${getConfig('general.bandName')}`
       },
@@ -235,7 +232,8 @@
         content: `${t('pages.cookies.title')} - ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).`
       },
       { property: 'og:type', content: 'website' }
-    ]
+    ],
+    link: [{ rel: 'canonical', href: `${SITE_URL}/${locale.value}/cookies-policy` }]
   })
 
   // Reactive data

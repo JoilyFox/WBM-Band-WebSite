@@ -227,7 +227,8 @@
   import { ref, onMounted, onUnmounted, computed } from 'vue'
   import { getConfig } from '~/utils/configHelpers'
   import { useI18n } from 'vue-i18n'
-  const { t } = useI18n()
+  import { SITE_URL } from '~/constants/app'
+  const { t, locale } = useI18n()
 
   // Meta tags for SEO
   useHead({
@@ -238,10 +239,6 @@
         content: `${t('pages.terms.title')} - ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).`
       },
       {
-        name: 'keywords',
-        content: `terms of service, ${getConfig('general.bandName')}, ${getConfig('general.fullBandName')}, user agreement, legal terms`
-      },
-      {
         property: 'og:title',
         content: `${t('pages.terms.title')} - ${getConfig('general.bandName')}`
       },
@@ -250,7 +247,8 @@
         content: `${t('pages.terms.title')} - ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).`
       },
       { property: 'og:type', content: 'website' }
-    ]
+    ],
+    link: [{ rel: 'canonical', href: `${SITE_URL}/${locale.value}/terms-of-service` }]
   })
 
   // Reactive data

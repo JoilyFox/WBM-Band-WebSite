@@ -9,6 +9,7 @@
   import { computed, onMounted } from 'vue'
   import { useMasterPage } from '~/composables/useMasterPage'
   import { useAnalytics } from '~/composables/useAnalytics'
+  import { SITE_URL } from '~/constants/app'
 
   definePageMeta({
     layout: 'empty',
@@ -18,8 +19,10 @@
   const route = useRoute()
   const slug = route.params.slug as string
 
-  const { release, localizedTitle, localizedDescription, metaImageUrl, pageUrl, keywords } =
-    useMasterPage({ slug, pageType: 'listen' })
+  const { release, localizedTitle, localizedDescription, metaImageUrl, pageUrl } = useMasterPage({
+    slug,
+    pageType: 'listen'
+  })
 
   const { trackReleaseView } = useAnalytics()
   onMounted(() => trackReleaseView({ releaseSlug: slug, pageType: 'listen' }))
@@ -30,7 +33,6 @@
     title: pageTitle,
     meta: [
       { name: 'description', content: localizedDescription },
-      { name: 'keywords', content: keywords },
       { property: 'og:title', content: pageTitle },
       { property: 'og:description', content: localizedDescription },
       { property: 'og:image', content: metaImageUrl },
@@ -42,6 +44,13 @@
       { name: 'twitter:title', content: pageTitle },
       { name: 'twitter:description', content: localizedDescription },
       { name: 'twitter:image', content: metaImageUrl }
+    ],
+    link: [
+      // Self-referential canonical to the clean, non-localized URL. The same
+      // release content is served at /ua/listen/<slug>, /en/listen/<slug> and
+      // the root /listen/<slug> alias; this consolidates them onto one URL —
+      // matching the sitemap entry and the /listen/<source>/<slug> variants.
+      { rel: 'canonical', href: `${SITE_URL}/listen/${slug}` }
     ]
   })
 </script>

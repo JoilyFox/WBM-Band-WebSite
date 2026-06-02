@@ -25,95 +25,10 @@ export interface UseMasterPageReturn {
   localizedDescription: ReturnType<typeof computed<string>>
   metaImageUrl: ReturnType<typeof computed<string>>
   pageUrl: ReturnType<typeof computed<string>>
-  keywords: ReturnType<typeof computed<string>>
   resolvedSource: SourcePlatform | null
 }
 
 const SITE_BASE_URL = SITE_URL
-
-const CYRILLIC_TRANSLIT_MAP: Record<string, string> = {
-  а: 'a',
-  б: 'b',
-  в: 'v',
-  г: 'h',
-  ґ: 'g',
-  д: 'd',
-  е: 'e',
-  є: 'ye',
-  ж: 'zh',
-  з: 'z',
-  и: 'y',
-  і: 'i',
-  ї: 'yi',
-  й: 'y',
-  к: 'k',
-  л: 'l',
-  м: 'm',
-  н: 'n',
-  о: 'o',
-  п: 'p',
-  р: 'r',
-  с: 's',
-  т: 't',
-  у: 'u',
-  ф: 'f',
-  х: 'kh',
-  ц: 'ts',
-  ч: 'ch',
-  ш: 'sh',
-  щ: 'shch',
-  ь: '',
-  ю: 'yu',
-  я: 'ya'
-}
-
-const BASE_KEYWORDS = [
-  'WBM',
-  'WBM Band',
-  'Woman Based Mechanics',
-  'ВМБ',
-  'ВБМ гурт',
-  'Вуман Бейсд Меканікс',
-  'Вумен Бейсд Мекенікс',
-  'rock',
-  'punk',
-  'alternative',
-  'music',
-  'band',
-  'рок',
-  'панк',
-  'альтернатива',
-  'музика',
-  'гурт',
-  'wbm music',
-  'вбм музика',
-  'вмб музика'
-]
-
-function buildKeywords(title: string): string {
-  const titleLower = title.toLowerCase()
-  const releaseKeywords = [
-    title,
-    `${title} WBM`,
-    `${title} WBM Band`,
-    `${title} Woman Based Mechanics`,
-    `${title} ВМБ`,
-    `${title} ВБМ`,
-    `${title} Вуман Бейсд Меканікс`
-  ]
-
-  if (/[а-яА-Я]/.test(title)) {
-    const transliterated = titleLower
-      .split('')
-      .map((char) => CYRILLIC_TRANSLIT_MAP[char] ?? char)
-      .join('')
-    if (transliterated !== titleLower) {
-      releaseKeywords.push(transliterated, `${transliterated} WBM`, `${transliterated} WBM Band`)
-    }
-  }
-
-  return [...new Set([...releaseKeywords, ...BASE_KEYWORDS])].join(', ')
-}
 
 function normalizeImageUrl(imageUrl: string): string {
   let normalized = imageUrl
@@ -135,8 +50,8 @@ function buildPageUrl(
 
 /**
  * Shared setup for listen + pre-save master pages: release lookup, i18n
- * title/description, OG meta image, canonical URL, SEO keyword list, and
- * (optionally) source-prefix attribution.
+ * title/description, OG meta image, canonical URL, and (optionally)
+ * source-prefix attribution.
  *
  * Throws a 404 createError if the slug isn't in musicLibrary. Pages
  * are responsible for calling `useHead` / `useSeoMeta` with the returned
@@ -185,8 +100,6 @@ export function useMasterPage(options: UseMasterPageOptions): UseMasterPageRetur
 
   const pageUrl = computed<string>(() => buildPageUrl(locale.value, pageType, slug, sourcePrefix))
 
-  const keywords = computed<string>(() => buildKeywords(localizedTitle.value))
-
   let resolvedSource: SourcePlatform | null = null
   if (
     sourcePrefix &&
@@ -222,7 +135,6 @@ export function useMasterPage(options: UseMasterPageOptions): UseMasterPageRetur
     localizedDescription,
     metaImageUrl,
     pageUrl,
-    keywords,
     resolvedSource
   }
 }
