@@ -328,7 +328,12 @@
       },
       { property: 'og:type', content: 'website' }
     ],
-    link: [{ rel: 'canonical', href: `${SITE_URL}/${locale.value}/privacy-policy` }]
+    link: [
+      { rel: 'canonical', href: `${SITE_URL}/${locale.value}/privacy-policy` },
+      { rel: 'alternate', hreflang: 'uk-UA', href: `${SITE_URL}/ua/privacy-policy` },
+      { rel: 'alternate', hreflang: 'en-US', href: `${SITE_URL}/en/privacy-policy` },
+      { rel: 'alternate', hreflang: 'x-default', href: `${SITE_URL}/ua/privacy-policy` }
+    ]
   })
 
   // Reactive data

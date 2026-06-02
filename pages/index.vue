@@ -40,6 +40,7 @@
   import { useScrollTo } from '~/composables/useScrollTo'
   import { useImagePreloader } from '~/composables/useImagePreloader'
   import { useMusicNavigation } from '~/composables/useMusicNavigation'
+  import { useBandStructuredData } from '~/composables/useStructuredData'
   import { createPageTitle, SITE_URL } from '~/constants/app'
   import { musicLibrary } from '~/data/musicLibrary'
   import { getConfig } from '~/utils/configHelpers'
@@ -162,9 +163,20 @@
     link: [
       // Self-referential canonical (ua → origin root, en → /en) so the home
       // page consolidates onto one URL, matching the sitemap.
-      { rel: 'canonical', href: pageUrl }
+      { rel: 'canonical', href: pageUrl },
+      // Reciprocal language alternates so Google serves the right-language home
+      // and pairs ua/en instead of treating them as duplicates (x-default → ua,
+      // the default locale). The home is one of the few surfaces where BOTH
+      // locales are independently indexed, so hreflang applies here.
+      { rel: 'alternate', hreflang: 'uk-UA', href: SITE_URL },
+      { rel: 'alternate', hreflang: 'en-US', href: `${SITE_URL}/en` },
+      { rel: 'alternate', hreflang: 'x-default', href: SITE_URL }
     ]
   })
+
+  // Emit the site-wide band entity (MusicGroup + WebSite) JSON-LD into the
+  // prerendered HTML for Google + AI/LLM entity understanding.
+  useBandStructuredData()
 
   // Composables
   const snackbar = useSnackbar()

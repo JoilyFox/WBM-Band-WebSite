@@ -233,7 +233,12 @@
       },
       { property: 'og:type', content: 'website' }
     ],
-    link: [{ rel: 'canonical', href: `${SITE_URL}/${locale.value}/cookies-policy` }]
+    link: [
+      { rel: 'canonical', href: `${SITE_URL}/${locale.value}/cookies-policy` },
+      { rel: 'alternate', hreflang: 'uk-UA', href: `${SITE_URL}/ua/cookies-policy` },
+      { rel: 'alternate', hreflang: 'en-US', href: `${SITE_URL}/en/cookies-policy` },
+      { rel: 'alternate', hreflang: 'x-default', href: `${SITE_URL}/ua/cookies-policy` }
+    ]
   })
 
   // Reactive data

@@ -43,6 +43,15 @@ export interface GeneralConfig {
     youtubeMusic?: string
   }
 
+  // External entity / knowledge-graph profiles, used as schema.org `sameAs`
+  // targets. Fill these once the off-site records exist (Phase 3 of the
+  // AI-search/SEO plan — see docs/ai-search-optimization-strategy.md). Empty
+  // values are filtered out, so a blank entry never emits a broken sameAs.
+  entityProfiles?: {
+    musicbrainz?: string
+    wikidata?: string
+  }
+
   // Legal and policy information
   legal: {
     privacyPolicyLastUpdated: string // ISO date string
@@ -100,6 +109,13 @@ export const generalConfig: GeneralConfig = {
     spotify: '',
     appleMusic: '',
     youtubeMusic: ''
+  },
+
+  // External entity profiles (Phase 3 — fill after creating the records; empty
+  // values are filtered out of the JSON-LD `sameAs`).
+  entityProfiles: {
+    musicbrainz: '',
+    wikidata: ''
   },
 
   // Legal and policy information

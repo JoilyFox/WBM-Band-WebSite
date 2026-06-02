@@ -8,6 +8,7 @@
 <script setup lang="ts">
   import { computed, onMounted } from 'vue'
   import { useMasterPage } from '~/composables/useMasterPage'
+  import { useReleaseStructuredData } from '~/composables/useStructuredData'
   import { useAnalytics } from '~/composables/useAnalytics'
   import { SITE_URL } from '~/constants/app'
 
@@ -23,6 +24,10 @@
     slug,
     pageType: 'listen'
   })
+
+  // MusicRecording + BreadcrumbList JSON-LD (references the band by @id). URLs
+  // match the non-localized canonical declared below.
+  useReleaseStructuredData({ release, localizedTitle, metaImageUrl })
 
   const { trackReleaseView } = useAnalytics()
   onMounted(() => trackReleaseView({ releaseSlug: slug, pageType: 'listen' }))

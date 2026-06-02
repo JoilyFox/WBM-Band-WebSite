@@ -248,7 +248,12 @@
       },
       { property: 'og:type', content: 'website' }
     ],
-    link: [{ rel: 'canonical', href: `${SITE_URL}/${locale.value}/terms-of-service` }]
+    link: [
+      { rel: 'canonical', href: `${SITE_URL}/${locale.value}/terms-of-service` },
+      { rel: 'alternate', hreflang: 'uk-UA', href: `${SITE_URL}/ua/terms-of-service` },
+      { rel: 'alternate', hreflang: 'en-US', href: `${SITE_URL}/en/terms-of-service` },
+      { rel: 'alternate', hreflang: 'x-default', href: `${SITE_URL}/ua/terms-of-service` }
+    ]
   })
 
   // Reactive data
