@@ -803,23 +803,11 @@
 </script>
 
 <style scoped>
-  /* Music Video quick-action pill: a faint YouTube-red hint over the neutral
-     glass — a soft red gradient wash + a lightly red-tinted border + the brand
-     play logo — just enough to mark it as the video without shouting. The
-     scoped selector (data-v specificity) reliably overrides heroPillClass's
-     white border. */
+  /* Music Video quick-action pill: border, text and icon stay neutral (as the
+     Lyrics pill); the only YouTube cue is a small, soft red radial glow on the
+     background near the logo — just a hint. */
   .hero-pill--video {
-    background-image: linear-gradient(
-      135deg,
-      rgba(255, 0, 0, 0.14) 0%,
-      rgba(255, 68, 68, 0.05) 45%,
-      transparent 75%
-    );
-    border-color: rgba(255, 68, 68, 0.3);
-  }
-
-  .hero-pill--video > i {
-    color: #ef4444;
+    background-image: radial-gradient(circle at 14% 50%, rgba(255, 0, 0, 0.16) 0%, transparent 50%);
   }
 
   /* Floating fixed container that holds both buttons */
