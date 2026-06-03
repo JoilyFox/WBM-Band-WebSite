@@ -71,17 +71,24 @@ To support a part not already in `LyricsPartKey`:
 - The platform-links pane and the lyrics pane are two children of a CSS-grid
   cell (`grid-area: 1 / 1`), so they overlap and cross-slide. `showLyrics` flips
   the keyed `<Transition>` child; `swapDirection` picks the slide direction.
-- Duration is driven by the device perf tier via
-  `transform … calc(var(--perf-animation-duration, 0.4) * 1s) …`. When
-  `shouldReduceAnimations` is true (low-perf or `prefers-reduced-motion`) the
-  transition name switches to a plain opacity crossfade (`lyrics-fade`) — no
-  horizontal travel.
+- **Two animation modes, chosen by `shouldReduceAnimations`** (`prefersReducedMotion
+|| level === 'low'`):
+  - Default → the directional **swipe** (`lyrics-swap-forward` / `-back`), a
+    fully-opaque `translateX` cross-slide at a fixed `0.42s`. The two panes tile
+    (one left-half, one right-half) and move together — lyrics in/out from the
+    right, links in/out from the left.
+  - Low-perf / reduced-motion → a clean opacity **fade** (`lyrics-fade`) with
+    `<Transition mode="out-in">` so the old pane fully leaves before the new
+    enters (**no overlap**). No horizontal travel.
+- The transition `transition:` declarations use `!important` so the blunt global
+  mobile perf overrides in `base.scss` can't clobber them: `.mobile-standard *
+{ transition-duration: 0.2s !important }` (keeps the swipe at 0.42s) and
+  `.mobile-conservative * { transition: none !important }` (keeps the fade alive).
 - `is-swapping` toggles `overflow: hidden` on the swap wrapper **only while a
   transition runs**, so resting platform-button shadows aren't clipped.
-- On open, the platforms section is `scrollIntoView`-ed so the swap is visible
-  on mobile (the trigger sits up in the hero, above the fold).
 - The floating back-arrow (top-left) first returns to the links view when lyrics
   are open, instead of leaving the page.
+- There is **no auto-scroll** on open — the swap happens in place.
 
 ## Gotchas
 
@@ -93,6 +100,15 @@ To support a part not already in `LyricsPartKey`:
   structure first.
 - **No desktop trigger yet** — only the `md:hidden` mobile/tablet hero pill opens
   the lyrics. Add a desktop affordance before relying on it on wide screens.
+- **Swipe-vs-fade depends on correct perf classification.** Chrome's User-Agent
+  Reduction freezes the device model to `"K"`, which used to drop every modern
+  Android phone into the `low`/`conservative` tier (→ fade, and the global
+  `.mobile-conservative` rule nuked transforms). `usePerformanceOptimization`
+  now recovers the real model via **UA Client Hints**
+  (`navigator.userAgentData.getHighEntropyValues(['model'])`) so recognized
+  flagships classify as `medium`+ and get the swipe. iOS Safari has no Client
+  Hints and its UA omits the model, so iOS flagships still fall back to the fade
+  — acceptable, but note it if revisiting.
 - Lyrics are **not** injected into JSON-LD. `MusicRecording` supports a
   `MusicComposition.lyrics` slot, but full-lyrics structured data has rights
   implications — leave it off unless deliberately cleared.

@@ -215,6 +215,45 @@ export function usePerformanceOptimization() {
     })
 
     calculatePerformanceLevel()
+
+    // ── Recover the real device model on Chromium (UA Client Hints) ───────────
+    // Chrome's User-Agent Reduction freezes the device model in `navigator.userAgent`
+    // to a placeholder ("K") and pins the Android version to 10, so the UA-regex
+    // flagship/GPU detection above misses EVERY recent Android phone — they all
+    // fall through to 'low'/'conservative' (which then disables transforms &
+    // transitions site-wide). UA Client Hints still expose the real model; query
+    // it asynchronously and re-evaluate so flagships are classified correctly.
+    const uaData = navigator.userAgentData
+    if (uaData?.getHighEntropyValues) {
+      uaData
+        .getHighEntropyValues(['model'])
+        .then((hints: { model?: string }) => {
+          const model = hints?.model?.trim()
+          if (!model) return
+          const info = detectDeviceModel(model)
+          const next = { ...deviceMetrics.value }
+          let changed = false
+          if (info.isFlagship && !next.isFlagship) {
+            next.isFlagship = true
+            changed = true
+          }
+          if (info.gpuTier !== 'low' && next.gpuTier === 'low') {
+            next.gpuTier = info.gpuTier
+            changed = true
+          }
+          if (info.model !== 'unknown' && next.deviceModel === 'unknown') {
+            next.deviceModel = info.model
+            changed = true
+          }
+          if (changed) {
+            deviceMetrics.value = next
+            calculatePerformanceLevel()
+          }
+        })
+        .catch(() => {
+          /* Client Hints unavailable or blocked — keep the UA-based estimate. */
+        })
+    }
   }
 
   const calculatePerformanceLevel = () => {

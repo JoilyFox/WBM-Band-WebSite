@@ -334,7 +334,6 @@
 
     <!-- Music Platform Links (swaps with the song lyrics via a horizontal slide) -->
     <section
-      ref="platformsSection"
       class="music-platforms flex-1 relative z-10 py-6 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/70 to-surface-950/60"
     >
       <div class="platforms-container max-w-3xl mx-auto rounded-xl">
@@ -346,6 +345,7 @@
         <div class="lyrics-swap" :class="{ 'is-swapping': swapping }">
           <Transition
             :name="swapTransitionName"
+            :mode="swapMode"
             @after-enter="swapping = false"
             @after-leave="swapping = false"
           >
@@ -491,29 +491,27 @@
   const showLyrics = ref(false)
   const swapDirection = ref<'forward' | 'back'>('forward')
   const swapping = ref(false)
-  const platformsSection = ref<HTMLElement | null>(null)
 
-  // Always a directional translateX swipe: lyrics slides in/out from the RIGHT,
-  // links slides in/out from the LEFT. A transform is GPU-cheap, so it runs on
-  // every tier; only an explicit `prefers-reduced-motion` request downgrades it
-  // to a quick crossfade — handled purely in CSS (see the media query below).
-  const swapTransitionName = computed(() => `lyrics-swap-${swapDirection.value}`)
+  // Reduced-motion OR a genuinely low-perf device gets a clean opacity crossfade
+  // (sequential, via `out-in`, so the two panes never overlap); everything else
+  // gets the directional translateX swipe — lyrics in/out from the RIGHT, links
+  // in/out from the LEFT. `shouldReduceAnimations` is `prefersReducedMotion ||
+  // level === 'low'`; Client Hints now keep modern flagships out of the 'low'
+  // tier (see usePerformanceOptimization) so they get the swipe, not the fade.
+  const swapTransitionName = computed(() =>
+    shouldReduceAnimations.value ? 'lyrics-fade' : `lyrics-swap-${swapDirection.value}`
+  )
+  // `out-in` for the fade (old fully leaves before new enters → no overlap);
+  // default/simultaneous for the cross-slide so both panes move together.
+  const swapMode = computed<'out-in' | undefined>(() =>
+    shouldReduceAnimations.value ? 'out-in' : undefined
+  )
 
   const openLyrics = () => {
     if (!lyricsAvailable.value) return
     swapDirection.value = 'forward'
     swapping.value = true
     showLyrics.value = true
-    // The trigger lives up in the hero; bring the swapping section into view so
-    // the cross-slide is actually visible on mobile (it sits below the fold).
-    if (isClient.value) {
-      nextTick(() => {
-        platformsSection.value?.scrollIntoView({
-          behavior: shouldReduceAnimations.value ? 'auto' : 'smooth',
-          block: 'start'
-        })
-      })
-    }
   }
 
   const closeLyrics = () => {
@@ -1789,33 +1787,30 @@
     transform: translateX(100%);
   }
 
-  /* Deliberate, consistent swipe timing across devices (a transform is cheap to
-     composite). Snappy ease-out so it settles cleanly. */
+  /* Deliberate, consistent swipe timing with a snappy ease-out. `!important` so
+     the global mobile perf overrides in base.scss
+     (`.mobile-standard * { transition-duration: 0.2s !important }`) can't clobber
+     the intended timing on mid/flagship phones. */
   .lyrics-swap-forward-enter-active,
   .lyrics-swap-forward-leave-active,
   .lyrics-swap-back-enter-active,
   .lyrics-swap-back-leave-active {
-    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
     will-change: transform;
   }
 
-  /* Accessibility: an explicit reduced-motion request drops the horizontal travel
-     for a quick opacity crossfade instead. (Low-perf devices still get the slide
-     — it's GPU-cheap — so only a real OS-level preference downgrades it.) */
-  @media (prefers-reduced-motion: reduce) {
-    .lyrics-swap-forward-enter-from,
-    .lyrics-swap-forward-leave-to,
-    .lyrics-swap-back-enter-from,
-    .lyrics-swap-back-leave-to {
-      transform: none;
-      opacity: 0;
-    }
-    .lyrics-swap-forward-enter-active,
-    .lyrics-swap-forward-leave-active,
-    .lyrics-swap-back-enter-active,
-    .lyrics-swap-back-leave-active {
-      transition: opacity 0.2s ease;
-    }
+  /* Low-perf / reduced-motion fallback: a clean opacity crossfade with NO
+     horizontal travel. Paired with `mode="out-in"` in the template so the old
+     pane fully fades out before the new fades in (the panes never overlap).
+     `!important` keeps the fade alive even under the conservative blanket rule
+     `.mobile-conservative * { transition: none !important }` in base.scss. */
+  .lyrics-fade-enter-from,
+  .lyrics-fade-leave-to {
+    opacity: 0;
+  }
+  .lyrics-fade-enter-active,
+  .lyrics-fade-leave-active {
+    transition: opacity 0.2s ease !important;
   }
 
   @keyframes fadeInUpSmooth {
