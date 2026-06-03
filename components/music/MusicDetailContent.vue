@@ -1019,111 +1019,6 @@
 }
 */
 
-  /* Glassmorphic action buttons styles */
-  .back-glass-btn,
-  .share-glass-btn {
-    position: fixed !important; /* default when rendered outside container */
-    top: 1.25rem;
-    left: 1rem;
-    z-index: 9999; /* Very high z-index to ensure it stays above everything */
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgba(30, 30, 40, 0.32);
-    box-shadow:
-      0 4px 24px 0 rgba(0, 0, 0, 0.18),
-      0 1.5px 6px 0 rgba(0, 0, 0, 0.1);
-    border: 1.5px solid rgba(255, 255, 255, 0.13);
-    backdrop-filter: blur(var(--perf-blur-strength, 12px));
-    -webkit-backdrop-filter: blur(var(--perf-blur-strength, 12px));
-    color: #fff;
-    transition:
-      background 0.25s,
-      box-shadow 0.25s,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 1;
-    cursor: pointer;
-    /* Ensure it creates its own stacking context */
-    isolation: isolate;
-  }
-
-  /* Optimized version for low-performance devices */
-  .back-glass-btn--optimized,
-  .share-glass-btn--optimized {
-    background: rgba(30, 30, 40, 0.85);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border: 1.5px solid rgba(255, 255, 255, 0.2);
-  }
-
-  /* When not in container, keep back on left and share on right */
-  .share-glass-btn {
-    left: auto;
-    right: 1rem;
-  }
-
-  /* Hide mobile share button on desktop as CSS safeguard */
-  @media (min-width: 768px) {
-    .share-glass-btn {
-      display: none !important;
-    }
-  }
-
-  .back-glass-btn:hover,
-  .share-glass-btn:hover {
-    background: rgba(60, 60, 80, 0.44);
-    box-shadow:
-      0 8px 32px 0 rgba(0, 0, 0, 0.22),
-      0 2px 8px 0 rgba(0, 0, 0, 0.13);
-  }
-
-  /* Optimized hover for low-performance devices */
-  .back-glass-btn--optimized:hover,
-  .share-glass-btn--optimized:hover {
-    background: rgba(60, 60, 80, 0.9);
-    transform: none;
-  }
-
-  /* Disable hover effects on mobile/touch devices */
-  @media (hover: none) and (pointer: coarse) {
-    .back-glass-btn:hover,
-    .share-glass-btn:hover {
-      background: rgba(30, 30, 40, 0.32);
-      box-shadow:
-        0 4px 24px 0 rgba(0, 0, 0, 0.18),
-        0 1.5px 6px 0 rgba(0, 0, 0, 0.1);
-      transform: none;
-    }
-  }
-
-  .back-glass-btn--transparent {
-    opacity: 0.2;
-    pointer-events: none;
-  }
-  .share-glass-btn--transparent {
-    opacity: 0.2;
-    pointer-events: none;
-  }
-
-  /* Preserve transitions for buttons even while modal performance classes are active */
-  :global(body.modal-open) .back-glass-btn,
-  :global(body.modal-open) .share-glass-btn {
-    transition:
-      background 0.25s,
-      box-shadow 0.25s,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
-  :global(body.modal-animating) .back-glass-btn,
-  :global(body.modal-animating) .share-glass-btn {
-    transition:
-      background 0.25s,
-      box-shadow 0.25s,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
-
   /* Performance optimizations */
   .music-detail-content {
     position: relative;
@@ -2067,15 +1962,6 @@
     -webkit-backdrop-filter: none !important;
   }
 
-  /* Exception: Keep back button transitions working */
-  :global(body.modal-open) .back-glass-btn,
-  :global(body.modal-open) .share-glass-btn {
-    transition:
-      background 0.25s,
-      box-shadow 0.25s,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
-
   /* Hard drop of effects only during the short modal transition window */
   :global(body.modal-animating) .music-detail-content.modal-mode,
   :global(body.modal-animating) .music-detail-content.modal-mode *,
@@ -2086,15 +1972,6 @@
     filter: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-  }
-
-  /* Exception: Keep back button transitions working during animation */
-  :global(body.modal-animating) .back-glass-btn,
-  :global(body.modal-animating) .share-glass-btn {
-    transition:
-      background 0.25s,
-      box-shadow 0.25s,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
   /* Lightweight image transitions in modal */
