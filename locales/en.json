@@ -240,8 +240,7 @@
     "detail": {
       "listen_now_title": "Listen Now",
       "presave_title": "Pre-save Now",
-      "release_label": "Release {date}",
-      "about_song_title": "About the song"
+      "release_label": "Release {date}"
     },
     "a11y": {
       "back_to_section": "Back to music section",

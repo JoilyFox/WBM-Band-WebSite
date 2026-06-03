@@ -334,22 +334,6 @@
       class="music-platforms flex-1 relative z-10 py-6 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/70 to-surface-950/60"
     >
       <div class="platforms-container max-w-3xl mx-auto rounded-xl">
-        <!-- About this song: the band's first-hand story — the strongest content
-             for search + AI citation. Server-rendered; full page only (kept out
-             of the compact home-page modal). -->
-        <div
-          v-if="displayStory && !isModal"
-          class="song-story max-w-2xl mx-auto mb-10 pb-8 border-b border-white/10"
-        >
-          <h2
-            class="song-story-title text-center text-xl md:text-2xl font-bold mb-4 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent"
-          >
-            {{ t('music.detail.about_song_title') }}
-          </h2>
-          <p class="song-story-text text-primary-200/80 text-base leading-relaxed">
-            {{ displayStory }}
-          </p>
-        </div>
         <h2
           class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-6 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md"
         >
@@ -741,20 +725,6 @@
     const translated = t(releaseDescriptionKey.value) as string
     if (translated !== releaseDescriptionKey.value && translated) return translated
     return ssrFallback
-  })
-
-  // Longer "about this song" prose. Resolved via i18n at SETUP level (not gated
-  // behind isHydrating) so it is baked into the prerendered SSG HTML — this is
-  // the band's first-hand content, the strongest signal for search + AI
-  // citation, so it MUST be server-rendered, not client-only.
-  // Derive from the (correct) description key, since some slugs use hyphens
-  // while their i18n keys use underscores (e.g. chorni-ptahy → chorni_ptahy).
-  const releaseStoryKey = computed(() =>
-    releaseDescriptionKey.value.replace(/\.description$/, '.story')
-  )
-  const displayStory = computed(() => {
-    const translated = t(releaseStoryKey.value) as string
-    return translated !== releaseStoryKey.value && translated ? translated : ''
   })
 
   function formatDate(

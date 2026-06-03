@@ -137,50 +137,68 @@ interface ReleaseStructuredDataOptions {
  */
 export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) {
   const { release, localizedTitle, metaImageUrl } = options
+  const { t } = useI18n({ useScope: 'global' })
   // Matches the self-referential canonical declared by pages/listen/[slug].vue.
   const canonicalUrl = `${SITE_URL}/listen/${release.slug}`
+  // Story key derived from the (correct) description key — some slugs use hyphens
+  // while their i18n keys use underscores (e.g. chorni-ptahy → chorni_ptahy).
+  const storyKey = (release.descriptionKey || `releases.${release.slug}.description`).replace(
+    /\.description$/,
+    '.story'
+  )
 
   useHead(
-    computed(() => ({
-      script: [
-        {
-          type: 'application/ld+json',
-          innerHTML: jsonLd([
-            {
-              '@type': 'MusicRecording',
-              '@id': `${canonicalUrl}#recording`,
-              name: localizedTitle.value,
-              url: canonicalUrl,
-              image: metaImageUrl.value,
-              // Date only (no time) — matches the visible release date.
-              datePublished: release.releaseDate.slice(0, 10),
-              genre: release.genre && release.genre.length ? release.genre : BAND_GENRE,
-              byArtist: {
-                '@type': 'MusicGroup',
-                '@id': BAND_ID,
-                name: generalConfig.fullBandName
-              }
-            },
-            {
-              '@type': 'BreadcrumbList',
-              itemListElement: [
-                {
-                  '@type': 'ListItem',
-                  position: 1,
-                  name: generalConfig.fullBandName,
-                  item: SITE_URL
-                },
-                {
-                  '@type': 'ListItem',
-                  position: 2,
-                  name: localizedTitle.value,
-                  item: canonicalUrl
-                }
-              ]
-            }
-          ])
+    computed(() => {
+      // The band's first-hand "about the song" prose lives ONLY in the structured
+      // data — it feeds search + AI crawlers without any visible change to the
+      // page, and without the spam risk that visually-hidden body text carries
+      // (Google treats CSS-hidden text as a manipulation signal; JSON-LD is the
+      // legitimate machine-only channel). The visible page keeps its short
+      // description; this is the long form for bots.
+      const story = t(storyKey) as string
+      const recording: Record<string, unknown> = {
+        '@type': 'MusicRecording',
+        '@id': `${canonicalUrl}#recording`,
+        name: localizedTitle.value,
+        url: canonicalUrl,
+        image: metaImageUrl.value,
+        // Date only (no time) — matches the visible release date.
+        datePublished: release.releaseDate.slice(0, 10),
+        genre: release.genre && release.genre.length ? release.genre : BAND_GENRE,
+        byArtist: {
+          '@type': 'MusicGroup',
+          '@id': BAND_ID,
+          name: generalConfig.fullBandName
         }
-      ]
-    }))
+      }
+      if (story && story !== storyKey) recording.description = story
+      return {
+        script: [
+          {
+            type: 'application/ld+json',
+            innerHTML: jsonLd([
+              recording,
+              {
+                '@type': 'BreadcrumbList',
+                itemListElement: [
+                  {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: generalConfig.fullBandName,
+                    item: SITE_URL
+                  },
+                  {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: localizedTitle.value,
+                    item: canonicalUrl
+                  }
+                ]
+              }
+            ])
+          }
+        ]
+      }
+    })
   )
 }
