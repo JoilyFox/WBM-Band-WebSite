@@ -205,3 +205,58 @@
 - Staging: https://joilyfox.github.io/WBM-Band-WebSite/ua (push to `main` → GitHub Pages)
 - New reusable component: `components/ui/ResponsiveText.vue` (`<UiResponsiveText>`)
 - GA4 Measurement ID: `G-Z8QRF6TWC2` (public, unchanged)
+
+---
+
+## Session: 2026-06-03 16:10 Europe/Kiev — AI-search/SEO Phases 1–2 + off-site entity graph (MusicBrainz + Wikidata)
+
+### Accomplished
+
+- ✅ Researched Google's AI-optimization guide + multi-source deep research → `docs/ai-search-optimization-strategy.md` (verdict: AI optimization = SEO + entity-building; ignore llms.txt/AI-schema hype).
+- ✅ Phase 1 (`9f4c464`): removed auto-generated keyword-meta everywhere; per-locale `<html lang>` (uk-UA/en-US); self-canonicals; i18n `baseUrl=SITE_URL`; real global meta description + 1200×630 social card.
+- ✅ Phase 2 (`12a01fa`): new `composables/useStructuredData.ts` — MusicGroup+WebSite (home) + MusicRecording+BreadcrumbList (per release); reciprocal hreflang on home + policy pages only.
+- ✅ Released-state CTA (`7314f71`): new optional `releaseSmartLink` field → "Listen on all platforms" button on `/listen/{slug}` when `musicPlatformLinks` empty (NO redirect; alina = id.ffm.to/alina). See release-states-system.md §4.
+- ✅ Wired real artist URLs into `config/general.ts` (`7fe4e3e`, `972e183`) → JSON-LD `sameAs` = 8; footer "Listen on" section activated.
+- ✅ Built off-site entity graph (browser automation): MusicBrainz artist enriched + Wikidata item Q140043384 created (full statements + 6 external IDs, P434↔MBID).
+- ✅ Song stories + bio + per-song genre added, then visible parts REVERTED per user (`4ce8b2f`, `05aa326`): story now ONLY in MusicRecording JSON-LD `description`; About bio restored to original; genre is schema-only.
+- ✅ MusicBrainz fully enriched: ISRCs, Wikidata reciprocal link, TikTok, genres, catalog#s, Чорні Птахи barcode, Spotify track links, Mania MV. (label + full credits skipped per user.)
+- ✅ Added `docs/entity-setup-guide.md` (+ recurring "new release" runbook); saved band profile + track metadata to auto-memory. All pushed to STAGING; production untouched.
+
+### Key decisions
+
+- "Hide for bots" = JSON-LD (`MusicRecording.description`), NOT CSS-hidden body text (Google treats hidden text as spam) — per user's bot-only-not-visible request.
+- USER PREFERENCE (firm): keep visible site changes MINIMAL; ASK before any visible change. Footer "Listen on" → user chose KEEP.
+- Release-page canonical kept NON-localized (`/listen/{slug}`) to match sitemap + attribution variants; hreflang only where both locales are independently indexed (home + policies).
+- Built the Wikidata item via authenticated `wbeditentity` API call from `evaluate_script` (far more reliable than clicking MB/Wikidata autocompletes).
+- Did NOT store account passwords in repo/env (repo is PUBLIC); ephemeral in-session browser login only.
+
+### Technical findings
+
+- AI search crawlers (GPTBot/ClaudeBot/PerplexityBot/OAI-SearchBot) run ZERO JS → all meta/JSON-LD must stay setup-level (SSG-baked), never onMounted. Site is compliant; treat as a release gate.
+  - Source: deep-research workflow (getpassionfruit.com, OpenAI/Anthropic bot docs)
+- slug hyphen vs i18n underscore: `chorni-ptahy` slug ≠ `chorni_ptahy` i18n key → derive keys from `descriptionKey`, not slug (silently hid the story until fixed).
+- MB external-links input is `type=url` (placeholder "Add link" then "Add another link"); YouTube Music `@handle` is rejected for that link type.
+
+### Credentials & IDs obtained
+
+- MusicBrainz + Wikidata accounts created (usernames in `reference_band_profile.md`); passwords were shared in chat — NOT written here; user advised to rotate + keep in a password manager.
+- Distributor track metadata (ISRCs/UPCs/cat#s/composers) — saved to `reference_band_profile.md` (auto-memory).
+
+### Blockers & open questions
+
+- MB label: confirm "Darkwood Records" (exists in MB) vs "Darkwood Music Group" (band metadata) — same entity, or create new? (label currently `[no label]`.)
+- Full MB credits (composers/lyricists/producer) skipped per user — would need ~5 Person entities + 2 Works.
+
+### Next session: start here
+
+1. When `Аліна` drops (~2026-06-12): add it to MusicBrainz (existing artist, same Add-Release flow); paste the real per-platform links into `data/musicLibrary.ts` `alina.musicPlatformLinks` (the CTA auto-swaps to the grid). Confirm the distributor primary-artist string is byte-identical "Woman Based Mechanics".
+2. Optional: resolve the MB label + add full credits once the user decides.
+3. Entity recognition builds over weeks — periodically probe ChatGPT/Gemini/Perplexity with "who is Woman Based Mechanics?" to track progress.
+
+### Important IDs & links discovered this session
+
+- MusicBrainz artist MBID: 62589d1f-dcf9-4e94-b5fc-a5e48c2e2368
+- Wikidata item: Q140043384
+- MB recordings: Манія `d36e69ee-4721-4a32-a343-10cfb7e22e85`, Чорні Птахи `5c1638aa-4c42-4c4b-ad77-c4c36bbbc339`
+- YouTube channel ID: UCEa33Jt-s0wCajzG2enYPmA · Spotify artist 0HAHqBJrbpBocXeVJ90NoO · Apple artist 1849021570
+- Strategy: `docs/ai-search-optimization-strategy.md` · Off-site guide: `docs/entity-setup-guide.md`
