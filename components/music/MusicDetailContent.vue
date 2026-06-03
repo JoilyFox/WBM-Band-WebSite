@@ -236,15 +236,13 @@
           </div>
         </div>
         <div class="music-info flex-1 min-w-0 text-center md:text-left">
-          <!-- Mobile Collapse Button -->
+          <!-- Mobile Collapse Button (same pill as the hero actions) -->
           <div class="md:hidden mb-3 flex justify-center">
-            <button
-              class="flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 border border-white/20 text-primary-200 text-sm font-medium transition-all duration-300 md:hover:bg-white/20 md:hover:scale-105"
+            <MusicHeroPill
+              icon="pi pi-chevron-up text-base leading-none"
+              :label="collapseLabel"
               @click="toggleHeroExpansion"
-            >
-              <i class="pi pi-chevron-up text-sm"></i>
-              <span>{{ collapseLabel }}</span>
-            </button>
+            />
           </div>
 
           <h1
@@ -296,37 +294,33 @@
         v-if="!isModal && showHeroActions"
         class="hero-quick-actions md:hidden relative z-10 mt-3 flex w-full max-w-[500px] mx-auto items-center gap-3"
       >
-        <a
+        <MusicHeroPill
           v-if="musicVideoUrl"
+          as="a"
           :href="musicVideoUrl"
           target="_blank"
           rel="noopener noreferrer"
-          :class="[heroPillClass, 'hero-pill--video', { 'flex-1 justify-center': bothActions }]"
+          accent="video"
+          icon="fab fa-youtube text-base leading-none"
+          :label="t('music.buttons.music_video')"
           :aria-label="t('music.buttons.watch_video')"
+          :class="{ 'flex-1 justify-center': bothActions }"
           @click="handleMusicVideoClick"
-        >
-          <i class="fab fa-youtube text-base leading-none" aria-hidden="true"></i>
-          <span>{{ t('music.buttons.music_video') }}</span>
-        </a>
+        />
         <!-- Lyrics: swaps the platform-links section below for the song lyrics
-             (horizontal cross-slide). Only present when the release ships lyrics
-             (lyricsAvailable). ml-auto pins it right (and right-aligns it when it
-             is the only button). Label swaps short↔long at 440px via
-             UiResponsiveText (always, whether paired or alone). -->
-        <button
+             (horizontal cross-slide). Only present when the release ships lyrics.
+             ml-auto pins it right when it is the only button; the label swaps
+             short↔long at 440px via the pill's responsive label. -->
+        <MusicHeroPill
           v-if="lyricsAvailable"
-          type="button"
-          :class="[heroPillClass, bothActions ? 'flex-1 justify-center' : 'ml-auto']"
+          icon="pi pi-align-left text-base leading-none"
+          :narrow-label="t('music.buttons.lyrics')"
+          :wide-label="t('music.buttons.song_lyrics')"
+          :breakpoint="440"
           :aria-label="t('music.a11y.show_lyrics')"
+          :class="bothActions ? 'flex-1 justify-center' : 'ml-auto'"
           @click="openLyrics"
-        >
-          <i class="pi pi-align-left text-base leading-none" aria-hidden="true"></i>
-          <UiResponsiveText
-            :narrow="t('music.buttons.lyrics')"
-            :wide="t('music.buttons.song_lyrics')"
-            :breakpoint="440"
-          />
-        </button>
+        />
       </div>
     </section>
 
@@ -516,12 +510,6 @@
     swapDirection.value = 'back'
     showLyrics.value = false
   }
-
-  // Shared glass-pill styling. Tailwind `hover:` is auto-wrapped in
-  // `@supports (hover: hover)` (tailwind.config.js → hoverOnlyWhenSupported), so
-  // the hover never sticks after a tap on touch devices.
-  const heroPillClass =
-    'inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-1 text-sm font-medium text-primary-200/70 bg-white/5 border border-white/15 backdrop-blur-md transition-all duration-100 ease-in-out hover:bg-white/10 hover:border-white/20 active:scale-[0.98] active:bg-white/15 active:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25'
 
   // Optimized scroll handling
   const { isScrolled } = useOptimizedScroll({ threshold: 60 })
@@ -929,13 +917,6 @@
 </script>
 
 <style scoped>
-  /* Music Video quick-action pill: border, text and icon stay neutral (as the
-     Lyrics pill); the only YouTube cue is a small, soft red radial glow on the
-     background near the logo — just a hint. */
-  .hero-pill--video {
-    background-image: radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.2) 0%, transparent 52%);
-  }
-
   /* Floating fixed container that holds both buttons */
   .floating-controls {
     position: fixed;
