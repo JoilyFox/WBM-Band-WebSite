@@ -243,7 +243,12 @@
     .btn-glassmorphic {
       backdrop-filter: none !important;
       background: rgba(255, 255, 255, 0.05) !important;
-      transition: background-color 0.2s ease !important;
+      /* Keep the cheap background-color transition for battery, but preserve the
+         opacity fade so the share button matches the scroll-fade timing of the
+         floating logo and back button (see .floating-logo / .back-glass-btn). */
+      transition:
+        background-color 0.2s ease,
+        opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
     /* Override only for flagship devices */
