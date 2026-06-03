@@ -341,22 +341,17 @@
 
     <!-- Music Platform Links (swaps with the song lyrics via a horizontal slide) -->
     <section
-      class="music-platforms flex-1 relative z-10 py-6 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/70 to-surface-950/60"
+      class="music-platforms flex-1 relative z-10 py-6 sm:pb-16 bg-gradient-to-b from-surface-900/70 to-surface-950/60"
     >
-      <div class="platforms-container max-w-3xl mx-auto rounded-xl">
-        <!-- Two stacked panes share one grid cell so they cross-slide (links exit
-             left while lyrics enter right, reversed on the way back). `swapDirection`
-             picks the slide direction via `swapTransitionName`; `is-swapping` clips
-             the off-screen pane only while a transition is running so resting button
-             shadows are never cut off. Reduced-motion fallback is CSS-only. -->
-        <div class="lyrics-swap" :class="{ 'is-swapping': swapping }">
-          <Transition
-            :name="swapTransitionName"
-            :mode="swapMode"
-            @after-enter="swapping = false"
-            @after-leave="swapping = false"
-          >
-            <div :key="showLyrics ? 'lyrics' : 'links'" class="lyrics-swap__pane">
+      <!-- Full-bleed swap: `.lyrics-swap` spans the viewport and clips at the SCREEN
+           edges, so the two panes cross-slide edge-to-edge (links exit left while
+           lyrics enter right, reversed on the way back) with nothing cutting them
+           off. The horizontal padding + max-width live on each pane's inner
+           container instead of the section. The reduced-motion fallback is CSS-only. -->
+      <div class="lyrics-swap">
+        <Transition :name="swapTransitionName" :mode="swapMode">
+          <div :key="showLyrics ? 'lyrics' : 'links'" class="lyrics-swap__pane">
+            <div class="platforms-container max-w-3xl mx-auto px-4 md:px-8 rounded-xl">
               <!-- LINKS VIEW -->
               <template v-if="!showLyrics">
                 <h2
@@ -407,8 +402,8 @@
               <!-- LYRICS VIEW -->
               <MusicLyrics v-else :sections="lyricsSections" @back="closeLyrics" />
             </div>
-          </Transition>
-        </div>
+          </div>
+        </Transition>
       </div>
     </section>
   </div>
@@ -497,7 +492,6 @@
   // renders the links view and there is no hydration mismatch.
   const showLyrics = ref(false)
   const swapDirection = ref<'forward' | 'back'>('forward')
-  const swapping = ref(false)
 
   // Reduced-motion OR a genuinely low-perf device gets a clean opacity crossfade
   // (sequential, via `out-in`, so the two panes never overlap); everything else
@@ -517,13 +511,11 @@
   const openLyrics = () => {
     if (!lyricsAvailable.value) return
     swapDirection.value = 'forward'
-    swapping.value = true
     showLyrics.value = true
   }
 
   const closeLyrics = () => {
     swapDirection.value = 'back'
-    swapping.value = true
     showLyrics.value = false
   }
 
@@ -1811,16 +1803,15 @@
   .lyrics-swap {
     display: grid;
     align-items: start;
+    /* Full-bleed: spans the viewport and clips the off-screen panes at the SCREEN
+       edges. Resting shadows live inside each pane's padded inner container, well
+       inside the screen edges, so they are never cut off. Always-on (not toggled)
+       so there's no overflow flip-flop repaint when the swap starts/ends. */
+    overflow: hidden;
   }
 
   .lyrics-swap > * {
     grid-area: 1 / 1;
-  }
-
-  /* Clip the off-screen pane ONLY while a transition runs, so resting platform
-     button shadows aren't cut off at the section edges. */
-  .lyrics-swap.is-swapping {
-    overflow: hidden;
   }
 
   /* Forward (links → lyrics): lyrics slides IN from the right, links slides OUT
@@ -1850,7 +1841,6 @@
   .lyrics-swap-back-enter-active,
   .lyrics-swap-back-leave-active {
     transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
-    will-change: transform;
   }
 
   /* Low-perf / reduced-motion fallback: a clean opacity crossfade with NO

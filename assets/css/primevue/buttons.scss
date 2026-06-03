@@ -356,7 +356,13 @@
     background: rgba(255, 255, 255, 0.08) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    transition: background-color 0.2s ease !important;
+    /* Keep the cheap background-color transition, but preserve the opacity fade so
+       BOTH floating buttons match the scroll-fade timing of the centre logo
+       (matches the base.scss rule; without the opacity here this !important would
+       strip the back button's fade in every URL-param state). */
+    transition:
+      background-color 0.2s ease,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
 
     &:hover,
     &:focus,
