@@ -134,7 +134,11 @@
         v-if="!isHeroExpanded"
         :class="[
           'md:hidden w-full max-w-5xl z-10 cursor-pointer transform transition-all duration-400 ease-out md:hover:scale-[1.02]',
-          heroInteracted ? 'animate-slideInCompact' : 'animate-heroFadeIn'
+          heroInteracted
+            ? 'animate-slideInCompact'
+            : heroEntered
+              ? 'animate-heroFadeIn'
+              : 'hero-prehidden'
         ]"
         @click="toggleHeroExpansion"
       >
@@ -676,6 +680,11 @@
   // The bouncier slideInCompact entrance is reserved for when the card re-appears
   // after the user collapses from full mode (the page is settled by then).
   const heroInteracted = ref(false)
+  // The first-open entrance is triggered ONCE, after mount (see onMounted) — never
+  // during SSR/hydration, where a late stylesheet or a re-render could restart or
+  // skip the keyframe and make it "blink". Until then the card sits pre-hidden so
+  // there's no flash of the un-animated element.
+  const heroEntered = ref(false)
   const toggleHeroExpansion = () => {
     heroInteracted.value = true
     isHeroExpanded.value = !isHeroExpanded.value
@@ -690,6 +699,13 @@
     // Hydration finished; allow switching to localized strings without triggering hydration warnings
     isHydrating.value = false
     updateCountdown()
+
+    // Fire the compact-card first-open entrance once the first frame has painted,
+    // so the fade always plays cleanly on the client (never interrupted by
+    // hydration). Before this the card is `hero-prehidden` (opacity 0).
+    requestAnimationFrame(() => {
+      heroEntered.value = true
+    })
 
     // Resize handler for responsive breakpoint (debounced)
     let resizeTimeout: NodeJS.Timeout
@@ -1752,22 +1768,26 @@
      transform, no overshoot — so it stays smooth even while the page is still
      mounting (no page transition covers it). slideInCompact handles the later
      post-collapse re-appearance instead. */
+  /* Compact card sits invisible until the entrance fires post-mount (heroEntered),
+     so there's no flash of the un-animated card and the fade can't be skipped. */
+  .hero-prehidden {
+    opacity: 0;
+  }
+
   .animate-heroFadeIn {
-    /* Deliberately slow + gentle ease-out so the block eases in super smoothly on
-       first load (no transform overshoot, so it never janks during the busy
-       mount). slideInCompact still handles the snappier post-collapse return. */
+    /* Deliberately slow, gentle ease-out — a pure opacity fade (no transform), so
+       it eases in super smoothly on first load and can never "jump"/blink even if
+       the mount is busy. slideInCompact handles the snappier post-collapse return. */
     animation: heroFadeIn 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    will-change: opacity, transform;
+    will-change: opacity;
   }
 
   @keyframes heroFadeIn {
     from {
       opacity: 0;
-      transform: translateY(12px);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
     }
   }
 
