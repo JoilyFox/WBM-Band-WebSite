@@ -29,6 +29,41 @@ export interface ReleaseTheme {
   intensity?: number
 }
 
+/**
+ * Canonical song-part keys for a lyrics section. Each maps to a localized label
+ * under the `music.parts.{key}` i18n namespace (e.g. 'verse' → "Verse" / "Куплет").
+ * To add a new part, extend this union AND add the key to `music.parts` in BOTH
+ * locale files (locales/uk.json + locales/en.json).
+ */
+export type LyricsPartKey =
+  | 'intro'
+  | 'verse'
+  | 'pre_chorus'
+  | 'chorus'
+  | 'post_chorus'
+  | 'hook'
+  | 'bridge'
+  | 'refrain'
+  | 'interlude'
+  | 'outro'
+
+/**
+ * One labeled section of a song's lyrics. Lyrics are stored in the song's
+ * ORIGINAL language — the lines are never translated; only the section LABEL is
+ * localized via `part`. See components/music/Lyrics.vue for rendering.
+ */
+export interface LyricsSection {
+  /**
+   * Song-part key → localized heading via `music.parts.{part}`. Omit it (or use
+   * a key that has no translation) to render the lines with NO heading.
+   */
+  part?: LyricsPartKey
+  /** Optional ordinal appended to the label, e.g. `num: 2` → "Verse 2" / "Куплет 2". */
+  num?: number
+  /** The section's lines, in order. One array entry = one rendered line. */
+  lines: string[]
+}
+
 export interface MusicRelease {
   id: string
   slug: string
@@ -47,6 +82,13 @@ export interface MusicRelease {
   /** Per-release genre(s) for the schema.org MusicRecording (English genre names). */
   genre?: string[]
   featured?: boolean
+  /**
+   * Optional song lyrics in the song's original language, split into labeled
+   * sections (verse/chorus/…). When present and non-empty, the release page
+   * shows a Lyrics button that swaps the platform links for the lyrics view.
+   * Section labels localize via `music.parts.*`; the lines do not translate.
+   */
+  lyrics?: LyricsSection[]
   musicPlatformLinks: {
     spotify?: string
     appleMusic?: string
@@ -179,7 +221,65 @@ export const musicLibrary: MusicRelease[] = [
       musicVideo: 'https://www.youtube.com/watch?v=z_uH1gA9Gwo'
     },
     useDistributorPreSave: true,
-    distributorPreSaveUrl: 'https://artists.landr.com/057829908413'
+    distributorPreSaveUrl: 'https://artists.landr.com/057829908413',
+    lyrics: [
+      {
+        part: 'verse',
+        num: 1,
+        lines: [
+          'Білий дим',
+          'Якби ти був тільки моїм',
+          'А так належиш всім підряд',
+          'Але повія тільки я, повія тільки',
+          'Так розболілась голова',
+          'Так розболілась голова',
+          'Так розболілась голова'
+        ]
+      },
+      {
+        part: 'chorus',
+        lines: [
+          'На руках попелом, подихом, пострілом одним',
+          'Ти мій, ти мій',
+          'Манія, по губах стікає біль твоя',
+          'Бо ти назавжди мій, ти мій'
+        ]
+      },
+      {
+        part: 'verse',
+        num: 2,
+        lines: [
+          'Спробував крізь мої пальці утекти',
+          'Хочеш віддатись світові',
+          'Але належиш лиш мені',
+          'Білий дим, зроблю покірним і німим',
+          'Лиш в замкнутому просторі',
+          'Можемо існувати ми'
+        ]
+      },
+      {
+        part: 'refrain',
+        lines: [
+          'Білий дим, якби ти був тільки моїм',
+          'А так належиш всім підряд',
+          'Але повія тільки я'
+        ]
+      },
+      {
+        part: 'chorus',
+        lines: [
+          'На руках попелом, подихом, пострілом одним',
+          'Ти мій, ти мій',
+          'Манія, по губах стікає біль твоя',
+          'Бо ти назавжди мій, ти мій',
+          'Ти мій, ти мій, ти мій'
+        ]
+      },
+      {
+        part: 'outro',
+        lines: ['Ти', 'Ти', 'Ти', 'Ти мій']
+      }
+    ]
   }
 ]
 

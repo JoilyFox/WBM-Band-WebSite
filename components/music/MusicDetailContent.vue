@@ -301,14 +301,17 @@
           <i class="fab fa-youtube text-base leading-none" aria-hidden="true"></i>
           <span>{{ t('music.buttons.music_video') }}</span>
         </a>
-        <!-- Lyrics: visual placeholder for now — behaviour wired up later.
-             ml-auto pins it to the right edge (and right-aligns it when it is the
-             only button). Label swaps short↔long at 440px via UiResponsiveText
-             (always, whether paired or alone). -->
+        <!-- Lyrics: swaps the platform-links section below for the song lyrics
+             (horizontal cross-slide). Only present when the release ships lyrics
+             (lyricsAvailable). ml-auto pins it right (and right-aligns it when it
+             is the only button). Label swaps short↔long at 440px via
+             UiResponsiveText (always, whether paired or alone). -->
         <button
           v-if="lyricsAvailable"
           type="button"
           :class="[heroPillClass, bothActions ? 'flex-1 justify-center' : 'ml-auto']"
+          :aria-label="t('music.a11y.show_lyrics')"
+          @click="openLyrics"
         >
           <i class="pi pi-align-left text-base leading-none" aria-hidden="true"></i>
           <UiResponsiveText
@@ -329,52 +332,75 @@
       @close="hideSharePopup"
     />
 
-    <!-- Music Platform Links -->
+    <!-- Music Platform Links (swaps with the song lyrics via a horizontal slide) -->
     <section
+      ref="platformsSection"
       class="music-platforms flex-1 relative z-10 py-6 sm:pb-16 px-4 md:px-8 bg-gradient-to-b from-surface-900/70 to-surface-950/60"
     >
       <div class="platforms-container max-w-3xl mx-auto rounded-xl">
-        <h2
-          class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-6 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md"
-        >
-          {{ listenNowTitle }}
-        </h2>
-        <div
-          v-if="hasPlatformLinks"
-          class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch"
-        >
-          <div
-            v-for="(url, platform) in availablePlatforms"
-            :key="platform"
-            class="platform-button-wrapper w-full h-full min-h-[110px] flex"
-            :class="{ 'max-md:!hidden': platform === 'musicVideo' }"
+        <!-- Two stacked panes share one grid cell so they cross-slide (links exit
+             left while lyrics enter right, reversed on the way back). `swapDirection`
+             picks the slide direction via `swapTransitionName`; `is-swapping` clips
+             the off-screen pane only while a transition is running so resting button
+             shadows are never cut off. Reduced-motion fallback is CSS-only. -->
+        <div class="lyrics-swap" :class="{ 'is-swapping': swapping }">
+          <Transition
+            :name="swapTransitionName"
+            @after-enter="swapping = false"
+            @after-leave="swapping = false"
           >
-            <MusicPlatformButton
-              :platform="platform"
-              :url="url"
-              :is-pre-save="isPreSave"
-              :release-slug="release.slug"
-              :page-type="pageType"
-              class="w-full h-full flex-1"
-            />
-          </div>
-        </div>
+            <div :key="showLyrics ? 'lyrics' : 'links'" class="lyrics-swap__pane">
+              <!-- LINKS VIEW -->
+              <template v-if="!showLyrics">
+                <h2
+                  class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-6 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md"
+                >
+                  {{ listenNowTitle }}
+                </h2>
+                <div
+                  v-if="hasPlatformLinks"
+                  class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch"
+                >
+                  <div
+                    v-for="(url, platform) in availablePlatforms"
+                    :key="platform"
+                    class="platform-button-wrapper w-full h-full min-h-[110px] flex"
+                    :class="{ 'max-md:!hidden': platform === 'musicVideo' }"
+                  >
+                    <MusicPlatformButton
+                      :platform="platform"
+                      :url="url"
+                      :is-pre-save="isPreSave"
+                      :release-slug="release.slug"
+                      :page-type="pageType"
+                      class="w-full h-full flex-1"
+                    />
+                  </div>
+                </div>
 
-        <!-- Released-state fallback: no individual platform links yet → a single
-             "Listen on all platforms" CTA to the distributor smart-link. The
-             moment real musicPlatformLinks are added, the grid above replaces it.
-             No redirect, so /listen stays a real, indexable page. -->
-        <div v-else-if="showSmartLinkCta" class="flex justify-center">
-          <a
-            :href="releaseSmartLink"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="smart-link-cta inline-flex items-center justify-center gap-2.5 rounded-2xl px-8 py-4 text-base font-bold text-surface-950 bg-gradient-to-br from-primary-50 to-primary-200 shadow-lg shadow-black/30 transition-transform duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 sm:text-lg"
-            @click="handleSmartLinkClick"
-          >
-            <i class="pi pi-play text-sm leading-none" aria-hidden="true"></i>
-            <span>{{ t('music.buttons.stream_all') }}</span>
-          </a>
+                <!-- Released-state fallback: no individual platform links yet → a
+                     single "Listen on all platforms" CTA to the distributor
+                     smart-link. The moment real musicPlatformLinks are added, the
+                     grid above replaces it. No redirect, so /listen stays a real,
+                     indexable page. -->
+                <div v-else-if="showSmartLinkCta" class="flex justify-center">
+                  <a
+                    :href="releaseSmartLink"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="smart-link-cta inline-flex items-center justify-center gap-2.5 rounded-2xl px-8 py-4 text-base font-bold text-surface-950 bg-gradient-to-br from-primary-50 to-primary-200 shadow-lg shadow-black/30 transition-transform duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 sm:text-lg"
+                    @click="handleSmartLinkClick"
+                  >
+                    <i class="pi pi-play text-sm leading-none" aria-hidden="true"></i>
+                    <span>{{ t('music.buttons.stream_all') }}</span>
+                  </a>
+                </div>
+              </template>
+
+              <!-- LYRICS VIEW -->
+              <MusicLyrics v-else :sections="lyricsSections" @back="closeLyrics" />
+            </div>
+          </Transition>
         </div>
       </div>
     </section>
@@ -448,14 +474,53 @@
     })
   }
 
-  // Lyrics button is a placeholder (no behaviour yet) and is always shown for
-  // now. When it becomes data-driven, gate `lyricsAvailable` and the whole row
-  // collapses cleanly (no leftover margin) when neither action is present.
-  const lyricsAvailable = ref(true)
+  // Lyrics are data-driven: the button (and the swipe-in lyrics view) exist only
+  // when the release actually ships lyrics in data/musicLibrary.ts. When absent,
+  // the whole quick-actions row collapses cleanly (no leftover margin).
+  const lyricsSections = computed(() => props.release?.lyrics ?? [])
+  const lyricsAvailable = computed(() => lyricsSections.value.length > 0)
   const showHeroActions = computed(() => Boolean(musicVideoUrl.value) || lyricsAvailable.value)
   // With both pills present they grow to share the row equally; a lone pill
   // keeps its natural content width (left for video, right for lyrics).
   const bothActions = computed(() => Boolean(musicVideoUrl.value) && lyricsAvailable.value)
+
+  // --- Lyrics view: in-place horizontal swap of the platform links <-> lyrics.
+  // `showLyrics` drives a directional cross-slide (links exit left, lyrics enter
+  // right; reversed on the way back). Pure client state — no route change — so SSR
+  // renders the links view and there is no hydration mismatch.
+  const showLyrics = ref(false)
+  const swapDirection = ref<'forward' | 'back'>('forward')
+  const swapping = ref(false)
+  const platformsSection = ref<HTMLElement | null>(null)
+
+  // Always a directional translateX swipe: lyrics slides in/out from the RIGHT,
+  // links slides in/out from the LEFT. A transform is GPU-cheap, so it runs on
+  // every tier; only an explicit `prefers-reduced-motion` request downgrades it
+  // to a quick crossfade — handled purely in CSS (see the media query below).
+  const swapTransitionName = computed(() => `lyrics-swap-${swapDirection.value}`)
+
+  const openLyrics = () => {
+    if (!lyricsAvailable.value) return
+    swapDirection.value = 'forward'
+    swapping.value = true
+    showLyrics.value = true
+    // The trigger lives up in the hero; bring the swapping section into view so
+    // the cross-slide is actually visible on mobile (it sits below the fold).
+    if (isClient.value) {
+      nextTick(() => {
+        platformsSection.value?.scrollIntoView({
+          behavior: shouldReduceAnimations.value ? 'auto' : 'smooth',
+          block: 'start'
+        })
+      })
+    }
+  }
+
+  const closeLyrics = () => {
+    swapDirection.value = 'back'
+    swapping.value = true
+    showLyrics.value = false
+  }
 
   // Shared glass-pill styling. Tailwind `hover:` is auto-wrapped in
   // `@supports (hover: hover)` (tailwind.config.js → hoverOnlyWhenSupported), so
@@ -781,6 +846,12 @@
   // Back button handler: go to / and scroll to music section, or just go to music library
   const { scrollToElementWithNavigation } = useScrollTo()
   const handleBack = async () => {
+    // While the lyrics view is open, the floating back arrow first returns to the
+    // platform-links view instead of leaving the page.
+    if (showLyrics.value) {
+      closeLyrics()
+      return
+    }
     if (shouldShowBackArrow.value) {
       // If came from music section, go back to home and scroll to music
       await router.push('/')
@@ -1676,6 +1747,75 @@
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  /* ── Lyrics swap (platform links ⇄ song lyrics) ─────────────────────────────
+     Both panes share one grid cell so they overlap and cross-slide as a unit:
+     at the midpoint the outgoing pane tiles the left half and the incoming pane
+     tiles the right half, meeting at the centre — a clean carousel swipe. Panes
+     stay fully OPAQUE (the off-screen half is clipped by `overflow: hidden`), so
+     the motion reads as a hard slide rather than a fade. `align-items: start`
+     keeps each pane its natural height despite the links/lyrics height gap. */
+  .lyrics-swap {
+    display: grid;
+    align-items: start;
+  }
+
+  .lyrics-swap > * {
+    grid-area: 1 / 1;
+  }
+
+  /* Clip the off-screen pane ONLY while a transition runs, so resting platform
+     button shadows aren't cut off at the section edges. */
+  .lyrics-swap.is-swapping {
+    overflow: hidden;
+  }
+
+  /* Forward (links → lyrics): lyrics slides IN from the right, links slides OUT
+     to the left. */
+  .lyrics-swap-forward-enter-from {
+    transform: translateX(100%);
+  }
+  .lyrics-swap-forward-leave-to {
+    transform: translateX(-100%);
+  }
+
+  /* Back (lyrics → links): links slides IN from the left, lyrics slides OUT to
+     the right. */
+  .lyrics-swap-back-enter-from {
+    transform: translateX(-100%);
+  }
+  .lyrics-swap-back-leave-to {
+    transform: translateX(100%);
+  }
+
+  /* Deliberate, consistent swipe timing across devices (a transform is cheap to
+     composite). Snappy ease-out so it settles cleanly. */
+  .lyrics-swap-forward-enter-active,
+  .lyrics-swap-forward-leave-active,
+  .lyrics-swap-back-enter-active,
+  .lyrics-swap-back-leave-active {
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  /* Accessibility: an explicit reduced-motion request drops the horizontal travel
+     for a quick opacity crossfade instead. (Low-perf devices still get the slide
+     — it's GPU-cheap — so only a real OS-level preference downgrades it.) */
+  @media (prefers-reduced-motion: reduce) {
+    .lyrics-swap-forward-enter-from,
+    .lyrics-swap-forward-leave-to,
+    .lyrics-swap-back-enter-from,
+    .lyrics-swap-back-leave-to {
+      transform: none;
+      opacity: 0;
+    }
+    .lyrics-swap-forward-enter-active,
+    .lyrics-swap-forward-leave-active,
+    .lyrics-swap-back-enter-active,
+    .lyrics-swap-back-leave-active {
+      transition: opacity 0.2s ease;
+    }
   }
 
   @keyframes fadeInUpSmooth {

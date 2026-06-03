@@ -235,18 +235,34 @@
       "music_video": "Дивитись Кліп",
       "lyrics": "Текст",
       "song_lyrics": "Текст Пісні",
-      "stream_all": "Слухати на всіх платформах"
+      "stream_all": "Слухати на всіх платформах",
+      "back": "Назад"
     },
     "detail": {
       "listen_now_title": "Слухати зараз",
       "presave_title": "Зберегти наперед",
-      "release_label": "Реліз {date}"
+      "release_label": "Реліз {date}",
+      "lyrics_title": "Текст пісні"
     },
     "a11y": {
       "back_to_section": "Назад до розділу музики",
       "go_to_library": "До медіатеки",
       "share_release": "Поділитися релізом",
-      "close_share_popup": "Закрити вікно поширення"
+      "close_share_popup": "Закрити вікно поширення",
+      "show_lyrics": "Показати текст пісні",
+      "back_to_platforms": "Назад до платформ для прослуховування"
+    },
+    "parts": {
+      "intro": "Інтро",
+      "verse": "Куплет",
+      "pre_chorus": "Передприспів",
+      "chorus": "Приспів",
+      "post_chorus": "Постприспів",
+      "hook": "Хук",
+      "bridge": "Брідж",
+      "refrain": "Рефрен",
+      "interlude": "Інтерлюдія",
+      "outro": "Аутро"
     },
     "share_popup": {
       "title": "Поділитися",

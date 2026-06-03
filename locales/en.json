@@ -235,18 +235,34 @@
       "music_video": "Music Video",
       "lyrics": "Lyrics",
       "song_lyrics": "Song Lyrics",
-      "stream_all": "Listen on all platforms"
+      "stream_all": "Listen on all platforms",
+      "back": "Back"
     },
     "detail": {
       "listen_now_title": "Listen Now",
       "presave_title": "Pre-save Now",
-      "release_label": "Release {date}"
+      "release_label": "Release {date}",
+      "lyrics_title": "Lyrics"
     },
     "a11y": {
       "back_to_section": "Back to music section",
       "go_to_library": "Go to music library",
       "share_release": "Share release",
-      "close_share_popup": "Close share popup"
+      "close_share_popup": "Close share popup",
+      "show_lyrics": "Show song lyrics",
+      "back_to_platforms": "Back to streaming platforms"
+    },
+    "parts": {
+      "intro": "Intro",
+      "verse": "Verse",
+      "pre_chorus": "Pre-Chorus",
+      "chorus": "Chorus",
+      "post_chorus": "Post-Chorus",
+      "hook": "Hook",
+      "bridge": "Bridge",
+      "refrain": "Refrain",
+      "interlude": "Interlude",
+      "outro": "Outro"
     },
     "share_popup": {
       "title": "Share",
