@@ -14,19 +14,22 @@
     <!-- Teleport to body to avoid ancestor transforms/containment breaking fixed positioning -->
     <Teleport to="body">
       <div v-if="!isModal" class="floating-controls">
-        <!-- Back: the same glass pill as the hero actions, sized as a 44px touch
-             target. The scroll-fade lives on the .floating-pill wrapper (matching
-             the centre logo's 0.45s fade) so the pill keeps its own hover. -->
-        <div class="floating-pill" :class="{ 'floating-pill--faded': backBtnTransparent }">
-          <MusicHeroPill
-            class="floating-pill__btn min-h-[44px] min-w-[44px] justify-center"
-            :icon="shouldShowBackArrow ? 'pi pi-arrow-left text-lg' : 'fa-solid fa-home text-base'"
-            :aria-label="
-              shouldShowBackArrow ? t('music.a11y.back_to_section') : t('music.a11y.go_to_library')
-            "
-            @click="handleBack"
-          />
-        </div>
+        <button
+          :class="[
+            'back-glass-btn',
+            {
+              'back-glass-btn--transparent': backBtnTransparent,
+              'back-glass-btn--optimized': shouldUseMobileFallback
+            }
+          ]"
+          :aria-label="
+            shouldShowBackArrow ? t('music.a11y.back_to_section') : t('music.a11y.go_to_library')
+          "
+          @click="handleBack"
+        >
+          <i v-if="shouldShowBackArrow" class="pi pi-arrow-left text-xl"></i>
+          <i v-else class="fa-solid fa-home text-lg"></i>
+        </button>
 
         <!-- Logo and Share button only on mobile -->
         <template v-if="!isDesktop && isClient">
@@ -43,14 +46,19 @@
             />
           </div>
 
-          <div class="floating-pill" :class="{ 'floating-pill--faded': backBtnTransparent }">
-            <MusicHeroPill
-              class="floating-pill__btn min-h-[44px] min-w-[44px] justify-center"
-              icon="pi pi-share-alt text-lg"
-              :aria-label="t('music.a11y.share_release')"
-              @click="handleShare"
-            />
-          </div>
+          <button
+            :class="[
+              'share-glass-btn',
+              {
+                'share-glass-btn--transparent': backBtnTransparent,
+                'share-glass-btn--optimized': shouldUseMobileFallback
+              }
+            ]"
+            :aria-label="t('music.a11y.share_release')"
+            @click="handleShare"
+          >
+            <i class="pi pi-share-alt text-xl"></i>
+          </button>
         </template>
       </div>
     </Teleport>
@@ -930,21 +938,14 @@
     }
   }
 
-  /* Floating Back / Share pill wrappers. The container disables pointer events, so
-     re-enable them here; the scroll-fade runs on this wrapper (matching the centre
-     logo's 0.45s timing) so the pill itself keeps its own hover transition. */
-  .floating-pill {
+  .floating-controls .back-glass-btn,
+  .floating-controls .share-glass-btn {
     pointer-events: auto;
-    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .floating-pill--faded {
-    opacity: 0.2;
-    pointer-events: none;
-  }
-  /* Keep the pill's rounded-xl glass look (same as the hero pills); just don't let
-     it shrink below the 44px touch target in the flex row. */
-  .floating-pill__btn {
-    flex-shrink: 0;
+    position: static !important; /* override fixed when inside container */
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
   }
 
   /* Floating logo in the center */
@@ -1018,6 +1019,111 @@
   mix-blend-mode: screen; // Brightening effect
 }
 */
+
+  /* Glassmorphic action buttons styles */
+  .back-glass-btn,
+  .share-glass-btn {
+    position: fixed !important; /* default when rendered outside container */
+    top: 1.25rem;
+    left: 1rem;
+    z-index: 9999; /* Very high z-index to ensure it stays above everything */
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(30, 30, 40, 0.32);
+    box-shadow:
+      0 4px 24px 0 rgba(0, 0, 0, 0.18),
+      0 1.5px 6px 0 rgba(0, 0, 0, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.13);
+    backdrop-filter: blur(var(--perf-blur-strength, 12px));
+    -webkit-backdrop-filter: blur(var(--perf-blur-strength, 12px));
+    color: #fff;
+    transition:
+      background 0.25s,
+      box-shadow 0.25s,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    cursor: pointer;
+    /* Ensure it creates its own stacking context */
+    isolation: isolate;
+  }
+
+  /* Optimized version for low-performance devices */
+  .back-glass-btn--optimized,
+  .share-glass-btn--optimized {
+    background: rgba(30, 30, 40, 0.85);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* When not in container, keep back on left and share on right */
+  .share-glass-btn {
+    left: auto;
+    right: 1rem;
+  }
+
+  /* Hide mobile share button on desktop as CSS safeguard */
+  @media (min-width: 768px) {
+    .share-glass-btn {
+      display: none !important;
+    }
+  }
+
+  .back-glass-btn:hover,
+  .share-glass-btn:hover {
+    background: rgba(60, 60, 80, 0.44);
+    box-shadow:
+      0 8px 32px 0 rgba(0, 0, 0, 0.22),
+      0 2px 8px 0 rgba(0, 0, 0, 0.13);
+  }
+
+  /* Optimized hover for low-performance devices */
+  .back-glass-btn--optimized:hover,
+  .share-glass-btn--optimized:hover {
+    background: rgba(60, 60, 80, 0.9);
+    transform: none;
+  }
+
+  /* Disable hover effects on mobile/touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    .back-glass-btn:hover,
+    .share-glass-btn:hover {
+      background: rgba(30, 30, 40, 0.32);
+      box-shadow:
+        0 4px 24px 0 rgba(0, 0, 0, 0.18),
+        0 1.5px 6px 0 rgba(0, 0, 0, 0.1);
+      transform: none;
+    }
+  }
+
+  .back-glass-btn--transparent {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+  .share-glass-btn--transparent {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+
+  /* Preserve transitions for buttons even while modal performance classes are active */
+  :global(body.modal-open) .back-glass-btn,
+  :global(body.modal-open) .share-glass-btn {
+    transition:
+      background 0.25s,
+      box-shadow 0.25s,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  :global(body.modal-animating) .back-glass-btn,
+  :global(body.modal-animating) .share-glass-btn {
+    transition:
+      background 0.25s,
+      box-shadow 0.25s,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
 
   /* Performance optimizations */
   .music-detail-content {
@@ -1962,6 +2068,15 @@
     -webkit-backdrop-filter: none !important;
   }
 
+  /* Exception: Keep back button transitions working */
+  :global(body.modal-open) .back-glass-btn,
+  :global(body.modal-open) .share-glass-btn {
+    transition:
+      background 0.25s,
+      box-shadow 0.25s,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
   /* Hard drop of effects only during the short modal transition window */
   :global(body.modal-animating) .music-detail-content.modal-mode,
   :global(body.modal-animating) .music-detail-content.modal-mode *,
@@ -1972,6 +2087,15 @@
     filter: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+  }
+
+  /* Exception: Keep back button transitions working during animation */
+  :global(body.modal-animating) .back-glass-btn,
+  :global(body.modal-animating) .share-glass-btn {
+    transition:
+      background 0.25s,
+      box-shadow 0.25s,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
   /* Lightweight image transitions in modal */
