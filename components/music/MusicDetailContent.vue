@@ -14,22 +14,19 @@
     <!-- Teleport to body to avoid ancestor transforms/containment breaking fixed positioning -->
     <Teleport to="body">
       <div v-if="!isModal" class="floating-controls">
-        <button
-          :class="[
-            'back-glass-btn',
-            {
-              'back-glass-btn--transparent': backBtnTransparent,
-              'back-glass-btn--optimized': shouldUseMobileFallback
-            }
-          ]"
-          :aria-label="
-            shouldShowBackArrow ? t('music.a11y.back_to_section') : t('music.a11y.go_to_library')
-          "
-          @click="handleBack"
-        >
-          <i v-if="shouldShowBackArrow" class="pi pi-arrow-left text-xl"></i>
-          <i v-else class="fa-solid fa-home text-lg"></i>
-        </button>
+        <!-- Back: the same glass pill as the hero actions, sized as a 44px touch
+             target. The scroll-fade lives on the .floating-pill wrapper (matching
+             the centre logo's 0.45s fade) so the pill keeps its own hover. -->
+        <div class="floating-pill" :class="{ 'floating-pill--faded': backBtnTransparent }">
+          <MusicHeroPill
+            class="floating-pill__btn min-h-[44px] min-w-[44px] justify-center"
+            :icon="shouldShowBackArrow ? 'pi pi-arrow-left text-lg' : 'fa-solid fa-home text-base'"
+            :aria-label="
+              shouldShowBackArrow ? t('music.a11y.back_to_section') : t('music.a11y.go_to_library')
+            "
+            @click="handleBack"
+          />
+        </div>
 
         <!-- Logo and Share button only on mobile -->
         <template v-if="!isDesktop && isClient">
@@ -46,19 +43,14 @@
             />
           </div>
 
-          <button
-            :class="[
-              'share-glass-btn',
-              {
-                'share-glass-btn--transparent': backBtnTransparent,
-                'share-glass-btn--optimized': shouldUseMobileFallback
-              }
-            ]"
-            :aria-label="t('music.a11y.share_release')"
-            @click="handleShare"
-          >
-            <i class="pi pi-share-alt text-xl"></i>
-          </button>
+          <div class="floating-pill" :class="{ 'floating-pill--faded': backBtnTransparent }">
+            <MusicHeroPill
+              class="floating-pill__btn min-h-[44px] min-w-[44px] justify-center"
+              icon="pi pi-share-alt text-lg"
+              :aria-label="t('music.a11y.share_release')"
+              @click="handleShare"
+            />
+          </div>
         </template>
       </div>
     </Teleport>
@@ -938,14 +930,21 @@
     }
   }
 
-  .floating-controls .back-glass-btn,
-  .floating-controls .share-glass-btn {
+  /* Floating Back / Share pill wrappers. The container disables pointer events, so
+     re-enable them here; the scroll-fade runs on this wrapper (matching the centre
+     logo's 0.45s timing) so the pill itself keeps its own hover transition. */
+  .floating-pill {
     pointer-events: auto;
-    position: static !important; /* override fixed when inside container */
-    top: auto;
-    left: auto;
-    right: auto;
-    bottom: auto;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .floating-pill--faded {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+  /* Keep the pill's rounded-xl glass look (same as the hero pills); just don't let
+     it shrink below the 44px touch target in the flex row. */
+  .floating-pill__btn {
+    flex-shrink: 0;
   }
 
   /* Floating logo in the center */
