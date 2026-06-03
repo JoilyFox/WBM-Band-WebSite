@@ -133,6 +133,10 @@ Remaining detail (for reference):
 
 ### Phase 3 — Off-site entity graph (mostly off-repo, highest leverage)
 
+> **Full step-by-step walkthrough → [entity-setup-guide.md](./entity-setup-guide.md)**
+> — tailored, copy-paste-ready MusicBrainz → Wikidata → DSP-claim guide with
+> verified field values and Wikidata property IDs.
+
 - **⏱ Time-sensitive (before the next release):** lock the exact distributor
   artist string `Woman Based Mechanics` + one ISRC per recording. Name/ISRC
   drift makes DSPs split you into two artist profiles — painful to merge after.
