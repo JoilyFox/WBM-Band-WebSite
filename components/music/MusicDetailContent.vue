@@ -1753,16 +1753,21 @@
      mounting (no page transition covers it). slideInCompact handles the later
      post-collapse re-appearance instead. */
   .animate-heroFadeIn {
-    animation: heroFadeIn 0.5s ease-out forwards;
-    will-change: opacity;
+    /* Deliberately slow + gentle ease-out so the block eases in super smoothly on
+       first load (no transform overshoot, so it never janks during the busy
+       mount). slideInCompact still handles the snappier post-collapse return. */
+    animation: heroFadeIn 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    will-change: opacity, transform;
   }
 
   @keyframes heroFadeIn {
     from {
       opacity: 0;
+      transform: translateY(12px);
     }
     to {
       opacity: 1;
+      transform: translateY(0);
     }
   }
 
