@@ -113,11 +113,11 @@ export const generalConfig: GeneralConfig = {
     youtubeMusic: 'https://music.youtube.com/@wbmbandofficial'
   },
 
-  // External entity profiles (Phase 3 — fill after creating the records; empty
-  // values are filtered out of the JSON-LD `sameAs`).
+  // External entity profiles — the "trust anchor" records that feed Google's
+  // Knowledge Graph + AI assistants. Flow into the MusicGroup JSON-LD `sameAs`.
   entityProfiles: {
-    musicbrainz: '',
-    wikidata: ''
+    musicbrainz: 'https://musicbrainz.org/artist/62589d1f-dcf9-4e94-b5fc-a5e48c2e2368',
+    wikidata: 'https://www.wikidata.org/wiki/Q140043384'
   },
 
   // Legal and policy information

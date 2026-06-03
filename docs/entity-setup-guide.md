@@ -258,6 +258,37 @@ the **Ukrainian National System (2010)** (ASCII, UN/BGN-recognized; e.g. х→kh
 
 ---
 
+## ✅ What's done (2026-06-03)
+
+- **MusicBrainz artist:** [Woman Based Mechanics](https://musicbrainz.org/artist/62589d1f-dcf9-4e94-b5fc-a5e48c2e2368) — MBID `62589d1f-dcf9-4e94-b5fc-a5e48c2e2368` (type Group, disambiguation, 5 aliases, both released singles + platform links).
+- **Wikidata item:** [Q140043384](https://www.wikidata.org/wiki/Q140043384) — full statements (instance-of, genre ×2, origin Kyiv/Ukraine, website, inception 2025) + all 6 external IDs, cites the MBID via P434.
+- **On-site:** both URLs wired into `config/general.ts` `entityProfiles` → live in the `MusicGroup` JSON-LD `sameAs`.
+- **Accounts:** MusicBrainz `wbmband`, Wikidata `WBMBand`. **Credentials live in Bohdan's password manager — never stored in this repo.**
+
+Still optional / later: claim Spotify + Apple for Artists, request the YouTube OAC, and add the reciprocal Wikidata link on the MusicBrainz artist page (MB↔Wikidata bots usually reconcile this within a few days anyway).
+
+## 8. Recurring: when you release a new single
+
+The entity foundation is built once. Each new release just needs a few touch-ups —
+ping Claude to drive the off-site parts in-session (log into the browser, or paste
+creds ephemerally; nothing is stored):
+
+1. **On-site** (repo): add the release to `data/musicLibrary.ts` (pre-save →
+   released state machine — see [release-states-system.md](./release-states-system.md)).
+   Set `releaseSmartLink` (the feature.fm link) so `/listen/<slug>` shows the
+   "Listen on all platforms" CTA until per-platform links exist; paste the real
+   Spotify/Apple/etc. links into `musicPlatformLinks` once live (the grid then
+   replaces the CTA automatically).
+2. **MusicBrainz**: add the new single to the **existing** artist (MBID above) via
+   the same Add-Release flow (§1b) — Single · Official · Worldwide · Digital Media ·
+   exact length · streaming links on the recording. **Do NOT create a new artist.**
+3. **Wikidata**: usually nothing — the band item (Q140043384) is stable. (Optionally
+   add a separate item for the release; low priority for a small catalogue.)
+4. **Consistency**: keep name / genre / hometown byte-identical everywhere (§4), and
+   reuse the same Latin romanization for any Cyrillic title (§7).
+
+---
+
 ## Sources (verified June 2026)
 
 - MusicBrainz: [Add an Artist](https://musicbrainz.org/doc/How_to_Add_an_Artist), [Aliases](https://musicbrainz.org/doc/Aliases), [artist-url relationships](https://musicbrainz.org/relationships/artist-url), [Wikidata linking](https://musicbrainz.org/doc/Wikidata)
