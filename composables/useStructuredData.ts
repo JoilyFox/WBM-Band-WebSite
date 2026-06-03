@@ -154,7 +154,7 @@ export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) 
               image: metaImageUrl.value,
               // Date only (no time) — matches the visible release date.
               datePublished: release.releaseDate.slice(0, 10),
-              genre: BAND_GENRE,
+              genre: release.genre && release.genre.length ? release.genre : BAND_GENRE,
               byArtist: {
                 '@type': 'MusicGroup',
                 '@id': BAND_ID,

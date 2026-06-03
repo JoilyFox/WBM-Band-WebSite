@@ -240,7 +240,8 @@
     "detail": {
       "listen_now_title": "Listen Now",
       "presave_title": "Pre-save Now",
-      "release_label": "Release {date}"
+      "release_label": "Release {date}",
+      "about_song_title": "About the song"
     },
     "a11y": {
       "back_to_section": "Back to music section",
@@ -297,15 +298,18 @@
   "releases": {
     "mania": {
       "title": "Mania",
-      "description": "This is a song about the thin line between love and obsession, between real feelings and the destructive urge to possess an abstract image."
+      "description": "This is a song about the thin line between love and obsession, between real feelings and the destructive urge to possess an abstract image.",
+      "story": "A song that runs along the blade's edge between love and obsession — between genuine feeling and a destructive, uncontrollable urge to possess. The lyrics carry this duality to a radical extreme: the heroine longs to seize not so much a real person as the phantom image she has built in her own head in a fit of craving and the mania to own. Musically, it is a measured, finely crafted rock sound forged in basements and cramped apartments — one that will not leave fans of a powerful female voice and driving instrumentals indifferent."
     },
     "chorni_ptahy": {
       "title": "Chorni Ptahy",
-      "description": "This song is a confession of alienation and trauma from a painful encounter with an indifferent society."
+      "description": "This song is a confession of alienation and trauma from a painful encounter with an indifferent society.",
+      "story": "Recorded last year, 'Chorni Ptahy' (Black Birds) is a song about the feeling of external pressure and inner instability. The heroine cannot fit into the frame of a society indifferent to her problems and feelings — a society that wounds her. A multi-layered arrangement complements the lyrics with heavy riffs and a devastating vocal."
     },
     "alina": {
       "title": "Alina",
-      "description": "A satirical song about the dangers of teenage online acquaintances, told through the eyes of an antagonist hiding behind a fake identity."
+      "description": "A satirical song about the dangers of teenage online acquaintances, told through the eyes of an antagonist hiding behind a fake identity.",
+      "story": "'Alina' is a sharp, satirical punk track that confronts one of the most painful problems of our time: the danger of unverified online acquaintances among teenagers. The lyrics lead the listener through the persona of a man who, posing as a teenage girl, tries to get his way. Through satire, a driving rhythm and an energetic sound, the band draws attention to something that today touches thousands of young people. It is a blunt verdict disguised as a song — one that will not leave the listener indifferent."
     }
   },
   "team": {
@@ -341,7 +345,7 @@
   "about": {
     "section_title": "About Us",
     "section_subtitle": "Discover the story behind the music",
-    "content": "Woman Based Mechanics is a Kyiv-based alternative rock band, characterized by melodious vocals and a combination of unconventional elements with a driving sound. The band members do not disclose the symbolism of the band name, but in their performance they precisely convey the dynamics and energy that it carries within. This music resonates with people's deep emotional struggles and, at the same time, unleashes the inner drive hidden in everyone."
+    "content": "Woman Based Mechanics is a young team of ambitious, driven musicians gathered around frontwoman Daria — the band's founder and chief creative force. We love fusing different genre leanings together, using unconventional techniques and elements while writing and recording, and digging into the imagery and ideas of the 'ugly' side of the human soul and psyche — the victories and defeats over oneself that resonate in the hearts of our like-minded listeners."
   },
   "contacts": {
     "section_title": "Contacts",

@@ -44,6 +44,8 @@ export interface MusicRelease {
   description?: string
   /** i18n key for localized description; falls back to slug-based default when omitted */
   descriptionKey?: string
+  /** Per-release genre(s) for the schema.org MusicRecording (English genre names). */
+  genre?: string[]
   featured?: boolean
   musicPlatformLinks: {
     spotify?: string
@@ -101,6 +103,7 @@ export const musicLibrary: MusicRelease[] = [
     releaseDate: '2026-06-11T21:00:00Z', // Midnight Kyiv time (EEST/UTC+3) → 00:00 on 2026-06-12
     imageUrl: '/images/optimized/albums-images/alina/cover.avif',
     descriptionKey: 'releases.alina.description',
+    genre: ['Alternative rock', 'Punk rock'],
     featured: true,
     // Released-state streaming links are filled in closer to release; the pre-save
     // flow uses the distributor smart-link below, not these.
@@ -135,6 +138,7 @@ export const musicLibrary: MusicRelease[] = [
       light: '#d4dde6'
     },
     descriptionKey: 'releases.chorni_ptahy.description',
+    genre: ['Alternative rock', 'Art rock'],
     featured: true,
     musicPlatformLinks: {
       spotify: 'https://open.spotify.com/track/2hujOwcGE21eCQHMz61y75?si=4VZFobFORxWvdNGEgYbzjg',
@@ -161,6 +165,7 @@ export const musicLibrary: MusicRelease[] = [
     imageUrl: '/images/optimized/albums-images/mania/cover.avif',
     blurredImageUrl: '/images/albums-images/mania/cover-blurred.jpg',
     descriptionKey: 'releases.mania.description',
+    genre: ['Alternative rock', 'Pop rock'],
     featured: true,
     musicPlatformLinks: {
       spotify: 'https://open.spotify.com/album/0pjAORRhgVsS7eP4R6JbMF?go=1',
