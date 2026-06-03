@@ -340,9 +340,7 @@
     />
 
     <!-- Music Platform Links (swaps with the song lyrics via a horizontal slide) -->
-    <section
-      class="music-platforms flex-1 relative z-10 py-6 sm:pb-16 bg-gradient-to-b from-surface-900/70 to-surface-950/60"
-    >
+    <section class="music-platforms flex-1 relative z-10 py-6 sm:pb-16 bg-surface-950/60">
       <!-- Full-bleed swap: `.lyrics-swap` spans the viewport and clips at the SCREEN
            edges, so the two panes cross-slide edge-to-edge (links exit left while
            lyrics enter right, reversed on the way back) with nothing cutting them
@@ -1197,7 +1195,16 @@
      ========================================================================= */
   .release-atmosphere {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* Pin to the VIEWPORT height (not the full page) so the ambient bloom stays
+       STATIC when content below grows — e.g. the lyrics swap making the page
+       taller. A page-height atmosphere rescales its palette mesh and "blinks" the
+       header/section on every height change. The veil fades its bottom into the
+       page base (--bloom-dark), so there's no hard edge where it ends. */
+    height: 100vh;
+    height: 100lvh;
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
