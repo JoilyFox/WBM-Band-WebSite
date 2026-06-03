@@ -132,7 +132,10 @@
       <!-- Mobile Compact Hero (default state on mobile) -->
       <div
         v-if="!isHeroExpanded"
-        class="md:hidden w-full max-w-5xl z-10 cursor-pointer transform transition-all duration-400 ease-out md:hover:scale-[1.02] animate-slideInCompact"
+        :class="[
+          'md:hidden w-full max-w-5xl z-10 cursor-pointer transform transition-all duration-400 ease-out md:hover:scale-[1.02]',
+          heroInteracted ? 'animate-slideInCompact' : 'animate-heroFadeIn'
+        ]"
         @click="toggleHeroExpansion"
       >
         <div
@@ -668,7 +671,13 @@
 
   // Mobile hero expansion state (default collapsed on mobile)
   const isHeroExpanded = ref(false)
+  // The first page-open shows the compact card with a gentle opacity fade (smooth
+  // even during the busy initial mount — cover image loading, layout settling).
+  // The bouncier slideInCompact entrance is reserved for when the card re-appears
+  // after the user collapses from full mode (the page is settled by then).
+  const heroInteracted = ref(false)
   const toggleHeroExpansion = () => {
+    heroInteracted.value = true
     isHeroExpanded.value = !isHeroExpanded.value
   }
 
@@ -918,7 +927,7 @@
      Lyrics pill); the only YouTube cue is a small, soft red radial glow on the
      background near the logo — just a hint. */
   .hero-pill--video {
-    background-image: radial-gradient(circle at 14% 50%, rgba(255, 0, 0, 0.16) 0%, transparent 50%);
+    background-image: radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.2) 0%, transparent 52%);
   }
 
   /* Floating fixed container that holds both buttons */
@@ -1722,26 +1731,46 @@
     }
   }
 
-  /* Optimized animations with performance considerations */
+  /* Optimized animations with performance considerations.
+     Expand/collapse run a touch longer (+0.15s) for a softer feel. */
   .animate-fadeInUpSmooth {
-    animation: fadeInUpSmooth 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeInUpSmooth 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     will-change: opacity, transform;
   }
 
   .animate-fadeOutDown {
-    animation: fadeOutDown 0.3s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
+    animation: fadeOutDown 0.45s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
     will-change: opacity, transform;
   }
 
   .animate-slideInCompact {
-    animation: slideInCompact 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation: slideInCompact 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     will-change: opacity, transform;
+  }
+
+  /* First page-open entrance for the compact hero: a plain opacity fade — no
+     transform, no overshoot — so it stays smooth even while the page is still
+     mounting (no page transition covers it). slideInCompact handles the later
+     post-collapse re-appearance instead. */
+  .animate-heroFadeIn {
+    animation: heroFadeIn 0.5s ease-out forwards;
+    will-change: opacity;
+  }
+
+  @keyframes heroFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   /* Reduced motion variants */
   .reduced-animations .animate-fadeInUpSmooth,
   .reduced-animations .animate-fadeOutDown,
-  .reduced-animations .animate-slideInCompact {
+  .reduced-animations .animate-slideInCompact,
+  .reduced-animations .animate-heroFadeIn {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
