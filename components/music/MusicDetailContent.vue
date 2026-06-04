@@ -302,12 +302,16 @@
           target="_blank"
           rel="noopener noreferrer"
           accent="video"
-          icon="fab fa-youtube text-base leading-none"
-          :label="t('music.buttons.music_video')"
           :aria-label="t('music.buttons.watch_video')"
           :class="{ 'flex-1 justify-center': bothActions }"
           @click="handleMusicVideoClick"
-        />
+        >
+          <!-- Slotted (not the icon/label props) so the label can collapse to an
+               icon-only pill on narrow phones when the lyrics view is open —
+               see `.mv-label` + the max-width:400px rule in the styles. -->
+          <i class="fab fa-youtube text-base leading-none" aria-hidden="true"></i>
+          <span class="mv-label">{{ t('music.buttons.music_video') }}</span>
+        </MusicHeroPill>
         <!-- Lyrics: swaps the platform-links section below for the song lyrics
              (horizontal cross-slide). Only present when the release ships lyrics.
              ml-auto pins it right when it is the only button; the label swaps
