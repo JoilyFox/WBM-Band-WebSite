@@ -31,7 +31,7 @@ Building, testing, or shipping the WBM static site: GitHub Pages staging (push t
 
 ## Gotchas
 
-- `deploy:github` = `DEPLOY_TARGET=github nuxt generate` — **bypasses `npm run generate`'s post-steps** (aliases, sitemap, bio-links). Pages staging won't have non-localized aliases/sitemap; only the FTP path (which runs `npm run generate`) does.
+- `deploy:github` = `DEPLOY_TARGET=github npm run generate:base && create-nonlocalized-aliases` — staging now **emits the non-localized `/listen` `/pre-save` aliases** (share-URL parity with production), but still skips `generate-sitemap` + `generate-bio-links` **by design** (both bake the production canonical wbmband.com URL, so they're pointless/misleading on Pages). Full `npm run generate` (the FTP/production path) runs all three.
 - Adding a page → add **both** `/en/path` and `/ua/path` to `nitro.prerender.routes` or it's absent from output.
 - New head links/meta must follow the `(github ? '/WBM-Band-WebSite' : '') + path` prefix pattern.
 - `.env.production` is gitignored — verify `git status` before commit. Doc shows `FTP_ROOT=/home/wbmband/` but the script default is `/home/wbmband/wbmband.com/www/`; set it explicitly.
@@ -41,7 +41,6 @@ Building, testing, or shipping the WBM static site: GitHub Pages staging (push t
 ## Related
 
 - Skill: `add-page-route` — the prerender list + non-localized share aliases the build emits.
-- Note: `deploy:github` (staging) runs `nuxt generate` directly, so it SKIPS `create-nonlocalized-aliases.js` / sitemap / bio-links that `npm run generate` (production) runs. Staging lacks the non-localized `/listen` `/pre-save` aliases.
 - Agents (`.claude/agents/`): `i18n-checker` (locale parity), `release-coordinator` (release-state transitions before deploy).
 - Commands: `npm run extract-colors` after cover changes; `npm run generate-favicons` / `compress-images` / `generate-blurred` for new assets.
 - CI: `.github/workflows/test.yml` (PR lint+unit/nuxt+e2e), `deploy.yml` (`build` needs `test`); husky pre-push runs fast suites.

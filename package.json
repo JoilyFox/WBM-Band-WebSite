@@ -17,7 +17,7 @@
     "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html",
     "build:production": "npm run generate",
     "deploy:production": "npm run build:production && node scripts/deploy-production.js",
-    "deploy:github": "DEPLOY_TARGET=github nuxt generate",
+    "deploy:github": "DEPLOY_TARGET=github npm run generate:base && node scripts/create-nonlocalized-aliases.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",

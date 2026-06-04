@@ -45,6 +45,14 @@ export default defineNuxtConfig({
 - When you run `npm run deploy:github`, the script sets `DEPLOY_TARGET=github`, so Nuxt generates GitHub Pages–compatible URLs.
 - For local development and production builds, `DEPLOY_TARGET` is undefined, so assets use root-relative paths that work on `wbmband.com`.
 
+> **Staging vs production build steps.** `deploy:github` (staging) runs
+> `generate:base` + `create-nonlocalized-aliases.js`, so the non-localized
+> `/listen/*` and `/pre-save/*` share URLs **are** testable on GitHub Pages.
+> It intentionally **omits** `generate-sitemap.js` and `generate-bio-links.js` —
+> both bake the canonical production URL (`wbmband.com`), so they only run in the
+> full `npm run generate` used by the production FTP deploy. Net: staging has the
+> share-URL aliases but no `sitemap.xml` / `bio-links.md` (by design).
+
 ---
 
 ## Initial Setup
