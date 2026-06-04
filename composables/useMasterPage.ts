@@ -9,7 +9,7 @@ import {
   type SourcePlatform
 } from '~/utils/sourceAttribution'
 
-export type MasterPageType = 'listen' | 'pre-save'
+export type MasterPageType = 'listen' | 'pre-save' | 'lyrics'
 
 export interface UseMasterPageOptions {
   slug: string

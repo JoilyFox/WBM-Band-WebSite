@@ -36,6 +36,21 @@
   RewriteCond %{REQUEST_URI} ^/en/listen/[^/]+(/[^/]+)?$
   RewriteRule ^en/listen/(.*)$ /en/listen/$1/index.html [L]
 
+  # Internal rewrite for /lyrics/<slug> to index.html (clean, non-localized).
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} ^/lyrics/[^/]+(/[^/]+)?$
+  RewriteRule ^lyrics/(.*)$ /ua/lyrics/$1/index.html [L]
+
+  # Internal rewrite for /ua/lyrics/<slug> to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} ^/ua/lyrics/[^/]+(/[^/]+)?$
+  RewriteRule ^ua/lyrics/(.*)$ /ua/lyrics/$1/index.html [L]
+
+  # Internal rewrite for /en/lyrics/<slug> to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_URI} ^/en/lyrics/[^/]+(/[^/]+)?$
+  RewriteRule ^en/lyrics/(.*)$ /en/lyrics/$1/index.html [L]
+
   # Internal rewrite (not redirect) for /pre-save/* to serve /ua/pre-save/* content
   # This keeps the URL the same but serves the localized content
   RewriteCond %{REQUEST_FILENAME} !-f
@@ -48,6 +63,12 @@
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_URI} ^/listen/
   RewriteRule ^listen/(.*)$ /ua/listen/$1 [L]
+
+  # Internal rewrite (not redirect) for /lyrics/* to serve /ua/lyrics/* content
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} ^/lyrics/
+  RewriteRule ^lyrics/(.*)$ /ua/lyrics/$1 [L]
 
   # DirectorySlash is Off (above), so a real directory requested WITHOUT a
   # trailing slash (e.g. /ua, /en) never reaches its DirectoryIndex and Apache

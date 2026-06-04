@@ -242,7 +242,9 @@
       "listen_now_title": "Слухати зараз",
       "presave_title": "Зберегти наперед",
       "release_label": "Реліз {date}",
-      "lyrics_title": "Текст пісні"
+      "lyrics_title": "Текст пісні",
+      "lyrics_page_title": "{songName} — Текст пісні",
+      "lyrics_meta_description": "Повний текст пісні «{songName}» гурту WBM Band."
     },
     "a11y": {
       "back_to_section": "Назад до розділу музики",

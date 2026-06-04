@@ -19,7 +19,8 @@ const outputRoot = path.resolve(__dirname, '../.output/public')
 
 const aliasMappings = [
   { from: 'ua/pre-save', to: 'pre-save' },
-  { from: 'ua/listen', to: 'listen' }
+  { from: 'ua/listen', to: 'listen' },
+  { from: 'ua/lyrics', to: 'lyrics' }
 ]
 
 const copyDirectory = (sourceDir, destinationDir) => {

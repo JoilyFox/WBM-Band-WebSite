@@ -127,6 +127,24 @@ interface ReleaseStructuredDataOptions {
   release: MusicRelease
   localizedTitle: ComputedRef<string>
   metaImageUrl: ComputedRef<string>
+  /**
+   * 'listen' (default) → the standard release page schema. 'lyrics' → the
+   * dedicated /lyrics/<slug> page: the recording's @id/url/canonical point at
+   * the lyrics URL, the full lyric text is embedded via recordingOf →
+   * MusicComposition.lyrics, and a third breadcrumb crumb is added. The band
+   * OWNS these lyrics, so embedding the text carries no rights concern.
+   */
+  variant?: 'listen' | 'lyrics'
+}
+
+/** Flatten a release's lyrics into a single newline-separated text block
+ *  (sections separated by a blank line) for MusicComposition.lyrics. */
+function lyricsToPlainText(release: MusicRelease): string {
+  if (!release.lyrics || !release.lyrics.length) return ''
+  return release.lyrics
+    .map((section) => section.lines.join('\n'))
+    .join('\n\n')
+    .trim()
 }
 
 /**
@@ -134,12 +152,19 @@ interface ReleaseStructuredDataOptions {
  * (referencing the band by @id) + a BreadcrumbList (the one active rich result
  * these deep pages can earn). URLs match the page's NON-localized canonical so
  * schema, canonical and sitemap all agree.
+ *
+ * With `variant: 'lyrics'` the same recording is re-anchored to the dedicated
+ * /lyrics/<slug> page and gains the embedded lyric text + a "Lyrics" breadcrumb.
  */
 export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) {
   const { release, localizedTitle, metaImageUrl } = options
+  const isLyrics = options.variant === 'lyrics'
   const { t } = useI18n({ useScope: 'global' })
-  // Matches the self-referential canonical declared by pages/listen/[slug].vue.
-  const canonicalUrl = `${SITE_URL}/listen/${release.slug}`
+  // Self-referential canonical for this page variant. Matches the canonical
+  // declared by the page (pages/listen/[slug].vue or pages/lyrics/[slug].vue).
+  const listenUrl = `${SITE_URL}/listen/${release.slug}`
+  const lyricsUrl = `${SITE_URL}/lyrics/${release.slug}`
+  const canonicalUrl = isLyrics ? lyricsUrl : listenUrl
   // Story key derived from the (correct) description key — some slugs use hyphens
   // while their i18n keys use underscores (e.g. chorni-ptahy → chorni_ptahy).
   const storyKey = (release.descriptionKey || `releases.${release.slug}.description`).replace(
@@ -172,6 +197,47 @@ export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) 
         }
       }
       if (story && story !== storyKey) recording.description = story
+
+      // On the lyrics page, embed the actual lyric text as the composition the
+      // recording is of — the machine-readable counterpart to the visible lyrics.
+      if (isLyrics) {
+        const lyricsText = lyricsToPlainText(release)
+        if (lyricsText) {
+          recording.recordingOf = {
+            '@type': 'MusicComposition',
+            '@id': `${lyricsUrl}#composition`,
+            name: localizedTitle.value,
+            lyrics: {
+              '@type': 'CreativeWork',
+              text: lyricsText
+            }
+          }
+        }
+      }
+
+      const breadcrumbItems: object[] = [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: generalConfig.fullBandName,
+          item: SITE_URL
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: localizedTitle.value,
+          item: listenUrl
+        }
+      ]
+      if (isLyrics) {
+        breadcrumbItems.push({
+          '@type': 'ListItem',
+          position: 3,
+          name: t('music.detail.lyrics_title') as string,
+          item: lyricsUrl
+        })
+      }
+
       return {
         script: [
           {
@@ -180,20 +246,7 @@ export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) 
               recording,
               {
                 '@type': 'BreadcrumbList',
-                itemListElement: [
-                  {
-                    '@type': 'ListItem',
-                    position: 1,
-                    name: generalConfig.fullBandName,
-                    item: SITE_URL
-                  },
-                  {
-                    '@type': 'ListItem',
-                    position: 2,
-                    name: localizedTitle.value,
-                    item: canonicalUrl
-                  }
-                ]
+                itemListElement: breadcrumbItems
               }
             ])
           }

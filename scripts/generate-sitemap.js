@@ -48,7 +48,11 @@ function extractReleases() {
     .map((block) => {
       const slug = block.match(/slug:\s*'([^']+)'/)?.[1]
       const releaseDate = block.match(/releaseDate:\s*'([^']+)'/)?.[1]
-      return slug ? { slug, releaseDate } : null
+      // A non-empty `lyrics: [ { ... } ]` array means this release ships a
+      // dedicated, indexable /lyrics/<slug> page (matches LYRICS_SLUGS in
+      // nuxt.config.ts + the prerender list). `lyrics: []` does NOT count.
+      const hasLyrics = /lyrics:\s*\[\s*\{/.test(block)
+      return slug ? { slug, releaseDate, hasLyrics } : null
     })
     .filter(Boolean)
 }
@@ -75,6 +79,16 @@ function buildSitemap(siteUrl, releases) {
   for (const release of releases) {
     entries.push({
       loc: `${siteUrl}/listen/${release.slug}`,
+      lastmod: release.releaseDate ? release.releaseDate.slice(0, 10) : undefined
+    })
+  }
+
+  // Dedicated lyrics pages — only for releases that ship lyrics (matches the
+  // /lyrics/<slug> canonical each lyrics page declares + the prerender list).
+  for (const release of releases) {
+    if (!release.hasLyrics) continue
+    entries.push({
+      loc: `${siteUrl}/lyrics/${release.slug}`,
       lastmod: release.releaseDate ? release.releaseDate.slice(0, 10) : undefined
     })
   }

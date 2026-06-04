@@ -422,12 +422,26 @@
     release: MusicRelease
     isModal?: boolean
     isPreSave?: boolean
+    /** Boot with the lyrics view already open (the dedicated /lyrics/<slug>
+     *  page passes this so the lyric text is SSR-rendered into the static HTML). */
+    initialShowLyrics?: boolean
+    /** Opt in to History-API URL syncing between the release page and the
+     *  /lyrics/<slug> URL when the lyrics view is toggled. Only the clean listen
+     *  page + the lyrics page enable it; the modal, pre-save and source-prefix
+     *  variants keep the pure in-place toggle (no URL change). */
+    lyricsUrlSync?: boolean
   }
 
   const props = withDefaults(defineProps<Props>(), {
     isModal: false,
-    isPreSave: false
+    isPreSave: false,
+    initialShowLyrics: false,
+    lyricsUrlSync: false
   })
+
+  // Emitted whenever the visible view flips, so the host page can keep its
+  // <title> / canonical in sync with the URL (see useReleaseHead).
+  const emit = defineEmits<{ 'view-change': ['links' | 'lyrics'] }>()
   const router = useRouter()
   const route = useRoute()
   const localePath = useLocalePath()
@@ -482,7 +496,7 @@
   // `showLyrics` drives a directional cross-slide (links exit left, lyrics enter
   // right; reversed on the way back). Pure client state — no route change — so SSR
   // renders the links view and there is no hydration mismatch.
-  const showLyrics = ref(false)
+  const showLyrics = ref(props.initialShowLyrics)
   const swapDirection = ref<'forward' | 'back'>('forward')
 
   // Reduced-motion OR a genuinely low-perf device gets a clean opacity crossfade
@@ -500,16 +514,69 @@
     shouldReduceAnimations.value ? 'out-in' : undefined
   )
 
+  // --- URL sync (release page <-> /lyrics/<slug>) --------------------------
+  // We change the URL with the History API directly — NOT router navigation —
+  // so the cross-slide animation is preserved and the component never remounts.
+  // vue-router only reacts to popstate (not pushState), so it stays put while we
+  // open lyrics; our own popstate handler re-syncs `showLyrics` for browser
+  // back/forward. Opening pushes a history entry (Back closes lyrics); closing
+  // replaces it (collapses the /lyrics entry back to /listen). Client + opt-in.
+  const isLyricsPath = (path: string) => /(^|\/)lyrics\//.test(path)
+
+  const pathForView = (target: 'links' | 'lyrics'): string => {
+    // Swap only the section segment, preserving whatever locale-prefix style the
+    // visitor is on (/listen/x, /ua/listen/x, /en/listen/x → the /lyrics sibling).
+    const current = window.location.pathname
+    return target === 'lyrics'
+      ? current.replace(/(^|\/)listen(\/)/, '$1lyrics$2')
+      : current.replace(/(^|\/)lyrics(\/)/, '$1listen$2')
+  }
+
+  const syncLyricsUrl = (target: 'links' | 'lyrics', mode: 'push' | 'replace') => {
+    if (!import.meta.client || !props.lyricsUrlSync) return
+    const path = pathForView(target)
+    if (path === window.location.pathname) return
+    if (mode === 'push') window.history.pushState(window.history.state, '', path)
+    else window.history.replaceState(window.history.state, '', path)
+  }
+
   const openLyrics = () => {
     if (!lyricsAvailable.value) return
     swapDirection.value = 'forward'
     showLyrics.value = true
+    if (props.lyricsUrlSync) {
+      syncLyricsUrl('lyrics', 'push')
+      emit('view-change', 'lyrics')
+    }
   }
 
   const closeLyrics = () => {
     swapDirection.value = 'back'
     showLyrics.value = false
+    if (props.lyricsUrlSync) {
+      syncLyricsUrl('links', 'replace')
+      emit('view-change', 'links')
+    }
   }
+
+  // Browser back/forward: mirror `showLyrics` to whatever view the URL now names.
+  const handleLyricsPopState = () => {
+    if (!props.lyricsUrlSync) return
+    const shouldShow = isLyricsPath(window.location.pathname)
+    if (shouldShow === showLyrics.value) return
+    swapDirection.value = shouldShow ? 'forward' : 'back'
+    showLyrics.value = shouldShow
+    emit('view-change', shouldShow ? 'lyrics' : 'links')
+  }
+
+  onMounted(() => {
+    if (import.meta.client && props.lyricsUrlSync) {
+      window.addEventListener('popstate', handleLyricsPopState)
+    }
+  })
+  onBeforeUnmount(() => {
+    if (import.meta.client) window.removeEventListener('popstate', handleLyricsPopState)
+  })
 
   // Optimized scroll handling
   const { isScrolled } = useOptimizedScroll({ threshold: 60 })

@@ -242,7 +242,9 @@
       "listen_now_title": "Listen Now",
       "presave_title": "Pre-save Now",
       "release_label": "Release {date}",
-      "lyrics_title": "Lyrics"
+      "lyrics_title": "Lyrics",
+      "lyrics_page_title": "{songName} Lyrics",
+      "lyrics_meta_description": "Read the full lyrics to “{songName}” by WBM Band."
     },
     "a11y": {
       "back_to_section": "Back to music section",

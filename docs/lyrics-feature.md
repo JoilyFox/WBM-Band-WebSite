@@ -3,8 +3,19 @@
 Per-release song lyrics shown on the release page. The release page's platform-links
 section and the lyrics share one spot and **cross-slide** horizontally: tapping the
 Lyrics pill slides the links out to the left while the lyrics slide in from the right
-(reversed on the way back). It's an in-page view swap — no route change, no new
-prerendered page.
+(reversed on the way back).
+
+The lyrics view is **deep-linkable and independently indexable**. Each release that
+ships lyrics also gets a dedicated, prerendered page at **`/lyrics/<slug>`** (bilingual
+`/ua/lyrics/<slug>` + `/en/lyrics/<slug>`, plus the clean non-localized alias) whose
+static HTML contains the actual lyric text, its own `<title>` ("Mania Lyrics" /
+"Манія — Текст пісні"), self-canonical, and `MusicComposition.lyrics` JSON-LD — so a
+search like "mania wbm lyrics" can surface it. Opening that URL boots the release page
+with lyrics already shown. Tapping the in-page Lyrics pill keeps the cross-slide **and**
+rewrites the URL to `/lyrics/<slug>` via the History API (no remount); browser
+back/forward and the in-pane Back return to `/listen/<slug>`. The lyrics route mirrors
+the existing `/listen` plumbing (prerender list, non-localized alias, `.htaccess`
+rewrite, sitemap) one-for-one.
 
 ## Overview
 
@@ -28,11 +39,26 @@ prerendered page.
   lyrics pane (auto-imported as `<MusicLyrics>`): header (back control + title) and
   the labeled sections. Emits `back`.
 - [`components/music/MusicDetailContent.vue`](../components/music/MusicDetailContent.vue)
-  — owns the `showLyrics` state, the directional cross-slide `<Transition>`, the
-  Lyrics button wiring, and the floating back-arrow interception.
-- `music.parts.*`, `music.detail.lyrics_title`, `music.buttons.back`,
-  `music.a11y.show_lyrics`, `music.a11y.back_to_platforms` in
+  — owns the `showLyrics` state (seeded from the `initialShowLyrics` prop), the
+  directional cross-slide `<Transition>`, the Lyrics button wiring, the floating
+  back-arrow interception, and — when `lyricsUrlSync` is set — the History-API URL
+  sync + `popstate` handling + the `view-change` emit.
+- [`pages/lyrics/[slug].vue`](../pages/lyrics/[slug].vue) — the dedicated lyrics page:
+  same `MusicDetailContent` booted with `initialShowLyrics` + `lyricsUrlSync`, guarded
+  by [`middleware/lyrics-access.ts`](../middleware/lyrics-access.ts) (404s releases with
+  no lyrics), lyrics-variant JSON-LD via `useReleaseStructuredData({ variant: 'lyrics' })`.
+- [`composables/useReleaseHead.ts`](../composables/useReleaseHead.ts) — the shared,
+  view-aware `<head>` used by both `/listen/[slug]` and `/lyrics/[slug]`: swaps
+  title / description / canonical / og between the "links" and "lyrics" views.
+- `music.parts.*`, `music.detail.lyrics_title`, `music.detail.lyrics_page_title`,
+  `music.detail.lyrics_meta_description`, `music.buttons.back`, `music.a11y.show_lyrics`,
+  `music.a11y.back_to_platforms` in
   [`locales/uk.json`](../locales/uk.json) + [`locales/en.json`](../locales/en.json).
+- Build wiring (mirrors `/listen`): `LYRICS_SLUGS` + the lyrics loop in
+  [`nuxt.config.ts`](../nuxt.config.ts) prerender list, the `ua/lyrics` alias in
+  [`scripts/create-nonlocalized-aliases.js`](../scripts/create-nonlocalized-aliases.js),
+  the `/lyrics` rewrites in [`public/.htaccess`](../public/.htaccess), and the lyrics
+  entries in [`scripts/generate-sitemap.js`](../scripts/generate-sitemap.js).
 
 ## Adding lyrics to a release
 
@@ -55,8 +81,12 @@ prerendered page.
    - `lines` is an array of strings, one per rendered line, in the **original
      language**. An empty string renders a blank line within a section.
 
-2. That's it — the Lyrics button and the swipe appear automatically. No i18n,
-   route, or prerender changes are needed for a new song.
+2. That's it — the Lyrics button, the swipe, **and** the dedicated, indexable
+   `/lyrics/<slug>` page all appear automatically. The prerender list
+   (`LYRICS_SLUGS` in `nuxt.config.ts`) and the sitemap both derive the lyrics
+   routes from "release has a non-empty `lyrics` array", so no i18n, route, or
+   prerender changes are needed for a new song. Run `npm run generate` and the
+   new `/lyrics/<slug>` (+ `/ua`, `/en`, clean alias) is built and sitemapped.
 
 ## Adding a new song-part label
 
@@ -89,6 +119,19 @@ To support a part not already in `LyricsPartKey`:
 - The floating back-arrow (top-left) first returns to the links view when lyrics
   are open, instead of leaving the page.
 - There is **no auto-scroll** on open — the swap happens in place.
+- **URL sync (deep-linking).** When the host page sets `lyricsUrlSync` (the clean
+  `/listen/[slug]` and `/lyrics/[slug]` pages do; the modal, pre-save and
+  source-attribution variants do **not**), `openLyrics` swaps the `listen` path
+  segment for `lyrics` and `pushState`s the result (preserving whatever
+  locale-prefix style the visitor is on); `closeLyrics` `replaceState`s back. We
+  use the **History API directly, not router navigation**, so the component never
+  remounts and the cross-slide is preserved — vue-router only reacts to `popstate`,
+  which our own handler also listens to so browser back/forward re-syncs
+  `showLyrics`. Each view flip emits `view-change`, which flips the page's `view`
+  ref and lets `useReleaseHead` swap `<title>` + canonical to match the address bar.
+- The dedicated `/lyrics/<slug>` page boots `MusicDetailContent` with
+  `initialShowLyrics`, so the lyrics pane is **SSR-rendered into the static HTML**
+  (the whole point — crawlers see the lyric text without running JS).
 
 ## Gotchas
 
@@ -98,8 +141,11 @@ To support a part not already in `LyricsPartKey`:
 - **Lyrics is per-release, single-song.** The catalog has no track model; if a real
   multi-track album/EP is ever added, lyrics would need to move onto a `tracks[]`
   structure first.
-- **No desktop trigger yet** — only the `md:hidden` mobile/tablet hero pill opens
-  the lyrics. Add a desktop affordance before relying on it on wide screens.
+- **No desktop trigger on `/listen` yet** — only the `md:hidden` mobile/tablet hero
+  pill opens the lyrics in-place. Desktop users still reach the full lyrics via the
+  dedicated `/lyrics/<slug>` URL (search/share/direct entry renders them open, and
+  the in-pane Back returns to `/listen`); a desktop "Lyrics" affordance on the
+  `/listen` page is still planned.
 - **Swipe-vs-fade depends on correct perf classification.** Chrome's User-Agent
   Reduction freezes the device model to `"K"`, which used to drop every modern
   Android phone into the `low`/`conservative` tier (→ fade, and the global
@@ -109,8 +155,11 @@ To support a part not already in `LyricsPartKey`:
   flagships classify as `medium`+ and get the swipe. iOS Safari has no Client
   Hints and its UA omits the model, so iOS flagships still fall back to the fade
   — acceptable, but note it if revisiting.
-- Lyrics are **not** injected into JSON-LD. `MusicRecording` supports a
-  `MusicComposition.lyrics` slot, but full-lyrics structured data has rights
-  implications — leave it off unless deliberately cleared.
+- Lyrics **are** embedded in JSON-LD **only on the `/lyrics/<slug>` page** (via
+  `useReleaseStructuredData({ variant: 'lyrics' })` → `MusicRecording.recordingOf`
+  → `MusicComposition.lyrics`). The generic rights caveat around full-lyrics
+  structured data does **not** apply here because the band owns these lyrics. The
+  plain `/listen/<slug>` page deliberately still omits them (its JSON-LD stays the
+  lean release schema).
 - Both locale files must define every `music.parts.*` key (a key present in one
   locale only silently renders the fallback language).

@@ -317,6 +317,17 @@ export const getReleaseBySlug = (slug: string): MusicRelease | undefined => {
   return musicLibrary.find((release) => release.slug === slug)
 }
 
+// Releases that ship a non-empty lyrics array. Drives which slugs get a
+// dedicated, indexable /lyrics/<slug> page (prerender list + sitemap).
+export const getReleasesWithLyrics = (): MusicRelease[] => {
+  return musicLibrary.filter((release) => Boolean(release.lyrics && release.lyrics.length > 0))
+}
+
+export const releaseHasLyrics = (slug: string): boolean => {
+  const release = getReleaseBySlug(slug)
+  return Boolean(release?.lyrics && release.lyrics.length > 0)
+}
+
 export const getReleaseById = (id: string): MusicRelease | undefined => {
   return musicLibrary.find((release) => release.id === id)
 }

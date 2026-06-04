@@ -3,6 +3,7 @@
     <MusicDetailContent
       :release="release"
       :is-modal="false"
+      :initial-show-lyrics="true"
       :lyrics-url-sync="true"
       @view-change="view = $event"
     />
@@ -19,27 +20,30 @@
 
   definePageMeta({
     layout: 'empty',
-    middleware: ['listen-access']
+    middleware: ['lyrics-access']
   })
 
   const route = useRoute()
   const slug = route.params.slug as string
 
+  // Same release lookup as the listen page; this page just boots the shared
+  // MusicDetailContent with the lyrics view already open (lyrics SSR-rendered
+  // into the static HTML so crawlers see the text without running JS).
   const { release, localizedTitle, localizedDescription, metaImageUrl } = useMasterPage({
     slug,
-    pageType: 'listen'
+    pageType: 'lyrics'
   })
 
-  // MusicRecording + BreadcrumbList JSON-LD (references the band by @id). URLs
-  // match the non-localized canonical owned by useReleaseHead.
-  useReleaseStructuredData({ release, localizedTitle, metaImageUrl })
+  // MusicRecording (+ embedded lyric text) + 3-level BreadcrumbList JSON-LD.
+  useReleaseStructuredData({ release, localizedTitle, metaImageUrl, variant: 'lyrics' })
 
-  // Starts on the platform links; flips to 'lyrics' when the visitor opens the
-  // in-page lyrics view (which also rewrites the URL to /lyrics/<slug>). The
-  // shared head builder swaps title + canonical to match.
-  const view = ref<ReleaseView>('links')
+  // Starts on the lyrics view; flips to 'links' if the visitor cross-slides back
+  // to the platform links (which also rewrites the URL to /listen/<slug>).
+  const view = ref<ReleaseView>('lyrics')
   useReleaseHead({ slug, localizedTitle, localizedDescription, metaImageUrl, view })
 
+  // A lyrics-page visit is still a release view; reuse the 'listen' funnel rather
+  // than introduce a new analytics page_type (keeps the GA4 schema unchanged).
   const { trackReleaseView } = useAnalytics()
   onMounted(() => trackReleaseView({ releaseSlug: slug, pageType: 'listen' }))
 </script>

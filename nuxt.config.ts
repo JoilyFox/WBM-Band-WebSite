@@ -5,6 +5,8 @@ import { SITE_URL } from './constants/app'
 
 const LOCALES = ['ua', 'en'] as const
 const RELEASE_SLUGS = musicLibrary.map((r) => r.slug)
+// Releases that ship lyrics get a dedicated, indexable /lyrics/<slug> page.
+const LYRICS_SLUGS = musicLibrary.filter((r) => r.lyrics && r.lyrics.length > 0).map((r) => r.slug)
 
 // Fail the build loudly if a song slug shadows a reserved source prefix.
 assertNoSlugCollisions(RELEASE_SLUGS)
@@ -32,6 +34,11 @@ const masterPageRoutes = (): string[] => {
           routes.push(`/${locale}/${pageType}/${prefix}/${slug}`)
         }
       }
+    }
+    // Dedicated lyrics pages — only for releases that actually ship lyrics, and
+    // clean URL only (no source-prefix attribution variants for lyrics).
+    for (const slug of LYRICS_SLUGS) {
+      routes.push(`/${locale}/lyrics/${slug}`)
     }
   }
   return routes
