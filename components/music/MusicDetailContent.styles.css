@@ -935,6 +935,12 @@
   .lyrics-morph-pill {
     position: relative;
     overflow: hidden;
+    /* Drop the pill's own horizontal padding so the sliding faces are clipped at
+       the BORDER, not the padding edge. The breathing room moves onto the faces
+       below, so the resting label position AND the pill's outer size are
+       unchanged — only the clip point moves out to the border. */
+    padding-left: 0;
+    padding-right: 0;
   }
   .pill-morph {
     display: grid;
@@ -944,6 +950,8 @@
   .pill-morph__face {
     grid-area: 1 / 1;
     width: 100%;
+    /* the px-3.5 the pill used to carry — keeps the resting inset identical */
+    padding-inline: 0.875rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
