@@ -1009,8 +1009,8 @@
       transform 0.1s ease-in-out,
       background-color 0.1s ease-in-out,
       border-color 0.1s ease-in-out,
-      /* a touch slower than the 0.42s text slide so the resize reads as its own beat */
-      flex-grow 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+      /* snappy resize, slightly quicker than the 0.42s text slide */
+      flex-grow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .hero-quick-actions.lyrics-active > .lyrics-morph-pill {
     flex-grow: 3;
