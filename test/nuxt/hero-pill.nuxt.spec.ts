@@ -4,17 +4,18 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MusicHeroPill from '~/components/music/HeroPill.vue'
 
 // The shared glass "pill" used for the release-hero actions (Music Video,
-// Lyrics, Collapse, Back). It renders as a <button> by default or an <a> when
-// `as="a"`, and carries two layout guards that must NOT be removed:
-//   - `appearance-none`: neutralizes the native control box. iOS Safari sizes a
-//     `-webkit-appearance: button` control with NATIVE metrics that scale with
-//     the system / accessibility text size, which inflated the <button> pills to
-//     200–300px tall on real devices (the <a> Music Video pill never broke —
-//     anchors have no native appearance). appearance:none makes the <button>
-//     size purely from CSS, exactly like the working <a>.
-//   - `self-center`: pins align-self so the pill can't be cross-axis stretched
-//     by a flex parent.
-// These two assertions are the regression guard for that fix.
+// Lyrics, Collapse, Back). It renders as a NATIVE <button> by default or a
+// native <a> when `as="a"`.
+//
+// REGRESSION GUARD — the pill must render NATIVE elements, never a PrimeVue
+// Button. PrimeVue globally registers a `Button` component, so a
+// `<component :is="'button'">` resolved 'button' → PrimeVue Button (+ Ripple).
+// In unstyled mode the ripple's <span class="p-ink"> is not position:absolute,
+// so a real pointer-down made it a static block and inflated the pill to ~200px
+// tall (the <a> Music Video pill never broke — no component is registered for
+// 'a'). The component now renders explicit <a>/<button>. The `p-button` / no-
+// `data-p` assertions below lock that in. `appearance-none` + `self-center` are
+// kept as defensive hygiene (native control sizing / flex stretch).
 
 describe('MusicHeroPill', () => {
   it('renders a <button> by default with type="button"', async () => {
@@ -22,6 +23,17 @@ describe('MusicHeroPill', () => {
     const btn = w.get('button')
     expect(btn.attributes('type')).toBe('button')
     expect(btn.text()).toContain('Collapse')
+  })
+
+  it('renders a NATIVE <button>, not a PrimeVue Button (no p-button / no Ripple)', async () => {
+    const w = await mountSuspended(MusicHeroPill, { props: { label: 'Lyrics' } })
+    const btn = w.get('button')
+    expect(btn.classes()).not.toContain('p-button')
+    expect(btn.classes()).not.toContain('p-component')
+    // PrimeVue marks its host with data-p; a native element never carries it.
+    expect(btn.attributes('data-p')).toBeUndefined()
+    // Ripple appends a <span class="p-ink"> — there must be none.
+    expect(w.find('.p-ink').exists()).toBe(false)
   })
 
   it('renders an <a> with href/target/rel when as="a"', async () => {
