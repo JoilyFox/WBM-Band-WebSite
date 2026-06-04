@@ -1012,8 +1012,9 @@
       transform 0.1s ease-in-out,
       background-color 0.1s ease-in-out,
       border-color 0.1s ease-in-out,
-      /* snappy resize, slightly quicker than the 0.42s text slide */
-      flex-grow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      /* fast (0.35s) but a gentle ease — the front-loaded easeOutQuint felt rough
+         on the width shrink; this accelerates/decelerates smoothly instead. */
+      flex-grow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .hero-quick-actions.lyrics-active > .lyrics-morph-pill {
     flex-grow: 3;
@@ -1033,14 +1034,18 @@
      leaving just the YouTube icon. Animated at the same 0.35s as the width. */
   .mv-label {
     display: inline-block;
-    max-width: 8rem;
+    /* Tighter cap (≈ the longest label) so the width collapse starts almost
+       immediately instead of idling while max-width drops from a loose value —
+       that idle-then-snap was the rough bit. The opacity/slide lead from t=0. */
+    max-width: 7rem;
     overflow: hidden;
     white-space: nowrap;
+    will-change: transform, opacity;
     transition:
-      max-width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-      margin 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      margin 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* On phones (≤450px — SE through the Pro Max widths) the 75/25 split can't fit
