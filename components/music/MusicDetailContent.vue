@@ -293,6 +293,7 @@
       <div
         v-if="!isModal && showHeroActions"
         class="hero-quick-actions md:hidden relative z-10 mt-3 flex w-full max-w-[500px] mx-auto items-center gap-3"
+        :class="{ 'lyrics-active': showLyrics && bothActions }"
       >
         <MusicHeroPill
           v-if="musicVideoUrl"

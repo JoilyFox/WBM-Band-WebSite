@@ -970,15 +970,15 @@
     opacity: 1;
   }
   .pill-morph__face--back {
-    transform: translateX(100%);
+    transform: translateX(-100%);
     opacity: 0;
   }
-  /* Lyrics view: the Lyrics face slides OUT to the LEFT while the Back face
-     slides IN from the RIGHT — a true cross-slide (no overlap). Reverses on the
-     way back, so the Lyrics text always travels on the LEFT edge and the Back
-     text on the RIGHT edge, mirroring the lyrics-pane swipe. */
+  /* Lyrics view: the Lyrics face slides OUT to the RIGHT while the Back face
+     slides IN from the LEFT — a true cross-slide (no overlap). Reverses on the
+     way back, so the Lyrics text always travels on the RIGHT edge and the Back
+     text on the LEFT edge. */
   .pill-morph.is-back .pill-morph__face--lyrics {
-    transform: translateX(-100%);
+    transform: translateX(100%);
     opacity: 0;
   }
   .pill-morph.is-back .pill-morph__face--back {
@@ -995,6 +995,33 @@
     .pill-morph__face {
       transform: none !important;
       transition: opacity 0.2s ease !important;
+    }
+  }
+
+  /* --- Lyrics-view width split ------------------------------------------- */
+  /* When both hero pills are present, opening the lyrics grows the Lyrics/Back
+     pill to ~75% of the row and shrinks the Music Video pill to the rest. Driven
+     by flex-grow (3:1) so the gap maths stay automatic, animated with the same
+     0.42s easing as the morphing text (the existing 0.1s hover transitions are
+     preserved in the list). */
+  .hero-quick-actions > .music-hero-pill {
+    transition:
+      transform 0.1s ease-in-out,
+      background-color 0.1s ease-in-out,
+      border-color 0.1s ease-in-out,
+      /* a touch slower than the 0.42s text slide so the resize reads as its own beat */
+      flex-grow 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .hero-quick-actions.lyrics-active > .lyrics-morph-pill {
+    flex-grow: 3;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* keep the hover transitions; drop only the width animation */
+    .hero-quick-actions > .music-hero-pill {
+      transition:
+        transform 0.1s ease-in-out,
+        background-color 0.1s ease-in-out,
+        border-color 0.1s ease-in-out;
     }
   }
 
