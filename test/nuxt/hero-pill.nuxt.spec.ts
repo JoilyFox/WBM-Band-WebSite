@@ -96,4 +96,18 @@ describe('MusicHeroPill', () => {
     expect(w.text()).toContain('Lyrics')
     expect(w.text()).toContain('Song Lyrics')
   })
+
+  // The 'video' accent drives the YouTube cue (red LEFT border + left glow) via
+  // the scoped .music-hero-pill--video rule.
+  it("adds the .music-hero-pill--video class for accent='video'", async () => {
+    const w = await mountSuspended(MusicHeroPill, {
+      props: { as: 'a', href: '#', accent: 'video', label: 'Music Video' }
+    })
+    expect(w.get('a').classes()).toContain('music-hero-pill--video')
+  })
+
+  it('omits the video accent class by default', async () => {
+    const w = await mountSuspended(MusicHeroPill, { props: { label: 'X' } })
+    expect(w.get('button').classes()).not.toContain('music-hero-pill--video')
+  })
 })
