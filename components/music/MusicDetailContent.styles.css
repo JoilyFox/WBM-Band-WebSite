@@ -1043,10 +1043,11 @@
       transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* On narrow phones (iPhone SE & co.) the 75/25 split can't fit BOTH labels, so
-     opening the lyrics collapses the Music Video pill to an icon-only ~10% button
-     (its label slides 10px left + fades) and hands the Back pill the room. */
-  @media (max-width: 400px) {
+  /* On phones (≤450px — SE through the Pro Max widths) the 75/25 split can't fit
+     BOTH labels, so opening the lyrics collapses the Music Video pill to an
+     icon-only ~10% button (its label slides 10px left + fades) and hands the
+     Back pill the room. */
+  @media (max-width: 450px) {
     /* Links view: an explicit 50/50. A definite flex-basis (½ the row minus ½ the
        0.75rem gap) sidesteps the width:100% grid feedback that skewed pure
        flex-grow into ~52/44. Scoped to the links state so it never fights the
