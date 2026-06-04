@@ -102,7 +102,15 @@
   .music-hero-pill--video {
     border-left-color: #573138;
     border-right-color: #3d383e;
-    background-image: radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.2) 0%, transparent 45%);
+    /* Red YouTube glow from the left edge. Drawn as a sized, non-repeating box so
+       its WIDTH (background-size) is animatable — it widens as the pill reduces in
+       the lyrics view (45% → 60% → 100%; see MusicDetailContent.styles.css). The
+       gradient itself reaches transparent at the box edge, so background-size 45%
+       reproduces the original "transparent 45%" look. */
+    background-image: radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.2) 0%, transparent 100%);
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 45% 100%;
   }
 
   @media (hover: hover) and (pointer: fine) {

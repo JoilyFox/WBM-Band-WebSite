@@ -1018,10 +1018,17 @@
          (calc 50%) and the lyrics view uses 0 — without this the basis snapped
          instantly on grow, flashing a wide empty pill before the label caught up. */
       flex-grow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-      flex-basis 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-basis 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      /* the YouTube glow widens in step with the shrink */
+      background-size 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .hero-quick-actions.lyrics-active > .lyrics-morph-pill {
     flex-grow: 3;
+  }
+  /* Music Video glow grows as the pill reduces: ~60% across the reduced (text-kept)
+     pill on wider phones, and the full button once it's icon-only (≤450px below). */
+  .hero-quick-actions.lyrics-active > .music-hero-pill--video {
+    background-size: 60% 100%;
   }
   @media (prefers-reduced-motion: reduce) {
     /* keep the hover transitions; drop only the width animation */
@@ -1066,10 +1073,12 @@
          at auto avoids a brief width dip at the start of the grow-back). */
       flex: 1 1 calc(50% - 0.375rem);
     }
-    /* Lyrics view: Music Video shrinks to just its YouTube icon… */
+    /* Lyrics view: Music Video shrinks to just its YouTube icon, and the red glow
+       fills the whole (now icon-only) button. */
     .hero-quick-actions.lyrics-active > .music-hero-pill--video {
       flex-grow: 0;
       min-width: auto;
+      background-size: 100% 100%;
     }
     /* …its label slides left and collapses away (gap absorbed by the margin). */
     .hero-quick-actions.lyrics-active > .music-hero-pill--video .mv-label {
