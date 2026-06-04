@@ -1012,13 +1012,13 @@
       transform 0.1s ease-in-out,
       background-color 0.1s ease-in-out,
       border-color 0.1s ease-in-out,
-      /* fast (0.35s) but a gentle ease — the front-loaded easeOutQuint felt rough
+      /* fast (0.25s) but a gentle ease — the front-loaded easeOutQuint felt rough
          on the width shrink; this accelerates/decelerates smoothly instead.
          flex-BASIS is animated too: the links view uses a definite basis
          (calc 50%) and the lyrics view uses 0 — without this the basis snapped
          instantly on grow, flashing a wide empty pill before the label caught up. */
-      flex-grow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-      flex-basis 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-grow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      flex-basis 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .hero-quick-actions.lyrics-active > .lyrics-morph-pill {
     flex-grow: 3;
@@ -1035,7 +1035,7 @@
 
   /* --- Small-phone responsiveness ---------------------------------------- */
   /* The Music Video label sits on its own span so it can collapse to nothing,
-     leaving just the YouTube icon. Animated at the same 0.35s as the width. */
+     leaving just the YouTube icon. Animated at the same 0.25s as the width. */
   .mv-label {
     display: inline-block;
     /* Tighter cap (≈ the longest label) so the width collapse starts almost
@@ -1046,10 +1046,10 @@
     white-space: nowrap;
     will-change: transform, opacity;
     transition:
-      max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-      margin 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      margin 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* On phones (≤450px — SE through the Pro Max widths) the 75/25 split can't fit
