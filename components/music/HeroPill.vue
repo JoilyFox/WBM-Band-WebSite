@@ -107,13 +107,13 @@
 
   @media (hover: hover) and (pointer: fine) {
     .music-hero-pill--video:hover {
-      border-left-color: rgba(255, 255, 255, 0.2);
-      border-right-color: rgba(255, 255, 255, 0.2);
+      border-left-color: #613d43;
+      border-right-color: #4b444d;
     }
   }
 
   .music-hero-pill--video:active {
-    border-left-color: rgba(255, 255, 255, 0.3);
-    border-right-color: rgba(255, 255, 255, 0.3);
+    border-left-color: #73575d;
+    border-right-color: #5f5a61;
   }
 </style>
