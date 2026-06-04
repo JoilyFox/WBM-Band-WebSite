@@ -1,7 +1,7 @@
 <template>
   <component
     :is="as"
-    class="music-hero-pill inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-1 text-sm font-medium text-primary-200/70 bg-white/5 border border-white/15 backdrop-blur-md transition-all duration-100 ease-in-out hover:bg-white/10 hover:border-white/20 active:scale-[0.98] active:bg-white/15 active:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25"
+    class="music-hero-pill inline-flex items-center justify-center self-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-1 text-sm font-medium leading-5 text-primary-200/70 bg-white/5 border border-white/15 backdrop-blur-md transition-[transform,background-color,border-color] duration-100 ease-in-out hover:bg-white/10 hover:border-white/20 active:scale-[0.98] active:bg-white/15 active:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25"
     :class="{ 'music-hero-pill--video': accent === 'video' }"
     v-bind="elementAttrs"
     @click="$emit('click', $event)"
