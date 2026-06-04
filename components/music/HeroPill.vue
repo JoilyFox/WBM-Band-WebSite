@@ -93,19 +93,13 @@
 </script>
 
 <style scoped>
-  /* Music Video pill (`accent="video"`): a TRANSLUCENT border that mirrors the
-     YouTube glow — red on the LEFT (by the play logo), fading to the same neutral
-     grey as the other pills by the middle, so the RIGHT edge never reddens (the
-     old flat red border was red on all sides — that was the "red right border").
-     Layered backgrounds: the interior fill + soft red glow are clipped to
-     padding-box, and a left→right red→grey gradient fills the border-box and
-     shows through the transparent 1px border — so it follows the rounded corners
-     and only the border ring is tinted, gradient-style. */
+  /* Music Video pill (`accent="video"`): a soft red YouTube glow on the
+     background, anchored to the LEFT (by the play logo). The pill keeps its
+     normal translucent grey border (`border-white/15`) with the default
+     border-box clip, so the glow shows THROUGH the border — the border reads red
+     where the glow sits (left) and the same neutral grey where it has faded out
+     (right). The glow fades well before the right edge, so that edge stays grey. */
   .music-hero-pill--video {
-    border-color: transparent;
-    background:
-      radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.11) 0%, transparent 46%) padding-box,
-      linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)) padding-box,
-      linear-gradient(to right, rgba(255, 45, 45, 0.5) 0%, rgba(255, 255, 255, 0.15) 48%) border-box;
+    background-image: radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.2) 0%, transparent 45%);
   }
 </style>
