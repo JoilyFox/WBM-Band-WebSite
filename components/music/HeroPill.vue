@@ -93,13 +93,13 @@
 </script>
 
 <style scoped>
-  /* YouTube cue on the Music Video pill (`accent="video"`): a clearly RED left
-     border — where the YouTube icon sits — plus a soft red glow that fades out
-     before the right half, so the other three borders keep the neutral grey.
-     Vue's scoped [data-v] attribute gives `border-left-color` higher specificity
-     than Tailwind's `border-white/15`, so the left border reliably wins. */
+  /* Soft red YouTube cue on the Music Video pill (`accent="video"`): a hint of
+     red glow anchored to the LEFT (where the YouTube icon sits). `padding-box`
+     clips the glow to the pill interior so it never bleeds through the
+     translucent border — that bleed was what tinted the left edge red. All four
+     borders stay the SAME neutral grey; the glow only colours the interior. */
   .music-hero-pill--video {
-    border-left-color: rgba(255, 38, 38, 0.5);
-    background-image: radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.22) 0%, transparent 46%);
+    background-image: radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.2) 0%, transparent 52%);
+    background-clip: padding-box;
   }
 </style>
