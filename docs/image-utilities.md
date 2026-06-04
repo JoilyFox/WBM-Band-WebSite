@@ -29,8 +29,9 @@ A simple composable for basic image loading state management.
 </script>
 
 <template>
-  <NuxtImg
-    src="/path/to/image.jpg"
+  <UiProgressiveImage
+    src="/path/to/image"
+    alt="Example"
     :class="{ loaded: imageLoaded }"
     @load="handleImageLoad"
     @error="handleImageError"
@@ -74,26 +75,34 @@ try {
 }
 ```
 
-### `getOptimizedImageUrl(src, width?, quality?)`
+### `getOptimizedImageUrl(src, width?, height?, quality?, preset?)`
 
-Generates optimized image URLs with query parameters.
+Maps an original image path to its pre-generated optimized variants under
+`/images/optimized/`. There is **no** runtime query-string transform — the files
+are emitted at build time by `scripts/compress-images.js`.
 
 **Parameters:**
 
 - `src`: Original image source
 - `width`: Target width (optional)
+- `height`: Target height (optional)
 - `quality`: Image quality 1-100 (default: 80)
+- `preset`: Preset name for predefined dimensions/quality (optional)
 
-**Returns:** Optimized image URL string
+**Returns:** An object with `avif`, `webp`, `jpg` URLs plus a `srcSet` object
+(`{ avif, webp, jpg }`).
 
 **Usage:**
 
 ```typescript
 import { getOptimizedImageUrl } from '~/utils/imageHelpers'
 
-const optimizedUrl = getOptimizedImageUrl('/image.jpg', 800, 90)
-// Returns: "/image.jpg?w=800&q=90&f=webp"
+const urls = getOptimizedImageUrl('/images/hero.jpg', undefined, undefined, 80, 'hero')
+// Returns: { avif: '/images/optimized/hero.avif', webp: '...', jpg: '...', srcSet: { ... } }
 ```
+
+> Most call sites should prefer `<UiProgressiveImage>` (or `generatePictureSources()`),
+> which wire all three formats plus the responsive `srcset` for you.
 
 ## CSS Integration
 
@@ -118,18 +127,21 @@ When using these utilities, pair them with CSS transitions for smooth animations
 4. **Preload critical images** for better UX
 5. **Use appropriate quality settings** for different use cases
 
-## Integration with NuxtImg
+## Integration with ProgressiveImage
 
-The utilities work seamlessly with Nuxt Image component:
+The project does not use `@nuxt/image`. These utilities back the
+`<UiProgressiveImage>` component (`components/ui/ProgressiveImage.vue`), which
+renders a native `<picture>` (AVIF → WebP → JPEG) built by
+`generatePictureSources()`:
 
 ```vue
-<NuxtImg
+<UiProgressiveImage
   :src="imageSrc"
+  alt="..."
+  preset="hero"
   :class="{ 'image-loaded': imageLoaded }"
   loading="eager"
-  fetchpriority="high"
-  format="webp,jpg"
-  quality="90"
+  fetch-priority="high"
   @load="handleImageLoad"
   @error="handleImageError"
 />

@@ -70,8 +70,7 @@ scripts/
 └── compress-images.js               # Batch image compression
 
 pages/
-├── index.vue                        # Updated with preloading
-└── performance.vue                  # Performance monitoring page
+└── index.vue                        # Updated with preloading
 
 public/images/
 ├── optimized/                       # Generated optimized images
@@ -215,7 +214,9 @@ npm run dev
 
 ### 3. Monitor Performance
 
-Visit `http://localhost:3000/performance` to see real-time metrics.
+Image load timing and Core Web Vitals are tracked at runtime via the
+`useImagePerformance` composable (`composables/useImagePerformance.ts`); inspect
+its output in the browser console / DevTools.
 
 ## 📈 Performance Monitoring
 
@@ -245,7 +246,7 @@ Visit `http://localhost:3000/performance` to see real-time metrics.
 
 ### Monitoring Performance
 
-- Check `/performance` page regularly
+- Check the `useImagePerformance` console output regularly
 - Use Lighthouse for full audits
 - Monitor real user metrics in production
 - All images are served as static files - no runtime processing overhead

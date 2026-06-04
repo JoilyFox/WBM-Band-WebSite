@@ -111,7 +111,7 @@ public/
 
 ## 📖 Documentation
 
-- **Setup Guide**: `docs/favicon-generation.md`
+- **Setup Guide**: this document (`docs/favicon-setup.md`)
 - **Technical Details**: Comments in `scripts/generate-favicons.js`
 - **Nuxt Config**: See `nuxt.config.ts` for HTML head configuration
 

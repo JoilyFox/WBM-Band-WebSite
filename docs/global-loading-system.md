@@ -84,8 +84,8 @@ The global loading system is built around a **[`GlobalLoadingBar`](../components
         return response
       },
       {
-        simulateProgress: true,
-        progressDuration: 2000
+        showProgress: true,
+        progressSteps: 20
       }
     )
   }
@@ -98,15 +98,18 @@ The global loading system is built around a **[`GlobalLoadingBar`](../components
 
 ```typescript
 const {
-  // State
-  isLoading, // ComputedRef<boolean>
-  loadingProgress, // ComputedRef<number>
+  // State (reactive refs from the store)
+  isLoading, // Ref<boolean>
+  loadingProgress, // Ref<number>
 
   // Methods
   showLoading, // () => void
   hideLoading, // () => void
   setProgress, // (progress: number) => void
-  withLoading // (fn: Function, options?) => Promise<any>
+  withLoading, // <T>(asyncFn: () => Promise<T>, options?) => Promise<T>
+
+  // Getters
+  getLoadingState // () => { isLoading: boolean; progress: number }
 } = useGlobalLoading()
 ```
 
@@ -128,14 +131,14 @@ const {
 - Parameters:
   - `progress` (number) - Progress percentage between 0 and 100
 
-**`withLoading(fn: Function, options?): Promise<any>`**
+**`withLoading<T>(asyncFn: () => Promise<T>, options?): Promise<T>`**
 
-- Wraps an async function with loading state management
+- Wraps an async function with loading state management (always calls `hideLoading()` in a `finally` block)
 - Parameters:
-  - `fn` (Function) - Async function to execute
-  - `options` (object) - Configuration options
-    - `simulateProgress` (boolean) - Whether to simulate progress updates
-    - `progressDuration` (number) - Duration for progress simulation in ms
+  - `asyncFn` (Function) - Async function to execute
+  - `options` (object, optional) - Configuration options. Progress is only stepped when **both** options below are provided/truthy:
+    - `showProgress` (boolean) - Whether to simulate stepped progress updates
+    - `progressSteps` (number) - Number of progress steps; each step waits 100ms and advances by `90 / progressSteps` percent (stops at 90%)
 - Returns: Promise with the result of the wrapped function
 
 ### Global Loading Store
@@ -170,8 +173,8 @@ export function useApiWithLoading() {
         return await api.get('/api/users')
       },
       {
-        simulateProgress: true,
-        progressDuration: 1500
+        showProgress: true,
+        progressSteps: 15
       }
     )
   }

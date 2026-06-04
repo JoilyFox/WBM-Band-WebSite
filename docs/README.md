@@ -15,10 +15,14 @@ This directory contains documentation for all the main features of the WBM Band 
 - [Image Utilities](./image-utilities.md) - Composables and helper functions for image loading states and optimization
 - [Favicon Setup](./favicon-setup.md) - Complete favicon generation system with multi-platform support and PWA compatibility
 - [Pre-save Functionality](./presave-functionality.md) - Pre-save system for upcoming music releases with automatic state transitions
+- [Release States System](./release-states-system.md) - Automatic preview / pre-save / released state management for each release based on release date and config flags
 - [Release Page Theming](./release-page-theming.md) - Cover-driven "Ambient Bloom" atmosphere on release pages (build-time palette extraction + per-release overrides, performance-tiered)
 - [Song Lyrics](./lyrics-feature.md) - Per-release lyrics that cross-slide in over the platform links; structured `lyrics[]` data, localized section labels, data-driven button
 - [AI Search & SEO Optimization Strategy](./ai-search-optimization-strategy.md) - Strategy for Google Search / AI Overviews / AI-assistant discoverability: gap audit, phased plan (Phase 1 done), include/exclude with pros-cons, and the off-site music-entity playbook (MusicBrainz/Wikidata)
 - [Off-Site Entity Setup Guide](./entity-setup-guide.md) - Copy-paste-ready MusicBrainz → Wikidata → Spotify/Apple-for-Artists → YouTube OAC walkthrough with verified field values and Wikidata property IDs (Phase 3 of the AI-search strategy)
+- [Web3Forms Setup Guide](./web3forms-setup.md) - Contact form integration via Web3Forms: getting the API key and wiring `web3formsApiKey` in `config/general.ts`
+- [Analytics Implementation — Task Plan](./analytics-implementation-tasks.md) - GA4 task plan for music master pages (`/listen/*`, `/pre-save/*`): hybrid path-prefix + referrer/UA source attribution, tracking visitors and converted listeners
+- [Testing Strategy](./testing-strategy.md) - Prioritized testing audit and implemented suites (unit/nuxt + e2e), coverage ratchet floors, CI wiring, and open findings
 
 ## Tech Stack
 
