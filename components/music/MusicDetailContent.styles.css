@@ -965,10 +965,12 @@
     transform: translateX(100%);
     opacity: 0;
   }
-  /* Lyrics view: Lyrics slides out past the right edge; Back slides in from the
-     right. Reverses on the way back (vice versa). */
+  /* Lyrics view: the Lyrics face slides OUT to the LEFT while the Back face
+     slides IN from the RIGHT — a true cross-slide (no overlap). Reverses on the
+     way back, so the Lyrics text always travels on the LEFT edge and the Back
+     text on the RIGHT edge, mirroring the lyrics-pane swipe. */
   .pill-morph.is-back .pill-morph__face--lyrics {
-    transform: translateX(100%);
+    transform: translateX(-100%);
     opacity: 0;
   }
   .pill-morph.is-back .pill-morph__face--back {
