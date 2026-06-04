@@ -78,7 +78,7 @@ Originals in `public/images/`, optimized variants in `public/images/optimized/`,
 
 ### Styling
 
-Tailwind utility-first (`tailwind.config.js`). Custom SCSS only in `assets/css/base.scss` (reset) and `assets/css/utilities.scss` (perf vars). PrimeVue is in unstyled mode (`theme: 'none'`) — components are styled via Tailwind. Custom breakpoint `md2: 951px` in addition to defaults.
+Tailwind utility-first (`tailwind.config.js`). Custom SCSS only in `assets/css/base.scss` (reset) and `assets/css/utilities.scss` (animation keyframes, glassmorphism utilities). The `--perf-*` tier variables and `.perf-low/medium/high` classes live in `base.scss`. PrimeVue is in unstyled mode (`theme: 'none'`) — components are styled via Tailwind. Custom breakpoint `md2: 951px` in addition to defaults.
 
 ### Error pages
 
@@ -88,26 +88,22 @@ Navigate to `/404` with query params `{ title, message, buttonText, buttonLink, 
 
 Prettier (`.prettierrc`): no semis, single quotes, 2-space, no trailing commas, 100-col, `vueIndentScriptAndStyle: true`. ESLint (`eslint.config.mjs`) extends Nuxt config + Prettier; `vue/multi-word-component-names`, `vue/no-v-html`, `vue/require-default-prop` are off; unused-vars and `any` are warnings.
 
-## Documentation (`docs/`)
+## Feature work (skills → docs)
 
-This file is a high-level map. Every feature area below has a deep-dive doc that is the source of truth for its API, edge cases, and gotchas. **Before modifying or extending a feature, read its doc.** Before adding a new feature that touches any of these systems, read the relevant doc(s) and follow the patterns established there. When you add a new feature/system, add a doc to `docs/` (use the template in `docs/README.md`), link it from `docs/README.md`, and add a one-liner to the list below.
+Feature work starts with the task-oriented **skills** in [`.claude/skills/`](.claude/skills/) — each is auto-triggered by its description, bundles the procedure + the exact helper files, and links the deep-dive `docs/*.md` that remain the **source of truth** for API, edge-cases, and gotchas. Follow the matching skill instead of reading every doc. Full doc index + the new-doc template: [`docs/README.md`](docs/README.md). When you add a feature/system: add its doc to `docs/`, link it from `docs/README.md`, and fold it into the relevant skill (or add a new skill).
 
-- [`docs/README.md`](docs/README.md) — index of all feature docs and the template for adding new ones.
-- [`docs/deployment-guide.md`](docs/deployment-guide.md) — production deploy to wbmband.com via FTP, GitHub Pages deploy, `DEPLOY_TARGET` mechanics, `.env.production` setup, `.htaccess` rules for non-localized share URLs.
-- [`docs/performance-optimization.md`](docs/performance-optimization.md) — device-tier detection, CSS performance variables, tier-conditioned classes, `usePerformanceOptimization` composables.
-- [`docs/api-caching.md`](docs/api-caching.md) — `ApiCache` (Web Cache API + `localStorage` fallback), TTLs, cache keys, invalidation via `invalidateCache()` / `apiCache.clear()`, `useApi()` composable.
-- [`docs/global-loading-system.md`](docs/global-loading-system.md) — top-bar progress indicator, `useGlobalLoading()` composable, `store/globalLoading.ts`.
-- [`docs/snackbar-notifications.md`](docs/snackbar-notifications.md) — toast/snackbar system, `useSnackbar()` composable, `store/snackbar.ts`.
-- [`docs/error-page-system.md`](docs/error-page-system.md) — `/404` route with query-param contract, `useErrorPage()` helpers, `components/common/ErrorPage.vue`, middleware integration pattern.
-- [`docs/image-optimization-guide.md`](docs/image-optimization-guide.md) — AVIF/WebP/JPEG pipeline, `<ProgressiveImage>`, `npm run compress-images`, SSG-compatible image strategy.
-- [`docs/pre-blurred-images.md`](docs/pre-blurred-images.md) — build-time blur/tint placeholder generation (`npm run generate-blurred`) replacing runtime overlay blur.
-- [`docs/image-utilities.md`](docs/image-utilities.md) — image composables and helpers (loading state, preloading, `useImagePreloader()`).
-- [`docs/favicon-setup.md`](docs/favicon-setup.md) — multi-platform favicon set, PWA icons, `npm run generate-favicons`, `DEPLOY_TARGET`-aware href prefixing.
-- [`docs/presave-functionality.md`](docs/presave-functionality.md) — pre-save page, distributor redirect flow, `preSaveMusicPlatformLinks`, `middleware/presave-access.ts`.
-- [`docs/release-states-system.md`](docs/release-states-system.md) — preview / pre-save / released state derivation, feature flags, automatic transitions when `releaseDate` passes.
-- [`docs/release-page-theming.md`](docs/release-page-theming.md) — cover-driven "Ambient Bloom" atmosphere on release pages: build-time palette extraction (`npm run extract-colors` → `data/coverColors.generated.ts`), `useReleaseTheme` resolver, per-release `theme` override, and the performance-tiered layer stack (heavy blur is high-perf-desktop only).
-- [`docs/lyrics-feature.md`](docs/lyrics-feature.md) — per-release song lyrics that cross-slide in over the platform-links section: structured `lyrics?: LyricsSection[]` on `MusicRelease` (original-language lines), localized section labels via `music.parts.*`, data-driven Lyrics button (mobile/tablet only for now), perf-tiered/reduced-motion swap.
-- [`docs/web3forms-setup.md`](docs/web3forms-setup.md) — contact form integration via Web3Forms, env keys, submission flow.
+| Skill (`.claude/skills/`) | Covers — see linked `docs/*.md` for depth                                            |
+| ------------------------- | ------------------------------------------------------------------------------------ |
+| `add-release`             | release in `musicLibrary.ts`, preview/pre-save/released state, cover theming, lyrics |
+| `work-with-images`        | AVIF/WebP/JPEG pipeline, `<UiProgressiveImage>`, blur placeholders, favicons         |
+| `add-page-route`          | new page/route, i18n (ua/en) parity, prerender list, `useLocalePath`                 |
+| `analytics-tracking`      | GA4 events, path-prefix source attribution (`useAnalytics`)                          |
+| `ui-feedback`             | global loading bar, snackbars, contextual `/404` error pages                         |
+| `performance`             | device-tier perf system, `--perf-*` CSS vars, reduced-motion                         |
+| `state-data-api`          | `useApi` + `ApiCache`, Pinia stores, `getConfig` config access                       |
+| `ship-deploy`             | tests/lint, `npm run generate`, FTP + GitHub Pages, `DEPLOY_TARGET`                  |
+| `seo-entity`              | JSON-LD, MusicBrainz/Wikidata entity (never add llms.txt / Review schema)            |
+| `contact-form`            | Web3Forms contact submission                                                         |
 
 ## Other pointers
 
