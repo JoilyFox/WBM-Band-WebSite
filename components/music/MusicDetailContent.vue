@@ -108,9 +108,9 @@
       :class="[
         'music-hero flex flex-col items-center justify-center relative overflow-hidden',
         {
-          'pt-20 pb-4 px-4 md:py-16 md:px-8': !isHeroExpanded && !isDesktop && !isModal,
+          'pt-20 pb-3 px-4 md:py-16 md:px-8': !isHeroExpanded && !isDesktop && !isModal,
           'py-4 px-4': !isHeroExpanded && !isDesktop && isModal,
-          'pt-16 pb-8 px-4 md:px-8': isHeroExpanded || isDesktop,
+          'pt-16 pb-3 md:pb-8 px-4 md:px-8': isHeroExpanded || isDesktop,
           'modal-hero': isModal
         }
       ]"
