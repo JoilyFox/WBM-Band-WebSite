@@ -926,6 +926,68 @@
     transition: opacity 0.2s ease !important;
   }
 
+  /* --- Lyrics pill morph -------------------------------------------------- */
+  /* The single hero pill swaps between the "Lyrics" trigger (links view) and the
+     "Back to Music" control (lyrics view) as the panes cross-slide. Both faces
+     are grid-stacked INSIDE the pill and clipped by it, so the pill's border and
+     size never move — only the icon+text slide off/in on the right and cross-fade.
+     Timing matches the 0.42s pane swipe. */
+  .lyrics-morph-pill {
+    position: relative;
+    overflow: hidden;
+  }
+  .pill-morph {
+    display: grid;
+    width: 100%;
+    overflow: hidden;
+  }
+  .pill-morph__face {
+    grid-area: 1 / 1;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    will-change: transform, opacity;
+    /* `!important` so the blunt global mobile perf overrides in base.scss can't
+       clobber the intended timing (same guard the pane swipe uses). */
+    transition:
+      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  }
+  /* Resting (links view): Lyrics centred & visible; Back parked off the right. */
+  .pill-morph__face--lyrics {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .pill-morph__face--back {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  /* Lyrics view: Lyrics slides out past the right edge; Back slides in from the
+     right. Reverses on the way back (vice versa). */
+  .pill-morph.is-back .pill-morph__face--lyrics {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  .pill-morph.is-back .pill-morph__face--back {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  /* Reduced-motion / low-perf: crossfade in place, no horizontal travel — mirrors
+     the pane's fade fallback so the two stay consistent. */
+  .pill-morph--reduced .pill-morph__face {
+    transform: none !important;
+    transition: opacity 0.2s ease !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pill-morph__face {
+      transform: none !important;
+      transition: opacity 0.2s ease !important;
+    }
+  }
+
   @keyframes fadeInUpSmooth {
     0% {
       opacity: 0;

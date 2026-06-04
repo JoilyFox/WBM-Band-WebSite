@@ -1,23 +1,14 @@
 <template>
   <div class="music-lyrics w-full">
-    <!-- Header: back-to-platforms control + centered title -->
-    <div class="mb-6 flex items-center gap-2">
-      <button
-        type="button"
-        class="lyrics-back inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-sm font-medium text-primary-200/80 bg-white/5 border border-white/15 transition-colors hover:bg-white/10 hover:border-white/25 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25"
-        :aria-label="t('music.a11y.back_to_platforms')"
-        @click="$emit('back')"
-      >
-        <i class="pi pi-arrow-left text-sm leading-none" aria-hidden="true"></i>
-        <span>{{ t('music.buttons.back') }}</span>
-      </button>
+    <!-- Header: centered title. The open/close control is the morphing hero
+         pill (Lyrics ⇄ Back to Music) in MusicDetailContent — this pane no longer
+         carries its own back button. -->
+    <div class="mb-6">
       <h2
-        class="flex-1 text-center text-2xl md:text-3xl font-extrabold bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md"
+        class="text-center text-2xl md:text-3xl font-extrabold bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md"
       >
         {{ t('music.detail.lyrics_title') }}
       </h2>
-      <!-- Spacer balances the back button so the title stays optically centered. -->
-      <span class="lyrics-header-spacer shrink-0" aria-hidden="true"></span>
     </div>
 
     <!-- Lyrics body: labeled sections, original-language lines. -->
@@ -44,7 +35,6 @@
   }
 
   defineProps<Props>()
-  defineEmits<{ back: [] }>()
 
   // Global scope keeps SSR/CSR in sync, matching the other music components.
   const { t } = useI18n({ useScope: 'global' })
@@ -62,11 +52,6 @@
 </script>
 
 <style scoped>
-  /* Roughly matches the back-button width so the title is centered between them. */
-  .lyrics-header-spacer {
-    width: 4.5rem;
-  }
-
   .lyrics-section + .lyrics-section {
     margin-top: 1.75rem;
   }

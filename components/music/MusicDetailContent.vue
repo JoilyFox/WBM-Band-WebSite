@@ -313,14 +313,34 @@
              short↔long at 440px via the pill's responsive label. -->
         <MusicHeroPill
           v-if="lyricsAvailable"
-          icon="pi pi-align-left text-base leading-none"
-          :narrow-label="t('music.buttons.lyrics')"
-          :wide-label="t('music.buttons.song_lyrics')"
-          :breakpoint="440"
-          :aria-label="t('music.a11y.show_lyrics')"
-          :class="bothActions ? 'flex-1 justify-center' : 'ml-auto'"
-          @click="openLyrics"
-        />
+          :aria-label="showLyrics ? t('music.buttons.back_to_music') : t('music.a11y.show_lyrics')"
+          :class="['lyrics-morph-pill', bothActions ? 'flex-1 justify-center' : 'ml-auto']"
+          @click="toggleLyrics"
+        >
+          <!-- Morphing content: the SAME pill is the Lyrics trigger (links view)
+               and the "Back to Music" control (lyrics view). Both faces are
+               grid-stacked and clipped by the pill; only the icon+text slide
+               (out/in on the right) + cross-fade, synced to the 0.42s pane swap.
+               The pill's border/size never change. Faces are aria-hidden — the
+               button's dynamic aria-label is the authoritative accessible name. -->
+          <span
+            class="pill-morph"
+            :class="{ 'is-back': showLyrics, 'pill-morph--reduced': shouldReduceAnimations }"
+          >
+            <span class="pill-morph__face pill-morph__face--lyrics" aria-hidden="true">
+              <i class="pi pi-align-left text-base leading-none"></i>
+              <UiResponsiveText
+                :narrow="t('music.buttons.lyrics')"
+                :wide="t('music.buttons.song_lyrics')"
+                :breakpoint="440"
+              />
+            </span>
+            <span class="pill-morph__face pill-morph__face--back" aria-hidden="true">
+              <i class="pi pi-arrow-left text-base leading-none"></i>
+              <span>{{ t('music.buttons.back_to_music') }}</span>
+            </span>
+          </span>
+        </MusicHeroPill>
       </div>
     </section>
 
@@ -392,7 +412,7 @@
               </template>
 
               <!-- LYRICS VIEW -->
-              <MusicLyrics v-else :sections="lyricsSections" @back="closeLyrics" />
+              <MusicLyrics v-else :sections="lyricsSections" />
             </div>
           </div>
         </Transition>
@@ -557,6 +577,14 @@
       syncLyricsUrl('links', 'replace')
       emit('view-change', 'links')
     }
+  }
+
+  // The morphing hero pill is the single open/close control (the in-pane back
+  // button was removed): open the lyrics when on the links view, close them when
+  // on the lyrics view. The floating top-left back-arrow still closes too.
+  const toggleLyrics = () => {
+    if (showLyrics.value) closeLyrics()
+    else openLyrics()
   }
 
   // Browser back/forward: mirror `showLyrics` to whatever view the URL now names.
