@@ -1,6 +1,10 @@
 /* Base Styles and Global Typography */
 @layer base {
   html {
+    /* Always reserve the scrollbar's space so toggling between a tall page (e.g.
+       the lyrics view) and a short one doesn't shift the whole layout sideways
+       when the scrollbar appears/disappears. */
+    scrollbar-gutter: stable;
     font-family:
       'Inter',
       'Manrope',
