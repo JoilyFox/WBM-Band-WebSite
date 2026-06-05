@@ -41,7 +41,7 @@
   import { useImagePreloader } from '~/composables/useImagePreloader'
   import { useMusicNavigation } from '~/composables/useMusicNavigation'
   import { useBandStructuredData } from '~/composables/useStructuredData'
-  import { createPageTitle, SITE_URL } from '~/constants/app'
+  import { SITE_URL } from '~/constants/app'
   import { musicLibrary } from '~/data/musicLibrary'
   import { getConfig } from '~/utils/configHelpers'
   import type { MusicRelease } from '~/data/musicLibrary'
@@ -62,7 +62,6 @@
 
   // Computed properties for config values
   const bandName = computed(() => getConfig('general.bandName'))
-  const fullBandName = computed(() => getConfig('general.fullBandName'))
 
   // Get the latest released track
   const latestRelease = computed(() => {
@@ -82,8 +81,11 @@
     return latestRelease.value.title
   })
 
-  // Computed properties for page title and description
-  const pageTitle = computed(() => fullBandName.value)
+  // Computed properties for page title and description.
+  // Home title carries the full entity name first (disambiguation), then the
+  // brand handles "WBM"/"ВБМ" so acronym queries ("wbm", "вбм") match — the full
+  // name alone doesn't contain them. Localized per locale.
+  const pageTitle = computed(() => t('app.home_title'))
   const pageDescription = computed(() => {
     if (latestReleaseTitle.value) {
       return t('app.meta_description', { release: latestReleaseTitle.value })
@@ -105,6 +107,10 @@
     // For other locales, include the locale prefix
     return `${SITE_URL}/${locale.value}`
   })
+
+  // OG locale (underscore format), with the reciprocal as the alternate.
+  const ogLocale = computed(() => (locale.value === 'ua' ? 'uk_UA' : 'en_US'))
+  const ogLocaleAlt = computed(() => (locale.value === 'ua' ? 'en_US' : 'uk_UA'))
 
   useHead({
     title: pageTitle,
@@ -141,6 +147,15 @@
       {
         property: 'og:url',
         content: pageUrl
+      },
+      // OG locale uses underscores (uk_UA), unlike hreflang's hyphen.
+      {
+        property: 'og:locale',
+        content: ogLocale
+      },
+      {
+        property: 'og:locale:alternate',
+        content: ogLocaleAlt
       },
       // Twitter Card
       {

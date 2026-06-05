@@ -70,7 +70,7 @@ is that it ignores this site's two defining traits — **bilingual** and
 
 ## 3. The governing insight
 
-**For a 3-single indie band, your own site will rarely be _the_ cited source.**
+**For a 3-single alternative rock band, your own site will rarely be _the_ cited source.**
 Citations come from third-party consensus (MusicBrainz, Wikidata, YouTube,
 press). So the highest-ROI work is **off** the codebase; on-site work is entity
 hygiene that _points at_ it.
@@ -102,14 +102,55 @@ Implemented (see [§6](#6-phase-1-changelog)):
 `WebSite` on the home page and `MusicRecording` + `BreadcrumbList` per release,
 all with a single stable `@id`, `sameAs` filtered to real URLs only, and **no**
 `member`/`Review`; reciprocal `hreflang` (`uk-UA`/`en-US`/`x-default`) on the
-home + policy pages (release pages keep their single non-localized canonical, so
-no hreflang there — canonical and hreflang stay consistent). Phase 3 prep:
+home + policy pages. (Content pages originally kept a single non-localized
+canonical with no hreflang — **superseded in Phase 2.5**, see below.) Phase 3 prep:
 `config.entityProfiles { musicbrainz, wikidata }` (empty, filtered out of
 `sameAs` until the off-site records exist).
 
-**Deferred — need real data / first-hand content (NOT to be fabricated):**
-replacing the `i.pravatar.cc` placeholder band members (then add `member`
-schema), and writing the per-song story prose.
+### Phase 2.5 — Per-locale ranking + lyrics keywords (in-repo) ✅ DONE
+
+Original Phase 2 deliberately gave `/listen` + `/lyrics` pages **one** non-localized
+canonical (the `ua` hub) and **no** hreflang. That collapses the EN version into
+UA — Google follows the canonical and ignores hreflang on the deduped URL — so the
+English page can't rank independently for `wbm <song> lyrics` while UA ranks for
+`<song> слова`. To let **each language rank in its own language** (the owner's
+explicit goal for the lyrics pages), Phase 2.5:
+
+- **Per-locale self-canonical** in `composables/useReleaseHead.ts`: EN → its
+  `/en/...` URL; UA → the clean non-localized hub (the `/lyrics`·`/listen` aliases
+  are byte-copies of the `ua` route). + reciprocal `uk-UA`/`en-US`/`x-default`
+  hreflang, `og:url`=canonical, `og:locale`.
+- **Lyrics keyword coverage:** UA title now carries "слова" (`«{song}» — слова
+пісні`), the visible H2 is "Слова пісні", and the meta description carries both
+  "слова" and "текст пісні" + the Cyrillic alias "ВБМ". Targets `манія слова`,
+  `чорні птахи слова`, `вбм слова`.
+- **Localized `<h1>`:** `MusicDetailContent.displayTitle` now resolves the
+  localized `t(releaseTitleKey)` instead of the static `release.title`, so the
+  prerendered H1 is correct per locale (previously e.g. `/ua/lyrics/mania` baked
+  `<h1>Mania</h1>`).
+- **Entity hardening:** `MusicGroup.disambiguatingDescription` (the "WBM" acronym
+  collision), `alternateName` gains `ВБМ`, and the lyrics `MusicComposition` +
+  `CreativeWork` gain `inLanguage: 'uk'`.
+- **Visible song story:** the band's first-hand `releases.<slug>.story` prose
+  (already written, both locales) now renders **visibly** on `/listen` via
+  `<MusicStory>` — not just in the JSON-LD `description`. This is the top on-page
+  content lever (Google's "unique, first-hand" signal) and unique text the
+  streaming/lyrics aggregators can't have. (Full page only; excluded from the
+  home modal to leave its tuned height transitions alone.)
+- **Sitemap:** now lists the `/en/listen` + `/en/lyrics` self-canonical URLs for
+  discovery (hreflang stays head-only — one method, per Google).
+- **Polish:** `music:musician` on the music.song OG; `og:locale`(+alternate) on
+  the policy pages.
+
+**Best-practice rules distilled from the 2026 research live in the
+[`seo-entity` skill](../.claude/skills/seo-entity/SKILL.md)** ("Best-practice
+rules" + "Myths / never-do") — the actionable cheat-sheet; this doc stays the
+strategy/audit narrative.
+
+**Deferred — need real data (NOT to be fabricated):** replacing the
+`i.pravatar.cc` placeholder band members (then add `member` schema) and the
+band's `foundingDate`/year. (The per-song story prose is written and now renders
+visibly — see Phase 2.5.)
 
 Remaining detail (for reference):
 

@@ -45,7 +45,7 @@ Keep this open while you fill in each platform.
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Primary name**                 | `Woman Based Mechanics`                                                                                                                                                   |
 | **Aliases**                      | `WBM Band`, `WBM`, `Вуман Бейсд Меканікс`                                                                                                                                 |
-| **Short description**            | `Ukrainian indie band` (or `Ukrainian alternative rock band`)                                                                                                             |
+| **Short description**            | `Ukrainian alternative rock band`                                                                                                                                         |
 | **Genre**                        | `alternative rock, punk` (same wording/order everywhere)                                                                                                                  |
 | **Origin / hometown**            | `Kyiv, Ukraine` (always **Kyiv**, never "Kiev")                                                                                                                           |
 | **Formed (year)**                | ⬜ _you fill — needed for MusicBrainz begin date + Wikidata inception_                                                                                                    |
@@ -91,7 +91,7 @@ Artist** (`musicbrainz.org/artist/create`):
 | ------------------- | ---------------------------------------------------------------------- |
 | Name                | `Woman Based Mechanics`                                                |
 | Sort name           | `Woman Based Mechanics` (verbatim — only a leading "the/a" would move) |
-| Disambiguation      | `Ukrainian indie band`                                                 |
+| Disambiguation      | `Ukrainian alternative rock band`                                      |
 | Type                | **Group**                                                              |
 | Area                | `Kyiv` (pick the city from autocomplete)                               |
 | Begin area          | `Kyiv`                                                                 |
@@ -106,7 +106,7 @@ Artist** (`musicbrainz.org/artist/create`):
 | `WBM`                  | en     | no                                  |
 | `Вуман Бейсд Меканікс` | uk     | **yes** (sort name = same Cyrillic) |
 
-Edit note: `New Kyiv-based indie band. Official site https://www.wbmband.com, Spotify artist 0HAHqBJrbpBocXeVJ90NoO.` → **Enter edit.**
+Edit note: `New Kyiv-based alternative rock band. Official site https://www.wbmband.com, Spotify artist 0HAHqBJrbpBocXeVJ90NoO.` → **Enter edit.**
 
 ### 1b. Add the two released singles (REQUIRED — an empty artist can be removed)
 
@@ -155,8 +155,8 @@ MBID clears it **without any press** (see "Notability" below). Create an account
 
 ### 2a. Labels / description / aliases
 
-- **Label (en)** `Woman Based Mechanics` · **Description (en)** `Ukrainian indie band`
-- **Label (uk)** `Вуман Бейсд Меканікс` · **Description (uk)** `українська інді-група`
+- **Label (en)** `Woman Based Mechanics` · **Description (en)** `Ukrainian alternative rock band`
+- **Label (uk)** `Вуман Бейсд Меканікс` · **Description (uk)** `український альтернативний рок-гурт`
 - **Aliases (en + uk):** `WBM`, `WBM Band`, and the other-script form of the name.
 
 ### 2b. Statements — verified property IDs
@@ -193,7 +193,7 @@ clearly identifiable entity describable with serious, publicly available
 references."** A **MusicBrainz record (cited via P434)** is exactly such a
 reference — an open, curated authority DB, not a promo page. So **no journalism,
 no Wikipedia, no streaming threshold is needed.** Keep the description neutral
-(`Ukrainian indie band`, no hype) and make sure **P434 is present** — that single
+(`Ukrainian alternative rock band`, no hype) and make sure **P434 is present** — that single
 identifier moves the item from "promotional/deletable" to "referenced/notable."
 This is why MusicBrainz must come first.
 
@@ -261,7 +261,9 @@ the **Ukrainian National System (2010)** (ASCII, UN/BGN-recognized; e.g. х→kh
 ## ✅ What's done (2026-06-03)
 
 - **MusicBrainz artist:** [Woman Based Mechanics](https://musicbrainz.org/artist/62589d1f-dcf9-4e94-b5fc-a5e48c2e2368) — MBID `62589d1f-dcf9-4e94-b5fc-a5e48c2e2368` (type Group, disambiguation, 5 aliases, both released singles + platform links).
-- **Wikidata item:** [Q140043384](https://www.wikidata.org/wiki/Q140043384) — full statements (instance-of, genre ×2, origin Kyiv/Ukraine, website, inception 2025) + all 6 external IDs, cites the MBID via P434.
+- **Wikidata item:** [Q140043384](https://www.wikidata.org/wiki/Q140043384) — full statements (instance-of, genre ×2, origin Kyiv/Ukraine, website, inception 2025) + all 6 external IDs, cites the MBID via P434. `uk` aliases: WBM, WBM Band, Woman Based Mechanics, **ВБМ** (Cyrillic acronym added 2026-06-05 to match MusicBrainz + the on-site `alternateName`, for "вбм" searches).
+- **On-site `foundingDate`:** `2025-11-14` (the debut single "Mania" release date) in the `MusicGroup` JSON-LD; matches the Wikidata inception (year 2025).
+- **Genre framing standardized (2026-06-05):** the band is **"Ukrainian alternative rock band"** / **"український альтернативний рок-гурт"** everywhere — on-site (hero subtitle, `app.meta_description`, `about.content`, global meta, `disambiguatingDescription`) **and** Wikidata `en`/`uk` descriptions **and** MusicBrainz disambiguation. Replaced the earlier "alternative rock band" wording so entity facts are consistent across sources.
 - **On-site:** both URLs wired into `config/general.ts` `entityProfiles` → live in the `MusicGroup` JSON-LD `sameAs`.
 - **Accounts:** MusicBrainz `wbmband`, Wikidata `WBMBand`. **Credentials live in Bohdan's password manager — never stored in this repo.**
 

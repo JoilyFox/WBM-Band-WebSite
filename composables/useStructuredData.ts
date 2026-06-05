@@ -79,15 +79,23 @@ function bandNode(description: string) {
   return {
     '@type': 'MusicGroup',
     '@id': BAND_ID,
-    // Lead with the full, unambiguous name; "WBM"/"WBM Band" are aliases (the
-    // acronym collides with unrelated entities).
+    // Lead with the full, unambiguous name; "WBM"/"WBM Band"/"ВБМ" are aliases
+    // (the acronym collides with unrelated entities). The Cyrillic "ВБМ" lets the
+    // entity resolve for Ukrainian-script searches (e.g. "вбм слова").
     name: generalConfig.fullBandName,
-    alternateName: [generalConfig.bandName, 'WBM'],
+    alternateName: [generalConfig.bandName, 'WBM', 'ВБМ'],
+    // Short factual statement to disambiguate the "WBM" acronym for entity
+    // resolution (a real schema property parsed by Google for this purpose).
+    disambiguatingDescription:
+      'Woman Based Mechanics (WBM, ВБМ) is a Ukrainian alternative rock band from Kyiv — distinct from other entities abbreviated “WBM”.',
     url: SITE_URL,
     logo: BAND_LOGO,
     image: BAND_LOGO,
     description,
     genre: BAND_GENRE,
+    // The band dates its start to its debut single "Mania" (2025-11-14).
+    // Matches the Wikidata inception (P571, year 2025) — keep the two in sync.
+    foundingDate: '2025-11-14',
     foundingLocation: { '@type': 'Place', name: 'Kyiv, Ukraine' },
     sameAs: bandSameAs()
   }
@@ -187,6 +195,8 @@ export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) 
         name: localizedTitle.value,
         url: canonicalUrl,
         image: metaImageUrl.value,
+        // The songs are sung in Ukrainian regardless of the page's UI locale.
+        inLanguage: 'uk',
         // Date only (no time) — matches the visible release date.
         datePublished: release.releaseDate.slice(0, 10),
         genre: release.genre && release.genre.length ? release.genre : BAND_GENRE,
@@ -207,8 +217,10 @@ export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) 
             '@type': 'MusicComposition',
             '@id': `${lyricsUrl}#composition`,
             name: localizedTitle.value,
+            inLanguage: 'uk',
             lyrics: {
               '@type': 'CreativeWork',
+              inLanguage: 'uk',
               text: lyricsText
             }
           }

@@ -9,7 +9,8 @@
  *
  * Only canonical URLs are included:
  *   - localized homes and policy pages
- *   - per-release clean listen URLs (matching each page's <link rel="canonical">)
+ *   - per-release listen + lyrics URLs, BOTH the clean UA hub and the /en/ self-
+ *     canonical (each locale self-canonicalizes; see composables/useReleaseHead.ts)
  * Source-attribution variants (/listen/<prefix>/<slug>) are `noindex` and the
  * transient pre-save pages are deliberately excluded.
  *
@@ -64,8 +65,9 @@ function buildSitemap(siteUrl, releases) {
   /** @type {{ loc: string, lastmod?: string }[]} */
   const entries = []
 
-  // Localized homes (ua canonical is the bare origin; see pages/index.vue).
-  entries.push({ loc: `${siteUrl}/` })
+  // Localized homes (ua canonical is the bare origin — no trailing slash, to
+  // match the <link rel="canonical"> + hreflang in pages/index.vue).
+  entries.push({ loc: `${siteUrl}` })
   entries.push({ loc: `${siteUrl}/en` })
 
   // Policy pages, both locales.
@@ -75,22 +77,23 @@ function buildSitemap(siteUrl, releases) {
     }
   }
 
-  // Per-release clean listen URLs (the canonical each release page declares).
+  // Per-release listen URLs. Each locale self-canonicalizes (UA hub = clean
+  // non-localized URL, EN = /en/...), so BOTH are listed for discovery; the
+  // ua/en language pairing itself lives in each page's <head> hreflang (one
+  // method — we don't duplicate hreflang into the sitemap).
   for (const release of releases) {
-    entries.push({
-      loc: `${siteUrl}/listen/${release.slug}`,
-      lastmod: release.releaseDate ? release.releaseDate.slice(0, 10) : undefined
-    })
+    const lastmod = release.releaseDate ? release.releaseDate.slice(0, 10) : undefined
+    entries.push({ loc: `${siteUrl}/listen/${release.slug}`, lastmod })
+    entries.push({ loc: `${siteUrl}/en/listen/${release.slug}`, lastmod })
   }
 
   // Dedicated lyrics pages — only for releases that ship lyrics (matches the
-  // /lyrics/<slug> canonical each lyrics page declares + the prerender list).
+  // per-locale canonical each lyrics page declares + the prerender list).
   for (const release of releases) {
     if (!release.hasLyrics) continue
-    entries.push({
-      loc: `${siteUrl}/lyrics/${release.slug}`,
-      lastmod: release.releaseDate ? release.releaseDate.slice(0, 10) : undefined
-    })
+    const lastmod = release.releaseDate ? release.releaseDate.slice(0, 10) : undefined
+    entries.push({ loc: `${siteUrl}/lyrics/${release.slug}`, lastmod })
+    entries.push({ loc: `${siteUrl}/en/lyrics/${release.slug}`, lastmod })
   }
 
   const urls = entries

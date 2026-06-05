@@ -1,8 +1,9 @@
 {
   "app": {
     "name": "WBM Band",
-    "tagline": "Alternative • Punk • Rock",
-    "meta_description": "WBM Band - alternative punk rock band. Listen to our new release {release}!",
+    "home_title": "Woman Based Mechanics (WBM) — Kyiv Alternative Rock Band",
+    "tagline": "Ukrainian alternative rock band",
+    "meta_description": "WBM Band — a Ukrainian alternative rock band. Listen to our new release {release}!",
     "welcome": "Welcome to {name}!",
     "ready": "Your modern Nuxt 3 application is ready to rock! 🎸",
     "all_rights": "All rights reserved."
@@ -246,7 +247,8 @@
       "release_label": "Release {date}",
       "lyrics_title": "Lyrics",
       "lyrics_page_title": "{songName} Lyrics",
-      "lyrics_meta_description": "Read the full lyrics to “{songName}” by WBM Band."
+      "lyrics_meta_description": "Read the full official lyrics to “{songName}” by WBM (Woman Based Mechanics), a Ukrainian alternative rock band.",
+      "about_title": "About the Song"
     },
     "a11y": {
       "back_to_section": "Back to music section",
@@ -364,7 +366,7 @@
   "about": {
     "section_title": "About Us",
     "section_subtitle": "Discover the story behind the music",
-    "content": "Woman Based Mechanics is a Kyiv-based alternative rock band, characterized by melodious vocals and a combination of unconventional elements with a driving sound. The band members do not disclose the symbolism of the band name, but in their performance they precisely convey the dynamics and energy that it carries within. This music resonates with people's deep emotional struggles and, at the same time, unleashes the inner drive hidden in everyone."
+    "content": "Woman Based Mechanics is a Ukrainian alternative rock band from Kyiv, characterized by melodious vocals and a combination of unconventional elements with a driving sound. The band members do not disclose the symbolism of the band name, but in their performance they precisely convey the dynamics and energy that it carries within. This music resonates with people's deep emotional struggles and, at the same time, unleashes the inner drive hidden in everyone."
   },
   "contacts": {
     "section_title": "Contacts",

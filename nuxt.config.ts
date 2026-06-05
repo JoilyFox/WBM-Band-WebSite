@@ -237,7 +237,7 @@ export default defineNuxtConfig({
         {
           name: 'description',
           content:
-            'Woman Based Mechanics (WBM Band) — a Kyiv-based alternative rock band. Listen to our latest singles and releases.'
+            'Woman Based Mechanics (WBM Band) — a Ukrainian alternative rock band. Listen to our latest singles and releases.'
         },
         { name: 'author', content: 'Woman Based Mechanics' },
 

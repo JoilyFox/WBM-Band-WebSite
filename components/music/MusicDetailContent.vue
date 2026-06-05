@@ -442,6 +442,11 @@
                     <span>{{ t('music.buttons.stream_all') }}</span>
                   </a>
                 </div>
+
+                <!-- First-hand "about the song" prose. Full /listen page only —
+                     kept out of the home-page modal (isModal) so its tuned height
+                     transitions are untouched. SSR-rendered into the static HTML. -->
+                <MusicStory v-if="storyText && !isModal" :story="storyText" />
               </template>
 
               <!-- LYRICS VIEW -->
@@ -983,12 +988,18 @@
   )
 
   // Localized title/description from locales.releases[slug]
-  // Hydration-aware: keep SSR fallbacks during hydration to avoid mismatches
+  // Resolve the LOCALIZED title at SSR too, so the prerendered <h1> is correct
+  // per locale. `release.title` is a single static string (e.g. mania = "Mania",
+  // chorni-ptahy = "Чорні Птахи"), so using it as the SSR value bakes the
+  // wrong-language H1 for one locale on every release — bad for "<song> слова" /
+  // "<song> lyrics" ranking. Hydration-safe: prefix routing keeps the locale
+  // stable between SSR and the client's first render (detectBrowserLanguage
+  // redirects on root only, and the non-localized alias resolves to default ua),
+  // so t() matches; release.title is the last-resort fallback for a missing key.
   const displayTitle = computed(() => {
-    const ssrFallback = props.release.title || props.release.slug
-    if (isHydrating.value) return ssrFallback
     const translated = t(releaseTitleKey.value) as string
-    return translated !== releaseTitleKey.value ? translated : ssrFallback
+    if (translated && translated !== releaseTitleKey.value) return translated
+    return props.release.title || props.release.slug
   })
 
   const displayDescription = computed(() => {
@@ -997,6 +1008,18 @@
     const translated = t(releaseDescriptionKey.value) as string
     if (translated !== releaseDescriptionKey.value && translated) return translated
     return ssrFallback
+  })
+
+  // First-hand "about the song" prose (the band's own words). Same key the
+  // MusicRecording JSON-LD uses; rendered VISIBLY on the /listen page so the
+  // structured-data description matches on-page content — unique, crawlable text
+  // that streaming/lyrics aggregators can't have (the top on-page SEO lever).
+  const releaseStoryKey = computed(() =>
+    releaseDescriptionKey.value.replace(/\.description$/, '.story')
+  )
+  const storyText = computed(() => {
+    const translated = t(releaseStoryKey.value) as string
+    return translated && translated !== releaseStoryKey.value ? translated : ''
   })
 
   function formatDate(

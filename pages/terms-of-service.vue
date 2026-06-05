@@ -246,7 +246,9 @@
         property: 'og:description',
         content: `${t('pages.terms.title')} - ${getConfig('general.fullBandName')} (${getConfig('general.bandName')}).`
       },
-      { property: 'og:type', content: 'website' }
+      { property: 'og:type', content: 'website' },
+      { property: 'og:locale', content: locale.value === 'ua' ? 'uk_UA' : 'en_US' },
+      { property: 'og:locale:alternate', content: locale.value === 'ua' ? 'en_US' : 'uk_UA' }
     ],
     link: [
       { rel: 'canonical', href: `${SITE_URL}/${locale.value}/terms-of-service` },
