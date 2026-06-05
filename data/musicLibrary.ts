@@ -195,7 +195,72 @@ export const musicLibrary: MusicRelease[] = [
     preSaveMusicPlatformLinks: {
       spotify:
         'https://accounts.spotify.com/authorize?response_type=code&client_id=5a14783d79444ee9babd9176b256979e&scope=user-follow-modify+user-library-modify+playlist-modify-public+playlist-modify-private+user-read-email+user-read-private&redirect_uri=https%3A%2F%2Flnk.to%2F~%2Fprerelease%2Fspotify&state=bFVybD1hcnRpc3RzLmxhbmRyLmNvbSUyRjA1NzkxNDU3ODk5NiZzSWQ9ZjBlYjk2NTUtYjFkZS00OWE2LWI4OGQtN2ZlNGFlMTFhYTU1JnRJZD01NzdhMGYwMi00OWVlLTRhNzgtYjdlOS1mNTA1Yzk1ZjUxOGQmdT1odHRwcyUzQSUyRiUyRmFydGlzdHMubGFuZHIuY29tJTJGMDU3OTE0NTc4OTk2JnZ0PWM0ZjkxMzQzOTdmM2U0NjAzOTk4MTQ2NDBmYjg0ZTg3JnZ1PTY5MDFlNTkwYjdhNTM3LjM1Mjk0MDk3JnJmPWh0dHBzJTNBJTJGJTJGd3d3LndibWJhbmQuY29tJTJG'
-    }
+    },
+    lyrics: [
+      {
+        part: 'verse',
+        num: 1,
+        lines: [
+          'Я руйнівник серед близької тобі сотні',
+          'Їх дуже мало, але їхній рух є зворотнім',
+          'Твоєму бажанню бути на самоті',
+          'Їм буде тебе так жаль, і вони не ті'
+        ]
+      },
+      {
+        part: 'chorus',
+        lines: [
+          'Чорні птахи непомітні на фоні бруду',
+          'Зграї летять у небо, кричать: «Не буду',
+          'Не буду, не буду вбивати в собі дитя',
+          'Люблю літати, літати, люблю життя»',
+          'Небо гримить у лихій мовчазній згоді',
+          'Не пробачає слабкість у непогоді',
+          'У небі рятує лиш каяття',
+          'І так все життя',
+          'І так все життя',
+          'Триває'
+        ]
+      },
+      {
+        part: 'verse',
+        num: 2,
+        lines: [
+          'А я саме той, кого ти не шукала ніколи',
+          'Ти знаєш, нас вчать жити серед людей зі школи',
+          'Ми стрибаємо із порожнечі в ще більший вакуум',
+          'Здаємось не в змозі хоч якось піти в атаку',
+          'Кидаємо спроби шукати далекі мрії',
+          'Ми живем тихо, а знаєш, всі ці Марії',
+          'Що мали б колись народити свого Христа',
+          'Зʼїдають його в собі, зачиняють вуста'
+        ]
+      },
+      {
+        part: 'chorus',
+        lines: [
+          'Чорні птахи непомітні на фоні бруду',
+          'Зграї летять у небо, кричать: «Не буду',
+          'Не буду, не буду вбивати в собі дитя',
+          'Люблю літати, літати, люблю життя»',
+          'Небо гримить у лихій мовчазній згоді',
+          'Не пробачає слабкість у непогоді',
+          'У небі рятує лиш каяття',
+          'І так все життя',
+          'І так все життя',
+          'Триває'
+        ]
+      },
+      {
+        part: 'outro',
+        lines: [
+          'Ти повіриш мені, ти вийдеш із небуття',
+          'З криком ламаючи сумніви й каяття',
+          'І я руйнівник тої тиші, в якій ти живеш',
+          'Подарунком свободи зламаю і тебе теж'
+        ]
+      }
+    ]
   },
   {
     id: '1',
