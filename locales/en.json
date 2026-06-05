@@ -247,8 +247,7 @@
       "release_label": "Release {date}",
       "lyrics_title": "Lyrics",
       "lyrics_page_title": "{songName} Lyrics",
-      "lyrics_meta_description": "Read the full official lyrics to “{songName}” by WBM (Woman Based Mechanics), a Ukrainian alternative rock band.",
-      "about_title": "About the Song"
+      "lyrics_meta_description": "Read the full official lyrics to “{songName}” by WBM (Woman Based Mechanics), a Ukrainian alternative rock band."
     },
     "a11y": {
       "back_to_section": "Back to music section",

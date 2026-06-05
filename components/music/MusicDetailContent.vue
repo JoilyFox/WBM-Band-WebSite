@@ -442,11 +442,6 @@
                     <span>{{ t('music.buttons.stream_all') }}</span>
                   </a>
                 </div>
-
-                <!-- First-hand "about the song" prose. Full /listen page only —
-                     kept out of the home-page modal (isModal) so its tuned height
-                     transitions are untouched. SSR-rendered into the static HTML. -->
-                <MusicStory v-if="storyText && !isModal" :story="storyText" />
               </template>
 
               <!-- LYRICS VIEW -->
@@ -1003,23 +998,15 @@
   })
 
   const displayDescription = computed(() => {
-    const ssrFallback = props.release.description
-    if (isHydrating.value) return ssrFallback
+    // Resolve the LOCALIZED description at SSR too, so the visible <p> is baked
+    // into the static HTML. It was client-only before: releases have no static
+    // `description` (only `descriptionKey`), so the old isHydrating fallback
+    // returned empty at SSR → the paragraph never reached no-JS crawlers. Mirrors
+    // displayTitle; hydration-safe (prefix routing keeps the locale stable, and
+    // `isHydrating` stays in use for the hero display toggle).
     const translated = t(releaseDescriptionKey.value) as string
-    if (translated !== releaseDescriptionKey.value && translated) return translated
-    return ssrFallback
-  })
-
-  // First-hand "about the song" prose (the band's own words). Same key the
-  // MusicRecording JSON-LD uses; rendered VISIBLY on the /listen page so the
-  // structured-data description matches on-page content — unique, crawlable text
-  // that streaming/lyrics aggregators can't have (the top on-page SEO lever).
-  const releaseStoryKey = computed(() =>
-    releaseDescriptionKey.value.replace(/\.description$/, '.story')
-  )
-  const storyText = computed(() => {
-    const translated = t(releaseStoryKey.value) as string
-    return translated && translated !== releaseStoryKey.value ? translated : ''
+    if (translated && translated !== releaseDescriptionKey.value) return translated
+    return props.release.description || ''
   })
 
   function formatDate(

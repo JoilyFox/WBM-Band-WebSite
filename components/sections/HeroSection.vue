@@ -69,9 +69,9 @@
 
     <!-- Content. On phones the whole block sits ~24px higher (-translate-y-6,
          reset at sm) and the subtitle is a touch smaller (text-lg). -->
-    <div class="relative z-20 text-center max-w-4xl mx-auto -translate-y-4 sm:translate-y-0">
+    <div class="relative z-20 text-center max-w-4xl mx-auto sm:translate-y-0">
       <h1
-        class="!text-5xl xs:!text-[3.5rem] md:!text-6xl font-bold text-white mb-2 md:mb-3 animate-fade-in"
+        class="!text-5xl sm:!text-[3.4rem] md:!text-6xl font-bold text-white mb-2 md:mb-3 animate-fade-in"
       >
         {{ displayTitle }}
       </h1>

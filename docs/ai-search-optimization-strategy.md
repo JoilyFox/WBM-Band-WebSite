@@ -131,12 +131,12 @@ explicit goal for the lyrics pages), Phase 2.5:
 - **Entity hardening:** `MusicGroup.disambiguatingDescription` (the "WBM" acronym
   collision), `alternateName` gains `ВБМ`, and the lyrics `MusicComposition` +
   `CreativeWork` gain `inLanguage: 'uk'`.
-- **Visible song story:** the band's first-hand `releases.<slug>.story` prose
-  (already written, both locales) now renders **visibly** on `/listen` via
-  `<MusicStory>` — not just in the JSON-LD `description`. This is the top on-page
-  content lever (Google's "unique, first-hand" signal) and unique text the
-  streaming/lyrics aggregators can't have. (Full page only; excluded from the
-  home modal to leave its tuned height transitions alone.)
+- **Song story (JSON-LD only):** the band's first-hand `releases.<slug>.story`
+  prose feeds the `MusicRecording` description for bots. A visible on-page
+  `<MusicStory>` section was trialled on `/listen` and **removed by band
+  preference (2026-06)** — the component is gone; the prose stays machine-facing.
+  Rendering it visibly remains the single highest-value untapped on-page lever
+  (Google's "unique, first-hand" signal) if the band ever wants it back.
 - **Sitemap:** now lists the `/en/listen` + `/en/lyrics` self-canonical URLs for
   discovery (hreflang stays head-only — one method, per Google).
 - **Polish:** `music:musician` on the music.song OG; `og:locale`(+alternate) on

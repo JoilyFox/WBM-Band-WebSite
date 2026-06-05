@@ -247,8 +247,7 @@
       "release_label": "Реліз {date}",
       "lyrics_title": "Слова пісні",
       "lyrics_page_title": "{songName} — слова пісні",
-      "lyrics_meta_description": "Слова та повний текст пісні «{songName}» гурту WBM (ВБМ, Woman Based Mechanics). Офіційний текст українською.",
-      "about_title": "Про пісню"
+      "lyrics_meta_description": "Слова та повний текст пісні «{songName}» гурту WBM (ВБМ, Woman Based Mechanics). Офіційний текст українською."
     },
     "a11y": {
       "back_to_section": "Назад до розділу музики",
