@@ -93,35 +93,10 @@
 </script>
 
 <style scoped>
-  /* Music Video pill (`accent="video"`): a red-brown left border (#573138) by the
-     YouTube play logo and an opaque grey right border (#3d383e). Both are opaque,
-     so the soft red background glow can't bleed THROUGH them — only the
-     translucent top/bottom edges pick the glow up. On hover/active the left &
-     right edges follow the same white/20 → white/30 lightening as the top/bottom
-     borders, so all four stay in sync. */
   .music-hero-pill--video {
-    border-left-color: #573138;
-    border-right-color: #3d383e;
-    /* Red YouTube glow from the left edge. Drawn as a sized, non-repeating box so
-       its WIDTH (background-size) is animatable — it widens as the pill reduces in
-       the lyrics view (45% → 60% → 100%; see MusicDetailContent.styles.css). The
-       gradient itself reaches transparent at the box edge, so background-size 45%
-       reproduces the original "transparent 45%" look. */
     background-image: radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.2) 0%, transparent 100%);
     background-repeat: no-repeat;
     background-position: left center;
     background-size: 45% 100%;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .music-hero-pill--video:hover {
-      border-left-color: #613d43;
-      border-right-color: #4b444d;
-    }
-  }
-
-  .music-hero-pill--video:active {
-    border-left-color: #73575d;
-    border-right-color: #5f5a61;
   }
 </style>
