@@ -84,6 +84,7 @@ describe('useReleaseTheme', () => {
           '--accent2',
           '--atmo-tint',
           '--bloom-accent',
+          '--bloom-accent-strong',
           '--bloom-dark',
           '--bloom-image',
           '--bloom-intensity',

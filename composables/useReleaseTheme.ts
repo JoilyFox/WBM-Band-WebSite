@@ -141,6 +141,10 @@ export const useReleaseTheme = (release: MaybeRefOrGetter<MusicRelease>) => {
       '--bloom-primary': rgba(palette.primary, 0.55),
       '--bloom-secondary': rgba(palette.secondary, 0.5),
       '--bloom-accent': rgba(palette.accent, 0.45),
+      // Near-opaque accent for FOREGROUND use (e.g. lyrics section labels). The
+      // 0.45 bloom alpha above is tuned for the background mesh and reads too dim
+      // as text — this keeps the cover tint but lifts it to a legible strength.
+      '--bloom-accent-strong': rgba(palette.accent, 0.9),
       '--bloom-dark': palette.dark,
       '--bloom-intensity': String(intensity),
 

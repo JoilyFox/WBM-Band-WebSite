@@ -63,9 +63,11 @@
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    /* Cover-driven accent (release theme), with a safe fallback. */
-    color: var(--bloom-accent, #a5b4fc);
-    opacity: 0.9;
+    /* Cover-driven accent (release theme), with a safe fallback. Uses the strong
+       (near-opaque) accent so the label is clearly legible while still reading a
+       touch dimmer than the lyric lines below it. */
+    color: var(--bloom-accent-strong, #a5b4fc);
+    opacity: 0.95;
   }
 
   .lyrics-section__lines {
