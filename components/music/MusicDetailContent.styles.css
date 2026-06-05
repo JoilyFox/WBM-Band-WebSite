@@ -1121,6 +1121,32 @@
     }
   }
 
+  /* Low-perf MOBILE: the global `.reduce-animations *` override strips the
+     mv-label's max-width transition (leaving only a 0.2s opacity fade) while the
+     pill's own width keeps animating at 0.25s — so on the collapse/grow-back the
+     label snaps to/from full width before the button finishes resizing and jolts
+     it. Re-assert ONE slightly longer (0.4s), shared timing on both the pill width
+     and the label so they move together and the snap is gone. The extra duration
+     also gives a slow device more frames to render the change smoothly. Gated to
+     `no-preference` so a genuine OS reduce-motion request still snaps (handled
+     above), not animates. */
+  @media (prefers-reduced-motion: no-preference) {
+    .music-detail-content.perf-low.mobile-device .hero-quick-actions>.music-hero-pill {
+      transition:
+        flex-grow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        flex-basis 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        background-size 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .music-detail-content.perf-low.mobile-device .mv-label {
+      transition:
+        max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        margin 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+  }
+
   /* On phones (≤450px — SE through the Pro Max widths) the 75/25 split can't fit
      BOTH labels, so opening the lyrics collapses the Music Video pill to an
      icon-only ~10% button (its label slides 10px left + fades) and hands the
