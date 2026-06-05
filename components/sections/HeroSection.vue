@@ -67,13 +67,14 @@
       </div>
     </div>
 
-    <!-- Content -->
-    <div class="relative z-20 text-center max-w-4xl mx-auto">
+    <!-- Content. On phones the whole block sits ~24px higher (-translate-y-6,
+         reset at sm) and the subtitle is a touch smaller (text-lg). -->
+    <div class="relative z-20 text-center max-w-4xl mx-auto -translate-y-6 sm:translate-y-0">
       <h1 class="xs:text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
         {{ displayTitle }}
       </h1>
 
-      <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto animate-slide-up">
+      <p class="text-lg md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto animate-slide-up">
         {{ displaySubtitle }}
       </p>
 
