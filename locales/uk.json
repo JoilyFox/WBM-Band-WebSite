@@ -237,7 +237,8 @@
       "song_lyrics": "Текст Пісні",
       "stream_all": "Слухати на всіх платформах",
       "back": "Назад",
-      "back_to_music": "Назад до музики"
+      "back_to_music": "Назад до музики",
+      "listen_to_song": "Слухати пісню"
     },
     "detail": {
       "listen_now_title": "Слухати зараз",

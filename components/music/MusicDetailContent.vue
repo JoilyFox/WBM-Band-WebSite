@@ -293,7 +293,7 @@
       <div
         v-if="!isModal && showHeroActions"
         class="hero-quick-actions md:hidden relative z-10 mt-3 flex w-full max-w-[500px] mx-auto items-center gap-3"
-        :class="{ 'lyrics-active': showLyrics && bothActions }"
+        :class="{ 'lyrics-active': showLyrics }"
       >
         <MusicHeroPill
           v-if="musicVideoUrl"
@@ -314,12 +314,17 @@
         </MusicHeroPill>
         <!-- Lyrics: swaps the platform-links section below for the song lyrics
              (horizontal cross-slide). Only present when the release ships lyrics.
-             ml-auto pins it right when it is the only button; the label swaps
-             short↔long at 440px via the pill's responsive label. -->
+             Alone (no Music Video): `--solo` makes it half the row on the links
+             view (right-pinned via ml-auto, like a paired Lyrics pill) and grows it
+             to the full row on the lyrics view. The label swaps short↔long at 440px
+             via the pill's responsive label. -->
         <MusicHeroPill
           v-if="lyricsAvailable"
-          :aria-label="showLyrics ? t('music.buttons.back_to_music') : t('music.a11y.show_lyrics')"
-          :class="['lyrics-morph-pill', bothActions ? 'flex-1 justify-center' : 'ml-auto']"
+          :aria-label="showLyrics ? lyricsBackLabel : t('music.a11y.show_lyrics')"
+          :class="[
+            'lyrics-morph-pill',
+            bothActions ? 'flex-1 justify-center' : 'lyrics-morph-pill--solo ml-auto'
+          ]"
           @click="toggleLyrics"
         >
           <!-- Morphing content: the SAME pill is the Lyrics trigger (links view)
@@ -341,8 +346,14 @@
               />
             </span>
             <span class="pill-morph__face pill-morph__face--back" aria-hidden="true">
-              <i class="pi pi-arrow-left text-base leading-none"></i>
-              <span>{{ t('music.buttons.back_to_music') }}</span>
+              <!-- Cold visitors (no prior context) get a play glyph + "Listen to
+                   the Song"; once they've used the toggle it morphs to the back
+                   arrow + "Back to Music". -->
+              <i
+                class="text-base leading-none"
+                :class="hasMusicNavContext ? 'pi pi-arrow-left' : 'pi pi-play'"
+              ></i>
+              <span>{{ lyricsBackLabel }}</span>
             </span>
           </span>
         </MusicHeroPill>
@@ -517,6 +528,20 @@
   // keeps its natural content width (left for video, right for lyrics).
   const bothActions = computed(() => Boolean(musicVideoUrl.value) && lyricsAvailable.value)
 
+  // Cold-entry-aware label for the lyrics "back" pill. A visitor who reached the
+  // lyrics straight from a search engine has no "music" to go back to, so the pill
+  // reads "Listen to the Song" until they interact with the toggle; after that it
+  // becomes "Back to Music" (persisted ~2h — see useMusicNavContext). SSR + first
+  // client render see hasContext=false (the cold label), then hydrate promotes it.
+  const {
+    hasContext: hasMusicNavContext,
+    markContext: markMusicNavContext,
+    hydrate: hydrateMusicNavContext
+  } = useMusicNavContext()
+  const lyricsBackLabel = computed(() =>
+    hasMusicNavContext.value ? t('music.buttons.back_to_music') : t('music.buttons.listen_to_song')
+  )
+
   // --- Lyrics view: in-place horizontal swap of the platform links <-> lyrics.
   // `showLyrics` drives a directional cross-slide (links exit left, lyrics enter
   // right; reversed on the way back). Pure client state — no route change — so SSR
@@ -588,6 +613,10 @@
   // button was removed): open the lyrics when on the links view, close them when
   // on the lyrics view. The floating top-left back-arrow still closes too.
   const toggleLyrics = () => {
+    // A real tap on the pill is the "interaction" that earns the visitor the
+    // context for the "Back to Music" label (vs the cold-entry "Listen to the
+    // Song"). Persisted ~2h so it survives refreshes/navigation in this session.
+    markMusicNavContext()
     if (showLyrics.value) closeLyrics()
     else openLyrics()
   }
@@ -603,6 +632,9 @@
   }
 
   onMounted(() => {
+    // Promote the cold "Listen to the Song" label to "Back to Music" if this
+    // visitor has interacted with the toggle within the TTL (client-only read).
+    hydrateMusicNavContext()
     if (import.meta.client && props.lyricsUrlSync) {
       window.addEventListener('popstate', handleLyricsPopState)
     }
