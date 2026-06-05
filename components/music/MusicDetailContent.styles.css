@@ -1061,6 +1061,21 @@
     background-size: 60% 100%;
   }
 
+  /* Lone lyrics pill (this release ships no Music Video): occupy ~half the row on
+     the release/links view — matching the right-hand slot a paired Lyrics pill
+     would take — then grow to the full row on the lyrics view. Right-pinned via
+     ml-auto so it grows leftward, animated by the shared .music-hero-pill flex
+     transition above. flex-grow stays 0 in both states so it's a pure flex-basis
+     grow (50% → 100%); placed AFTER the flex-grow:3 rule so it wins for --solo. */
+  .hero-quick-actions>.lyrics-morph-pill--solo {
+    flex: 0 1 calc(50% - 0.375rem);
+  }
+
+  .hero-quick-actions.lyrics-active>.lyrics-morph-pill--solo {
+    flex-grow: 0;
+    flex-basis: 100%;
+  }
+
   @media (prefers-reduced-motion: reduce) {
 
     /* keep the hover transitions; drop only the width animation. `!important` to
@@ -1115,8 +1130,10 @@
     /* Links view: an explicit 50/50. A definite flex-basis (½ the row minus ½ the
        0.75rem gap) sidesteps the width:100% grid feedback that skewed pure
        flex-grow into ~52/44. Scoped to the links state so it never fights the
-       lyrics-view split below. */
-    .hero-quick-actions:not(.lyrics-active)>.music-hero-pill {
+       lyrics-view split below. The `:not(--solo)` keeps this off the lone Lyrics
+       pill — its flex-grow:1 would make the sole child fill the whole row (100%)
+       instead of the intended half; --solo is sized by its own rule above. */
+    .hero-quick-actions:not(.lyrics-active)>.music-hero-pill:not(.lyrics-morph-pill--solo) {
       /* definite basis → exact 50/50 (no min-width:0 needed; keeping min-width
          at auto avoids a brief width dip at the start of the grow-back). */
       flex: 1 1 calc(50% - 0.375rem);
