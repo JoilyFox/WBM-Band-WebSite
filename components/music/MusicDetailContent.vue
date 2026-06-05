@@ -267,20 +267,37 @@
             {{ displayDescription }}
           </p>
 
-          <!-- Desktop Share Button -->
-          <div v-if="isDesktop && isClient" class="desktop-share-button mt-6">
-            <Button
+          <!-- Desktop hero action row: an optional Lyrics button alongside Share,
+               in the shared glassmorphic design. Music Video stays in the platform
+               grid below (not here). Share drops to icon-only once it shares the
+               row with the Lyrics button. Client + desktop only. -->
+          <div
+            v-if="isDesktop && isClient"
+            class="desktop-share-button mt-6 items-center gap-3 flex-wrap"
+          >
+            <MusicActionButton
+              v-if="lyricsAvailable"
+              :icon="
+                showLyrics
+                  ? hasMusicNavContext
+                    ? 'pi pi-arrow-left'
+                    : 'pi pi-play'
+                  : 'pi pi-align-left'
+              "
+              :label="showLyrics ? lyricsBackLabel : t('music.buttons.lyrics')"
+              :aria-label="showLyrics ? lyricsBackLabel : t('music.a11y.show_lyrics')"
+              :optimized="shouldUseMobileFallback"
+              @click="toggleLyrics"
+            />
+            <MusicActionButton
               id="desktop-share-button"
-              class="btn-glassmorphic"
-              :class="{ 'btn-glassmorphic--optimized': shouldUseMobileFallback }"
+              icon="pi pi-share-alt"
+              :label="t('music.buttons.share')"
+              :icon-only="desktopShareIconOnly"
               :aria-label="t('music.a11y.share_release')"
-              unstyled
-              :pt="{ ripple: { style: 'display: none !important' } }"
+              :optimized="shouldUseMobileFallback"
               @click="showDesktopSharePopup"
-            >
-              <i class="pi pi-share-alt"></i>
-              <span>{{ t('music.buttons.share') }}</span>
-            </Button>
+            />
           </div>
         </div>
       </div>
@@ -376,7 +393,7 @@
            lyrics enter right, reversed on the way back) with nothing cutting them
            off. The horizontal padding + max-width live on each pane's inner
            container instead of the section. The reduced-motion fallback is CSS-only. -->
-      <div class="lyrics-swap">
+      <div ref="lyricsSwapEl" class="lyrics-swap">
         <Transition :name="swapTransitionName" :mode="swapMode">
           <div :key="showLyrics ? 'lyrics' : 'links'" class="lyrics-swap__pane">
             <div class="platforms-container max-w-3xl mx-auto px-4 md:px-8 rounded-xl">
@@ -440,7 +457,6 @@
 <script setup lang="ts">
   import { computed, ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import Button from 'primevue/button'
   import { useScrollTo } from '~/composables/useScrollTo'
   import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'
   import { useOptimizedScroll } from '~/composables/useOptimizedScroll'
@@ -528,6 +544,11 @@
   // keeps its natural content width (left for video, right for lyrics).
   const bothActions = computed(() => Boolean(musicVideoUrl.value) && lyricsAvailable.value)
 
+  // Desktop hero action row: Share is always present; the Lyrics button joins it
+  // when the release ships lyrics. Share collapses to icon-only once it's no longer
+  // the lone button. (Music Video lives in the platform grid, not this row.)
+  const desktopShareIconOnly = computed(() => lyricsAvailable.value)
+
   // Cold-entry-aware label for the lyrics "back" pill. A visitor who reached the
   // lyrics straight from a search engine has no "music" to go back to, so the pill
   // reads "Listen to the Song" until they interact with the toggle; after that it
@@ -563,6 +584,57 @@
   const swapMode = computed<'out-in' | undefined>(() =>
     shouldReduceAnimations.value ? 'out-in' : undefined
   )
+
+  // --- Smooth height change on the links <-> lyrics swap --------------------
+  // The two panes share one grid cell, so the container's natural height changes
+  // in a single frame when the views swap — which on the full page yanks the
+  // footer up, and in the modal makes the body resize abruptly. We tween the
+  // container's height across the same 0.42s/easing instead.
+  //
+  // Two details keep it glitch-free in modal mode, where the global
+  // `transition: none` would otherwise remove the leaving pane instantly:
+  //   • lock the CURRENT height BEFORE the panes swap (the watch is pre-flush, so
+  //     this runs before the DOM update) — otherwise the container snaps to the new
+  //     height first and our tween then yanks it back, the flicker that was seen;
+  //   • set the height transition with `important`, to beat the modal's
+  //     `transition: none !important`.
+  // Skipped only for reduced motion (its out-in fade has no overlap to bridge).
+  const lyricsSwapEl = ref<HTMLElement | null>(null)
+  let cancelSwapHeight: (() => void) | null = null
+
+  watch(showLyrics, async (isLyrics) => {
+    const el = lyricsSwapEl.value
+    if (!el || !import.meta.client || shouldReduceAnimations.value) return
+    if (cancelSwapHeight) cancelSwapHeight() // rapid re-toggle: drop the in-flight tween
+    const startH = el.offsetHeight
+    el.style.height = `${startH}px` // lock before the DOM swaps the panes
+    await nextTick()
+    // The entering pane is the one whose content matches the new view; its own
+    // height is the natural target even while the container is height-locked.
+    const panes = Array.from(el.querySelectorAll<HTMLElement>('.lyrics-swap__pane'))
+    const target = panes.find((p) => Boolean(p.querySelector('.music-lyrics')) === isLyrics)
+    const targetH = target ? target.offsetHeight : 0
+    if (!targetH || targetH === startH) {
+      el.style.height = ''
+      return
+    }
+    void el.offsetHeight // commit the locked start height
+    el.style.setProperty('transition', 'height 0.42s cubic-bezier(0.22, 1, 0.36, 1)', 'important')
+    el.style.height = `${targetH}px`
+    const finish = () => {
+      el.style.height = ''
+      el.style.removeProperty('transition')
+      el.removeEventListener('transitionend', onEnd)
+      clearTimeout(timer)
+      cancelSwapHeight = null
+    }
+    const onEnd = (e: TransitionEvent) => {
+      if (e.target === el && e.propertyName === 'height') finish()
+    }
+    el.addEventListener('transitionend', onEnd)
+    const timer = setTimeout(finish, 600) // safety net if transitionend never fires
+    cancelSwapHeight = finish
+  })
 
   // --- URL sync (release page <-> /lyrics/<slug>) --------------------------
   // We change the URL with the History API directly — NOT router navigation —
@@ -852,7 +924,9 @@
         : props.release.musicPlatformLinks
 
     const orderedPlatforms: Record<string, string> = {}
-    const priorityOrder = ['spotify', 'youtubeMusic', 'appleMusic', 'musicVideo']
+    // Music Video leads the grid (it's the visual hook); on mobile its cell is
+    // hidden (`max-md:!hidden`) so the order there effectively starts at Spotify.
+    const priorityOrder = ['musicVideo', 'spotify', 'youtubeMusic', 'appleMusic']
 
     // Add priority platforms first
     priorityOrder.forEach((platform) => {
@@ -979,25 +1053,15 @@
   // Back button handler: go to / and scroll to music section, or just go to music library
   const { scrollToElementWithNavigation } = useScrollTo()
   const handleBack = async () => {
-    // While the lyrics view is open, the floating back arrow first returns to the
-    // platform-links view instead of leaving the page.
-    if (showLyrics.value) {
-      closeLyrics()
-      return
-    }
-    if (shouldShowBackArrow.value) {
-      // If came from music section, go back to home and scroll to music
-      await router.push('/')
-      setTimeout(() => {
-        scrollToElementWithNavigation('music')
-      }, 100)
-    } else {
-      // If no specific origin, go to music library/home
-      await router.push('/')
-      setTimeout(() => {
-        scrollToElementWithNavigation('music')
-      }, 100)
-    }
+    // The floating top-left control always sends the visitor to the home page (and
+    // scrolls to the music section) — never a history "back". The lyrics view
+    // rewrites the URL (/listen <-> /lyrics), so a history back would just bounce
+    // between those rather than leave the release; going straight home is the
+    // intent regardless of the current view or how the visitor arrived.
+    await router.push('/')
+    setTimeout(() => {
+      scrollToElementWithNavigation('music')
+    }, 100)
   }
 
   // Logo click handler: scroll to hero section
