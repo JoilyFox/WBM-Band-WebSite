@@ -56,6 +56,8 @@
     "vue-i18n": "^9.13.1"
   },
   "devDependencies": {
+    "@google-analytics/admin": "^9.1.0",
+    "@google-analytics/data": "^6.1.0",
     "@nuxt/eslint": "^1.10.0",
     "@nuxt/test-utils": "^4.0.3",
     "@pinia/testing": "^1.0.3",

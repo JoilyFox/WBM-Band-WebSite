@@ -13,6 +13,39 @@
 
 ---
 
+## ⚠️ Production diagnosis — 2026-06-06 ("visitors show, per-source attribution empty")
+
+Audited live `wbmband.com` (decoded real `/g/collect` payloads) + adversarial code audit. **Operating/debugging
+playbook now lives in [`analytics-debugging.md`](analytics-debugging.md)** — read it before touching GA numbers.
+
+Confirmed on a fresh prefixed visit (`/listen/i/chorni-ptahy`, consent undecided): `gcs=G100` (analytics **denied** /
+cookieless); `page_view` carried **no** `source_platform`; `release_view` carried both `ep.source_platform=instagram`
+**and** `up.source_platform=instagram`.
+
+**Root causes (full table: `analytics-debugging.md` §6):**
+
+1. **[CRITICAL, fixed]** `source_platform` was set **only** as a user property in `plugins/analytics.client.ts`, but the
+   dimension is **Event-scoped** and `page_view` carries no event params ⇒ `(not set)` on every standard report. → plugin
+   now also `gtag('set', { source_platform })` (event-param carrier).
+2. **[HIGH, owner decision]** Consent default-deny ⇒ most traffic cookieless (`gcs=G100`), no session source. Consider
+   region-scoping `analytics_storage` granted for non-EEA/UK. (`analytics-debugging.md` §2)
+3. **[HIGH, fixed by #1]** Attribution must be read in a custom **Exploration** on `release_view`/`platform_click`, not
+   standard Acquisition reports. (`analytics-debugging.md` §4)
+4. **[MEDIUM, verify]** Custom-dimension registration unverified + forward-only/no-backfill. → run `scripts/ga-admin.mjs`.
+5. **[HIGH, verify-then-fix]** `transport_type` passed as an event _param_ ≠ real beacon; distributor pre-save
+   conversion may be lost on unload. Listen-page buttons are `target="_blank"` (safe). Confirm in DebugView first.
+6. **[MEDIUM, fixed]** `release_view` dedup key omitted source ⇒ multi-source same-session views dropped. → key is now
+   `pageType:slug:source`.
+7. **[LOW, recommended]** `reset()` doesn't push `denied`; `hydrate()` coupled to the toast — deliberate current design.
+
+**Previously-unverified checks now resolved:** 0.2 (correct ID `G-Z8QRF6TWC2` confirmed live), 3.3 (`page_view` +
+`release_view` fire, `204`), 5.5 (`gcs=G100` confirmed under default-deny).
+
+**Next (needs GA API access — service account, `analytics-debugging.md` §5):** verify/fix dims + key events via
+`scripts/ga-admin.mjs`, confirm root cause #5 in DebugView, build the canonical Exploration, decide consent posture.
+
+---
+
 ## Source-prefix scheme (final)
 
 | Source      | Prefix | Example                               |

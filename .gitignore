@@ -18,3 +18,11 @@ dist
 
 # macOS Finder metadata
 .DS_Store
+
+# Secrets — GA4 / Google Cloud service-account keys must NEVER be committed.
+# Keep the JSON key OUTSIDE the repo; these patterns are a safety net.
+*service-account*.json
+*-sa-key*.json
+gcp-*.json
+ga4-*.json
+**/*.credentials.json

@@ -63,13 +63,18 @@ export function useAnalytics() {
 
   function trackReleaseView({ releaseSlug, pageType, transport }: ReleaseViewParams): void {
     if (typeof window === 'undefined') return
-    const key = `${pageType}:${releaseSlug}`
+    const source = getSourcePlatform()
+    // Dedup per session AND per source: the same release opened from two bio
+    // links (e.g. /listen/i/<slug> then /listen/tt/<slug>) is two distinct
+    // source views and must both be counted. Keying on pageType:slug alone
+    // would silently drop the second source.
+    const key = `${pageType}:${releaseSlug}:${source}`
     if (getSeenViews().includes(key)) return
     markViewSeen(key)
     gtag('event', 'release_view', {
       release_slug: releaseSlug,
       page_type: pageType,
-      source_platform: getSourcePlatform(),
+      source_platform: source,
       ...(transport ? { transport_type: transport } : {})
     })
   }

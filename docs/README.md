@@ -22,6 +22,7 @@ This directory contains documentation for all the main features of the WBM Band 
 - [Off-Site Entity Setup Guide](./entity-setup-guide.md) - Copy-paste-ready MusicBrainz → Wikidata → Spotify/Apple-for-Artists → YouTube OAC walkthrough with verified field values and Wikidata property IDs (Phase 3 of the AI-search strategy)
 - [Web3Forms Setup Guide](./web3forms-setup.md) - Contact form integration via Web3Forms: getting the API key and wiring `web3formsApiKey` in `config/general.ts`
 - [Analytics Implementation — Task Plan](./analytics-implementation-tasks.md) - GA4 task plan for music master pages (`/listen/*`, `/pre-save/*`): hybrid path-prefix + referrer/UA source attribution, tracking visitors and converted listeners
+- [GA4 Analytics — Operations, Debugging & Why Reports Go Empty](./analytics-debugging.md) - The operating/debugging source of truth: the scope⇄carrier mental model, why "aggregate works but per-source is empty," Consent Mode default-deny reality, the end-to-end `/g/collect` + DebugView validation runbook, the canonical attribution Exploration, and the GA4 Admin/Data API service-account + MCP access recipe
 - [Testing Strategy](./testing-strategy.md) - Prioritized testing audit and implemented suites (unit/nuxt + e2e), coverage ratchet floors, CI wiring, and open findings
 
 ## Tech Stack

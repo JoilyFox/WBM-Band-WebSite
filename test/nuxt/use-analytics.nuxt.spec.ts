@@ -96,7 +96,8 @@ describe('useAnalytics()', () => {
 
       const raw = window.sessionStorage.getItem(DEDUP_KEY)
       expect(raw).toBeTruthy()
-      expect(JSON.parse(raw as string)).toEqual(['listen:mania'])
+      // Dedup key is pageType:slug:source (source mock defaults to 'instagram').
+      expect(JSON.parse(raw as string)).toEqual(['listen:mania:instagram'])
     })
 
     it('treats a different pageType for the same slug as a distinct view', () => {
@@ -107,8 +108,8 @@ describe('useAnalytics()', () => {
 
       expect(gtag).toHaveBeenCalledTimes(2)
       expect(JSON.parse(window.sessionStorage.getItem(DEDUP_KEY) as string)).toEqual([
-        'listen:mania',
-        'pre-save:mania'
+        'listen:mania:instagram',
+        'pre-save:mania:instagram'
       ])
     })
 
@@ -119,6 +120,25 @@ describe('useAnalytics()', () => {
       trackReleaseView({ releaseSlug: 'other-song', pageType: 'listen' })
 
       expect(gtag).toHaveBeenCalledTimes(2)
+    })
+
+    it('treats the SAME release from a different source as a distinct view (source-aware dedup)', () => {
+      // A band pushes one release across multiple bio links; opening
+      // /listen/i/<slug> then /listen/tt/<slug> in one session is two source
+      // views and both must fire. Keying on pageType:slug alone dropped the 2nd.
+      const { trackReleaseView } = useAnalytics()
+
+      getOrPersistSourcePlatform.mockReturnValue('instagram')
+      trackReleaseView({ releaseSlug: 'mania', pageType: 'listen' })
+
+      getOrPersistSourcePlatform.mockReturnValue('tiktok')
+      trackReleaseView({ releaseSlug: 'mania', pageType: 'listen' })
+
+      expect(gtag).toHaveBeenCalledTimes(2)
+      expect(JSON.parse(window.sessionStorage.getItem(DEDUP_KEY) as string)).toEqual([
+        'listen:mania:instagram',
+        'listen:mania:tiktok'
+      ])
     })
 
     it('still records the release_view event even for bot traffic (views are not bot-filtered)', () => {
@@ -134,7 +154,7 @@ describe('useAnalytics()', () => {
     })
 
     it('survives a pre-seeded dedup list and only fires for unseen keys', () => {
-      window.sessionStorage.setItem(DEDUP_KEY, JSON.stringify(['listen:mania']))
+      window.sessionStorage.setItem(DEDUP_KEY, JSON.stringify(['listen:mania:instagram']))
       const { trackReleaseView } = useAnalytics()
 
       trackReleaseView({ releaseSlug: 'mania', pageType: 'listen' })
