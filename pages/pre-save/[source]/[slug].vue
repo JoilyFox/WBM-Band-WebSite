@@ -70,7 +70,7 @@
   const bypassDistributor = ref(false)
   const showRedirectScreen = computed(() => willAutoRedirect.value && !bypassDistributor.value)
 
-  onMounted(() => {
+  onMounted(async () => {
     const bypass = route.query.bypass === 'true'
     if (willAutoRedirect.value && bypass) {
       // Debug escape hatch: show the body, don't redirect, don't log a conversion.
@@ -78,23 +78,28 @@
       trackReleaseView({ releaseSlug: slug, pageType: 'pre-save' })
       return
     }
-    // 'beacon' keeps the per-source view alive past the external navigation below —
-    // that view is the whole point of the /pre-save/<source>/<slug> link.
-    trackReleaseView({
-      releaseSlug: slug,
-      pageType: 'pre-save',
-      transport: willAutoRedirect.value ? 'beacon' : undefined
-    })
     if (willAutoRedirect.value) {
-      // Releases flagged skipDistributorConversionEvent (distributor smart-links that
-      // complete the save off-site) opt out of the synthetic conversion event so the
-      // auto-redirect isn't logged as a 100% conversion; release_view still counts the
+      // AWAIT delivery before the external redirect tears the page down — gtag
+      // has no real beacon transport here, so fire-and-forget events are
+      // cancelled on unload (which silently lost every per-source view +
+      // distributor conversion). Releases flagged skipDistributorConversionEvent
+      // opt out of the synthetic conversion; release_view still counts the
       // per-source visit (the whole point of the /pre-save/<source>/<slug> link).
+      const pending = [trackReleaseView({ releaseSlug: slug, pageType: 'pre-save' })]
       if (!release.skipDistributorConversionEvent) {
-        trackPlatformClick({ platformName: 'distributor', releaseSlug: slug, pageType: 'pre-save' })
+        pending.push(
+          trackPlatformClick({
+            platformName: 'distributor',
+            releaseSlug: slug,
+            pageType: 'pre-save'
+          })
+        )
       }
-      navigateTo(release.distributorPreSaveUrl, { external: true, redirectCode: 302 })
+      await Promise.all(pending)
+      await navigateTo(release.distributorPreSaveUrl, { external: true, redirectCode: 302 })
+      return
     }
+    trackReleaseView({ releaseSlug: slug, pageType: 'pre-save' })
   })
 
   useSeoMeta({

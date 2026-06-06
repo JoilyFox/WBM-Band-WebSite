@@ -6,13 +6,6 @@ export type MasterPageType = 'listen' | 'pre-save'
 export interface ReleaseViewParams {
   releaseSlug: string
   pageType: MasterPageType
-  /**
-   * Set to 'beacon' when an external navigation follows immediately (the
-   * pre-save distributor auto-redirect). sendBeacon survives page teardown,
-   * so the view isn't lost in the hop to the distributor. Omit on normal
-   * pages — the default transport is fine when nothing tears the page down.
-   */
-  transport?: 'beacon'
 }
 
 export interface PlatformClickParams {
@@ -22,6 +15,12 @@ export interface PlatformClickParams {
 }
 
 const VIEW_DEDUP_KEY = 'wbm_release_views_seen'
+
+// Upper bound on how long an awaited event waits for gtag to dispatch it
+// before we proceed anyway. Must exceed the Consent Mode `wait_for_update`
+// (500ms) so the cookieless ping is actually sent before navigation, while
+// still being short enough not to make a redirect feel broken.
+const EVENT_FLUSH_TIMEOUT_MS = 1000
 
 function getSeenViews(): string[] {
   if (typeof window === 'undefined') return []
@@ -61,35 +60,63 @@ export function useAnalytics() {
     return getOrPersistSourcePlatform()
   }
 
-  function trackReleaseView({ releaseSlug, pageType, transport }: ReleaseViewParams): void {
-    if (typeof window === 'undefined') return
+  /**
+   * Fire a GA4 event and resolve once gtag confirms it was dispatched (via
+   * `event_callback`) or a safety timeout elapses. Callers that navigate away
+   * immediately afterwards (the pre-save distributor redirect) MUST await this,
+   * otherwise the page is torn down before the cookieless ping leaves the
+   * browser and the event is lost — `transport_type` as an event param is NOT
+   * real beacon transport, so fire-and-forget-then-redirect drops the hit.
+   * `event_timeout` caps how long gtag itself waits; the extra setTimeout is a
+   * backstop for when gtag never calls back (blocked, not loaded, no consent).
+   */
+  function sendEvent(name: string, params: Record<string, unknown>): Promise<void> {
+    return new Promise((resolve) => {
+      let settled = false
+      const done = (): void => {
+        if (settled) return
+        settled = true
+        clearTimeout(timer)
+        resolve()
+      }
+      const timer = setTimeout(done, EVENT_FLUSH_TIMEOUT_MS)
+      gtag('event', name, {
+        ...params,
+        event_callback: done,
+        event_timeout: EVENT_FLUSH_TIMEOUT_MS
+      })
+    })
+  }
+
+  function trackReleaseView({ releaseSlug, pageType }: ReleaseViewParams): Promise<void> {
+    if (typeof window === 'undefined') return Promise.resolve()
     const source = getSourcePlatform()
     // Dedup per session AND per source: the same release opened from two bio
     // links (e.g. /listen/i/<slug> then /listen/tt/<slug>) is two distinct
     // source views and must both be counted. Keying on pageType:slug alone
     // would silently drop the second source.
     const key = `${pageType}:${releaseSlug}:${source}`
-    if (getSeenViews().includes(key)) return
+    if (getSeenViews().includes(key)) return Promise.resolve()
     markViewSeen(key)
-    gtag('event', 'release_view', {
+    return sendEvent('release_view', {
       release_slug: releaseSlug,
       page_type: pageType,
-      source_platform: source,
-      ...(transport ? { transport_type: transport } : {})
+      source_platform: source
     })
   }
 
-  function trackPlatformClick({ platformName, releaseSlug, pageType }: PlatformClickParams): void {
-    if (typeof window === 'undefined') return
-    if (isLikelyBot()) return
-    gtag('event', 'platform_click', {
+  function trackPlatformClick({
+    platformName,
+    releaseSlug,
+    pageType
+  }: PlatformClickParams): Promise<void> {
+    if (typeof window === 'undefined') return Promise.resolve()
+    if (isLikelyBot()) return Promise.resolve()
+    return sendEvent('platform_click', {
       platform_name: platformName,
       release_slug: releaseSlug,
       page_type: pageType,
-      source_platform: getSourcePlatform(),
-      // 'beacon' transport survives the navigation that follows the click,
-      // so the event isn't lost when the browser tears down the page.
-      transport_type: 'beacon'
+      source_platform: getSourcePlatform()
     })
   }
 

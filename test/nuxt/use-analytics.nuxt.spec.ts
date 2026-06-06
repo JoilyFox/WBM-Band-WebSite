@@ -25,6 +25,13 @@ beforeEach(() => {
   // Restore default mock implementations cleared above.
   isLikelyBot.mockImplementation(() => false)
   getOrPersistSourcePlatform.mockImplementation(() => 'instagram')
+  // gtag invokes the event_callback synchronously, mirroring how real gtag
+  // confirms an event was dispatched — so the awaitable sends resolve and the
+  // flush-timeout timer is cleared (no leaked timers between tests).
+  gtag.mockImplementation((_cmd: string, _name: string, params?: Record<string, unknown>) => {
+    const cb = params?.event_callback
+    if (typeof cb === 'function') (cb as () => void)()
+  })
   // The dedup state lives in the real (nuxt-env) sessionStorage.
   window.sessionStorage.clear()
 })
@@ -54,31 +61,35 @@ describe('useAnalytics()', () => {
       trackReleaseView({ releaseSlug: 'mania', pageType: 'listen' })
 
       expect(gtag).toHaveBeenCalledTimes(1)
-      expect(gtag).toHaveBeenCalledWith('event', 'release_view', {
-        release_slug: 'mania',
-        page_type: 'listen',
-        source_platform: 'youtube'
-      })
+      expect(gtag).toHaveBeenCalledWith(
+        'event',
+        'release_view',
+        expect.objectContaining({
+          release_slug: 'mania',
+          page_type: 'listen',
+          source_platform: 'youtube'
+        })
+      )
     })
 
-    it('does NOT include transport_type when transport is omitted', () => {
+    it('attaches event_callback + event_timeout for delivery, and no dead transport_type param', () => {
       const { trackReleaseView } = useAnalytics()
       trackReleaseView({ releaseSlug: 'mania', pageType: 'listen' })
 
       const params = gtag.mock.calls[0][2]
+      // event_callback + event_timeout are what let the pre-save redirect await
+      // real delivery; transport_type-as-param was a no-op and is gone.
+      expect(typeof params.event_callback).toBe('function')
+      expect(params.event_timeout).toBeGreaterThan(0)
       expect(params).not.toHaveProperty('transport_type')
     })
 
-    it("passes transport_type:'beacon' when transport is 'beacon'", () => {
+    it('resolves the returned promise once gtag dispatches (awaitable before a redirect)', async () => {
       const { trackReleaseView } = useAnalytics()
-      trackReleaseView({ releaseSlug: 'mania', pageType: 'pre-save', transport: 'beacon' })
-
-      expect(gtag).toHaveBeenCalledWith('event', 'release_view', {
-        release_slug: 'mania',
-        page_type: 'pre-save',
-        source_platform: 'instagram',
-        transport_type: 'beacon'
-      })
+      await expect(
+        trackReleaseView({ releaseSlug: 'mania', pageType: 'pre-save' })
+      ).resolves.toBeUndefined()
+      expect(gtag).toHaveBeenCalledTimes(1)
     })
 
     it('dedupes a SECOND identical view via sessionStorage (does not re-fire)', () => {
@@ -175,7 +186,7 @@ describe('useAnalytics()', () => {
   })
 
   describe('trackPlatformClick()', () => {
-    it("fires platform_click with the correct params and transport_type:'beacon' for a human", () => {
+    it('fires platform_click with the correct params for a human', () => {
       getOrPersistSourcePlatform.mockReturnValue('telegram')
       const { trackPlatformClick } = useAnalytics()
 
@@ -186,13 +197,30 @@ describe('useAnalytics()', () => {
       })
 
       expect(gtag).toHaveBeenCalledTimes(1)
-      expect(gtag).toHaveBeenCalledWith('event', 'platform_click', {
-        platform_name: 'spotify',
-        release_slug: 'mania',
-        page_type: 'listen',
-        source_platform: 'telegram',
-        transport_type: 'beacon'
-      })
+      expect(gtag).toHaveBeenCalledWith(
+        'event',
+        'platform_click',
+        expect.objectContaining({
+          platform_name: 'spotify',
+          release_slug: 'mania',
+          page_type: 'listen',
+          source_platform: 'telegram'
+        })
+      )
+      // transport_type-as-param was a no-op (not real beacon) and is removed.
+      expect(gtag.mock.calls[0][2]).not.toHaveProperty('transport_type')
+    })
+
+    it('resolves the returned promise so the pre-save redirect can await delivery', async () => {
+      const { trackPlatformClick } = useAnalytics()
+      await expect(
+        trackPlatformClick({
+          platformName: 'distributor',
+          releaseSlug: 'alina',
+          pageType: 'pre-save'
+        })
+      ).resolves.toBeUndefined()
+      expect(gtag).toHaveBeenCalledTimes(1)
     })
 
     it('suppresses the conversion event for bot traffic (isLikelyBot → true)', () => {
