@@ -69,6 +69,10 @@ Custom definitions. Build the attribution Exploration (filter `^(release_view|pl
 
 ## Gotchas
 
+- **GA is OFF in dev and on GitHub Pages staging** (`gtag.enabled` in `nuxt.config.ts`) since 2026-06-12 — dev/staging
+  hosts once contributed ~86 % of the property's events ("everything looks direct" bug, root-cause #10). Don't expect
+  DebugView hits from `npm run dev`; test on production. Non-prod hosts running a prod build are tagged
+  `traffic_type:'internal'` by the plugin; `ga-report.mjs` filters to wbmband.com hosts (`GA_ALL_HOSTS=1` to override).
 - A user property and an event parameter of the **same name are different carriers**; registering one scope does not
   create the other — the mismatched one silently returns `(not set)`.
 - The auto `page_view` carries **no** custom event params ⇒ event-scoped dims are `(not set)` on standard

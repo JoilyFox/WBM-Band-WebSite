@@ -24,10 +24,20 @@ import { getOrPersistSourcePlatform } from '~/utils/sourceAttribution'
  * before app:mounted, so it alone won't carry source_platform; the release_view
  * conversion event always does.)
  */
+// Hostnames whose traffic counts as real visitors. Anything else that still
+// runs a production build (e.g. `npx serve .output/public` on localhost) gets
+// tagged traffic_type=internal so GA4's "Internal Traffic" data filter can
+// exclude it. Dev servers and GitHub Pages staging never send at all —
+// `gtag.enabled` in nuxt.config.ts disables the module for those builds.
+const PRODUCTION_HOSTS = ['wbmband.com', 'www.wbmband.com']
+
 export default defineNuxtPlugin((nuxtApp) => {
   const { gtag } = useGtag()
 
   nuxtApp.hook('app:mounted', () => {
+    if (!PRODUCTION_HOSTS.includes(window.location.hostname)) {
+      gtag('set', { traffic_type: 'internal' })
+    }
     const source = getOrPersistSourcePlatform()
     gtag('set', { source_platform: source })
     gtag('set', 'user_properties', { source_platform: source })

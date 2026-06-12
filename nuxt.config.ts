@@ -334,6 +334,11 @@ export default defineNuxtConfig({
   // before the first event fires, so users who accept immediately don't
   // pollute the modeled-data path.
   gtag: {
+    // Only collect on the real production deploy. Dev servers (localhost/0.0.0.0)
+    // and the GitHub Pages staging build were sending events to the production
+    // property and accounted for ~86% of its 30-day data, drowning real visitors.
+    // useGtag()/useAnalytics() become safe no-ops when disabled.
+    enabled: process.env.NODE_ENV !== 'development' && process.env.DEPLOY_TARGET !== 'github',
     id: 'G-Z8QRF6TWC2',
     initCommands: [
       [

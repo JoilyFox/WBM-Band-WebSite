@@ -60,7 +60,9 @@ async function resolvePropertyId() {
     }
   }
   if (!props.length) {
-    console.error('\n✗ This identity can access NO GA4 properties. Check it has access to the property.')
+    console.error(
+      '\n✗ This identity can access NO GA4 properties. Check it has access to the property.'
+    )
     return null
   }
   const wbm = props.find((p) => /wbm|wbmband/i.test(`${p.name} ${p.account}`))
@@ -72,7 +74,9 @@ async function resolvePropertyId() {
     console.log(`\n→ Only one property; using ${props[0].id}`)
     return props[0].id
   }
-  console.error('\n✗ Multiple properties and no obvious WBM match. Re-run with GA4_PROPERTY_ID=<id> from the list above.')
+  console.error(
+    '\n✗ Multiple properties and no obvious WBM match. Re-run with GA4_PROPERTY_ID=<id> from the list above.'
+  )
   return null
 }
 
@@ -85,7 +89,8 @@ async function listKeyEvents(parent) {
     const [rows] = await admin.listConversionEvents({ parent })
     return {
       rows: rows.map((r) => ({ eventName: r.eventName })),
-      create: (k) => admin.createConversionEvent({ parent, conversionEvent: { eventName: k.eventName } })
+      create: (k) =>
+        admin.createConversionEvent({ parent, conversionEvent: { eventName: k.eventName } })
     }
   }
 }
@@ -94,16 +99,20 @@ async function main() {
   const propertyId = await resolvePropertyId()
   if (!propertyId) process.exit(1)
   const parent = `properties/${propertyId}`
-  console.log(`\nGA4 property ${parent} — mode: ${APPLY ? 'APPLY (writes enabled)' : 'READ-ONLY'}\n`)
+  console.log(
+    `\nGA4 property ${parent} — mode: ${APPLY ? 'APPLY (writes enabled)' : 'READ-ONLY'}\n`
+  )
 
   // 1. Custom dimensions
   const [dims] = await admin.listCustomDimensions({ parent })
   console.log(`Custom dimensions (${dims.length}/50 event-scoped cap shared):`)
-  for (const d of dims) console.log(`  • ${d.parameterName.padEnd(18)} scope=${d.scope.padEnd(6)} "${d.displayName}"`)
+  for (const d of dims)
+    console.log(`  • ${d.parameterName.padEnd(18)} scope=${d.scope.padEnd(6)} "${d.displayName}"`)
   const missingDims = DESIRED_DIMENSIONS.filter((want) => !dims.some((have) => sameDim(have, want)))
   if (missingDims.length) {
     console.log('\n  MISSING:')
-    for (const m of missingDims) console.log(`  ✗ ${m.parameterName} (${m.scope}) — "${m.displayName}"`)
+    for (const m of missingDims)
+      console.log(`  ✗ ${m.parameterName} (${m.scope}) — "${m.displayName}"`)
     if (APPLY) {
       for (const m of missingDims) {
         await admin.createCustomDimension({ parent, customDimension: m })
@@ -118,7 +127,9 @@ async function main() {
   const ke = await listKeyEvents(parent)
   console.log(`\nKey events (${ke.rows.length}):`)
   for (const k of ke.rows) console.log(`  • ${k.eventName}`)
-  const missingKe = DESIRED_KEY_EVENTS.filter((want) => !ke.rows.some((have) => have.eventName === want.eventName))
+  const missingKe = DESIRED_KEY_EVENTS.filter(
+    (want) => !ke.rows.some((have) => have.eventName === want.eventName)
+  )
   if (missingKe.length) {
     console.log('\n  MISSING:')
     for (const m of missingKe) console.log(`  ✗ ${m.eventName}`)
@@ -141,13 +152,19 @@ async function main() {
       dimensions: [{ name: 'eventName' }, { name: 'customEvent:source_platform' }],
       metrics: [{ name: 'eventCount' }],
       dimensionFilter: {
-        filter: { fieldName: 'eventName', inListFilter: { values: ['release_view', 'platform_click'] } }
+        filter: {
+          fieldName: 'eventName',
+          inListFilter: { values: ['release_view', 'platform_click'] }
+        }
       }
     })
-    if (!report.rows?.length) console.log('  (no rows — no data in range, or events not flowing / consent-denied only)')
+    if (!report.rows?.length)
+      console.log('  (no rows — no data in range, or events not flowing / consent-denied only)')
     for (const r of report.rows || []) {
       const [ev, src] = r.dimensionValues.map((v) => v.value)
-      console.log(`  ${ev.padEnd(16)} source=${(src || '').padEnd(12)} count=${r.metricValues[0].value}`)
+      console.log(
+        `  ${ev.padEnd(16)} source=${(src || '').padEnd(12)} count=${r.metricValues[0].value}`
+      )
     }
   } catch (e) {
     console.log(`  (report failed: ${e.message})`)

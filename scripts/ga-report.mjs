@@ -26,6 +26,14 @@ const days = Number(daysArg) || 28
 const dateRanges = [{ startDate: `${days}daysAgo`, endDate: 'today' }]
 const EVENTS = ['release_view', 'platform_click']
 
+// Historical data in the property is heavily polluted by dev servers
+// (localhost / 0.0.0.0) and the GitHub Pages staging host, so every query is
+// scoped to the production hostnames. Set GA_ALL_HOSTS=1 to see everything.
+const PRODUCTION_HOSTS = ['wbmband.com', 'www.wbmband.com']
+const hostFilter = process.env.GA_ALL_HOSTS
+  ? []
+  : [{ filter: { fieldName: 'hostName', inListFilter: { values: PRODUCTION_HOSTS } } }]
+
 const data = new BetaAnalyticsDataClient()
 
 async function resolvePropertyId() {
@@ -63,7 +71,14 @@ async function listReleases(property) {
     dateRanges,
     dimensions: [{ name: 'customEvent:release_slug' }, { name: 'eventName' }],
     metrics: [{ name: 'eventCount' }],
-    dimensionFilter: { filter: { fieldName: 'eventName', inListFilter: { values: EVENTS } } }
+    dimensionFilter: {
+      andGroup: {
+        expressions: [
+          { filter: { fieldName: 'eventName', inListFilter: { values: EVENTS } } },
+          ...hostFilter
+        ]
+      }
+    }
   })
   const rows = fold(r.rows, 0)
   console.log(`\nAll releases — last ${days} days (visits vs conversions)\n`)
@@ -90,7 +105,8 @@ async function reportRelease(property, slug) {
       andGroup: {
         expressions: [
           { filter: { fieldName: 'customEvent:release_slug', stringFilter: { value: slug } } },
-          { filter: { fieldName: 'eventName', inListFilter: { values: EVENTS } } }
+          { filter: { fieldName: 'eventName', inListFilter: { values: EVENTS } } },
+          ...hostFilter
         ]
       }
     }
