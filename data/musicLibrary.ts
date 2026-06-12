@@ -147,9 +147,20 @@ export const musicLibrary: MusicRelease[] = [
     descriptionKey: 'releases.alina.description',
     genre: ['Alternative rock', 'Punk rock'],
     featured: true,
-    // Released-state streaming links are filled in closer to release; the pre-save
-    // flow uses the distributor smart-link below, not these.
-    musicPlatformLinks: {},
+    // Auto-extraction picks the green room walls as the accent (#659e39), which
+    // tints the lyrics section labels green. Override the accent with a soft
+    // pastel coral that matches the warm peach-pink rug glow on the cover — keeps
+    // the warm taupe bloom (primary/secondary) from the generated palette.
+    theme: {
+      accent: '#f4a890'
+    },
+    musicPlatformLinks: {
+      spotify: 'https://open.spotify.com/track/13UFLpXjAoVNW3IKCW6Hzf?si=0fbc733064b94732',
+      appleMusic:
+        'https://music.apple.com/ua/album/%D0%B0%D0%BB%D1%96%D0%BD%D0%B0/6774072720?i=6774072728',
+      youtubeMusic: 'https://music.youtube.com/watch?v=wxuovrzFW78&si=81JjXjcu2NJ4uNHE',
+      deezer: 'https://www.deezer.com/track/4048321671'
+    },
     useDistributorPreSave: true,
     distributorPreSaveUrl: 'https://id.ffm.to/alina',
     // feature.fm handles the actual save off-site, so skip the synthetic distributor
@@ -158,7 +169,43 @@ export const musicLibrary: MusicRelease[] = [
     // After release, the same feature.fm link flips to a streaming chooser. Used
     // as the "Listen on all platforms" CTA on /listen/alina until the individual
     // platform links are filled in (then the grid replaces the CTA).
-    releaseSmartLink: 'https://id.ffm.to/alina'
+    releaseSmartLink: 'https://id.ffm.to/alina',
+    lyrics: [
+      {
+        part: 'verse',
+        num: 1,
+        lines: [
+          'Забув своє імʼя, а може й загубив',
+          'Напередодні дня ще одне собі створив',
+          'Розбещений Іван та цнотлива Марія',
+          'Та улюбленим імʼям назавжди було Поліна',
+          'Цей світ на тебе тисне, тебе не розуміють',
+          'Та лише та сама тебе до серця пригріє',
+          'Друкуєш старими пальцями на телефоні',
+          'Своїй найкращі подружці «ну як там в тебе в школі?»'
+        ]
+      },
+      {
+        part: 'chorus',
+        lines: [
+          'Що скаже твоя мама дізнавшись всі секрети',
+          'сорокорічний син в Інтернеті прикидається юною леді'
+        ]
+      },
+      {
+        part: 'verse',
+        num: 2,
+        lines: [
+          'Надягнув свій улюблений образ',
+          'Він так довго чекав на цю ніч',
+          'Темно синій кашкет та невкладені вуса',
+          'Аліна чекай. Твоя подруга клас',
+          'В парку темно, нікого немає.',
+          'Лише зморщені два мужика',
+          'Ти підійдеш до нього й спитаєш: Аліна?'
+        ]
+      }
+    ]
   },
   {
     id: '2',
