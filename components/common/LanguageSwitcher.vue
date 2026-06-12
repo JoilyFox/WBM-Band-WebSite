@@ -3,7 +3,13 @@
     <label v-if="showLabel" class="sr-only">{{ t('lang.switch_label') }}</label>
     <button
       type="button"
-      :class="['lang-switch', { 'lang-switch--big': size === 'big' }]"
+      :class="[
+        'lang-switch',
+        'liquid-glass',
+        'liquid-glass--pill',
+        'liquid-glass-interactive',
+        { 'lang-switch--big': size === 'big' }
+      ]"
       :aria-label="t('lang.switch_label')"
       :aria-pressed="true"
       @click="toggleLocale"
@@ -51,12 +57,11 @@
   .lang-switch {
     display: inline-flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 9999px;
     padding: 2px;
     gap: 2px;
-    backdrop-filter: blur(6px);
+    /* Lightish control: keep the frost subtle so the header chrome stays light */
+    --lg-tint: rgb(255 255 255 / 0.06);
+    --lg-rim: rgb(255 255 255 / 0.4);
   }
   .lang-switch--big {
     padding: 2px; /* keep container compact */

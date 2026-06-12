@@ -6,7 +6,7 @@
           <div
             v-for="snackbar in visibleSnackbars"
             :key="snackbar.id"
-            class="snackbar-item"
+            class="snackbar-item liquid-glass liquid-glass--panel"
             :class="getSnackbarClasses(snackbar.type)"
             @mouseenter="pauseTimer(snackbar.id)"
             @mouseleave="resumeTimer(snackbar.id)"
@@ -150,18 +150,11 @@
   }
 
   .snackbar-item {
-    position: relative;
+    --lg-radius: 0.75rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
     padding: 1rem;
-    border-radius: 0.75rem;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow:
-      0 20px 25px -5px rgba(0, 0, 0, 0.1),
-      0 10px 10px -5px rgba(0, 0, 0, 0.04),
-      0 0 0 1px rgba(255, 255, 255, 0.05);
     pointer-events: auto;
     min-width: 280px;
     max-width: 100%;
@@ -180,21 +173,23 @@
 
   @media (hover: hover) and (pointer: fine) {
     .snackbar-item:hover {
-      transform: translateY(-2px);
       box-shadow:
-        0 25px 50px -12px rgba(0, 0, 0, 0.25),
-        0 0 0 1px rgba(255, 255, 255, 0.1);
+        0 25px 50px -12px rgba(0, 0, 0, 0.4),
+        0 8px 24px rgba(0, 0, 0, 0.3);
     }
   }
 
+  // Type tints feed the liquid-glass material (--lg-tint) so the frosted
+  // backdrop keeps the colored wash; the colored hairline + left accent
+  // stay on the host. Don't set `background` here — the material owns it.
   .snackbar-base {
-    background: rgba(15, 23, 42, 0.85);
+    --lg-tint: rgb(15 23 42 / 0.85);
     border: 1px solid rgba(148, 163, 184, 0.2);
     color: rgb(248, 250, 252);
   }
 
   .snackbar-success {
-    background: rgba(5, 46, 22, 0.85);
+    --lg-tint: rgba(5, 46, 22, 0.85);
     border: 1px solid rgba(34, 197, 94, 0.3);
     border-left: 4px solid rgb(34, 197, 94);
 
@@ -204,7 +199,7 @@
   }
 
   .snackbar-error {
-    background: rgba(69, 10, 10, 0.85);
+    --lg-tint: rgba(69, 10, 10, 0.85);
     border: 1px solid rgba(239, 68, 68, 0.3);
     border-left: 4px solid rgb(239, 68, 68);
 
@@ -214,7 +209,7 @@
   }
 
   .snackbar-warning {
-    background: rgba(69, 26, 3, 0.85);
+    --lg-tint: rgba(69, 26, 3, 0.85);
     border: 1px solid rgba(245, 158, 11, 0.3);
     border-left: 4px solid rgb(245, 158, 11);
 
@@ -224,7 +219,7 @@
   }
 
   .snackbar-info {
-    background: rgba(23, 37, 84, 0.85);
+    --lg-tint: rgba(23, 37, 84, 0.85);
     border: 1px solid rgba(59, 130, 246, 0.3);
     border-left: 4px solid rgb(59, 130, 246);
 

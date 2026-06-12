@@ -2,8 +2,8 @@
   <div class="min-h-screen bg-surface-950">
     <NuxtRouteAnnouncer />
 
-    <!-- Header with glassy background -->
-    <header class="fixed top-0 left-0 right-0 z-40 bg-black/5 backdrop-blur-performance">
+    <!-- Header: Liquid Glass bar (docs/liquid-glass.md) -->
+    <header class="liquid-glass liquid-glass--bar fixed top-0 left-0 right-0 z-40">
       <CommonContainer size="xl" padding="md" :overflow-visible="true">
         <div class="flex items-start justify-between h-16 relative pt-1">
           <!-- Mobile Logo Fade System (dual logos for smooth transition) -->
@@ -98,7 +98,7 @@
     <Transition name="mobile-menu">
       <div v-if="isMobileMenuOpen" class="fixed inset-0 z-50 md2:hidden" @click="closeMobileMenu">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-md"></div>
+        <div class="liquid-glass-veil absolute inset-0"></div>
 
         <!-- Menu Content -->
         <div class="relative flex flex-col items-center justify-center h-full" @click.stop>
@@ -551,20 +551,6 @@
       opacity: 0;
       transform: translateY(15px) scale(0.98);
     }
-  }
-
-  /* Smooth backdrop blur effect for better glass morphism */
-  header {
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-  }
-
-  /* Mobile menu backdrop blur */
-  .mobile-menu-enter-active .absolute,
-  .mobile-menu-leave-active .absolute {
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    transition: backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Ensure navigation links don't get too close to logo area on desktop */

@@ -86,13 +86,50 @@
 
   // `appearance-none` keeps the native <button> from picking up platform control
   // sizing; `self-center` pins align-self so a flex parent can't stretch the pill.
+  // `relative` anchors the scoped ::after specular rim/sheen (added in <style>).
   const pillClass = computed(() => [
-    'music-hero-pill inline-flex appearance-none items-center justify-center self-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-1 text-sm font-medium leading-5 text-primary-200/70 bg-white/5 border border-white/15 backdrop-blur-md transition-[transform,background-color,border-color] duration-100 ease-in-out hover:bg-white/10 hover:border-white/20 active:scale-[0.98] active:bg-white/15 active:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25',
+    'music-hero-pill relative inline-flex appearance-none items-center justify-center self-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-1 text-sm font-medium leading-5 text-primary-200/70 bg-white/5 border border-white/15 backdrop-blur-md transition-[transform,background-color,border-color] duration-100 ease-in-out hover:bg-white/10 hover:border-white/20 active:scale-[0.98] active:bg-white/15 active:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25',
     { 'music-hero-pill--video': props.accent === 'video' }
   ])
 </script>
 
 <style scoped>
+  /*
+   * Specular rim + faint top sheen so the pill reads as part of the liquid-glass
+   * family WITHOUT a full .liquid-glass conversion — these pills live under the
+   * MusicDetailContent perf root (perf-tier / mobile-tier ancestors) whose cascade
+   * fights backdrop-filter, so we keep the existing Tailwind backdrop-blur-md
+   * (already perf-tiered upstream) and only paint a lightweight inner highlight.
+   * The ::after is purely decorative: it sits above the pill background but
+   * BELOW the content (which is lifted to z-index:1), and never intercepts
+   * pointer events.
+   */
+  .music-hero-pill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    /* top-left bright rim, soft bottom-right rim, hairline inner edge */
+    box-shadow:
+      inset 1.5px 1.5px 1px -1px rgb(255 255 255 / 0.45),
+      inset -1px -1px 1px -1px rgb(255 255 255 / 0.12),
+      inset 0 0 0 1px rgb(255 255 255 / 0.04);
+    /* faint sheen falling off from the top edge */
+    background-image: linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0.1) 0%,
+      rgb(255 255 255 / 0) 45%
+    );
+  }
+
+  /* Keep icon + label above the decorative ::after rim/sheen. */
+  .music-hero-pill > * {
+    position: relative;
+    z-index: 1;
+  }
+
   .music-hero-pill--video {
     background-image: radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.2) 0%, transparent 100%);
     background-repeat: no-repeat;

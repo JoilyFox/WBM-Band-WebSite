@@ -10,6 +10,9 @@
 /* Scroll animation components */
 @import './components/scroll-animations.scss';
 
+/* Liquid Glass material system */
+@import './components/liquid-glass.scss';
+
 /* PrimeVue component customizations */
 @import './primevue/buttons.scss';
 @import './primevue/dialog.scss';

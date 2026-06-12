@@ -245,14 +245,21 @@
     pointer-events: none;
   }
 
-  /* Performance-aware soft inner glow */
+  /* Performance-aware soft inner glow + liquid-lite specular rim & top sheen */
   .platform-button::after {
     content: '';
     position: absolute;
     inset: 0;
+    z-index: 1;
+    border-radius: inherit;
     background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, transparent 38%),
       radial-gradient(120% 150% at -10% -20%, rgba(255, 255, 255, 0.06), transparent 60%),
       radial-gradient(120% 150% at 110% 120%, rgba(255, 255, 255, 0.04), transparent 60%);
+    box-shadow:
+      inset 1.5px 1.5px 1px -1px rgba(255, 255, 255, 0.35),
+      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.1),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
     opacity: 0.6;
     pointer-events: none;
     transition: opacity $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
@@ -301,6 +308,7 @@
 
   .platform-icon {
     position: relative;
+    z-index: 2;
     width: 2.6rem;
     height: 2.6rem;
     border-radius: $icon-border-radius;
@@ -334,6 +342,8 @@
   }
 
   .platform-content {
+    position: relative;
+    z-index: 2;
     flex: 1;
     min-width: 0;
     transition: transform $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
@@ -360,6 +370,8 @@
   }
 
   .platform-arrow {
+    position: relative;
+    z-index: 2;
     opacity: 0.8;
     transition:
       transform $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1),

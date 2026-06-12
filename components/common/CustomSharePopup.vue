@@ -8,8 +8,7 @@
     >
       <div
         ref="popup"
-        class="custom-share-popup"
-        :class="{ 'custom-share-popup--optimized': isLowPerformanceDevice }"
+        class="custom-share-popup liquid-glass liquid-glass--panel liquid-glass--lens"
         :style="popupStyle"
         @click.stop
       >
@@ -203,30 +202,17 @@
     z-index: 10001;
   }
 
-  /* Popup */
+  /* Popup — liquid-glass panel (frost/rim/lens handled by the global system).
+     Keep the light translucent wash as the tint so legibility matches the
+     original look; --lg-radius preserves the original 1rem corners (the lens
+     layer clips to it, so it must be set via this var, not border-radius). */
   .custom-share-popup {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.05) 100%
-    );
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
-    box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.05);
+    --lg-radius: 1rem;
+    --lg-tint: linear-gradient(135deg, rgb(255 255 255 / 0.1) 0%, rgb(255 255 255 / 0.05) 100%);
     width: 400px;
     max-width: 90vw;
     color: white;
     animation: popupFadeIn 0.2s ease-out;
-  }
-
-  .custom-share-popup--optimized {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
   }
 
   /* Header */
@@ -379,44 +365,22 @@
     }
   }
 
-  /* Animations */
+  /* Animations — opacity-only entry. A transform on the host would turn it
+     into a backdrop root and suppress the liquid-glass frost while the
+     animation runs, so the original scale/translate was dropped. */
   @keyframes popupFadeIn {
     from {
       opacity: 0;
-      transform: scale(0.95) translateY(-10px);
     }
     to {
       opacity: 1;
-      transform: scale(1) translateY(0);
     }
   }
 
-  /* Arrow pointing to target */
-  .custom-share-popup::before {
-    content: '';
-    position: absolute;
-    top: -9px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .custom-share-popup::after {
-    content: '';
-    position: absolute;
-    top: -9px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-bottom: 7px solid rgba(255, 255, 255, 0.05);
-  }
+  /* Note: the previous CSS-triangle arrow used .custom-share-popup::before /
+     ::after. Those pseudos are now owned by the liquid-glass material (frost +
+     specular rim), so the arrow is intentionally dropped — re-adding it here
+     would override the material's pseudos and kill the frosted backdrop. */
 
   /* Responsive */
   @media (max-width: 640px) {

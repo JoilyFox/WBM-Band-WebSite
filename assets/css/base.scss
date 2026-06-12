@@ -211,7 +211,10 @@
     .glassmorphic,
     .glass-effect,
     .btn-glassmorphic {
-      backdrop-filter: var(--perf-blur-strength, blur(12px)) !important;
+      /* --perf-blur-strength holds a bare length (e.g. '12px'), so it must be
+         wrapped in blur() — `backdrop-filter: 12px` is invalid and was being
+         dropped whenever the var was set. */
+      backdrop-filter: blur(var(--perf-blur-strength, 12px)) !important;
     }
 
     .complex-animation {

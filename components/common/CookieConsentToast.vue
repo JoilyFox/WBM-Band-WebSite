@@ -2,7 +2,7 @@
   <Transition name="cookie-toast">
     <div
       v-if="visible"
-      class="cookie-toast"
+      class="cookie-toast liquid-glass liquid-glass--panel"
       :style="dragStyle"
       role="dialog"
       :aria-label="t('cookies.banner.aria')"
@@ -172,11 +172,10 @@
     z-index: 40;
     width: min(20rem, calc(100vw - 2rem));
     padding: 1rem 1.1rem;
-    border-radius: 0.9rem;
-    background: rgba(15, 15, 18, 0.78);
-    backdrop-filter: blur(var(--perf-blur-strength, 14px)) saturate(120%);
-    -webkit-backdrop-filter: blur(var(--perf-blur-strength, 14px)) saturate(120%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Liquid-glass material: radius drives the lens clip, tint replaces the
+       bespoke dark wash. Saturate uses the panel/base default. */
+    --lg-radius: 0.9rem;
+    --lg-tint: rgb(15 15 18 / 0.78);
     box-shadow:
       0 12px 40px rgba(0, 0, 0, 0.45),
       inset 0 1px 0 rgba(255, 255, 255, 0.06);

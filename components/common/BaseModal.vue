@@ -10,7 +10,7 @@
     >
       <div
         v-show="isVisible"
-        class="modal-backdrop"
+        class="modal-backdrop liquid-glass-veil"
         :class="{ 'is-animating': isAnimating }"
         @click="handleBackdropClick"
       >
@@ -24,10 +24,14 @@
           @click.stop
         >
           <div
-            class="modal-content"
+            class="modal-content liquid-glass liquid-glass--panel"
             :class="{ 'is-animating': isAnimating, 'content-ready': contentReady }"
           >
-            <button class="modal-close-btn" aria-label="Close modal" @click="$emit('close')">
+            <button
+              class="modal-close-btn liquid-glass liquid-glass--pill liquid-glass-interactive"
+              aria-label="Close modal"
+              @click="$emit('close')"
+            >
               <i class="pi pi-times"></i>
             </button>
 
@@ -275,16 +279,16 @@
     justify-content: center;
     padding: 1rem;
 
+    /* Dark dim kept on the veil tint so legibility matches the old look.
+       The frost (blur) comes from .liquid-glass-veil and is tier-gated. */
     background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
 
-    transform: translateZ(0);
-    will-change: opacity, backdrop-filter;
-    transition:
-      opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      backdrop-filter 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-      -webkit-backdrop-filter 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    /* No transform here: this element carries the veil's own backdrop-filter,
+       and a transform/filter on it would suppress that frost. */
+    will-change: opacity;
+    /* Open/close cross-fades OPACITY only — the veil's blur is fixed, so we
+       drop the old backdrop-filter interpolation (cheaper, still smooth). */
+    transition: opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .modal-container {
@@ -298,24 +302,22 @@
 
   .modal-content {
     position: relative;
-    background: rgba(0, 0, 0, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow:
-      0 25px 50px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    /* Glass material (tint, frost, rim, elevation) comes from
+       .liquid-glass .liquid-glass--panel. Override only the radius + a darker,
+       high-legibility tint; modal content needs to stay readable. */
+    --lg-radius: 24px;
+    --lg-tint: rgb(10 12 18 / 0.92);
+    --lg-tint-flat: rgb(10 12 18 / 0.97);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     max-height: 90vh;
 
-    transform: translateZ(0);
+    /* Entrance animates opacity/transform only (driven by .content-ready and
+       the modal-enter/leave transition classes below). NOTE: no persistent
+       transform/filter/contain:paint on this host — those would turn it into a
+       backdrop root and silently disable the glass frost. */
     will-change: transform, opacity;
-    contain: layout style paint;
-    backface-visibility: hidden;
   }
 
   .modal-content:not(.content-ready) {
@@ -326,19 +328,10 @@
   .modal-content.content-ready {
     transition:
       transform 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      /* Ease the shadow + blur back in when the lightweight animating state is
-         dropped (onAfterEnter), instead of snapping the big bottom shadow on. */
-        box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-      backdrop-filter 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-      -webkit-backdrop-filter 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .modal-content.is-animating {
-    /* blur(0) (not `none`) so backdrop-filter can interpolate smoothly on revert */
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
     pointer-events: none;
   }
 
@@ -376,11 +369,14 @@
     width: 2.5rem;
     height: 2.5rem;
 
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Round glass pill: tint/frost/rim + hover border + press glow & active
+       scale all come from .liquid-glass .liquid-glass--pill
+       .liquid-glass-interactive. Only force the circular radius here. */
+    --lg-radius: 50%;
+    /* Slightly darker tint than a default pill so the icon stays legible on
+       bright cover art behind the modal. */
+    --lg-tint: rgb(8 10 16 / 0.55);
+    --lg-tint-flat: rgb(8 10 16 / 0.92);
 
     color: white;
     font-size: 1.125rem;
@@ -388,54 +384,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    box-shadow:
-      0 4px 12px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-
-  .modal-close-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: scale(1.05);
-    box-shadow:
-      0 6px 20px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  }
-
-  @media (hover: none) and (pointer: coarse) {
-    .modal-close-btn:hover {
-      background: rgba(0, 0, 0, 0.7);
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: none;
-      box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    }
-  }
-
-  .modal-close-btn:active {
-    transform: scale(0.95);
   }
 
   :global(.modal-enter-active),
   :global(.modal-leave-active) {
-    transition:
-      opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      backdrop-filter 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-      -webkit-backdrop-filter 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Cross-fade the veil on OPACITY only — its blur is a fixed value from
+       .liquid-glass-veil, so there is nothing to interpolate. */
+    transition: opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   :global(.modal-enter-from),
   :global(.modal-leave-to) {
     opacity: 0;
-    /* !important needed because the scoped .modal-backdrop selector picks up
-       a [data-v-hash] attribute, raising its specificity above :global() */
-    backdrop-filter: blur(0px) !important;
-    -webkit-backdrop-filter: blur(0px) !important;
   }
 
   :global(.modal-enter-active) .modal-content,
@@ -460,14 +420,12 @@
   @media (max-width: 768px) {
     .modal-backdrop {
       padding: 0.5rem;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
     }
 
     .modal-content {
-      border-radius: 20px;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      /* Radius must go through --lg-radius so the lens clip-path tracks it
+         (the global tier system handles blur strength — no override here). */
+      --lg-radius: 20px;
     }
 
     .modal-close-btn {

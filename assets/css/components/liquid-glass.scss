@@ -1,0 +1,264 @@
+/* ============================================================
+   Liquid Glass material system (macOS Tahoe-style)
+   See docs/liquid-glass.md for the full API and gotchas.
+
+   Layer model — zero extra markup, both pseudos sit BELOW content:
+     host      tint wash, radius, border, elevation shadow
+     ::before  frost (backdrop-filter blur+saturate+brightness) and, on
+               Chromium high tier, the lens (filter: url(#lg-lens*) —
+               SVG displacement of the filtered backdrop). Safari/Firefox
+               never receive filter:url() (gated by body.lg-can-lens,
+               set only when navigator.userAgentData exists), so they
+               keep a clean frosted look with zero risk.
+     ::after   specular rim (inset hairlines) + pointer-reactive sheen
+               + press glow — rasterized gradients/shadows, no per-frame
+               backdrop sampling.
+
+   Tier gating via body classes set in app.vue (after client detection):
+     (no class)        safe default = liquid-lite (small blur, rim, tint)
+     body.lg-tier-high full material; + lensing when body.lg-can-lens
+     body.lg-tier-medium  liquid-lite (same as default)
+     body.lg-tier-low  flat fallback: no backdrop-filter, near-opaque tint
+   Media fallbacks mirror Apple's accessibility behavior:
+     prefers-reduced-transparency → flat; prefers-reduced-motion → static.
+
+   Radius MUST be set via --lg-radius (not Tailwind rounded-*): the lens
+   layer clips with clip-path inset(0 round var(--lg-radius)) and cannot
+   read border-radius.
+   ============================================================ */
+
+/* Animatable press-glow intensity (graceful: snaps where unsupported) */
+@property --lg-glow {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.liquid-glass {
+  /* --- tunables (override per variant / per use) --- */
+  --lg-radius: 1rem;
+  --lg-blur: 5px; /* liquid-lite default */
+  --lg-blur-full: 8px; /* high tier */
+  --lg-saturate: 150%;
+  --lg-saturate-full: 180%;
+  --lg-brightness: 1.05;
+  --lg-tint: rgb(16 19 28 / 0.34);
+  --lg-tint-flat: rgb(13 15 22 / 0.92); /* low tier / reduced transparency */
+  --lg-rim: rgb(255 255 255 / 0.5);
+  --lg-rim-soft: rgb(255 255 255 / 0.16);
+  --lg-sheen: rgb(255 255 255 / 0.09);
+  --lg-lens-filter: none; /* variants point this at an SVG filter */
+  --lg-lens: none; /* activated only on lg-tier-high + lg-can-lens */
+  --lg-px: 50%; /* pointer-specular position (v-lg-pointer) */
+  --lg-py: -20%;
+
+  position: relative;
+  /* Contain the z-index:-1 pseudos. MUST stay a plain z-index stacking
+     context — `isolation: isolate` (or opacity/filter/mask on the host)
+     turns the host into a backdrop root and the ::before's backdrop-filter
+     can no longer see the page behind it (frost silently becomes a no-op). */
+  z-index: 0;
+  border-radius: var(--lg-radius);
+  background: var(--lg-tint);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 0.25),
+    0 2px 6px rgb(0 0 0 / 0.16);
+}
+
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate))
+    brightness(var(--lg-brightness));
+  backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate))
+    brightness(var(--lg-brightness));
+  /* Chromium-only lens; clip displaced pixels to the glass shape */
+  filter: var(--lg-lens);
+  clip-path: inset(0 round var(--lg-radius));
+}
+
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  /* Specular rim: bright top-left arc, faint counter-glint, hairline shell */
+  box-shadow:
+    inset 2px 2px 1px -1.5px var(--lg-rim),
+    inset -2px -2px 1px -1.5px var(--lg-rim-soft),
+    inset 0 0 0 1px rgb(255 255 255 / 0.05);
+  /* Press glow (alpha driven by --lg-glow) over pointer-reactive sheen */
+  background:
+    radial-gradient(
+      10rem circle at var(--lg-press-x, 50%) var(--lg-press-y, 50%),
+      rgb(255 255 255 / calc(0.26 * var(--lg-glow, 0))),
+      transparent 70%
+    ),
+    radial-gradient(
+      130% 100% at var(--lg-px) var(--lg-py),
+      var(--lg-sheen),
+      transparent 58%
+    );
+}
+
+/* ---------- interaction (pills, buttons) ---------- */
+.liquid-glass-interactive {
+  cursor: pointer;
+  transition:
+    --lg-glow 0.5s ease-out,
+    transform 0.16s ease-out,
+    border-color 0.2s ease;
+}
+
+.liquid-glass-interactive:active {
+  --lg-glow: 1;
+  transform: scale(0.97);
+  transition:
+    --lg-glow 0.08s ease-in,
+    transform 0.08s ease-in;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .liquid-glass-interactive:hover {
+    border-color: rgb(255 255 255 / 0.22);
+  }
+}
+
+/* ---------- variants ---------- */
+
+/* Top bar: full-width, square. Low blur so the lens bend stays visible
+   ("clear glass" — Apple uses small blur + high saturation, not heavy frost). */
+.liquid-glass--bar {
+  --lg-radius: 0px;
+  --lg-blur: 7px; /* medium tier: frosted, no lens */
+  --lg-blur-full: 3px; /* high tier: clear, so the refraction shows through */
+  --lg-saturate: 160%;
+  --lg-saturate-full: 190%;
+  --lg-brightness: 1.06;
+  --lg-lens-filter: url('#lg-lens-bar');
+  --lg-tint: linear-gradient(to bottom, rgb(9 11 17 / 0.32), rgb(9 11 17 / 0.16));
+  --lg-tint-flat: rgb(8 10 16 / 0.9);
+  /* Strength of the cross-browser faux-refraction band (see ::after). */
+  --lg-edge-blur: 10px;
+  border: none;
+  /* Specular shell lives on the host box-shadow so ::after is free for the
+     refraction band: top sheen rim + a bright glint at the bottom lip. */
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 0.22),
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    inset 0 -2px 1px -1px rgb(255 255 255 / 0.14);
+}
+
+.liquid-glass--bar::before {
+  /* Frost (+ Chromium displacement lens) across the whole bar. */
+  inset: 0;
+  clip-path: none;
+}
+
+.liquid-glass--bar::after {
+  /* CROSS-BROWSER FAUX-BEND. A band hugging the lower lip re-blurs and
+     brightens the backdrop much harder than the bar's clear frost. The abrupt
+     blur/brightness step at the edge reads as light bending through a thick,
+     curved glass lip — the only "refraction" Safari/Firefox can show (plain
+     backdrop-filter, no SVG). In Chromium this layers under the real
+     displacement lens on ::before for extra depth. Masked to the lower band so
+     the rest of the bar stays clear. */
+  inset: 0;
+  -webkit-backdrop-filter: blur(var(--lg-edge-blur)) brightness(1.15) saturate(1.4);
+  backdrop-filter: blur(var(--lg-edge-blur)) brightness(1.15) saturate(1.4);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 50%, #000 74%, #000 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 50%, #000 74%, #000 90%, transparent 100%);
+}
+
+/* Capsule controls: pills, round buttons, switchers */
+.liquid-glass--pill {
+  --lg-radius: 9999px;
+  --lg-blur: 4px;
+  --lg-blur-full: 6px;
+}
+
+/* Thick glass: modals, popups, toasts — deeper shadow, stronger frost */
+.liquid-glass--panel {
+  --lg-radius: 1.25rem;
+  --lg-blur: 10px;
+  --lg-blur-full: 16px;
+  --lg-tint: rgb(14 16 24 / 0.55);
+  --lg-tint-flat: rgb(12 14 20 / 0.96);
+  box-shadow:
+    0 25px 50px -12px rgb(0 0 0 / 0.5),
+    0 8px 24px rgb(0 0 0 / 0.3);
+}
+
+/* Lens opt-in. Edge refraction (the SVG displacement) is the most expensive
+   layer, so it is NOT on by default — only the bar and elements that add this
+   modifier get it, keeping at most a few lensed surfaces on screen at once
+   (the research GPU budget). Everything else stays frost + rim + tint, which
+   is still the full premium look minus the backdrop warp. */
+.liquid-glass--lens {
+  --lg-lens-filter: url('#lg-lens');
+}
+
+/* Full-screen veil (mobile menu / modal backdrops): frost + tint only,
+   single layer, no rim/lens — keep it as one cheap element. */
+.liquid-glass-veil {
+  background: rgb(5 6 10 / 0.72);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+/* ---------- tier gating (body classes from app.vue) ---------- */
+
+body.lg-tier-high .liquid-glass {
+  --lg-blur: var(--lg-blur-full);
+  --lg-saturate: var(--lg-saturate-full);
+}
+
+/* Lens only where SVG-in-backdrop filters actually render (Chromium).
+   Firefox/Safari must never receive filter:url() here — an unresolved
+   reference can suppress painting of the whole pseudo-element. */
+body.lg-tier-high.lg-can-lens .liquid-glass {
+  --lg-lens: var(--lg-lens-filter);
+}
+
+@mixin lg-flat {
+  .liquid-glass {
+    background: var(--lg-tint-flat);
+
+    &::before,
+    &::after {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      filter: none;
+    }
+  }
+
+  .liquid-glass-veil {
+    background: rgb(3 4 8 / 0.96);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+body.lg-tier-low {
+  @include lg-flat;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  body {
+    @include lg-flat;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-glass-interactive,
+  .liquid-glass-interactive:active {
+    transition: none;
+    transform: none;
+  }
+}
