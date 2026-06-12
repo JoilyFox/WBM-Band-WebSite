@@ -136,8 +136,8 @@
    ("clear glass" — Apple uses small blur + high saturation, not heavy frost). */
 .liquid-glass--bar {
   --lg-radius: 0px;
-  --lg-blur: 7px; /* medium tier: frosted, no lens */
-  --lg-blur-full: 3px; /* high tier: clear, so the refraction shows through */
+  --lg-blur: 4px; /* default/medium + non-Chromium: clear-ish glass */
+  --lg-blur-full: 3px; /* Chromium: clear, so the refraction shows through */
   --lg-saturate: 160%;
   --lg-saturate-full: 190%;
   --lg-brightness: 1.06;
@@ -223,6 +223,17 @@ body.lg-tier-high .liquid-glass {
    Firefox/Safari must never receive filter:url() here — an unresolved
    reference can suppress painting of the whole pseudo-element. */
 body.lg-tier-high.lg-can-lens .liquid-glass {
+  --lg-lens: var(--lg-lens-filter);
+}
+
+/* The top bar is a single bounded element, so it can afford the clear-glass
+   blur + displacement lens on EVERY Chromium tier (not just high) — this keeps
+   the header looking the same crisp/bendy way on mobile Chrome as on desktop,
+   instead of falling back to the frostier medium-tier blur. (lg-tier-low still
+   wins via the flat mixin's higher-specificity backdrop-filter:none.) */
+body.lg-can-lens .liquid-glass--bar {
+  --lg-blur: var(--lg-blur-full);
+  --lg-saturate: var(--lg-saturate-full);
   --lg-lens: var(--lg-lens-filter);
 }
 

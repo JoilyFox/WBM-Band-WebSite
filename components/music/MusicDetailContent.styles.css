@@ -119,32 +119,36 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    background: rgba(30, 30, 40, 0.32);
-    box-shadow:
-      0 4px 24px 0 rgba(0, 0, 0, 0.18),
-      0 1.5px 6px 0 rgba(0, 0, 0, 0.1);
-    border: 1.5px solid rgba(255, 255, 255, 0.13);
-    backdrop-filter: blur(var(--perf-blur-strength, 12px));
-    -webkit-backdrop-filter: blur(var(--perf-blur-strength, 12px));
     color: #fff;
-    transition:
-      background 0.25s,
-      box-shadow 0.25s,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 1;
     cursor: pointer;
-    /* Ensure it creates its own stacking context */
-    isolation: isolate;
+    border-radius: 50%;
+    /* Direct Liquid-Glass look (frost + specular rim painted on the element
+       itself — NOT the .liquid-glass ::before system, which can't resolve its
+       containing block on these Teleported buttons and blows up to full width).
+       Soft dark tint, low blur clear glass, bright top-left rim + faint counter
+       rim via inset shadows, plus elevation. */
+    background: rgb(22 24 32 / 0.42);
+    -webkit-backdrop-filter: blur(8px) saturate(1.5);
+    backdrop-filter: blur(8px) saturate(1.5);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    box-shadow:
+      inset 1.2px 1.2px 0.5px -0.8px rgb(255 255 255 / 0.5),
+      inset -1px -1px 1px -1px rgb(255 255 255 / 0.12),
+      0 4px 16px rgb(0 0 0 / 0.3);
+    /* Keep the opacity scroll-fade that coordinates with the floating logo. */
+    transition:
+      background 0.25s ease,
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.16s ease-out;
   }
 
-  /* Optimized version for low-performance devices */
-  .back-glass-btn--optimized,
-  .share-glass-btn--optimized {
-    background: rgba(30, 30, 40, 0.85);
-    backdrop-filter: none;
+  /* Low/reduced tiers: flatten to a solid translucent circle (cheap). */
+  body.lg-tier-low .back-glass-btn,
+  body.lg-tier-low .share-glass-btn {
+    background: rgb(18 20 28 / 0.9);
     -webkit-backdrop-filter: none;
-    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: none;
   }
 
   /* When not in container, keep back on left and share on right */
@@ -160,31 +164,12 @@
     }
   }
 
-  .back-glass-btn:hover,
-  .share-glass-btn:hover {
-    background: rgba(60, 60, 80, 0.44);
-    box-shadow:
-      0 8px 32px 0 rgba(0, 0, 0, 0.22),
-      0 2px 8px 0 rgba(0, 0, 0, 0.13);
-  }
-
-  /* Optimized hover for low-performance devices */
-  .back-glass-btn--optimized:hover,
-  .share-glass-btn--optimized:hover {
-    background: rgba(60, 60, 80, 0.9);
-    transform: none;
-  }
-
-  /* Disable hover effects on mobile/touch devices */
-  @media (hover: none) and (pointer: coarse) {
-
+  /* Hover lifts the tint slightly; the material owns frost/rim/shadow.
+     .liquid-glass-interactive already gates its own hover to fine pointers. */
+  @media (hover: hover) and (pointer: fine) {
     .back-glass-btn:hover,
     .share-glass-btn:hover {
-      background: rgba(30, 30, 40, 0.32);
-      box-shadow:
-        0 4px 24px 0 rgba(0, 0, 0, 0.18),
-        0 1.5px 6px 0 rgba(0, 0, 0, 0.1);
-      transform: none;
+      --lg-tint: rgb(40 42 54 / 0.5);
     }
   }
 

@@ -245,21 +245,18 @@
 
   /* Battery optimization for mobile */
   @media screen and (max-width: 768px) {
-    /* Force conservative mode for all mobile by default */
-    .share-glass-btn,
+    /* Force conservative mode for all mobile by default.
+       (.share-glass-btn / .back-glass-btn are Liquid Glass now — tiered globally
+       via body.lg-tier-*; only .btn-glassmorphic is battery-throttled here.) */
     .btn-glassmorphic {
       backdrop-filter: none !important;
       background: rgba(255, 255, 255, 0.05) !important;
-      /* Keep the cheap background-color transition for battery, but preserve the
-         opacity fade so the share button matches the scroll-fade timing of the
-         floating logo and back button (see .floating-logo / .back-glass-btn). */
       transition:
         background-color 0.2s ease,
         opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
     /* Override only for flagship devices */
-    .mobile-flagship .share-glass-btn,
     .mobile-flagship .btn-glassmorphic {
       backdrop-filter: blur(6px) !important;
     }

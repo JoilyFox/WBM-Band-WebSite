@@ -382,26 +382,10 @@
     }
   }
 
-  .share-glass-btn,
-  .back-glass-btn {
-    background: rgba(255, 255, 255, 0.08) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    /* Keep the cheap background-color transition, but preserve the opacity fade so
-       BOTH floating buttons match the scroll-fade timing of the centre logo
-       (matches the base.scss rule; without the opacity here this !important would
-       strip the back button's fade in every URL-param state). */
-    transition:
-      background-color 0.2s ease,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
-
-    &:hover,
-    &:focus,
-    &:active {
-      background: rgba(255, 255, 255, 0.12) !important;
-      transform: none !important;
-    }
-  }
+  /* NOTE: .share-glass-btn / .back-glass-btn are now Liquid Glass (see
+     MusicDetailContent.styles.css); their mobile/tier/reduced-motion fallback
+     is handled globally by body.lg-tier-* — do not re-add backdrop overrides
+     for them here. */
 
   /* Override for flagship mobile devices */
   .mobile-flagship {
@@ -415,17 +399,6 @@
       -webkit-backdrop-filter: blur(6px) !important;
       transition: all 0.3s ease !important;
     }
-
-    .share-glass-btn,
-    .back-glass-btn {
-      backdrop-filter: blur(6px) !important;
-      -webkit-backdrop-filter: blur(6px) !important;
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.05) 100%
-      ) !important;
-    }
   }
 
   /* Standard mobile devices - limited effects */
@@ -436,20 +409,11 @@
       background: rgba(255, 255, 255, 0.1) !important;
       transition: all 0.2s ease !important;
     }
-
-    .share-glass-btn,
-    .back-glass-btn {
-      backdrop-filter: blur(4px) !important;
-      -webkit-backdrop-filter: blur(4px) !important;
-      background: rgba(255, 255, 255, 0.1) !important;
-    }
   }
 
   /* Reduced motion respect on mobile */
   @media (prefers-reduced-motion: reduce) {
-    .btn-glassmorphic,
-    .share-glass-btn,
-    .back-glass-btn {
+    .btn-glassmorphic {
       transition: none !important;
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;

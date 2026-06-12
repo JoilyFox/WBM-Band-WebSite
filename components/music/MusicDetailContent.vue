@@ -18,8 +18,7 @@
           :class="[
             'back-glass-btn',
             {
-              'back-glass-btn--transparent': backBtnTransparent,
-              'back-glass-btn--optimized': shouldUseMobileFallback
+              'back-glass-btn--transparent': backBtnTransparent
             }
           ]"
           :aria-label="
@@ -50,8 +49,7 @@
             :class="[
               'share-glass-btn',
               {
-                'share-glass-btn--transparent': backBtnTransparent,
-                'share-glass-btn--optimized': shouldUseMobileFallback
+                'share-glass-btn--transparent': backBtnTransparent
               }
             ]"
             :aria-label="t('music.a11y.share_release')"
@@ -143,7 +141,12 @@
         @click="toggleHeroExpansion"
       >
         <div
-          class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md transition-all duration-400 ease-out hover:bg-white/8 hover:border-white/15 hover:shadow-lg md:hover:bg-white/8 md:hover:border-white/15 md:hover:shadow-lg"
+          class="liquid-glass liquid-glass-interactive flex items-center gap-4 p-4 transition-all duration-400 ease-out"
+          style="
+            --lg-radius: 1rem;
+            --lg-tint: rgb(255 255 255 / 0.05);
+            --lg-rim: rgb(255 255 255 / 0.32);
+          "
         >
           <!-- Small Album Cover -->
           <div

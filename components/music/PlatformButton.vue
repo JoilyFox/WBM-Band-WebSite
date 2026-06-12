@@ -208,7 +208,7 @@
     border-radius: $button-border-radius;
 
     background: rgba(8, 8, 8, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     backdrop-filter: blur($perf-blur-strength) saturate(120%);
     -webkit-backdrop-filter: blur($perf-blur-strength) saturate(120%);
     color: white;
@@ -232,7 +232,7 @@
     border-radius: $button-border-radius;
     padding: 1px;
     background: v-bind('config.gradient');
-    opacity: 0.25;
+    opacity: 0.15;
     transition: opacity $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
@@ -256,11 +256,12 @@
       linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, transparent 38%),
       radial-gradient(120% 150% at -10% -20%, rgba(255, 255, 255, 0.06), transparent 60%),
       radial-gradient(120% 150% at 110% 120%, rgba(255, 255, 255, 0.04), transparent 60%);
+    /* Softer, lower-contrast specular rim (gentle liquid glass, not a hard edge) */
     box-shadow:
-      inset 1.5px 1.5px 1px -1px rgba(255, 255, 255, 0.35),
-      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.1),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-    opacity: 0.6;
+      inset 1px 1px 1px -1px rgba(255, 255, 255, 0.2),
+      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.06),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    opacity: 0.55;
     pointer-events: none;
     transition: opacity $perf-animation-duration cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -269,10 +270,10 @@
   @media (hover: hover) and (pointer: fine) {
     .platform-button:hover {
       transform: translateY(-3px) scale(1.02);
-      border-color: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.16);
       box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255, 255, 255, 0.15);
+        0 0 0 1px rgba(255, 255, 255, 0.08);
     }
 
     .platform-button:hover::before {
