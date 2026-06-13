@@ -226,50 +226,61 @@ export default defineNuxtPlugin((nuxtApp) => {
   })
 
   /**
-   * v-lg-viewport-follow — in in-app webviews (body.lg-inapp), translate the
-   * element to stay pinned to the top of the VISUAL viewport as the native
-   * browser chrome (Telegram/IG/FB URL bar) collapses/expands on scroll, so the
-   * floating logo + burger shift up with it. Uses the Visual Viewport API
-   * (offsetTop) on an rAF-coalesced resize/scroll listener.
+   * v-lg-header-autohide — in in-app webviews (body.lg-inapp), tuck the header
+   * up out of view when scrolling DOWN (which is exactly when Telegram/IG/FB
+   * hide their browser chrome) and reveal it when scrolling UP or near the top.
+   * So the floating logo + burger "move up" with the collapsing chrome.
    *
-   * STRICTLY gated to lg-inapp: elsewhere the header carries the glass frost,
-   * and ANY transform on it would create a backdrop root and kill the frost —
-   * so outside in-app we clear the transform entirely (never set translateY(0)).
-   * Known iOS caveat: visualViewport events are coalesced/late in webviews, so a
-   * little lag/jump during the chrome animation is expected (accepted trade-off).
+   * This replaces the visualViewport approach, which is a no-op in Telegram's
+   * WKWebView (it never reports the native chrome collapse via offsetTop, so the
+   * header never moved). Scroll DIRECTION is the reliable trigger. rAF-coalesced.
+   *
+   * STRICTLY gated to lg-inapp: elsewhere the header carries the glass frost and
+   * ANY transform on it would create a backdrop root and kill the frost — so
+   * outside in-app the transform is cleared and never set.
    */
-  nuxtApp.vueApp.directive('lg-viewport-follow', {
+  nuxtApp.vueApp.directive('lg-header-autohide', {
     getSSRProps: () => ({}),
 
     mounted(el: HTMLElement) {
-      const vv = window.visualViewport
-      if (!vv) return
-
+      let lastY = window.scrollY || 0
+      let hidden = false
       let raf = 0
-      const sync = () => {
+
+      const apply = () => {
         raf = 0
         if (!document.body.classList.contains('lg-inapp')) {
-          // No transform in a normal browser (would break the header frost).
-          if (el.style.transform) el.style.transform = ''
+          if (el.style.transform) {
+            el.style.transform = ''
+            hidden = false
+          }
           return
         }
-        el.style.transform = `translateY(${vv.offsetTop.toFixed(1)}px)`
+        const y = window.scrollY || 0
+        const dy = y - lastY
+        lastY = y
+        if (y <= 60) {
+          if (hidden) {
+            el.style.transform = ''
+            hidden = false
+          }
+        } else if (dy > 4 && !hidden) {
+          el.style.transform = 'translateY(-110%)' // scroll down → tuck up & away
+          hidden = true
+        } else if (dy < -4 && hidden) {
+          el.style.transform = '' // scroll up → reveal
+          hidden = false
+        }
       }
-      const schedule = () => {
-        if (!raf) raf = requestAnimationFrame(sync)
+      const onScroll = () => {
+        if (!raf) raf = requestAnimationFrame(apply)
       }
 
-      vv.addEventListener('resize', schedule, { passive: true })
-      vv.addEventListener('scroll', schedule, { passive: true })
-      // Reset on return-to-page to dodge the iOS stuck-offsetTop bug.
-      window.addEventListener('pageshow', schedule, { passive: true })
-      schedule()
+      window.addEventListener('scroll', onScroll, { passive: true })
 
       viewportCleanups.set(el, () => {
         if (raf) cancelAnimationFrame(raf)
-        vv.removeEventListener('resize', schedule)
-        vv.removeEventListener('scroll', schedule)
-        window.removeEventListener('pageshow', schedule)
+        window.removeEventListener('scroll', onScroll)
       })
     },
 

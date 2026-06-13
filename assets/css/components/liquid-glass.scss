@@ -295,6 +295,9 @@ body.lg-tier-low .liquid-glass {
 body.lg-inapp .liquid-glass--bar {
   background: transparent;
   box-shadow: none;
+  /* Smooth the v-lg-header-autohide tuck-up / reveal on scroll. */
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
 body.lg-inapp .liquid-glass--bar::before,
