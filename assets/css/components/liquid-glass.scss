@@ -39,14 +39,15 @@
   --lg-radius: 1rem;
   --lg-blur: 5px; /* liquid-lite default */
   --lg-blur-full: 8px; /* high tier */
-  --lg-saturate: 150%;
-  --lg-saturate-full: 180%;
-  --lg-brightness: 1.05;
+  --lg-saturate: 160%;
+  --lg-saturate-full: 185%;
+  --lg-brightness: 1.08;
   --lg-tint: rgb(16 19 28 / 0.34);
   --lg-tint-flat: rgb(13 15 22 / 0.92); /* low tier / reduced transparency */
-  --lg-rim: rgb(255 255 255 / 0.5);
+  --lg-rim: rgb(255 255 255 / 0.6);
   --lg-rim-soft: rgb(255 255 255 / 0.16);
   --lg-sheen: rgb(255 255 255 / 0.09);
+  --lg-gloss: rgb(255 255 255 / 0.18); /* "wet" top specular streak intensity */
   --lg-lens-filter: none; /* variants point this at an SVG filter */
   --lg-lens: none; /* activated only on lg-tier-high + lg-can-lens */
   --lg-px: 50%; /* pointer-specular position (v-lg-pointer) */
@@ -88,13 +89,21 @@
   z-index: -1;
   pointer-events: none;
   border-radius: inherit;
-  /* Specular rim: bright top-left arc, faint counter-glint, hairline shell */
+  /* Specular shell: crisp bright top edge (the Apple "wet" sheen line), bright
+     top-left arc, faint counter-glint, hairline. Pure CSS — renders on iOS. */
   box-shadow:
+    inset 0 1px 0.5px rgb(255 255 255 / 0.4),
     inset 2px 2px 1px -1.5px var(--lg-rim),
     inset -2px -2px 1px -1.5px var(--lg-rim-soft),
-    inset 0 0 0 1px rgb(255 255 255 / 0.05);
-  /* Press glow (alpha driven by --lg-glow) over pointer-reactive sheen */
+    inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  /* Top specular streak (glossy highlight) over press-glow + pointer sheen. */
   background:
+    linear-gradient(
+      157deg,
+      var(--lg-gloss) 0%,
+      rgb(255 255 255 / 0.04) 20%,
+      transparent 46%
+    ),
     radial-gradient(
       10rem circle at var(--lg-press-x, 50%) var(--lg-press-y, 50%),
       rgb(255 255 255 / calc(0.26 * var(--lg-glow, 0))),
