@@ -56,6 +56,7 @@ function canPhysics(): boolean {
 export default defineNuxtPlugin((nuxtApp) => {
   const cleanups = new WeakMap<HTMLElement, () => void>()
   const physicsCleanups = new WeakMap<HTMLElement, () => void>()
+  const viewportCleanups = new WeakMap<HTMLElement, () => void>()
   let filterSeq = 0
 
   nuxtApp.vueApp.directive('lg-pointer', {
@@ -221,6 +222,60 @@ export default defineNuxtPlugin((nuxtApp) => {
     unmounted(el: HTMLElement) {
       physicsCleanups.get(el)?.()
       physicsCleanups.delete(el)
+    }
+  })
+
+  /**
+   * v-lg-viewport-follow — in in-app webviews (body.lg-inapp), translate the
+   * element to stay pinned to the top of the VISUAL viewport as the native
+   * browser chrome (Telegram/IG/FB URL bar) collapses/expands on scroll, so the
+   * floating logo + burger shift up with it. Uses the Visual Viewport API
+   * (offsetTop) on an rAF-coalesced resize/scroll listener.
+   *
+   * STRICTLY gated to lg-inapp: elsewhere the header carries the glass frost,
+   * and ANY transform on it would create a backdrop root and kill the frost —
+   * so outside in-app we clear the transform entirely (never set translateY(0)).
+   * Known iOS caveat: visualViewport events are coalesced/late in webviews, so a
+   * little lag/jump during the chrome animation is expected (accepted trade-off).
+   */
+  nuxtApp.vueApp.directive('lg-viewport-follow', {
+    getSSRProps: () => ({}),
+
+    mounted(el: HTMLElement) {
+      const vv = window.visualViewport
+      if (!vv) return
+
+      let raf = 0
+      const sync = () => {
+        raf = 0
+        if (!document.body.classList.contains('lg-inapp')) {
+          // No transform in a normal browser (would break the header frost).
+          if (el.style.transform) el.style.transform = ''
+          return
+        }
+        el.style.transform = `translateY(${vv.offsetTop.toFixed(1)}px)`
+      }
+      const schedule = () => {
+        if (!raf) raf = requestAnimationFrame(sync)
+      }
+
+      vv.addEventListener('resize', schedule, { passive: true })
+      vv.addEventListener('scroll', schedule, { passive: true })
+      // Reset on return-to-page to dodge the iOS stuck-offsetTop bug.
+      window.addEventListener('pageshow', schedule, { passive: true })
+      schedule()
+
+      viewportCleanups.set(el, () => {
+        if (raf) cancelAnimationFrame(raf)
+        vv.removeEventListener('resize', schedule)
+        vv.removeEventListener('scroll', schedule)
+        window.removeEventListener('pageshow', schedule)
+      })
+    },
+
+    unmounted(el: HTMLElement) {
+      viewportCleanups.get(el)?.()
+      viewportCleanups.delete(el)
     }
   })
 })
