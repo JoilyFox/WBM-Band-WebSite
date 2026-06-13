@@ -16,9 +16,19 @@
  * stretched by the filter — keeping generation under a millisecond even for a
  * full-width bar, cheap enough to recompute on resize.
  */
+/** Per-corner radii (px): top-left, top-right, bottom-right, bottom-left. */
+export interface CornerRadii {
+  tl: number
+  tr: number
+  br: number
+  bl: number
+}
+
 export interface LiquidLensOptions {
-  /** Corner radius of the glass element, px. */
+  /** Uniform corner radius, px. Ignored when `radii` is given. */
   radius?: number
+  /** Per-corner radii, px — lets the lens follow an element rounded on only some corners. */
+  radii?: CornerRadii
   /** Width of the refractive rim band, px. Defaults to a fraction of the short side. */
   edge?: number
   /** Convexity of the rim profile: higher = sharper magnification right at the lip. */
@@ -34,20 +44,28 @@ export interface LiquidLensResult {
 
 const MAP_MAX = 192 // cap per-axis map resolution (the map is smooth)
 
-/** Signed distance to a rounded-rect boundary; positive INSIDE the shape. */
+/**
+ * Signed distance to a rounded-rect boundary with independent corner radii;
+ * positive INSIDE the shape. `cx/cy` is the centre, `halfW/halfH` the half-size.
+ */
 function insideDistance(
   x: number,
   y: number,
+  cx: number,
+  cy: number,
   halfW: number,
   halfH: number,
-  rx: number,
-  ry: number
+  radii: CornerRadii
 ): number {
-  const qx = Math.abs(x - halfW) - rx
-  const qy = Math.abs(y - halfH) - ry
+  const px = x - cx
+  const py = y - cy
+  // Select the radius for the quadrant the point falls in (px>0 right, py>0 down).
+  const r = px > 0 ? (py > 0 ? radii.br : radii.tr) : py > 0 ? radii.bl : radii.tl
+  const qx = Math.abs(px) - halfW + r
+  const qy = Math.abs(py) - halfH + r
   const outside = Math.hypot(Math.max(qx, 0), Math.max(qy, 0))
   const inside = Math.min(Math.max(qx, qy), 0)
-  return -(outside + inside)
+  return -(outside + inside - r)
 }
 
 /**
@@ -63,7 +81,15 @@ export function buildLiquidLensMap(
   if (typeof document === 'undefined' || width < 2 || height < 2) return null
 
   const shortSide = Math.min(width, height)
-  const radius = Math.min(opts.radius ?? 0, shortSide / 2)
+  const cap = shortSide / 2
+  const uniform = opts.radius ?? 0
+  const src = opts.radii ?? { tl: uniform, tr: uniform, br: uniform, bl: uniform }
+  const radii: CornerRadii = {
+    tl: Math.min(src.tl, cap),
+    tr: Math.min(src.tr, cap),
+    br: Math.min(src.br, cap),
+    bl: Math.min(src.bl, cap)
+  }
   const edge = Math.max(2, Math.min(opts.edge ?? shortSide * 0.32, shortSide / 2))
   const curve = opts.curve ?? 1.7
 
@@ -81,25 +107,23 @@ export function buildLiquidLensMap(
 
   const halfW = width / 2
   const halfH = height / 2
-  const rx = Math.max(0, halfW - radius)
-  const ry = Math.max(0, halfH - radius)
 
   for (let py = 0; py < mh; py++) {
     for (let px = 0; px < mw; px++) {
       const x = ((px + 0.5) / mw) * width
       const y = ((py + 0.5) / mh) * height
-      const d = insideDistance(x, y, halfW, halfH, rx, ry)
+      const d = insideDistance(x, y, halfW, halfH, halfW, halfH, radii)
 
       let dx = 0
       let dy = 0
       if (d >= 0 && d < edge) {
         // Inward surface normal = gradient of the inside-distance field.
         const gx =
-          insideDistance(x + 1, y, halfW, halfH, rx, ry) -
-          insideDistance(x - 1, y, halfW, halfH, rx, ry)
+          insideDistance(x + 1, y, halfW, halfH, halfW, halfH, radii) -
+          insideDistance(x - 1, y, halfW, halfH, halfW, halfH, radii)
         const gy =
-          insideDistance(x, y + 1, halfW, halfH, rx, ry) -
-          insideDistance(x, y - 1, halfW, halfH, rx, ry)
+          insideDistance(x, y + 1, halfW, halfH, halfW, halfH, radii) -
+          insideDistance(x, y - 1, halfW, halfH, halfW, halfH, radii)
         const len = Math.hypot(gx, gy) || 1
         // Convex profile: 1 at the rim, easing to 0 at the inner edge of the band.
         const t = Math.pow(1 - d / edge, curve)

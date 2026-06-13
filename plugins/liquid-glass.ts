@@ -164,10 +164,18 @@ export default defineNuxtPlugin((nuxtApp) => {
         if (!rect.width || !rect.height) return
         // Low tier renders flat glass (CSS handles it); don't waste a map there.
         const low = document.body.classList.contains('lg-tier-low')
-        const radius = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0
-        // Key folds in the flat/lens state so a tier flip rebuilds, but unrelated
-        // body-class churn (e.g. modal-open) at the same geometry is a no-op.
-        const key = `${Math.round(rect.width)}x${Math.round(rect.height)}r${Math.round(radius)}|${low ? 'flat' : 'lens'}`
+        const cs = getComputedStyle(el)
+        // Read each corner so the lens follows a partially-rounded element (e.g.
+        // the header rounded on its bottom corners only).
+        const radii = {
+          tl: parseFloat(cs.borderTopLeftRadius) || 0,
+          tr: parseFloat(cs.borderTopRightRadius) || 0,
+          br: parseFloat(cs.borderBottomRightRadius) || 0,
+          bl: parseFloat(cs.borderBottomLeftRadius) || 0
+        }
+        // Key folds in geometry + flat/lens state, so a resize or corner-radius
+        // change rebuilds, but unrelated body-class churn (modal-open) is a no-op.
+        const key = `${Math.round(rect.width)}x${Math.round(rect.height)}|${radii.tl},${radii.tr},${radii.br},${radii.bl}|${low ? 'flat' : 'lens'}`
         if (key === lastKey) return
         lastKey = key
         if (low) {
@@ -175,7 +183,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           return
         }
         const map = buildLiquidLensMap(rect.width, rect.height, strength, {
-          radius,
+          radii,
           edge: opts.edge,
           curve: opts.curve
         })
