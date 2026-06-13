@@ -247,29 +247,34 @@ export default defineNuxtPlugin((nuxtApp) => {
       let hidden = false
       let raf = 0
 
+      const reveal = () => {
+        el.style.transform = ''
+        el.style.opacity = ''
+        hidden = false
+      }
+      const tuck = () => {
+        // Slide up AND fade. The logo overflows the bar's box (it's far taller),
+        // so a translate alone leaves it cropped — the opacity fade hides any
+        // overflow so it disappears cleanly.
+        el.style.transform = 'translateY(-100%)'
+        el.style.opacity = '0'
+        hidden = true
+      }
       const apply = () => {
         raf = 0
         if (!document.body.classList.contains('lg-inapp')) {
-          if (el.style.transform) {
-            el.style.transform = ''
-            hidden = false
-          }
+          if (hidden || el.style.transform) reveal()
           return
         }
         const y = window.scrollY || 0
         const dy = y - lastY
         lastY = y
         if (y <= 60) {
-          if (hidden) {
-            el.style.transform = ''
-            hidden = false
-          }
+          if (hidden) reveal()
         } else if (dy > 4 && !hidden) {
-          el.style.transform = 'translateY(-110%)' // scroll down → tuck up & away
-          hidden = true
+          tuck()
         } else if (dy < -4 && hidden) {
-          el.style.transform = '' // scroll up → reveal
-          hidden = false
+          reveal()
         }
       }
       const onScroll = () => {
