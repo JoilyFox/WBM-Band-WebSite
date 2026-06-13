@@ -23,6 +23,9 @@ export function useAutoRotationControl(
 ) {
   const isInViewport = ref(false)
 
+  // Keep a reference to the observer so we can disconnect it on cleanup
+  let observer: IntersectionObserver | null = null
+
   /**
    * Start auto-rotation for all cards with staggered delays
    */
@@ -63,7 +66,7 @@ export function useAutoRotationControl(
   const setupObserver = () => {
     if (!import.meta.client || !sectionRef.value) return
 
-    const observer = new IntersectionObserver(
+    observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -87,8 +90,17 @@ export function useAutoRotationControl(
     observer.observe(sectionRef.value)
   }
 
+  /**
+   * Disconnect the intersection observer (call on unmount to avoid leaks)
+   */
+  const cleanup = () => {
+    observer?.disconnect()
+    observer = null
+  }
+
   return {
     isInViewport,
-    setupObserver
+    setupObserver,
+    cleanup
   }
 }

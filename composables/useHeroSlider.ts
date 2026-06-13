@@ -43,6 +43,8 @@ export function useHeroSlider(
 
   // Timer reference
   let timer: NodeJS.Timeout | null = null
+  // Track the transition-reset timeout so it can be cleared on unmount / re-fire
+  let transitionTimer: NodeJS.Timeout | null = null
 
   // Reactive image list — recomputes when the source ref/getter changes
   const images = computed(() => toValue(imagesSource))
@@ -78,8 +80,12 @@ export function useHeroSlider(
       progressKey.value++
 
       // Reset transition state after animation
-      setTimeout(() => {
+      if (transitionTimer) {
+        clearTimeout(transitionTimer)
+      }
+      transitionTimer = setTimeout(() => {
         isTransitioning.value = false
+        transitionTimer = null
       }, transitionDuration)
 
       // Restart timer for auto-play
@@ -150,6 +156,10 @@ export function useHeroSlider(
 
   onUnmounted(() => {
     stopAutoPlay()
+    if (transitionTimer) {
+      clearTimeout(transitionTimer)
+      transitionTimer = null
+    }
   })
 
   // Progress calculation for indicators

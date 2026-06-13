@@ -4,7 +4,7 @@
  * Desktop: Maintains current detection system
  */
 
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 interface DeviceMetrics {
   deviceMemory: number
@@ -205,14 +205,10 @@ export function usePerformanceOptimization() {
       gpuTier: deviceInfo.gpuTier
     }
 
-    // Check for reduced motion preference
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    prefersReducedMotion.value = mediaQuery.matches
-
-    mediaQuery.addEventListener('change', (e) => {
-      prefersReducedMotion.value = e.matches
-      calculatePerformanceLevel()
-    })
+    // Read current reduced-motion preference (the live `change` listener is
+    // wired once in onMounted and torn down in onUnmounted — see below — so it
+    // is NOT registered here, which used to add a new listener on every resize).
+    prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     calculatePerformanceLevel()
 
@@ -390,10 +386,9 @@ export function usePerformanceOptimization() {
     if (deviceMetrics.value.isTablet) classes.push('tablet-device')
     if (deviceMetrics.value.isFlagship) classes.push('flagship-device')
     if (shouldReduceAnimations.value) classes.push('reduce-animations')
-    if (!performanceLevel.value.enableBackdropBlur) classes.push('no-backdrop-blur')
+    // Only `simple-gradients` has matching CSS (MusicDetailContent); the former
+    // no-backdrop-blur / no-floating / no-parallax classes had no rules anywhere.
     if (!performanceLevel.value.enableComplexGradients) classes.push('simple-gradients')
-    if (!performanceLevel.value.enableFloatingEffects) classes.push('no-floating')
-    if (!performanceLevel.value.enableParallax) classes.push('no-parallax')
 
     return classes.join(' ')
   }
@@ -444,9 +439,24 @@ export function usePerformanceOptimization() {
     detectDeviceCapabilities()
   }
 
+  // Live reduced-motion preference. Wired once (not per detect/resize) and
+  // removed on unmount so neither this nor the resize listener leaks.
+  const reducedMotionMql =
+    typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null
+  const handleReducedMotionChange = (e: MediaQueryListEvent) => {
+    prefersReducedMotion.value = e.matches
+    calculatePerformanceLevel()
+  }
+
   onMounted(() => {
     detectDeviceCapabilities()
     window.addEventListener('resize', handleResize, { passive: true })
+    reducedMotionMql?.addEventListener('change', handleReducedMotionChange)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', handleResize)
+    reducedMotionMql?.removeEventListener('change', handleReducedMotionChange)
   })
 
   return {

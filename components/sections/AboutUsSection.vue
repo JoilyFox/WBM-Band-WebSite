@@ -186,12 +186,16 @@
 
         img.onload = () => {
           preloadedCount.value++
-          console.log(`[AboutUsSection] Preloaded image ${index + 1}/${totalImages}:`, image.src)
+          if (import.meta.dev) {
+            console.log(`[AboutUsSection] Preloaded image ${index + 1}/${totalImages}:`, image.src)
+          }
 
           // Once all images are preloaded, show the swiper
           if (preloadedCount.value === totalImages) {
             imagesPreloaded.value = true
-            console.log('[AboutUsSection] All images preloaded, initializing swiper')
+            if (import.meta.dev) {
+              console.log('[AboutUsSection] All images preloaded, initializing swiper')
+            }
           }
         }
 
@@ -202,7 +206,9 @@
           // Still initialize swiper even if some images fail to load
           if (preloadedCount.value === totalImages) {
             imagesPreloaded.value = true
-            console.log('[AboutUsSection] Preloading complete (with errors), initializing swiper')
+            if (import.meta.dev) {
+              console.log('[AboutUsSection] Preloading complete (with errors), initializing swiper')
+            }
           }
         }
       })

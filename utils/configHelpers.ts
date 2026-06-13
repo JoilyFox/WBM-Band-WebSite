@@ -105,16 +105,6 @@ export const isUpcomingRelease = (dateString?: string): boolean => {
 }
 
 /**
- * Get the nearest upcoming release from the music library
- * Note: Import is done at top of file to avoid runtime issues
- */
-export const getNearestUpcomingRelease = () => {
-  // Import musicLibrary - this needs to be imported at the top of files that use it
-  // We'll handle this in the components that call this function
-  return null // Placeholder - components will use their own logic
-}
-
-/**
  * Check if pre-save mode is active for a given release
  * This is a simple check - components should handle the actual logic
  */

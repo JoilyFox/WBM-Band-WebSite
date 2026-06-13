@@ -153,7 +153,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, computed } from 'vue'
+  import { ref, reactive, computed, onBeforeUnmount } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { getConfig } from '~/utils/configHelpers'
 
@@ -236,6 +236,10 @@
   const submitSuccess = ref(false)
   const submitError = ref(false)
 
+  // Track the success/error reset timeouts so we can clear them on unmount
+  // (prevents a state write after the component is gone).
+  const resetTimers: ReturnType<typeof setTimeout>[] = []
+
   const handleSubmit = async () => {
     if (isSubmitting.value) return
 
@@ -269,25 +273,36 @@
         formData.message = ''
 
         // Hide success message after 5 seconds
-        setTimeout(() => {
-          submitSuccess.value = false
-        }, 5000)
+        resetTimers.push(
+          setTimeout(() => {
+            submitSuccess.value = false
+          }, 5000)
+        )
       } else {
         submitError.value = true
-        setTimeout(() => {
-          submitError.value = false
-        }, 5000)
+        resetTimers.push(
+          setTimeout(() => {
+            submitError.value = false
+          }, 5000)
+        )
       }
     } catch (error) {
       console.error('Form submission error:', error)
       submitError.value = true
-      setTimeout(() => {
-        submitError.value = false
-      }, 5000)
+      resetTimers.push(
+        setTimeout(() => {
+          submitError.value = false
+        }, 5000)
+      )
     } finally {
       isSubmitting.value = false
     }
   }
+
+  onBeforeUnmount(() => {
+    resetTimers.forEach((id) => clearTimeout(id))
+    resetTimers.length = 0
+  })
 </script>
 
 <style scoped lang="scss">

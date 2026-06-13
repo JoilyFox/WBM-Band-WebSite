@@ -8,7 +8,7 @@
         'modal-mode': isModal
       }
     ]"
-    :style="{ ...themeVars, ...performanceCSSVars }"
+    :style="rootStyle"
   >
     <!-- Back/Share Buttons (only on page, not modal) -->
     <!-- Teleport to body to avoid ancestor transforms/containment breaking fixed positioning -->
@@ -917,6 +917,10 @@
   // CSS; mobile/low tiers get the cheap palette-gradient mesh only.)
   const { themeVars, atmosphereClass, variant } = useReleaseTheme(() => props.release)
   const isLiquid = computed(() => variant.value === 'liquid')
+
+  // Merge the theme + perf CSS vars once per dependency change instead of
+  // rebuilding a fresh object literal on every render (was `:style="{ ... }"`).
+  const rootStyle = computed(() => ({ ...themeVars.value, ...performanceCSSVars.value }))
 
   const availablePlatforms = computed(() => {
     const platforms: Record<string, string> = {}

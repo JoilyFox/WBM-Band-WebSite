@@ -1,4 +1,5 @@
 import { apiCache } from '~/utils/cache'
+import { DEFAULT_CACHE_TTL_MS } from '~/constants/app'
 
 interface ApiOptions {
   method?: string
@@ -65,11 +66,7 @@ export async function cachedApiRequest(
 ): Promise<any> {
   const { method = 'GET', headers = {}, body, params } = options
 
-  const {
-    enabled = false,
-    ttl = 5 * 60 * 1000, // 5 minutes
-    key: customKey
-  } = cacheOptions
+  const { enabled = false, ttl = DEFAULT_CACHE_TTL_MS, key: customKey } = cacheOptions
 
   const operation = `${method.toLowerCase()} request to ${url}`
 
@@ -88,7 +85,9 @@ export async function cachedApiRequest(
     if (enabled && method.toLowerCase() === 'get') {
       const cachedData = await apiCache.get(cacheKey, ttl)
       if (cachedData !== null) {
-        console.log(`Cache hit for ${operation}`)
+        if (import.meta.dev) {
+          console.log(`Cache hit for ${operation}`)
+        }
         return cachedData
       }
     }
@@ -107,7 +106,9 @@ export async function cachedApiRequest(
     }
 
     // Make API request
-    console.log(`Making ${operation}`)
+    if (import.meta.dev) {
+      console.log(`Making ${operation}`)
+    }
     const response = await fetch(fullUrl, fetchOptions)
 
     if (!response.ok) {
@@ -119,7 +120,9 @@ export async function cachedApiRequest(
     // Cache the response if enabled and method is GET
     if (enabled && method.toLowerCase() === 'get') {
       await apiCache.set(cacheKey, responseData)
-      console.log(`Cached response for ${operation}`)
+      if (import.meta.dev) {
+        console.log(`Cached response for ${operation}`)
+      }
     }
 
     return responseData
@@ -212,7 +215,9 @@ export async function invalidateCache(pattern: string | RegExp): Promise<void> {
 
           if (shouldInvalidate) {
             localStorage.removeItem(key)
-            console.log(`Invalidated localStorage cache for: ${cacheKey}`)
+            if (import.meta.dev) {
+              console.log(`Invalidated localStorage cache for: ${cacheKey}`)
+            }
           }
         }
       })
@@ -242,7 +247,9 @@ export async function invalidateCache(pattern: string | RegExp): Promise<void> {
 
       if (shouldInvalidate) {
         await cache.delete(request)
-        console.log(`Invalidated cache for: ${cacheKey}`)
+        if (import.meta.dev) {
+          console.log(`Invalidated cache for: ${cacheKey}`)
+        }
       }
     }
   } catch (error) {

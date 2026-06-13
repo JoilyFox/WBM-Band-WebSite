@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, nextTick, computed, watch, onMounted, onUnmounted } from 'vue'
+  import { ref, nextTick, watch, onMounted, onUnmounted } from 'vue'
   import Button from 'primevue/button'
   import { useShareFunctionality } from '~/composables/useShareFunctionality'
   import { usePerformanceOptimization } from '~/composables/usePerformanceOptimization'

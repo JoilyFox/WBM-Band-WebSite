@@ -23,11 +23,6 @@
 
 /* Performance-aware animations */
 @media (prefers-reduced-motion: no-preference) {
-  /* Smooth animations for capable devices */
-  .smooth-scroll-animation {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
   /* Simplified animations for low-performance devices */
   @media (max-width: 768px) and (max-resolution: 1.5dppx) {
     .transition-all {
@@ -42,32 +37,6 @@
   will-change: transform;
   backface-visibility: hidden;
   perspective: 1000px;
-}
-
-/* Performance-aware backdrop blur */
-.backdrop-blur-performance {
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-
-  @media (max-width: 768px) and (max-resolution: 1.5dppx) {
-    /* Reduce blur on low-performance mobile devices */
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-  }
-}
-
-/* Scroll-based animation states */
-.scroll-animation-enter {
-  opacity: 0;
-  transform: translateY(20px);
-  transition:
-    opacity 0.3s ease-out,
-    transform 0.3s ease-out;
-}
-
-.scroll-animation-enter-active {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 /* Low-performance device optimizations */
@@ -91,11 +60,3 @@
   }
 }
 
-/* Accessibility-first approach */
-@media (prefers-reduced-motion: reduce) {
-  .scroll-animation-enter {
-    transition: none;
-    opacity: 1;
-    transform: none;
-  }
-}

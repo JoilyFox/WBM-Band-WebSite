@@ -272,6 +272,9 @@
     if (autoRotationTimer.value) {
       clearInterval(autoRotationTimer.value)
     }
+    if (debounceTimer.value) {
+      clearTimeout(debounceTimer.value)
+    }
   })
 
   /**

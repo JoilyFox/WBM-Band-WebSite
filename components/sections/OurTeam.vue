@@ -132,7 +132,11 @@
   })
 
   // Use auto-rotation control composable
-  const { setupObserver } = useAutoRotationControl(sectionRef, memberCardRefs)
+  const { setupObserver, cleanup } = useAutoRotationControl(sectionRef, memberCardRefs)
+
+  // Keep references for teardown (avoid leaking observer/timeout on unmount)
+  let animationObserver: IntersectionObserver | null = null
+  let setupAnimationTimeout: ReturnType<typeof setTimeout> | null = null
 
   // Modal state
   const selectedMember = ref<TeamMember | null>(null)
@@ -156,12 +160,12 @@
     const cards = document.querySelectorAll('.team-card-animate')
     if (!cards.length) return
 
-    const observer = new IntersectionObserver(
+    animationObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('animate-in')
-            observer.unobserve(entry.target)
+            animationObserver?.unobserve(entry.target)
           }
         })
       },
@@ -171,7 +175,7 @@
       }
     )
 
-    cards.forEach((card) => observer.observe(card))
+    cards.forEach((card) => animationObserver?.observe(card))
   }
 
   // Lifecycle hooks
@@ -179,7 +183,17 @@
     sectionRef.value = document.getElementById('our-team')
     setupObserver()
     // Small delay to ensure DOM is ready
-    setTimeout(() => setupAnimationObserver(), 100)
+    setupAnimationTimeout = setTimeout(() => setupAnimationObserver(), 100)
+  })
+
+  onBeforeUnmount(() => {
+    cleanup()
+    animationObserver?.disconnect()
+    animationObserver = null
+    if (setupAnimationTimeout) {
+      clearTimeout(setupAnimationTimeout)
+      setupAnimationTimeout = null
+    }
   })
 </script>
 

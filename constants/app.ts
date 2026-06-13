@@ -21,6 +21,9 @@ export const APP_DESCRIPTION =
 export const WEBSITE_TITLE = `${APP_NAME} Website`
 export const CACHE_NAME = `${APP_SLUG}-api-cache`
 
+/** Default GET-cache time-to-live (5 minutes), shared by the API + cache layer. */
+export const DEFAULT_CACHE_TTL_MS = 5 * 60 * 1000
+
 /**
  * Helper function to create page titles
  * @param pageTitle - The specific page title
@@ -47,13 +50,4 @@ export const createErrorTitle = (statusCode: string | number): string => {
  */
 export const createWelcomeMessage = (customMessage?: string): string => {
   return customMessage || `Welcome to ${APP_NAME}!`
-}
-
-/**
- * Helper function to create cache names for different purposes
- * @param purpose - The purpose of the cache (e.g., 'api', 'images', 'data')
- * @returns Formatted cache name
- */
-export const createCacheName = (purpose: string = 'api'): string => {
-  return `${APP_SLUG}-${purpose}-cache`
 }

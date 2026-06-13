@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { cachedGet, cachedPost, cachedPut, apiDelete, invalidateCache } from '~/utils/api'
 import { apiCache } from '~/utils/cache'
+import { DEFAULT_CACHE_TTL_MS } from '~/constants/app'
 
 interface UseApiOptions {
   cache?: {
@@ -50,7 +51,7 @@ export function useApi() {
    * GET request with caching
    */
   const get = async <T = any>(url: string, options: UseApiOptions = {}): Promise<T | null> => {
-    const { cache = { enabled: true, ttl: 5 * 60 * 1000 } } = options
+    const { cache = { enabled: true, ttl: DEFAULT_CACHE_TTL_MS } } = options
 
     return request(() => cachedGet(url, {}, cache, options.errorHandling), options)
   }

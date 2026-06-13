@@ -2,7 +2,7 @@
  * Composable for managing image preloading and performance optimization
  */
 
-import { ref, onMounted, readonly } from 'vue'
+import { ref, readonly } from 'vue'
 import { preloadCriticalImages, IMAGE_SIZES } from '~/utils/imageHelpers'
 import { useAssetUrl } from './useAssetUrl'
 

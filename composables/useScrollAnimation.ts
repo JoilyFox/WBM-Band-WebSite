@@ -49,11 +49,17 @@ export function useScrollAnimation(options: ScrollAnimationOptions = {}) {
   let isListenerActive = false
   let intersectionObserver: IntersectionObserver | null = null
   const isVisible = ref(true)
-  const frameCount = 0
   let performanceStartTime = 0
   let lastDirectionChangeTime = 0
   // Keep reference to sentinel to clean it up properly
   let sentinelEl: HTMLDivElement | null = null
+  // Keep references to the reduced-motion media query + its handler so we can
+  // remove the listener on unmount (otherwise it leaks for the page lifetime).
+  let reducedMotionQuery: MediaQueryList | null = null
+  const handleReducedMotionChange = (e: MediaQueryListEvent) => {
+    prefersReducedMotion.value = e.matches
+    adaptThrottling()
+  }
 
   // Adaptive performance tracking
   const performanceMetrics = {
@@ -68,13 +74,10 @@ export function useScrollAnimation(options: ScrollAnimationOptions = {}) {
 
     // Check for reduced motion preference
     if (reducedMotionRespect) {
-      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-      prefersReducedMotion.value = mediaQuery.matches
+      reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+      prefersReducedMotion.value = reducedMotionQuery.matches
 
-      mediaQuery.addEventListener('change', (e) => {
-        prefersReducedMotion.value = e.matches
-        adaptThrottling()
-      })
+      reducedMotionQuery.addEventListener('change', handleReducedMotionChange)
     }
 
     // Detect low-performance indicators
@@ -291,6 +294,12 @@ export function useScrollAnimation(options: ScrollAnimationOptions = {}) {
         // Ignore error if element is already removed
       }
       sentinelEl = null
+    }
+
+    // Remove the reduced-motion media query listener
+    if (reducedMotionQuery) {
+      reducedMotionQuery.removeEventListener('change', handleReducedMotionChange)
+      reducedMotionQuery = null
     }
   }
 

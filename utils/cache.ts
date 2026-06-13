@@ -1,4 +1,4 @@
-import { CACHE_NAME } from '~/constants/app'
+import { CACHE_NAME, DEFAULT_CACHE_TTL_MS } from '~/constants/app'
 
 /**
  * ApiCache class for browser-based API response caching using Web Cache API
@@ -59,7 +59,7 @@ export class ApiCache {
    * @param ttl - Time to live in milliseconds (default: 5 minutes)
    * @returns Cached data or null if not found/expired
    */
-  async get(cacheKey: string, ttl: number = 5 * 60 * 1000): Promise<any | null> {
+  async get(cacheKey: string, ttl: number = DEFAULT_CACHE_TTL_MS): Promise<any | null> {
     try {
       // Check if we're in a browser environment
       if (typeof window === 'undefined') {
@@ -252,14 +252,18 @@ export class ApiCache {
 
       if (this._useLocalStorage) {
         this.clearLocalStorage()
-        console.log(`LocalStorage cache '${this.cacheName}' cleared`)
+        if (import.meta.dev) {
+          console.log(`LocalStorage cache '${this.cacheName}' cleared`)
+        }
         return
       }
 
       if (!('caches' in window)) return
 
       await caches.delete(this.cacheName)
-      console.log(`Cache '${this.cacheName}' cleared`)
+      if (import.meta.dev) {
+        console.log(`Cache '${this.cacheName}' cleared`)
+      }
     } catch (error) {
       console.error('Error clearing cache:', error)
     }
@@ -284,7 +288,9 @@ export class ApiCache {
             const cachedData = await response.json()
             if (now - cachedData.timestamp > maxAge) {
               await cache.delete(request)
-              console.log(`Cleaned up expired cache entry: ${request.url}`)
+              if (import.meta.dev) {
+                console.log(`Cleaned up expired cache entry: ${request.url}`)
+              }
             }
           }
         } catch (error) {
