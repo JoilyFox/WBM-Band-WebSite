@@ -265,12 +265,16 @@ export function usePerformanceOptimization() {
       let mobileStrategy: 'flagship' | 'standard' | 'conservative' = 'conservative'
       let level: PerformanceLevel['level'] = 'low'
 
-      if (metrics.isFlagship && metrics.gpuTier === 'high') {
-        // Only the best mobile devices get high performance
+      if (metrics.isFlagship || metrics.gpuTier === 'high') {
+        // A confirmed flagship (e.g. Pixel 10 Pro, recovered via UA Client Hints)
+        // gets the full effect. Android Chrome's UA Reduction hides the GPU
+        // renderer string, so gpuTier can essentially never read 'high' on modern
+        // phones — flagship confirmation is the strongest capability signal we
+        // have, and current flagships handle the full glass/lens comfortably.
         mobileStrategy = 'flagship'
         level = 'high'
-      } else if (metrics.isFlagship || metrics.gpuTier === 'medium') {
-        // Good mobile devices get medium performance
+      } else if (metrics.gpuTier === 'medium') {
+        // Recognised mid-range GPUs get medium performance
         mobileStrategy = 'standard'
         level = 'medium'
       }
