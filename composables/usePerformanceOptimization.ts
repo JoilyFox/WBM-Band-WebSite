@@ -18,6 +18,8 @@ interface DeviceMetrics {
   deviceModel: string
   isFlagship: boolean
   gpuTier: 'low' | 'medium' | 'high'
+  /** Positive evidence of a genuinely slow GPU (software rasterizer / old GPU). */
+  gpuWeak: boolean
 }
 
 interface PerformanceLevel {
@@ -46,7 +48,8 @@ export function usePerformanceOptimization() {
     screenHeight: 1080,
     deviceModel: 'unknown',
     isFlagship: false,
-    gpuTier: 'medium'
+    gpuTier: 'medium',
+    gpuWeak: false
   })
 
   const performanceLevel = ref<PerformanceLevel>({
@@ -65,63 +68,68 @@ export function usePerformanceOptimization() {
 
   const prefersReducedMotion = ref(false)
 
-  // Flagship device detection patterns
+  // Flagship device detection patterns. Matched against the UA string AND the
+  // UA-Client-Hints `model` (Chromium Android) AND the WebGL renderer — because
+  // modern Android Chrome freezes the UA model to "K", so the model only shows
+  // up via Client Hints, and the GPU only via the WebGL renderer.
   const FLAGSHIP_DEVICES = {
-    iphone: [
-      // iPhone 12 and newer (A14+)
-      /iPhone1[3-9],/i, // iPhone 13, 14, 15+
-      /iPhone1[2-9],[2-9]/i // iPhone 12 Pro Max etc
-    ],
+    iphone: [/iPhone1[2-9],/i, /iPhone[2-9]\d,/i],
     samsung: [
-      // Galaxy S20+ and Galaxy Note 20+ (2020+)
-      /SM-[GN][0-9]{3}[0-9]+/i, // S21, S22, S23, S24, Note series
-      /SM-F[0-9]{3}/i // Galaxy Fold/Flip series
+      /SM-[SFN]\d{3}/i, // Galaxy S / Z Fold / Z Flip / Note flagships
+      /SM-A[5-9]\d{2}/i // Galaxy A5x–A9x upper mid-range (capable)
     ],
-    google: [
-      // Pixel 6+ (Tensor chips)
-      /Pixel [6-9]/i,
-      /Pixel 1[0-9]/i // Pixel 10+
-    ],
-    oneplus: [
-      // OnePlus 8+ (2020+)
-      /OnePlus [8-9]/i,
-      /OnePlus 1[0-9]/i
-    ],
-    xiaomi: [
-      // Xiaomi flagship series
-      /Mi 1[0-9]/i, // Mi 10, 11, 12+
-      /Xiaomi 1[0-9]/i,
-      /Redmi K[3-9][0-9]/i // Redmi K30+
+    google: [/Pixel ([6-9]|1\d)/i], // Pixel 6 … 19 (+ Pro/a)
+    oneplus: [/OnePlus ([89]|1\d)/i, /CPH2\d{3}/i, /[A-Z]E2\d{3}/i, /ONEPLUS A\d/i],
+    xiaomi: [/(?:Xiaomi|Mi) 1\d/i, /Redmi K[3-9]\d/i, /POCO [FX]\d/i, /\b2[34]\d{2}[A-Z]/i],
+    oppovivo: [/CPH2\d{3}/i, /\bV2\d{3}\b/i, /iQOO/i],
+    others: [
+      /Nothing Phone/i,
+      /\bA06[0-9]\b/i, // Nothing build codes
+      /ASUS_AI2[0-9]/i,
+      /ROG Phone/i, // Asus gaming
+      /XQ-[A-Z]{2}\d{2}/i // Sony Xperia 1/5
     ]
   }
 
+  // GPU buckets. `high`/`medium` confirm capability; `weak` is POSITIVE evidence
+  // of a genuinely slow GPU (software rasterizer or old mobile GPU) — the only
+  // thing that should push a device down to the flat fallback.
   const GPU_TIER_INDICATORS = {
     high: [
-      // Apple A14+ (iPhone 12+, iPad Air 4+)
-      /iPhone1[3-9],/i,
-      /iPhone1[2-9],[2-9]/i,
-      /iPad13,[0-9]/i, // iPad Air 4+
-      /iPad1[4-9],[0-9]/i, // iPad Pro 2021+
-
-      // Android flagships with Adreno 650+, Mali-G78+, etc.
-      /Adreno \(TM\) [6-9][5-9][0-9]/i,
-      /Mali-G[7-9][8-9]/i
+      /iPhone1[2-9],/i,
+      /iPad1[3-9],/i,
+      /Apple M\d/i, // Apple Silicon Mac
+      /Apple GPU/i, // iOS WebGL renderer (generic) — treat as high by platform
+      /Adreno \(TM\) (6[5-9]\d|[78]\d\d)/i, // Adreno 650+, 7xx, 8xx
+      /Mali-G(7[1-9]|[89]\d)/i, // Mali-G71x … G9xx
+      /Immortalis-G\d{3}/i, // ARM Immortalis (all flagship)
+      /Xclipse \d{3}/i, // Samsung RDNA
+      /(RTX|GTX 1[6-9]|Radeon RX|\bArc\b|Iris Xe)/i // desktop dGPU / modern iGPU
     ],
     medium: [
-      // Apple A10-A13 (iPhone 7-11, iPad 6-8)
-      /iPhone(?:9|10|11|12),[0-9]/i,
-      /iPad[6-8],[0-9]/i,
-
-      // Mid-range Android GPUs
-      /Adreno \(TM\) [5-6][0-4][0-9]/i,
-      /Mali-G[5-7][0-7]/i
+      /iPhone(?:9|10|11),/i,
+      /iPad[6-9],/i,
+      /Adreno \(TM\) (5[5-9]\d|6[0-4]\d)/i, // Adreno 55x–64x
+      /Mali-G(5[2-9]|6\d|7[01])/i, // Mali-G52 … G710
+      /Intel\(R\) (UHD|Iris)/i
+    ],
+    weak: [
+      /SwiftShader|llvmpipe|Microsoft Basic Render|Software/i, // software rasterizer
+      /Adreno \(TM\) [1-4]\d\d/i, // Adreno < 500
+      /Mali-(4|T\d|G3\d|G5[01])/i, // old Mali
+      /PowerVR/i
     ]
   }
 
   // Detect device characteristics
   const detectDeviceModel = (
     userAgent: string
-  ): { model: string; isFlagship: boolean; gpuTier: 'low' | 'medium' | 'high' } => {
+  ): {
+    model: string
+    isFlagship: boolean
+    gpuTier: 'low' | 'medium' | 'high'
+    gpuWeak: boolean
+  } => {
     const ua = userAgent.toLowerCase()
 
     // Check flagship devices
@@ -143,25 +151,50 @@ export function usePerformanceOptimization() {
       isFlagship = true
     }
 
-    // Determine GPU tier
+    // Determine GPU tier. `low` here is the UNKNOWN default (not a downgrade
+    // signal); `gpuWeak` is POSITIVE evidence of a genuinely slow GPU (software
+    // rasterizer / old mobile GPU) — the only GPU signal that forces a downgrade.
+    // `signal` is the UA plus, on Android, the WebGL renderer + Client-Hints
+    // model (passed in), since the bare UA no longer carries model/GPU info.
     let gpuTier: 'low' | 'medium' | 'high' = 'low'
     if (GPU_TIER_INDICATORS.high.some((pattern) => pattern.test(userAgent))) {
       gpuTier = 'high'
     } else if (GPU_TIER_INDICATORS.medium.some((pattern) => pattern.test(userAgent))) {
       gpuTier = 'medium'
     }
+    const gpuWeak = GPU_TIER_INDICATORS.weak.some((pattern) => pattern.test(userAgent))
 
-    // Extract device model name
+    // Extract a human-ish model name for debugging.
     let model = 'unknown'
     const iphoneMatch = userAgent.match(/iPhone[0-9,]+/i)
     const samsungMatch = userAgent.match(/SM-[A-Z0-9]+/i)
-    const pixelMatch = userAgent.match(/Pixel [0-9]+/i)
+    const pixelMatch = userAgent.match(/Pixel [0-9]+( Pro)?/i)
 
     if (iphoneMatch) model = iphoneMatch[0]
     else if (samsungMatch) model = samsungMatch[0]
     else if (pixelMatch) model = pixelMatch[0]
 
-    return { model, isFlagship, gpuTier }
+    return { model, isFlagship, gpuTier, gpuWeak }
+  }
+
+  // Read the real GPU from the WebGL renderer — the most reliable GPU signal on
+  // Android (the UA no longer carries it). Returns '' if blocked/unavailable
+  // (Safari returns a generic "Apple GPU"; privacy browsers may return null).
+  const detectGpuRenderer = (): string => {
+    if (typeof document === 'undefined') return ''
+    try {
+      const canvas = document.createElement('canvas')
+      const gl = (canvas.getContext('webgl') ||
+        canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null
+      if (!gl) return ''
+      const dbg = gl.getExtension('WEBGL_debug_renderer_info')
+      const renderer = dbg
+        ? (gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) as string)
+        : (gl.getParameter(gl.RENDERER) as string)
+      return renderer || ''
+    } catch {
+      return ''
+    }
   }
 
   // Computed properties for easy access
@@ -192,8 +225,11 @@ export function usePerformanceOptimization() {
     const screen = window.screen
     const userAgent = navigator.userAgent || ''
 
-    // Detect device characteristics
-    const deviceInfo = detectDeviceModel(userAgent)
+    // Detect device characteristics. Feed the WebGL renderer alongside the UA so
+    // the GPU regexes can identify Android GPUs (the bare UA no longer carries
+    // them); the Client-Hints model is folded in later (async) below.
+    const gpuRenderer = detectGpuRenderer()
+    const deviceInfo = detectDeviceModel(`${userAgent} ${gpuRenderer}`)
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       userAgent
     )
@@ -212,7 +248,8 @@ export function usePerformanceOptimization() {
       screenHeight: screen.height || window.innerHeight,
       deviceModel: deviceInfo.model,
       isFlagship: deviceInfo.isFlagship,
-      gpuTier: deviceInfo.gpuTier
+      gpuTier: deviceInfo.gpuTier,
+      gpuWeak: deviceInfo.gpuWeak
     }
 
     // Read current reduced-motion preference (the live `change` listener is
@@ -236,7 +273,7 @@ export function usePerformanceOptimization() {
         .then((hints: { model?: string }) => {
           const model = hints?.model?.trim()
           if (!model) return
-          const info = detectDeviceModel(model)
+          const info = detectDeviceModel(`${model} ${gpuRenderer}`)
           const next = { ...deviceMetrics.value }
           let changed = false
           if (info.isFlagship && !next.isFlagship) {
@@ -265,36 +302,39 @@ export function usePerformanceOptimization() {
   const calculatePerformanceLevel = () => {
     const metrics = deviceMetrics.value
 
-    // Mobile-First Strategy: Start with conservative mobile settings
+    // Mobile strategy: CAPABLE-BY-DEFAULT. UA Reduction (Android freezes the
+    // model to "K") + iOS privacy mean we usually can't identify the device, so
+    // assume it's capable (glass shows) and only downgrade on POSITIVE
+    // weak-evidence. This inverts the old "default low, upgrade only known
+    // flagships" logic that wrongly flattened iPhones and the Pixel 10 Pro.
     if (metrics.isMobile && !metrics.isTablet) {
-      // Mobile devices - default to low performance, upgrade only flagships
-      let mobileStrategy: 'flagship' | 'standard' | 'conservative' = 'conservative'
-      let level: PerformanceLevel['level'] = 'low'
+      let mobileStrategy: 'flagship' | 'standard' | 'conservative' = 'standard'
+      let level: PerformanceLevel['level'] = 'medium'
 
       if (metrics.isFlagship || metrics.gpuTier === 'high') {
-        // A confirmed flagship (e.g. Pixel 10 Pro, recovered via UA Client Hints)
-        // gets the full effect. Android Chrome's UA Reduction hides the GPU
-        // renderer string, so gpuTier can essentially never read 'high' on modern
-        // phones — flagship confirmation is the strongest capability signal we
-        // have, and current flagships handle the full glass/lens comfortably.
+        // Confirmed-capable (flagship model via Client Hints, or a high-tier GPU
+        // from the WebGL renderer) → full effect. NEVER downgraded — this is the
+        // guarantee against false-lows.
         mobileStrategy = 'flagship'
         level = 'high'
-      } else if (metrics.gpuTier === 'medium') {
-        // Recognised mid-range GPUs get medium performance
-        mobileStrategy = 'standard'
-        level = 'medium'
+      } else {
+        // Unknown device: capable by default (medium). Downgrade to the flat low
+        // tier ONLY on positive weak-evidence — a software/old GPU (gpuWeak) or
+        // two agreeing weak hardware signals. Absent values default to capable
+        // (deviceMemory/hardwareConcurrency fall back to 4; iOS clamps cores to 2
+        // but is already 'flagship' above, so it never reaches here).
+        const lowRam = metrics.deviceMemory <= 2
+        const lowCores = metrics.hardwareConcurrency <= 3
+        const slowNet = metrics.effectiveType === '2g' || metrics.effectiveType === 'slow-2g'
+        if (metrics.gpuWeak || (lowRam && lowCores) || (lowRam && slowNet)) {
+          mobileStrategy = 'conservative'
+          level = 'low'
+        }
       }
-      // All other mobile devices stay at 'conservative' low performance
 
-      // Override for reduced motion or very low specs
-      if (
-        prefersReducedMotion.value ||
-        metrics.deviceMemory < 2 ||
-        metrics.hardwareConcurrency < 2
-      ) {
-        level = 'low'
-        mobileStrategy = 'conservative'
-      }
+      // NOTE: prefers-reduced-motion no longer forces the 'low' tier — that
+      // would needlessly flatten the (static) glass on capable devices. It is
+      // honoured separately via enableAnimations / shouldReduceAnimations.
 
       // Set mobile performance configuration
       performanceLevel.value = {
