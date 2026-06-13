@@ -2,8 +2,13 @@
   <div class="min-h-screen bg-surface-950">
     <NuxtRouteAnnouncer />
 
-    <!-- Header: Liquid Glass bar (docs/liquid-glass.md) -->
-    <header class="liquid-glass liquid-glass--bar fixed top-0 left-0 right-0 z-40">
+    <!-- Header: Liquid Glass bar with JS physics refraction (docs/liquid-glass.md).
+         v-lg-physics generates a Snell's-law displacement map from the bar's real
+         geometry (Chromium only); falls back to the static lens / faux-bend. -->
+    <header
+      v-lg-physics="{ strength: 84, edge: 16, curve: 2 }"
+      class="liquid-glass liquid-glass--bar fixed top-0 left-0 right-0 z-40"
+    >
       <CommonContainer size="xl" padding="md" :overflow-visible="true">
         <div class="flex items-start justify-between h-16 relative pt-1">
           <!-- Mobile Logo Fade System (dual logos for smooth transition) -->
