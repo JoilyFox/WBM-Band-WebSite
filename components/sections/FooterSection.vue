@@ -593,12 +593,16 @@
     width: 2.5rem;
     height: 2.5rem;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 50%;
     color: rgba(255, 255, 255, 0.7);
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* Liquid glass: clear frost + saturation + specular rim */
+    backdrop-filter: blur(6px) saturate(1.5);
+    -webkit-backdrop-filter: blur(6px) saturate(1.5);
+    box-shadow:
+      inset 1.2px 1.2px 0.5px -0.8px rgba(255, 255, 255, 0.45),
+      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.12);
   }
 
   /* Desktop hover effects only */
@@ -961,12 +965,16 @@
     width: 2rem;
     height: 2rem;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 50%;
     color: rgba(255, 255, 255, 0.7);
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* Liquid glass: clear frost + saturation + specular rim */
+    backdrop-filter: blur(6px) saturate(1.5);
+    -webkit-backdrop-filter: blur(6px) saturate(1.5);
+    box-shadow:
+      inset 1.2px 1.2px 0.5px -0.8px rgba(255, 255, 255, 0.45),
+      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.12);
     text-decoration: none;
   }
 

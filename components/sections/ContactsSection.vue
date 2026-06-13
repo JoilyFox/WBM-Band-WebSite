@@ -336,16 +336,19 @@
     background:
       linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%),
       linear-gradient(225deg, rgba(147, 51, 234, 0.03) 0%, transparent 60%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     padding: 1.5rem;
     padding-top: 1.75rem;
-    backdrop-filter: blur(20px);
+    /* Liquid glass: clear frost + saturation */
+    backdrop-filter: blur(9px) saturate(1.5);
+    -webkit-backdrop-filter: blur(9px) saturate(1.5);
     position: relative;
     overflow: hidden;
     box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      inset 1.5px 1.5px 1px -1px rgba(255, 255, 255, 0.4),
+      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
   }
 
@@ -410,7 +413,12 @@
     letter-spacing: 0.05em;
     cursor: pointer;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    /* Liquid glass: clear frost + saturation + specular rim */
+    backdrop-filter: blur(6px) saturate(1.5);
+    -webkit-backdrop-filter: blur(6px) saturate(1.5);
+    box-shadow:
+      inset 1.2px 1.2px 0.5px -0.8px rgba(255, 255, 255, 0.4),
+      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.1);
   }
 
   /* Desktop hover effects only */
@@ -527,17 +535,20 @@
     background:
       linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%),
       linear-gradient(180deg, rgba(147, 51, 234, 0.02) 0%, transparent 100%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     padding: 1.5rem;
     padding-top: 1.75rem;
-    backdrop-filter: blur(20px);
+    /* Liquid glass: clear frost + saturation */
+    backdrop-filter: blur(9px) saturate(1.5);
+    -webkit-backdrop-filter: blur(9px) saturate(1.5);
     margin-bottom: 1rem;
     position: relative;
     overflow: hidden;
     box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      inset 1.5px 1.5px 1px -1px rgba(255, 255, 255, 0.4),
+      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.1);
   }
 
   .social-links-section::before {
@@ -695,16 +706,19 @@
     background:
       linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.03) 100%),
       rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 18px;
     padding: 1.5rem;
-    backdrop-filter: blur(20px);
+    /* Liquid glass: clear frost + saturation */
+    backdrop-filter: blur(9px) saturate(1.5);
+    -webkit-backdrop-filter: blur(9px) saturate(1.5);
     margin-bottom: 1rem;
     position: relative;
     overflow: hidden;
     box-shadow:
       0 4px 20px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      inset 1.5px 1.5px 1px -1px rgba(255, 255, 255, 0.38),
+      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.1);
   }
 
   .info-card-clickable {
