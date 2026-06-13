@@ -176,17 +176,6 @@
   mask-image: linear-gradient(to bottom, transparent 50%, #000 74%, #000 90%, transparent 100%);
 }
 
-/* Mobile: round the bar's bottom corners into a floating app-bar. v-lg-physics
-   reads these per-corner radii, so the lens refracts the backdrop around the
-   curve — the rounded corners themselves become liquid-glass lenses. The pseudo
-   layers inherit border-radius, so frost + faux-bend follow the same shape. */
-@media (max-width: 950px) {
-  .liquid-glass--bar {
-    border-bottom-left-radius: 1.5rem;
-    border-bottom-right-radius: 1.5rem;
-  }
-}
-
 /* Capsule controls: pills, round buttons, switchers */
 .liquid-glass--pill {
   --lg-radius: 9999px;
