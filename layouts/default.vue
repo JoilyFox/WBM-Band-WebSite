@@ -7,7 +7,6 @@
          geometry (Chromium only); falls back to the static lens / faux-bend. -->
     <header
       v-lg-physics="{ strength: 84, edge: 16, curve: 2 }"
-      v-lg-header-autohide
       class="liquid-glass liquid-glass--bar fixed top-0 left-0 right-0 z-40"
     >
       <CommonContainer size="xl" padding="md" :overflow-visible="true">

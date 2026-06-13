@@ -302,13 +302,10 @@ body.lg-tier-low .liquid-glass {
    background entirely (logo + nav float over the content) and give the burger
    its own round glass button, like the release-page floating controls. */
 body.lg-inapp .liquid-glass--bar {
+  /* Stays pinned + visible at the top; just no glass band over the native
+     browser chrome (the logo + burger float over the content). */
   background: transparent;
   box-shadow: none;
-  /* Smooth the v-lg-header-autohide tuck-up + fade / reveal on scroll. */
-  transition:
-    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.3s ease;
-  will-change: transform, opacity;
 }
 
 body.lg-inapp .liquid-glass--bar::before,

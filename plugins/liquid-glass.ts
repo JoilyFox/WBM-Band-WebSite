@@ -56,7 +56,6 @@ function canPhysics(): boolean {
 export default defineNuxtPlugin((nuxtApp) => {
   const cleanups = new WeakMap<HTMLElement, () => void>()
   const physicsCleanups = new WeakMap<HTMLElement, () => void>()
-  const viewportCleanups = new WeakMap<HTMLElement, () => void>()
   let filterSeq = 0
 
   nuxtApp.vueApp.directive('lg-pointer', {
@@ -222,76 +221,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     unmounted(el: HTMLElement) {
       physicsCleanups.get(el)?.()
       physicsCleanups.delete(el)
-    }
-  })
-
-  /**
-   * v-lg-header-autohide — in in-app webviews (body.lg-inapp), tuck the header
-   * up out of view when scrolling DOWN (which is exactly when Telegram/IG/FB
-   * hide their browser chrome) and reveal it when scrolling UP or near the top.
-   * So the floating logo + burger "move up" with the collapsing chrome.
-   *
-   * This replaces the visualViewport approach, which is a no-op in Telegram's
-   * WKWebView (it never reports the native chrome collapse via offsetTop, so the
-   * header never moved). Scroll DIRECTION is the reliable trigger. rAF-coalesced.
-   *
-   * STRICTLY gated to lg-inapp: elsewhere the header carries the glass frost and
-   * ANY transform on it would create a backdrop root and kill the frost — so
-   * outside in-app the transform is cleared and never set.
-   */
-  nuxtApp.vueApp.directive('lg-header-autohide', {
-    getSSRProps: () => ({}),
-
-    mounted(el: HTMLElement) {
-      let lastY = window.scrollY || 0
-      let hidden = false
-      let raf = 0
-
-      const reveal = () => {
-        el.style.transform = ''
-        el.style.opacity = ''
-        hidden = false
-      }
-      const tuck = () => {
-        // Slide up AND fade. The logo overflows the bar's box (it's far taller),
-        // so a translate alone leaves it cropped — the opacity fade hides any
-        // overflow so it disappears cleanly.
-        el.style.transform = 'translateY(-100%)'
-        el.style.opacity = '0'
-        hidden = true
-      }
-      const apply = () => {
-        raf = 0
-        if (!document.body.classList.contains('lg-inapp')) {
-          if (hidden || el.style.transform) reveal()
-          return
-        }
-        const y = window.scrollY || 0
-        const dy = y - lastY
-        lastY = y
-        if (y <= 60) {
-          if (hidden) reveal()
-        } else if (dy > 4 && !hidden) {
-          tuck()
-        } else if (dy < -4 && hidden) {
-          reveal()
-        }
-      }
-      const onScroll = () => {
-        if (!raf) raf = requestAnimationFrame(apply)
-      }
-
-      window.addEventListener('scroll', onScroll, { passive: true })
-
-      viewportCleanups.set(el, () => {
-        if (raf) cancelAnimationFrame(raf)
-        window.removeEventListener('scroll', onScroll)
-      })
-    },
-
-    unmounted(el: HTMLElement) {
-      viewportCleanups.get(el)?.()
-      viewportCleanups.delete(el)
     }
   })
 })
