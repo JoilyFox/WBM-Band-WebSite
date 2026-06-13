@@ -720,12 +720,6 @@
     }
   }
 
-  /* Floating animation only for high-performance devices */
-  .perf-high .music-album-cover:not(.modal-cover) {
-    animation: float 6s ease-in-out infinite;
-    will-change: transform;
-  }
-
   /* Performance-based backdrop blur via CSS variables */
   .music-album-cover {
     backdrop-filter: blur(var(--perf-blur-strength, 0px));
@@ -1209,19 +1203,6 @@
   }
 
   /* Optimized keyframe animations with performance considerations */
-
-  /* Basic motion effects */
-  @keyframes float {
-
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-
-    50% {
-      transform: translateY(-10px);
-    }
-  }
 
   @keyframes auroraShift {
     0% {
