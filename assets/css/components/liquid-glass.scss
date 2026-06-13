@@ -302,6 +302,14 @@ body.lg-tier-low .liquid-glass {
    glass PILL inset from the edges — a clearly-intentional floating island. */
 body.lg-inapp .liquid-glass--bar {
   --lg-radius: 9999px;
+  /* iOS has no SVG lens, so the bar's clear/low-blur "show the bend" setting
+     just reads as faint blur — give the pill a frostier, more saturated body
+     with a visible tint so it actually looks like glass. */
+  --lg-blur: 11px;
+  --lg-blur-full: 11px;
+  --lg-saturate: 175%;
+  --lg-saturate-full: 175%;
+  --lg-tint: rgb(15 17 25 / 0.5);
   left: 0.75rem;
   right: 0.75rem;
   top: calc(0.45rem + env(safe-area-inset-top, 0px));
@@ -310,7 +318,9 @@ body.lg-inapp .liquid-glass--bar {
   box-shadow:
     0 12px 30px rgb(0 0 0 / 0.38),
     0 2px 8px rgb(0 0 0 / 0.22);
-  overflow: hidden; /* contain content to the pill shape */
+  /* No overflow:hidden — the ::before/::after are self-clipped by their own
+     border-radius, and clipping the logo (which sits slightly proud of the
+     pill) was cutting it off. */
 }
 
 /* Keep the frost; replace the bar's bottom faux-bend band with an all-round
@@ -343,16 +353,16 @@ body.lg-inapp .liquid-glass--bar .pt-1,
 body.lg-inapp .liquid-glass--bar .pt-2 {
   padding-top: 0;
 }
-body.lg-inapp .liquid-glass--bar img {
+body.lg-inapp .liquid-glass--bar svg {
   height: 2.4rem !important;
+  width: auto !important;
 }
-/* The mobile logos are absolutely positioned at top-[30px]/[20px] (for the tall
-   header where they overflow); re-center them vertically inside the pill. */
-body.lg-inapp .liquid-glass--bar [class~='left-1/2'] {
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
-}
+/* The mobile logos are absolutely positioned at top-[30px]/[20px] for the tall
+   header (where they overflow downward). In the pill, center BOTH variants so
+   the logo sits neatly in the middle and never sticks out / gets clipped. */
+body.lg-inapp .liquid-glass--bar [class~='left-1/2'],
 body.lg-inapp .liquid-glass--bar [class~='left-[4px]'] {
   top: 50% !important;
-  transform: translateY(-50%) !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
 }
