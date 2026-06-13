@@ -310,17 +310,17 @@ body.lg-inapp .liquid-glass--bar {
   --lg-saturate: 175%;
   --lg-saturate-full: 175%;
   --lg-tint: rgb(15 17 25 / 0.5);
-  left: 0.75rem;
-  right: 0.75rem;
+  left: 0.875rem; /* 14px — 2px tighter per side (4px narrower) than full-width */
+  right: 0.875rem;
   top: calc(0.45rem + env(safe-area-inset-top, 0px));
   border-radius: 9999px;
   background: var(--lg-tint);
   box-shadow:
     0 12px 30px rgb(0 0 0 / 0.38),
     0 2px 8px rgb(0 0 0 / 0.22);
-  /* No overflow:hidden — the ::before/::after are self-clipped by their own
-     border-radius, and clipping the logo (which sits slightly proud of the
-     pill) was cutting it off. */
+  /* Only the BACKGROUND becomes a pill — the header content (logo, burger)
+     renders exactly as in normal browsers. No content/logo overrides, no
+     overflow:hidden (the ::before/::after self-clip by their own radius). */
 }
 
 /* Keep the frost; replace the bar's bottom faux-bend band with an all-round
@@ -340,29 +340,4 @@ body.lg-inapp .liquid-glass--bar::after {
     inset 1.5px 1.5px 1px -1px var(--lg-rim),
     inset -1px -1px 1px -1px var(--lg-rim-soft);
   background: linear-gradient(157deg, var(--lg-gloss) 0%, transparent 46%);
-}
-
-/* Compact the row and fit the (normally oversized) logo into the pill. */
-body.lg-inapp .liquid-glass--bar .h-16 {
-  height: 3.25rem;
-}
-body.lg-inapp .liquid-glass--bar .items-start {
-  align-items: center;
-}
-body.lg-inapp .liquid-glass--bar .pt-1,
-body.lg-inapp .liquid-glass--bar .pt-2 {
-  padding-top: 0;
-}
-body.lg-inapp .liquid-glass--bar svg {
-  height: 2.4rem !important;
-  width: auto !important;
-}
-/* The mobile logos are absolutely positioned at top-[30px]/[20px] for the tall
-   header (where they overflow downward). In the pill, center BOTH variants so
-   the logo sits neatly in the middle and never sticks out / gets clipped. */
-body.lg-inapp .liquid-glass--bar [class~='left-1/2'],
-body.lg-inapp .liquid-glass--bar [class~='left-[4px]'] {
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
 }
