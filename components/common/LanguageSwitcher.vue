@@ -123,19 +123,45 @@
     }
     const from = current
     const midTx = (from.tx + target.tx) / 2
-    // Stretch wider than either endpoint mid-travel, with a slight vertical
-    // squash — the gooey "liquid" beat — then settle with a soft overshoot.
-    const midSx = Math.max(from.sx, target.sx) * 1.16
+    const dir = Math.sign(target.tx - from.tx) || 1
+    const past = dir * 6 // overshoot a few px past the target, then settle back
+    const wide = Math.max(from.sx, target.sx)
+    // Cartoon squash & stretch (12 principles): anticipation crouch → fast,
+    // wide-and-FLAT mid-flight (the big height squeeze) → impact lands TALL and
+    // narrow past the mark → rebound → settle. Per-keyframe easing gives each
+    // beat its own slow-in / slow-out, so it reads springy, not linear.
     running = thumb.animate(
       [
-        { transform: `translateX(${from.tx}px) scaleX(${from.sx}) scaleY(1)` },
+        // rest
+        { transform: `translateX(${from.tx}px) scaleX(${from.sx}) scaleY(1)`, easing: 'ease-in' },
+        // anticipation: crouch down + bulge wide before it leaves
         {
-          transform: `translateX(${midTx}px) scaleX(${midSx}) scaleY(0.88)`,
-          offset: 0.5
+          transform: `translateX(${from.tx}px) scaleX(${from.sx * 1.08}) scaleY(0.78)`,
+          offset: 0.12,
+          easing: 'cubic-bezier(0.3, 0, 0.2, 1)'
         },
+        // mid-flight: stretched wide and squeezed flat — the height squash
+        {
+          transform: `translateX(${midTx}px) scaleX(${wide * 1.28}) scaleY(0.55)`,
+          offset: 0.46,
+          easing: 'cubic-bezier(0.5, 0, 0.4, 1)'
+        },
+        // impact: snaps tall and narrow, a hair past the landing point
+        {
+          transform: `translateX(${target.tx + past}px) scaleX(${target.sx * 0.84}) scaleY(1.3)`,
+          offset: 0.7,
+          easing: 'cubic-bezier(0.3, 0, 0.3, 1)'
+        },
+        // rebound: small counter-squash on the way to rest
+        {
+          transform: `translateX(${target.tx}px) scaleX(${target.sx * 1.05}) scaleY(0.92)`,
+          offset: 0.86,
+          easing: 'ease-out'
+        },
+        // rest
         { transform: `translateX(${target.tx}px) scaleX(${target.sx}) scaleY(1)` }
       ],
-      { duration: 440, easing: 'cubic-bezier(0.34, 1.32, 0.46, 1)' }
+      { duration: 540 }
     )
     current = { ...target }
   }
