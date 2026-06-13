@@ -256,10 +256,23 @@ body.lg-can-lens .liquid-glass--bar {
   }
 }
 
-body.lg-tier-low {
-  @include lg-flat;
+/* Low tier (genuinely weak devices, and the non-Chromium fallback): keep a
+   plain "transparent blurred" frosted glass — the classic glassmorphism look.
+   Drop the specular rim / sheen / faux-bend (::after) and the lens, but KEEP
+   the backdrop blur and the normal translucent tint. Per preference this is a
+   transparent blurred background, NOT the flat darkened fill. */
+body.lg-tier-low .liquid-glass {
+  &::before {
+    filter: none;
+  }
+
+  &::after {
+    display: none;
+  }
 }
 
+/* Accessibility only: users who request reduced transparency get the truly
+   flat, mostly-opaque layer (no blur), matching Apple's Reduced Transparency. */
 @media (prefers-reduced-transparency: reduce) {
   body {
     @include lg-flat;
@@ -272,4 +285,36 @@ body.lg-tier-low {
     transition: none;
     transform: none;
   }
+}
+
+/* ---------- in-app webviews (Telegram / Instagram / Facebook …) ----------
+   Their native URL/title bar sits above the page and collapses on scroll, so a
+   fixed glass header reads as a detached "floating band". Drop the bar's
+   background entirely (logo + nav float over the content) and give the burger
+   its own round glass button, like the release-page floating controls. */
+body.lg-inapp .liquid-glass--bar {
+  background: transparent;
+  box-shadow: none;
+}
+
+body.lg-inapp .liquid-glass--bar::before,
+body.lg-inapp .liquid-glass--bar::after {
+  display: none;
+}
+
+body.lg-inapp .mobile-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgb(22 24 32 / 0.42);
+  -webkit-backdrop-filter: blur(8px) saturate(1.5);
+  backdrop-filter: blur(8px) saturate(1.5);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  box-shadow:
+    inset 1.2px 1.2px 0.5px -0.8px rgb(255 255 255 / 0.5),
+    inset -1px -1px 1px -1px rgb(255 255 255 / 0.12),
+    0 4px 16px rgb(0 0 0 / 0.3);
 }

@@ -25,4 +25,4 @@ dist
 *-sa-key*.json
 gcp-*.json
 ga4-*.json
-**/*.credentials.json
+**/*.credentials.jsonscreenshots/

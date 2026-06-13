@@ -105,12 +105,26 @@
   const { performanceLevel } = usePerformanceOptimization()
   const lgDetected = ref(false)
   const lgCanLens = ref(false)
+  const lgInApp = ref(false)
   onMounted(() => {
     lgDetected.value = true
     // navigator.userAgentData exists only in Chromium — the only engine that
     // renders SVG filters over backdrops. @supports can't detect this
     // (Safari/Firefox parse `filter: url()` fine, they just don't render it).
     lgCanLens.value = Boolean(navigator.userAgentData)
+
+    // In-app webview (Telegram / Instagram / Facebook …). These render a native
+    // URL/title bar above the page that overlaps a position:fixed header, so the
+    // header drops its glass background there (see liquid-glass.scss). Telegram
+    // on iOS has no UA token — its reliable signal is window.TelegramWebviewProxy;
+    // FB/IG expose UA tokens; a generic iOS webview omits the `Safari/` token.
+    const ua = navigator.userAgent
+    const isIOS = /iPhone|iPad|iPod/.test(ua)
+    lgInApp.value = Boolean(
+      window.TelegramWebviewProxy ||
+        /FBAN|FBAV|FB_IAB|Instagram|Line\/|Snapchat/.test(ua) ||
+        (isIOS && /AppleWebKit/.test(ua) && !/Safari\//.test(ua))
+    )
   })
 
   useHead({
@@ -122,6 +136,7 @@
         if (!lgDetected.value) return ''
         const classes = [`lg-tier-${performanceLevel.value.level}`]
         if (lgCanLens.value) classes.push('lg-can-lens')
+        if (lgInApp.value) classes.push('lg-inapp')
         return classes.join(' ')
       })
     }

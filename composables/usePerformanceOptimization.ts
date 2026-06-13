@@ -133,6 +133,16 @@ export function usePerformanceOptimization() {
       }
     }
 
+    // iOS: modern Safari/WebKit UA hides the hardware model (and iOS has no UA
+    // Client Hints to recover it), so the regexes above can't identify an
+    // iPhone — leaving it stuck on the 'low' tier, which FLATTENS the glass
+    // (backdrop-filter:none) and was why Liquid Glass never appeared on iOS.
+    // Every iOS device runs the same capable WebKit and handles -webkit-
+    // backdrop-filter fine, so treat iOS as a capable flagship.
+    if (/iphone|ipad|ipod/i.test(ua)) {
+      isFlagship = true
+    }
+
     // Determine GPU tier
     let gpuTier: 'low' | 'medium' | 'high' = 'low'
     if (GPU_TIER_INDICATORS.high.some((pattern) => pattern.test(userAgent))) {
