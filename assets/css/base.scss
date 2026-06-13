@@ -152,13 +152,14 @@
     }
   }
 
-  /* Flagship mobile performance - full effects but optimized */
+  /* Flagship mobile performance - full effects but optimized.
+     NOTE: deliberately does NOT cap animation/transition durations. A flagship
+     runs animations at their designed timing; the former blanket
+     `* { animation-duration: 0.6s !important }` crushed intentionally slow
+     ambient release-page animations (atmoDrift 28s, auroraShift 20s, float 6s…,
+     all gated to .perf-high which flagships now reach) down to 0.6s, making them
+     frantically fast. */
   .mobile-flagship {
-    * {
-      animation-duration: 0.6s !important;
-      transition-duration: 0.3s !important;
-    }
-
     /* Enable limited glassmorphic effects */
     .btn-glassmorphic {
       backdrop-filter: blur(8px) !important;
