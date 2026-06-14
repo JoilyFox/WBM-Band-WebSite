@@ -10,22 +10,29 @@
     >
       <div
         v-show="isVisible"
-        class="modal-backdrop liquid-glass-veil"
+        class="modal-backdrop"
         :class="{ 'is-animating': isAnimating }"
         @click="handleBackdropClick"
       >
         <div
           ref="dialogRef"
           class="modal-container"
+          :class="{ 'is-animating': isAnimating, 'content-ready': contentReady }"
           role="dialog"
           aria-modal="true"
           :aria-label="ariaLabel"
           tabindex="-1"
           @click.stop
         >
+          <!-- The glass host carries NO transform/opacity/will-change of its own
+               (those go on .modal-container) so its backdrop-filter frost + lens
+               keep working — see the backdrop-root note in the <style> below.
+               v-lg-physics adds the Chromium-only refraction lens that warps the
+               (lightly darkened) page behind the panel; Safari/Firefox no-op it
+               and fall back to the soft frost. -->
           <div
-            class="modal-content liquid-glass liquid-glass--panel"
-            :class="{ 'is-animating': isAnimating, 'content-ready': contentReady }"
+            v-lg-physics="LENS"
+            class="modal-content liquid-glass liquid-glass--panel liquid-glass--refract"
           >
             <button
               class="modal-close-btn liquid-glass liquid-glass--pill liquid-glass-interactive"
@@ -64,6 +71,11 @@
     ariaLabel: 'Dialog'
   })
   const emit = defineEmits<Emits>()
+
+  // Refraction lens for the glass panel (v-lg-physics): a per-geometry Snell's
+  // -law displacement map warps the page behind the modal, concentrated at the
+  // rounded edges. Chromium-only; a no-op elsewhere (soft frost stands in).
+  const LENS = { strength: 64, edge: 96, curve: 1.5 }
 
   const isAnimating = ref(false)
   const contentReady = ref(false)
@@ -279,18 +291,24 @@
     justify-content: center;
     padding: 1rem;
 
-    /* Dark dim kept on the veil tint so legibility matches the old look.
-       The frost (blur) comes from .liquid-glass-veil and is tier-gated. */
-    background: rgba(0, 0, 0, 0.85);
+    /* Just a SMALL darkening scrim — no blur. The page stays clearly visible
+       behind it so the glass panel has something real to refract; the darkening
+       is what the lens then warps + the panel tints. (Was a heavy 0.85 black +
+       blur(14px) veil; the modal itself is now the glass, not the backdrop.) */
+    background: rgba(0, 0, 0, 0.42);
 
-    /* No transform here: this element carries the veil's own backdrop-filter,
-       and a transform/filter on it would suppress that frost. */
+    /* No transform/filter here: a transform on the backdrop would become the
+       backdrop root for the panel inside and suppress its frost. */
     will-change: opacity;
     /* Open/close cross-fades OPACITY only — the veil's blur is fixed, so we
        drop the old backdrop-filter interpolation (cheaper, still smooth). */
     transition: opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* The entrance (slide + fade) lives on the CONTAINER, not the glass host.
+     A transform/opacity on the .liquid-glass element (or its ancestor mid-
+     animation) makes it a backdrop root and kills its frost + lens. By moving
+     the motion up one level, the glass host stays clean at rest and refracts. */
   .modal-container {
     position: relative;
     width: 100%;
@@ -298,41 +316,46 @@
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-  }
-
-  .modal-content {
-    position: relative;
-    /* Glass material (tint, frost, rim, elevation) comes from
-       .liquid-glass .liquid-glass--panel. Override only the radius + a darker,
-       high-legibility tint; modal content needs to stay readable. */
-    --lg-radius: 24px;
-    --lg-tint: rgb(10 12 18 / 0.92);
-    --lg-tint-flat: rgb(10 12 18 / 0.97);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    max-height: 90vh;
-
-    /* Entrance animates opacity/transform only (driven by .content-ready and
-       the modal-enter/leave transition classes below). NOTE: no persistent
-       transform/filter/contain:paint on this host — those would turn it into a
-       backdrop root and silently disable the glass frost. */
     will-change: transform, opacity;
   }
 
-  .modal-content:not(.content-ready) {
+  .modal-container:not(.content-ready) {
     opacity: 0;
     transform: translateY(16px);
   }
 
-  .modal-content.content-ready {
+  .modal-container.content-ready {
     transition:
       transform 0.26s cubic-bezier(0.4, 0, 0.2, 1),
       opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .modal-content.is-animating {
+  .modal-container.is-animating {
     pointer-events: none;
+  }
+
+  .modal-content {
+    position: relative;
+    /* Glass material (frost, rim, elevation) comes from
+       .liquid-glass .liquid-glass--panel. Here: bigger radius + a BALANCED
+       translucent tint so the darkened, refracted page reads through the panel
+       while the title/text stay crisp. --lg-tint-flat stays near-opaque for the
+       reduced-transparency fallback. */
+    --lg-radius: 24px;
+    --lg-tint: rgb(12 14 22 / 0.5);
+    --lg-tint-flat: rgb(10 12 18 / 0.95);
+    /* Soft frosted glass everywhere by default — this IS the Safari / iOS /
+       Firefox look (they can't render the refraction lens). */
+    --lg-blur: 12px;
+    --lg-blur-full: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    /* The 12px frost above is the Safari / iOS / Firefox look. On Chromium the
+       global `.liquid-glass--refract` rule drops this to near-clear so the
+       v-lg-physics displacement lens reads as real refraction.
+       NOTE: no transform / opacity / will-change / contain:paint on this host. */
   }
 
   .modal-scroll-wrapper {
@@ -398,21 +421,21 @@
     opacity: 0;
   }
 
-  :global(.modal-enter-active) .modal-content,
-  :global(.modal-leave-active) .modal-content {
+  :global(.modal-enter-active) .modal-container,
+  :global(.modal-leave-active) .modal-container {
     transition:
       transform 0.26s cubic-bezier(0.4, 0, 0.2, 1),
       opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  :global(.modal-enter-from) .modal-content,
-  :global(.modal-leave-to) .modal-content {
+  :global(.modal-enter-from) .modal-container,
+  :global(.modal-leave-to) .modal-container {
     transform: translateY(16px);
     opacity: 0;
   }
 
-  :global(.modal-enter-to) .modal-content,
-  :global(.modal-leave-from) .modal-content {
+  :global(.modal-enter-to) .modal-container,
+  :global(.modal-leave-from) .modal-container {
     transform: translateY(0);
     opacity: 1;
   }

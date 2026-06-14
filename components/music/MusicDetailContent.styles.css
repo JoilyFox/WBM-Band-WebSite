@@ -408,8 +408,10 @@
 
   /* Modal-specific optimizations for smooth animations */
   .music-detail-content.modal-mode {
-    /* Simplified background for modals to reduce rendering load */
-    background: linear-gradient(180deg, #020202 0%, #1a1a1a 50%, #020202 100%) !important;
+    /* TRANSPARENT so the BaseModal glass panel (frost + refraction + translucent
+       tint) shows through the whole modal body — this content used to paint an
+       opaque #020202→#1a1a1a fill that hid the glass entirely. */
+    background: transparent !important;
     animation: none !important;
     /* Force compositing layer for smoother animations */
     transform: translateZ(0);
@@ -443,12 +445,37 @@
     transform: none !important;
   }
 
+  /* Liquid-glass modal: the hero must read as the SAME translucent glass as the
+     rest of the panel, so strip the heavy dark vignette (::after) down to a
+     whisper for cover separation, and keep the accent aurora (::before) as a
+     faint cover-colour bloom only. !important beats the perf-tier vignette
+     overrides regardless of source order. */
+  .modal-hero .music-hero::after {
+    background: radial-gradient(120% 70% at 50% 112%, rgba(0, 0, 0, 0.3), transparent 62%) !important;
+  }
+
+  .modal-hero .music-hero::before {
+    opacity: 0.5 !important;
+  }
+
+  /* The panel is translucent now, so guarantee hero BODY text stays legible
+     over any cover/backdrop with a soft shadow — WITHOUT darkening the glass.
+     (The title + platforms heading already carry Tailwind drop-shadow-lg/md.) */
+  .modal-mode .music-date,
+  .modal-mode .music-countdown,
+  .modal-mode .music-description {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  }
+
   .modal-overlay {
     animation: none !important;
+    /* Drop the heavy black linear that used to darken the hero band — keep only
+       a faint cover-colour bloom floating over the glass (Ambient Bloom), so the
+       hero shows the same translucent glass as the rest of the modal. */
     background:
-      radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
-      radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
-      linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.6) 100%) !important;
+      radial-gradient(circle at 30% 70%, var(--accent1), transparent 60%),
+      radial-gradient(circle at 70% 30%, var(--accent2), transparent 60%) !important;
+    opacity: 0.4 !important;
     will-change: auto;
   }
 
