@@ -297,18 +297,24 @@
        blur(14px) veil; the modal itself is now the glass, not the backdrop.) */
     background: rgba(0, 0, 0, 0.42);
 
-    /* No transform/filter here: a transform on the backdrop would become the
-       backdrop root for the panel inside and suppress its frost. */
-    will-change: opacity;
-    /* Open/close cross-fades OPACITY only — the veil's blur is fixed, so we
-       drop the old backdrop-filter interpolation (cheaper, still smooth). */
+    /* CRITICAL: no `will-change` / transform / filter / opacity<1 here at rest.
+       Any of those on an ANCESTOR of the glass panel establishes a "backdrop
+       root", which silently suppresses the panel's backdrop-filter frost (the
+       page behind would render SHARP, not blurred). `will-change: opacity` is
+       persistent and counts — so it is intentionally omitted. The opacity
+       cross-fade still composites fine without the hint. */
     transition: opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* The entrance (slide + fade) lives on the CONTAINER, not the glass host.
-     A transform/opacity on the .liquid-glass element (or its ancestor mid-
-     animation) makes it a backdrop root and kills its frost + lens. By moving
-     the motion up one level, the glass host stays clean at rest and refracts. */
+  /* The entrance (slide + fade) lives on the CONTAINER, not the glass host, so
+     the .liquid-glass element itself stays transform/opacity-free and its frost
+     renders at rest. CRITICAL: this container is an ANCESTOR of the glass panel,
+     so it must NOT carry a persistent `will-change: transform/opacity` either —
+     that also makes it a backdrop root and suppresses the panel's blur even
+     while idle. The transient transform DURING the open/close animation briefly
+     drops the frost (hidden by the fade); at rest there is no transform and the
+     frost is back. No will-change hint — the one-shot transition composites
+     fine without it. */
   .modal-container {
     position: relative;
     width: 100%;
@@ -316,7 +322,6 @@
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-    will-change: transform, opacity;
   }
 
   .modal-container:not(.content-ready) {
