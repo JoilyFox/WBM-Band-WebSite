@@ -373,6 +373,22 @@
     /* NOTE: no transform / opacity / will-change / contain:paint on this host. */
   }
 
+  /* Smooth frost-in. The container's slide (transform) suppresses the panel's
+     backdrop-filter while it runs, so the blur would otherwise SNAP on the
+     instant the slide ends. Instead we hold the blur at 0 during the slide and
+     ramp it 0 -> full afterwards: the transition-delay (~slide duration) lines
+     the ramp up with the moment the suppression lifts, so it frosts in. */
+  .modal-content::before {
+    transition:
+      backdrop-filter 0.5s ease 0.24s,
+      -webkit-backdrop-filter 0.5s ease 0.24s;
+  }
+
+  .modal-container:not(.content-ready) .modal-content::before {
+    -webkit-backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+    backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+  }
+
   .modal-scroll-wrapper {
     overflow-y: auto;
     flex: 1;

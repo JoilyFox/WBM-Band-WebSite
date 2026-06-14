@@ -215,6 +215,30 @@
     animation: popupFadeIn 0.2s ease-out;
   }
 
+  /* Smooth frost-in. The opacity fade above suppresses the panel's
+     backdrop-filter while it runs, so the blur would SNAP on when the fade ends.
+     A deterministic keyframe on the ::before holds the blur at 0 for the first
+     ~36% (≈ the 0.2s fade), then ramps it 0 -> full — so the frost grows in
+     just as the fade finishes. (Animation on the ::before, not the host, and
+     not opacity, so it never re-triggers the backdrop-root suppression.) */
+  .custom-share-popup::before {
+    animation: popupFrostIn 0.55s ease-out;
+  }
+
+  @keyframes popupFrostIn {
+    0%,
+    36% {
+      -webkit-backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+      backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+    }
+    100% {
+      -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate))
+        brightness(var(--lg-brightness));
+      backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate))
+        brightness(var(--lg-brightness));
+    }
+  }
+
   /* Header */
   .share-popup-header {
     display: flex;
@@ -406,7 +430,8 @@
 
   /* Performance optimizations */
   @media (prefers-reduced-motion: reduce) {
-    .custom-share-popup {
+    .custom-share-popup,
+    .custom-share-popup::before {
       animation: none;
     }
 
