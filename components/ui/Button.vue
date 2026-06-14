@@ -169,10 +169,8 @@
     pointer-events: none;
   }
 
-  /* Content wrapper — the hover "swell" and press "squish" deform THIS, not the
-     glass host (a host transform would kill its own backdrop-filter). Sits above
-     the glass pseudos. The elastic curve makes the swell feel like surface
-     tension settling, not a linear zoom. */
+  /* Content wrapper — the "grow on hover" scales THIS (not the glass host, whose
+     transform would kill its own backdrop-filter). Sits above the glass pseudos. */
   .lg-btn__content {
     position: relative;
     z-index: 1;
@@ -180,7 +178,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    transition: transform 0.46s cubic-bezier(0.34, 1.6, 0.5, 1);
+    transition: transform 0.28s cubic-bezier(0.34, 1.4, 0.6, 1);
   }
 
   .lg-btn__icon {
@@ -269,17 +267,12 @@
     color: rgb(255 255 255 / 0.9);
   }
 
-  /* Hover = the content swells (surface-tension bulge) while the glass plate
-     keeps its frost. Press = the content squishes in with the host. */
+  /* The content swells slightly on hover — reads as the button growing while the
+     glass plate keeps its frost. Gated to fine pointers + no-reduced-motion. */
   @media (hover: hover) and (pointer: fine) {
     .lg-btn:hover .lg-btn__content {
-      transform: scale(1.09);
+      transform: scale(1.05);
     }
-  }
-
-  .lg-btn:active .lg-btn__content {
-    transform: scale(0.92);
-    transition: transform 0.12s ease-out;
   }
 
   /* ---------- flat families ---------- */
@@ -288,7 +281,7 @@
     color: #000000; /* surface-950 */
     border: 1px solid transparent;
     transition:
-      transform 0.46s cubic-bezier(0.34, 1.6, 0.5, 1),
+      transform 0.16s ease-out,
       background-color 0.2s ease,
       box-shadow 0.2s ease;
   }
@@ -298,7 +291,7 @@
     color: #fff;
     border: 1px solid rgb(255 255 255 / 0.3);
     transition:
-      transform 0.46s cubic-bezier(0.34, 1.6, 0.5, 1),
+      transform 0.16s ease-out,
       background-color 0.2s ease,
       border-color 0.2s ease;
   }
@@ -308,7 +301,7 @@
     color: rgb(255 255 255 / 0.82);
     border: 1px solid transparent;
     transition:
-      transform 0.46s cubic-bezier(0.34, 1.6, 0.5, 1),
+      transform 0.16s ease-out,
       background-color 0.2s ease,
       color 0.2s ease;
   }
@@ -328,13 +321,11 @@
     }
   }
 
-  /* Flat families can squash the host directly (no backdrop-filter to suppress),
-     then spring back via the elastic base transition. */
+  /* Flat families can scale the host directly (no backdrop-filter to suppress). */
   .lg-btn--solid:active,
   .lg-btn--outline:active,
   .lg-btn--ghost:active {
-    transform: scale(0.9);
-    transition: transform 0.12s cubic-bezier(0.5, 0, 0.75, 0.35);
+    transform: scale(0.97);
   }
 
   /* ---------- focus ring (every variant, keyboard only) ---------- */
@@ -354,7 +345,6 @@
       transition: none;
     }
     .lg-btn:hover .lg-btn__content,
-    .lg-btn:active .lg-btn__content,
     .lg-btn--solid:active,
     .lg-btn--outline:active,
     .lg-btn--ghost:active {
