@@ -75,7 +75,7 @@
   // Refraction lens for the glass panel (v-lg-physics): a per-geometry Snell's
   // -law displacement map warps the page behind the modal, concentrated at the
   // rounded edges. Chromium-only; a no-op elsewhere (soft frost stands in).
-  const LENS = { strength: 64, edge: 96, curve: 1.5 }
+  const LENS = { strength: 104, edge: 140, curve: 1.45 }
 
   const isAnimating = ref(false)
   const contentReady = ref(false)
@@ -337,25 +337,35 @@
   .modal-content {
     position: relative;
     /* Glass material (frost, rim, elevation) comes from
-       .liquid-glass .liquid-glass--panel. Here: bigger radius + a BALANCED
-       translucent tint so the darkened, refracted page reads through the panel
-       while the title/text stay crisp. --lg-tint-flat stays near-opaque for the
-       reduced-transparency fallback. */
+       .liquid-glass .liquid-glass--panel. Here we push a RICH glass surface so
+       it reads as a real glass slab over the dark page, not just a tinted hole:
+       a lighter translucent tint, strong vibrancy (saturate + brightness) and
+       bright specular highlights (rim + glossy top streak). --lg-tint-flat stays
+       near-opaque for the reduced-transparency fallback. */
     --lg-radius: 24px;
-    --lg-tint: rgb(12 14 22 / 0.5);
+    --lg-tint: rgb(13 15 24 / 0.36);
     --lg-tint-flat: rgb(10 12 18 / 0.95);
-    /* Soft frosted glass everywhere by default — this IS the Safari / iOS /
-       Firefox look (they can't render the refraction lens). */
-    --lg-blur: 12px;
-    --lg-blur-full: 12px;
+    /* Vibrancy: lift + saturate whatever's behind so the glass glows like the
+       macOS material instead of looking flat-transparent. */
+    --lg-saturate: 210%;
+    --lg-saturate-full: 235%;
+    --lg-brightness: 1.2;
+    /* Bright specular shell — the strongest "this is glass" cue over a dark
+       backdrop: crisp lit rim + a glossy top sheen streak. */
+    --lg-rim: rgb(255 255 255 / 0.82);
+    --lg-rim-soft: rgb(255 255 255 / 0.24);
+    --lg-gloss: rgb(255 255 255 / 0.42);
+    --lg-sheen: rgb(255 255 255 / 0.16);
+    /* Frosted glass with real body — this IS the Safari / iOS / Firefox look
+       (no lens there). On Chromium the global `.liquid-glass--refract` rule
+       lowers it a little so the displacement lens still reads through the frost. */
+    --lg-blur: 13px;
+    --lg-blur-full: 13px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     max-height: 90vh;
-    /* The 12px frost above is the Safari / iOS / Firefox look. On Chromium the
-       global `.liquid-glass--refract` rule drops this to near-clear so the
-       v-lg-physics displacement lens reads as real refraction.
-       NOTE: no transform / opacity / will-change / contain:paint on this host. */
+    /* NOTE: no transform / opacity / will-change / contain:paint on this host. */
   }
 
   .modal-scroll-wrapper {

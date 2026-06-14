@@ -253,8 +253,8 @@ body.lg-can-lens .liquid-glass--bar {
    Safari/iOS/Firefox, which never get the lens. Must follow the tier rules
    above so it wins the equal-specificity --lg-blur cascade. */
 body.lg-can-lens .liquid-glass--refract {
-  --lg-blur: 4px;
-  --lg-blur-full: 4px;
+  --lg-blur: 9px;
+  --lg-blur-full: 9px;
 }
 
 @mixin lg-flat {
