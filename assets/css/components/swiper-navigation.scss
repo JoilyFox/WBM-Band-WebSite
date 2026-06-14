@@ -5,8 +5,13 @@
      host properties (Swiper owns the ::after pseudo for the chevron, so the
      frost/rim live on the host's own backdrop-filter + box-shadow here instead
      of the system's ::before/::after). The Apple-glass morph mirrors
-     .liquid-glass-interactive: rim lights up on hover, elastic pop on press. */
-  position: relative;
+     .liquid-glass-interactive: rim lights up on hover, elastic pop on press.
+
+     NOTE: do NOT set `position` here — Swiper's own CSS positions
+     .swiper-button-prev/next as `position: absolute` at the slider's sides;
+     overriding it (e.g. to relative) drops them out of place / out of view.
+     OurTeam's custom-div nav re-declares `position: absolute` after the
+     include, so it is unaffected either way. */
   width: 44px;
   height: 44px;
   border-radius: 50%;
