@@ -297,24 +297,25 @@
        blur(14px) veil; the modal itself is now the glass, not the backdrop.) */
     background: rgba(0, 0, 0, 0.42);
 
-    /* CRITICAL: no `will-change` / transform / filter / opacity<1 here at rest.
-       Any of those on an ANCESTOR of the glass panel establishes a "backdrop
-       root", which silently suppresses the panel's backdrop-filter frost (the
-       page behind would render SHARP, not blurred). `will-change: opacity` is
-       persistent and counts — so it is intentionally omitted. The opacity
-       cross-fade still composites fine without the hint. */
-    transition: opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+    /* CRITICAL: no `will-change` / transform / filter / opacity<1 here — at rest
+       OR during the open/close animation. Any of those on an ANCESTOR of the
+       glass panel makes it a backdrop root and suppresses the panel's frost. So
+       the scrim fades via BACKGROUND-COLOR (opacity stays 1), which lets the
+       panel's blur ramp in from the very first frame instead of being held back
+       until a fade/slide finishes. */
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* The entrance (slide + fade) lives on the CONTAINER, not the glass host, so
-     the .liquid-glass element itself stays transform/opacity-free and its frost
-     renders at rest. CRITICAL: this container is an ANCESTOR of the glass panel,
-     so it must NOT carry a persistent `will-change: transform/opacity` either —
-     that also makes it a backdrop root and suppresses the panel's blur even
-     while idle. The transient transform DURING the open/close animation briefly
-     drops the frost (hidden by the fade); at rest there is no transform and the
-     frost is back. No will-change hint — the one-shot transition composites
-     fine without it. */
+  .modal-backdrop.modal-enter-from,
+  .modal-backdrop.modal-leave-to {
+    background: rgba(0, 0, 0, 0);
+  }
+
+  /* The container is STATIC — it carries no transform/opacity (those on an
+     ancestor of the glass panel would suppress its frost). The entrance is the
+     panel materializing (frost + tint fade) and the inner content rising, all
+     of which keep the glass host transform/opacity-free so the blur renders the
+     whole time. */
   .modal-container {
     position: relative;
     width: 100%;
@@ -322,17 +323,6 @@
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-  }
-
-  .modal-container:not(.content-ready) {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-
-  .modal-container.content-ready {
-    transition:
-      transform 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .modal-container.is-animating {
@@ -373,20 +363,62 @@
     /* NOTE: no transform / opacity / will-change / contain:paint on this host. */
   }
 
-  /* Smooth frost-in. The container's slide (transform) suppresses the panel's
-     backdrop-filter while it runs, so the blur would otherwise SNAP on the
-     instant the slide ends. Instead we hold the blur at 0 during the slide and
-     ramp it 0 -> full afterwards: the transition-delay (~slide duration) lines
-     the ramp up with the moment the suppression lifts, so it frosts in. */
+  /* Materialize, starting the moment the modal reveals — no transform/opacity on
+     the panel or its ancestors, so the frost ramps in from frame one (no slide
+     to wait out, no pop). The panel fades its tint + shadow in, the frost ramps
+     0 -> full, and the inner content rises — concurrently, fast. The
+     `.modal-leave-to` selectors play it in reverse on close. */
+  .modal-content {
+    transition:
+      background 0.34s ease,
+      box-shadow 0.34s ease,
+      border-color 0.34s ease;
+  }
   .modal-content::before {
     transition:
-      backdrop-filter 0.5s ease 0.24s,
-      -webkit-backdrop-filter 0.5s ease 0.24s;
+      backdrop-filter 0.38s cubic-bezier(0.33, 0, 0.2, 1),
+      -webkit-backdrop-filter 0.38s cubic-bezier(0.33, 0, 0.2, 1);
+  }
+  .modal-scroll-wrapper,
+  .modal-close-btn {
+    transition:
+      opacity 0.34s ease,
+      transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
 
-  .modal-container:not(.content-ready) .modal-content::before {
+  /* Hidden state — applied on the FIRST frame of open (Vue's enter-from) and
+     during close (leave-to), so the materialize starts the moment the modal
+     appears (not gated on the cover decode). Only descendant/own props change
+     here; nothing that would turn an ancestor of the glass into a backdrop
+     root. The cover's own blur-up placeholder covers any undecoded frame. */
+  .modal-backdrop.modal-enter-from .modal-content,
+  .modal-backdrop.modal-leave-to .modal-content {
+    background: rgb(13 15 24 / 0);
+    border-color: transparent;
+    box-shadow: none;
+  }
+  .modal-backdrop.modal-enter-from .modal-content::before,
+  .modal-backdrop.modal-leave-to .modal-content::before {
     -webkit-backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
     backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+  }
+  .modal-backdrop.modal-enter-from .modal-scroll-wrapper,
+  .modal-backdrop.modal-enter-from .modal-close-btn,
+  .modal-backdrop.modal-leave-to .modal-scroll-wrapper,
+  .modal-backdrop.modal-leave-to .modal-close-btn {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  /* Reduced motion: no ramp, snap straight to the frosted panel. */
+  @media (prefers-reduced-motion: reduce) {
+    .modal-backdrop,
+    .modal-content,
+    .modal-content::before,
+    .modal-scroll-wrapper,
+    .modal-close-btn {
+      transition: none;
+    }
   }
 
   .modal-scroll-wrapper {
@@ -438,37 +470,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  :global(.modal-enter-active),
-  :global(.modal-leave-active) {
-    /* Cross-fade the veil on OPACITY only — its blur is a fixed value from
-       .liquid-glass-veil, so there is nothing to interpolate. */
-    transition: opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  :global(.modal-enter-from),
-  :global(.modal-leave-to) {
-    opacity: 0;
-  }
-
-  :global(.modal-enter-active) .modal-container,
-  :global(.modal-leave-active) .modal-container {
-    transition:
-      transform 0.26s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  :global(.modal-enter-from) .modal-container,
-  :global(.modal-leave-to) .modal-container {
-    transform: translateY(16px);
-    opacity: 0;
-  }
-
-  :global(.modal-enter-to) .modal-container,
-  :global(.modal-leave-from) .modal-container {
-    transform: translateY(0);
-    opacity: 1;
   }
 
   @media (max-width: 768px) {
