@@ -343,24 +343,24 @@
        bright specular highlights (rim + glossy top streak). --lg-tint-flat stays
        near-opaque for the reduced-transparency fallback. */
     --lg-radius: 24px;
-    --lg-tint: rgb(13 15 24 / 0.36);
+    --lg-tint: rgb(13 15 24 / 0.34);
     --lg-tint-flat: rgb(10 12 18 / 0.95);
-    /* Vibrancy: lift + saturate whatever's behind so the glass glows like the
-       macOS material instead of looking flat-transparent. */
-    --lg-saturate: 210%;
-    --lg-saturate-full: 235%;
-    --lg-brightness: 1.2;
-    /* Bright specular shell — the strongest "this is glass" cue over a dark
-       backdrop: crisp lit rim + a glossy top sheen streak. */
-    --lg-rim: rgb(255 255 255 / 0.82);
-    --lg-rim-soft: rgb(255 255 255 / 0.24);
-    --lg-gloss: rgb(255 255 255 / 0.42);
-    --lg-sheen: rgb(255 255 255 / 0.16);
-    /* Frosted glass with real body — this IS the Safari / iOS / Firefox look
-       (no lens there). On Chromium the global `.liquid-glass--refract` rule
-       lowers it a little so the displacement lens still reads through the frost. */
-    --lg-blur: 13px;
-    --lg-blur-full: 13px;
+    /* Vibrancy: lift + saturate whatever's behind so the frosted glass glows
+       like the macOS material rather than looking like a flat grey panel. */
+    --lg-saturate: 185%;
+    --lg-saturate-full: 200%;
+    --lg-brightness: 1.12;
+    /* Bright specular shell — crisp lit rim + a glossy top sheen streak. */
+    --lg-rim: rgb(255 255 255 / 0.78);
+    --lg-rim-soft: rgb(255 255 255 / 0.22);
+    --lg-gloss: rgb(255 255 255 / 0.36);
+    --lg-sheen: rgb(255 255 255 / 0.14);
+    /* Proper FROST — a thick, clearly-glassy blur (like the header bar, but
+       heavier). This is the Safari / iOS / Firefox value; Chromium gets a
+       slightly lower frost via `.liquid-glass--refract` so the displacement
+       lens still bends the blurred page through it. */
+    --lg-blur: 22px;
+    --lg-blur-full: 22px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
