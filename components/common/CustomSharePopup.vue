@@ -25,14 +25,15 @@
         <!-- Header -->
         <div class="share-popup-header">
           <h3 class="share-popup-title">{{ t('music.share_popup.title') }}</h3>
-          <button
-            class="share-popup-close"
-            :class="{ 'share-popup-close--optimized': isLowPerformanceDevice }"
+          <UiButton
+            variant="clear"
+            size="sm"
+            shape="circle"
+            icon-only
+            icon="pi pi-times"
             aria-label="Close share popup"
             @click="$emit('close')"
-          >
-            <i class="pi pi-times"></i>
-          </button>
+          />
         </div>
 
         <!-- Content -->
@@ -292,37 +293,8 @@
     margin: 0;
   }
 
-  .share-popup-close {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .share-popup-close:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-      transform: scale(1.05);
-    }
-  }
-
-  .share-popup-close--optimized {
-    transition: background-color 0.2s ease;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .share-popup-close--optimized:hover {
-      transform: none;
-    }
-  }
+  /* Close button is now <UiButton variant="clear" shape="circle" icon-only> —
+     liquid-glass material + the shared Apple-glass morph come from the system. */
 
   /* Content */
   .share-popup-content {
@@ -493,12 +465,6 @@
     .share-popup-header,
     .share-popup-content {
       animation: none;
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .share-popup-close:hover {
-        transform: none;
-      }
     }
   }
 </style>

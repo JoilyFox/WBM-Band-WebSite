@@ -26,17 +26,18 @@
 
           <!-- Social Media Links Row -->
           <div class="flex space-x-4">
-            <a
+            <UiButton
               v-for="social in socialLinks"
               :key="social.name"
+              variant="clear"
+              size="sm"
+              shape="circle"
+              icon-only
+              :icon="social.icon"
               :href="social.url"
               :aria-label="social.label"
-              class="social-link-minimal"
               target="_blank"
-              rel="noopener noreferrer"
-            >
-              <i :class="social.icon" class="text-lg"></i>
-            </a>
+            />
           </div>
 
           <!-- Privacy Policy Links Row -->
@@ -90,17 +91,18 @@
 
           <!-- Center Section: Social Media Links -->
           <div class="flex space-x-4">
-            <a
+            <UiButton
               v-for="social in socialLinks"
               :key="social.name"
+              variant="clear"
+              size="sm"
+              shape="circle"
+              icon-only
+              :icon="social.icon"
               :href="social.url"
               :aria-label="social.label"
-              class="social-link-minimal"
               target="_blank"
-              rel="noopener noreferrer"
-            >
-              <i :class="social.icon" class="text-lg"></i>
-            </a>
+            />
           </div>
 
           <!-- Right Section: Legal Links and Developer Credit -->
@@ -164,17 +166,18 @@
 
               <!-- Social Media Links -->
               <div class="flex space-x-4 justify-center lg:justify-start">
-                <a
+                <UiButton
                   v-for="social in socialLinks"
                   :key="social.name"
+                  variant="clear"
+                  size="md"
+                  shape="circle"
+                  icon-only
+                  :icon="social.icon"
                   :href="social.url"
                   :aria-label="social.label"
-                  class="social-link"
                   target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i :class="social.icon" class="text-xl"></i>
-                </a>
+                />
               </div>
             </div>
 
@@ -585,50 +588,6 @@
     }
   }
 
-  /* Social media links */
-  .social-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 50%;
-    color: rgba(255, 255, 255, 0.7);
-    transition: all 0.3s ease;
-    /* Liquid glass: clear frost + saturation + specular rim */
-    backdrop-filter: blur(6px) saturate(1.5);
-    -webkit-backdrop-filter: blur(6px) saturate(1.5);
-    box-shadow:
-      inset 1.2px 1.2px 0.5px -0.8px rgba(255, 255, 255, 0.45),
-      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.12);
-  }
-
-  /* Desktop hover effects only */
-  @media (hover: hover) and (pointer: fine) {
-    .social-link:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-      color: rgba(255, 255, 255, 0.9);
-      transform: translateY(-2px) scale(1.05);
-      box-shadow:
-        0 4px 15px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    }
-  }
-
-  /* Mobile and touch device specific styles */
-  @media (hover: none) and (pointer: coarse) {
-    .social-link:active {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-      color: rgba(255, 255, 255, 0.9);
-      transform: scale(0.95);
-      transition-duration: 0.15s;
-    }
-  }
-
   /* Contact items */
   .footer-contact-item {
     display: flex;
@@ -794,7 +753,6 @@
 
   /* Focus states for accessibility */
   .footer-link:focus-visible,
-  .social-link:focus-visible,
   .streaming-icon-link:focus-visible,
   .legal-link:focus-visible,
   .footer-logo-button:focus-visible,
@@ -805,7 +763,6 @@
 
   /* Remove default focus outlines on click */
   .footer-link:focus:not(:focus-visible),
-  .social-link:focus:not(:focus-visible),
   .streaming-icon-link:focus:not(:focus-visible),
   .legal-link:focus:not(:focus-visible),
   .footer-logo-button:focus:not(:focus-visible),
@@ -844,11 +801,6 @@
       font-size: 0.8rem;
     }
 
-    .social-link {
-      width: 2.25rem;
-      height: 2.25rem;
-    }
-
     .legal-link {
       font-size: 0.7rem;
     }
@@ -868,7 +820,6 @@
   /* Reduce motion for accessibility */
   @media (prefers-reduced-motion: reduce) {
     .footer-link,
-    .social-link,
     .streaming-icon-link,
     .legal-link,
     .footer-logo-button,
@@ -881,7 +832,6 @@
     }
 
     .footer-link:hover,
-    .social-link:hover,
     .streaming-icon-link:hover,
     .legal-link:hover,
     .footer-logo-button:hover,
@@ -899,7 +849,6 @@
     }
 
     .footer-link:active,
-    .social-link:active,
     .streaming-icon-link:active,
     .legal-link:active,
     .footer-logo-button:active,
@@ -958,56 +907,6 @@
     filter: brightness(1.1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2));
   }
 
-  .social-link-minimal {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 50%;
-    color: rgba(255, 255, 255, 0.7);
-    transition: all 0.3s ease;
-    /* Liquid glass: clear frost + saturation + specular rim */
-    backdrop-filter: blur(6px) saturate(1.5);
-    -webkit-backdrop-filter: blur(6px) saturate(1.5);
-    box-shadow:
-      inset 1.2px 1.2px 0.5px -0.8px rgba(255, 255, 255, 0.45),
-      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.12);
-    text-decoration: none;
-  }
-
-  /* Desktop hover effects only */
-  @media (hover: hover) and (pointer: fine) {
-    .social-link-minimal:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-      color: rgba(255, 255, 255, 0.9);
-      transform: translateY(-2px) scale(1.05);
-      box-shadow:
-        0 4px 15px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    }
-  }
-
-  /* Mobile and touch device specific styles */
-  @media (hover: none) and (pointer: coarse) {
-    .social-link-minimal:active {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-      color: rgba(255, 255, 255, 0.9);
-      transform: scale(0.95);
-      transition-duration: 0.15s;
-    }
-  }
-
-  /* Focus state for accessibility */
-  .social-link-minimal:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.3);
-    outline-offset: 2px;
-  }
-
   .legal-link-minimal {
     color: rgba(255, 255, 255, 0.3);
     font-size: 0.75rem;
@@ -1060,19 +959,16 @@
   /* Reduced motion support for minimized footer */
   @media (prefers-reduced-motion: reduce) {
     .footer-logo-link-minimal,
-    .social-link-minimal,
     .legal-link-minimal {
       transition: none;
     }
 
     .footer-logo-link-minimal:hover,
-    .social-link-minimal:hover,
     .legal-link-minimal:hover {
       transform: none;
     }
 
     .footer-logo-link-minimal:active,
-    .social-link-minimal:active,
     .legal-link-minimal:active {
       transform: none;
     }
@@ -1086,7 +982,6 @@
     }
 
     .footer-link,
-    .social-link,
     .legal-link,
     .developer-link {
       color: #ffffff;
@@ -1095,8 +990,6 @@
 
     .footer-link:hover,
     .footer-link:focus,
-    .social-link:hover,
-    .social-link:focus,
     .legal-link:hover,
     .legal-link:focus,
     .developer-link:hover,
@@ -1145,7 +1038,6 @@
 
     /* High contrast overrides for minimized footer */
     .footer-minimized .footer-logo-link-minimal,
-    .footer-minimized .social-link-minimal,
     .footer-minimized .legal-link-minimal {
       color: #ffffff;
       border-color: #ffffff;
@@ -1153,8 +1045,6 @@
 
     .footer-minimized .footer-logo-link-minimal:hover,
     .footer-minimized .footer-logo-link-minimal:focus,
-    .footer-minimized .social-link-minimal:hover,
-    .footer-minimized .social-link-minimal:focus,
     .footer-minimized .legal-link-minimal:hover,
     .footer-minimized .legal-link-minimal:focus {
       background: #ffffff;
