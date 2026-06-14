@@ -32,12 +32,19 @@
     inset -2px -2px 1px -1.5px rgb(255 255 255 / 0.16),
     0 8px 20px rgb(0 0 0 / 0.28);
 
-  /* Only animate compositor-friendly props (never backdrop-filter). */
+  /* "Liquid" morph (no glow), mirroring .liquid-glass-interactive: elastic curve
+     drives the press-release spring; only compositor-friendly props animate
+     (never backdrop-filter). */
   transition:
-    transform 0.36s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.2s ease,
-    border-color 0.2s ease,
+    transform 0.46s cubic-bezier(0.34, 1.6, 0.5, 1),
+    border-color 0.25s ease,
     opacity 0.3s ease;
+
+  /* The chevron swells on hover (the glass plate keeps its frost), squishes on
+     press. */
+  & > * {
+    transition: transform 0.46s cubic-bezier(0.34, 1.6, 0.5, 1);
+  }
 
   /* Default opacity 0 (hidden until hover) - can be overridden */
   opacity: 0;
@@ -46,21 +53,23 @@
      on touchscreens (this mixin is shared by every swiper nav button). */
   @media (hover: hover) and (pointer: fine) {
     &:hover {
-      border-color: rgb(255 255 255 / 0.3);
-      box-shadow:
-        inset 0 1px 0.5px rgb(255 255 255 / 0.55),
-        inset 2px 2px 1.5px -1.5px rgb(255 255 255 / 0.92),
-        inset -2px -2px 1.5px -1.5px rgb(255 255 255 / 0.32),
-        0 0 16px -2px rgb(255 255 255 / 0.22),
-        0 10px 24px rgb(0 0 0 / 0.32);
+      border-color: rgb(255 255 255 / 0.2);
+    }
+    &:hover > * {
+      transform: scale(1.22);
     }
   }
 
-  /* Press: nudge up, bouncy-settle on release (transient transform — its
-     one-frame frost drop reads as the press). */
+  /* Press: the glass squashes like soft gel, then springs back with the elastic
+     base curve (transient transform — its one-frame frost drop reads as the
+     squish). */
   &:active {
-    transform: scale(1.06);
-    transition: transform 0.11s ease-out;
+    transform: scale(0.9);
+    transition: transform 0.12s cubic-bezier(0.5, 0, 0.75, 0.35);
+  }
+  &:active > * {
+    transform: scale(0.86);
+    transition: transform 0.12s ease-out;
   }
 
   /* pointer-events:none means :hover / :active never fire — disabled stays
@@ -73,7 +82,12 @@
   @media (prefers-reduced-motion: reduce) {
     transition: opacity 0.3s ease;
 
-    &:active {
+    & > * {
+      transition: none;
+    }
+    &:active,
+    &:active > *,
+    &:hover > * {
       transform: none;
     }
   }
