@@ -12,6 +12,16 @@
         :style="popupStyle"
         @click.stop
       >
+        <!-- Glass pointer toward the share button (desktop). A separate element,
+             not a ::before/::after — those pseudos belong to the liquid-glass
+             material (frost + rim). -->
+        <span
+          class="share-popup-arrow"
+          :class="arrowPlacement"
+          :style="arrowStyle"
+          aria-hidden="true"
+        />
+
         <!-- Header -->
         <div class="share-popup-header">
           <h3 class="share-popup-title">{{ t('music.share_popup.title') }}</h3>
@@ -93,6 +103,12 @@
 
   // Popup positioning
   const popupStyle = ref({})
+  // Arrow (pointer toward the share button). placement = which side of the button
+  // the popup sits on; arrowStyle.left aligns the arrow with the button's centre.
+  const arrowPlacement = ref<'below' | 'above'>('below')
+  const arrowStyle = ref({})
+
+  const ARROW_GAP = 12 // space between button and popup, leaving room for the arrow
 
   // Calculate popup position relative to target
   const calculatePosition = () => {
@@ -103,7 +119,8 @@
     const popupRect = popupEl.getBoundingClientRect()
 
     // Position popup below the target with some offset
-    let top = target.bottom + 10
+    let top = target.bottom + ARROW_GAP
+    let placement: 'below' | 'above' = 'below'
     let left = target.left + target.width / 2 - popupRect.width / 2
 
     // Ensure popup stays within viewport
@@ -119,9 +136,18 @@
 
     // If popup would go off-screen at bottom, position above target
     if (top + popupRect.height > viewportHeight - 10) {
-      top = target.top - popupRect.height - 10
+      top = target.top - popupRect.height - ARROW_GAP
+      placement = 'above'
     }
 
+    // Align the arrow with the button's horizontal centre, clamped so it never
+    // slides past the popup's rounded corners (even when the popup was nudged to
+    // stay on-screen).
+    const buttonCenterX = target.left + target.width / 2
+    const arrowLeft = Math.max(18, Math.min(popupRect.width - 18, buttonCenterX - left))
+
+    arrowPlacement.value = placement
+    arrowStyle.value = { left: `${arrowLeft}px` }
     popupStyle.value = {
       position: 'fixed',
       top: `${top}px`,
@@ -212,30 +238,42 @@
     width: 400px;
     max-width: 90vw;
     color: white;
-    animation: popupFadeIn 0.2s ease-out;
   }
 
-  /* Smooth frost-in. The opacity fade above suppresses the panel's
-     backdrop-filter while it runs, so the blur would SNAP on when the fade ends.
-     A deterministic keyframe on the ::before holds the blur at 0 for the first
-     ~36% (≈ the 0.2s fade), then ramps it 0 -> full — so the frost grows in
-     just as the fade finishes. (Animation on the ::before, not the host, and
-     not opacity, so it never re-triggers the backdrop-root suppression.) */
+  /* Materialize from the first frame the popup mounts (like the release modal):
+     NO opacity/transform on the host — those would make it a backdrop root and
+     suppress the frost — so the blur ramps in immediately. The frost grows on
+     the ::before, the content (+ arrow) fades and rises. */
   .custom-share-popup::before {
-    animation: popupFrostIn 0.55s ease-out;
+    animation: popupFrostIn 0.4s ease-out both;
   }
 
   @keyframes popupFrostIn {
-    0%,
-    36% {
+    from {
       -webkit-backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
       backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
     }
-    100% {
+    to {
       -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate))
         brightness(var(--lg-brightness));
       backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate))
         brightness(var(--lg-brightness));
+    }
+  }
+
+  .share-popup-header,
+  .share-popup-content {
+    animation: popupContentIn 0.4s ease-out both;
+  }
+
+  @keyframes popupContentIn {
+    from {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
     }
   }
 
@@ -389,22 +427,41 @@
     }
   }
 
-  /* Animations — opacity-only entry. A transform on the host would turn it
-     into a backdrop root and suppress the liquid-glass frost while the
-     animation runs, so the original scale/translate was dropped. */
-  @keyframes popupFadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+  /* Glass pointer toward the share button. A frosted triangle (clip-path on a
+     small backdrop-filtered box) that samples the page just like the popup, so
+     it reads as the same glass tapering to a point. Horizontal position comes
+     from arrowStyle (aligned to the button centre); placement flips it up/down
+     depending on whether the popup sits below or above the button. */
+  .share-popup-arrow {
+    position: absolute;
+    width: 22px;
+    height: 12px;
+    margin-left: -11px; /* centre on the arrowStyle.left anchor */
+    /* A touch more tint than the body so the small point still reads as glass
+       over the dark gap, plus the page frost behind it. */
+    background: linear-gradient(160deg, rgb(255 255 255 / 0.17) 0%, rgb(255 255 255 / 0.07) 100%);
+    -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate))
+      brightness(var(--lg-brightness));
+    backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate))
+      brightness(var(--lg-brightness));
+    z-index: -1;
+    animation: popupFrostIn 0.4s ease-out both;
   }
 
-  /* Note: the previous CSS-triangle arrow used .custom-share-popup::before /
-     ::after. Those pseudos are now owned by the liquid-glass material (frost +
-     specular rim), so the arrow is intentionally dropped — re-adding it here
-     would override the material's pseudos and kill the frosted backdrop. */
+  .share-popup-arrow.below {
+    top: -11px; /* base meets the popup's top edge, tip points up at the button */
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    /* specular rim on the leading (top) point + a little depth below */
+    filter: drop-shadow(0 -1px 0.5px rgb(255 255 255 / 0.3))
+      drop-shadow(0 1px 2px rgb(0 0 0 / 0.22));
+  }
+
+  .share-popup-arrow.above {
+    bottom: -11px; /* tip points down at the button */
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    filter: drop-shadow(0 1px 0.5px rgb(255 255 255 / 0.3))
+      drop-shadow(0 -1px 2px rgb(0 0 0 / 0.22));
+  }
 
   /* Responsive */
   @media (max-width: 640px) {
@@ -431,7 +488,10 @@
   /* Performance optimizations */
   @media (prefers-reduced-motion: reduce) {
     .custom-share-popup,
-    .custom-share-popup::before {
+    .custom-share-popup::before,
+    .share-popup-arrow,
+    .share-popup-header,
+    .share-popup-content {
       animation: none;
     }
 
