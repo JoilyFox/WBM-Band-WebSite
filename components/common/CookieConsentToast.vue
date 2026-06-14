@@ -13,16 +13,24 @@
     >
       <p class="cookie-toast__message">{{ t('cookies.banner.message') }}</p>
       <div class="cookie-toast__actions">
-        <button type="button" class="cookie-toast__btn cookie-toast__btn--accept" @click="onAccept">
+        <UiButton
+          variant="solid"
+          size="sm"
+          shape="rounded"
+          class="cookie-toast__btn--accept"
+          @click="onAccept"
+        >
           {{ t('cookies.banner.accept') }}
-        </button>
-        <button
-          type="button"
-          class="cookie-toast__btn cookie-toast__btn--decline"
+        </UiButton>
+        <UiButton
+          variant="outline"
+          size="sm"
+          shape="rounded"
+          class="cookie-toast__btn--decline"
           @click="onDecline"
         >
           {{ t('cookies.banner.decline') }}
-        </button>
+        </UiButton>
         <NuxtLinkLocale to="/cookies-policy" class="cookie-toast__link">
           {{ t('cookies.banner.details') }}
         </NuxtLinkLocale>
@@ -213,46 +221,8 @@
     flex-wrap: wrap;
   }
 
-  .cookie-toast__btn {
-    appearance: none;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    color: white;
-    padding: 0.45rem 0.9rem;
-    border-radius: 0.55rem;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition:
-      background-color 0.18s ease,
-      border-color 0.18s ease,
-      transform 0.18s ease;
-    font-family: inherit;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .cookie-toast__btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.28);
-    }
-  }
-
-  .cookie-toast__btn:active {
-    transform: scale(0.97);
-  }
-
-  .cookie-toast__btn--accept {
-    background: rgba(255, 255, 255, 0.92);
-    color: #0f0f12;
-    border-color: transparent;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .cookie-toast__btn--accept:hover {
-      background: white;
-    }
-  }
-
+  /* Accept/decline are now <UiButton variant="solid|outline" size="sm"> — styling
+     + interaction come from the unified button. Only the details link is bespoke. */
   .cookie-toast__link {
     margin-left: auto;
     font-size: 0.78rem;
