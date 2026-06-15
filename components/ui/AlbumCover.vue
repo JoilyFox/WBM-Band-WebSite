@@ -33,12 +33,11 @@
 
     <!-- Play Overlay (Desktop only) — clear liquid-glass play button. Decorative
          (the card itself is the click target), so it's aria-hidden / not focusable
-         and just lets the click bubble. No scale-in transform: a persistent scale
-         on the glass host (or an ancestor) would suppress its backdrop frost while
-         hovered — the overlay's fade + the button's own morph carry it instead. -->
-    <div
-      class="absolute inset-0 md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 hidden"
-    >
+         and just lets the click bubble. The overlay is NOT opacity-faded: an
+         ancestor opacity < 1 suppresses the button's backdrop-filter mid-fade (the
+         blur would pop in late). Instead the button "frosts in" on hover — its
+         blur, tint, rim and icon all ramp while the host stays opaque (see CSS). -->
+    <div class="absolute inset-0 md:flex items-center justify-center z-20 hidden">
       <UiButton
         variant="clear"
         shape="circle"
@@ -126,5 +125,68 @@
   /* Optically centre the play triangle (it reads slightly left-heavy dead-centre). */
   .album-play-btn :deep(.lg-btn__icon) {
     margin-left: 2px;
+  }
+
+  /* --- Frost-in reveal ---------------------------------------------------
+     The play button materialises on card hover by ramping its OWN blur + fading
+     its tint/rim/icon — never via an ancestor opacity (that suppresses the
+     backdrop-filter while < 1, making the blur pop in late). The host stays
+     opaque the whole time, so the frost paints smoothly as it appears. */
+  .album-play-btn {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    transition:
+      background 0.3s ease,
+      border-color 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .album-play-btn::before {
+    -webkit-backdrop-filter: blur(0) saturate(1) brightness(1);
+    backdrop-filter: blur(0) saturate(1) brightness(1);
+    transition:
+      backdrop-filter 0.3s ease,
+      -webkit-backdrop-filter 0.3s ease;
+  }
+  .album-play-btn::after {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .album-play-btn :deep(.lg-btn__content) {
+    opacity: 0;
+    transition:
+      opacity 0.3s ease,
+      transform 0.46s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .group:hover .album-play-btn {
+      background: var(--lg-tint);
+      border-color: rgb(255 255 255 / 0.12);
+      box-shadow:
+        0 8px 24px rgb(0 0 0 / 0.25),
+        0 2px 6px rgb(0 0 0 / 0.16);
+    }
+    .group:hover .album-play-btn::before {
+      -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate))
+        brightness(var(--lg-brightness));
+      backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturate))
+        brightness(var(--lg-brightness));
+    }
+    .group:hover .album-play-btn::after {
+      opacity: 1;
+    }
+    .group:hover .album-play-btn :deep(.lg-btn__content) {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .album-play-btn,
+    .album-play-btn::before,
+    .album-play-btn::after,
+    .album-play-btn :deep(.lg-btn__content) {
+      transition: none;
+    }
   }
 </style>
