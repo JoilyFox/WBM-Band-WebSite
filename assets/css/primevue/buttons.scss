@@ -128,7 +128,7 @@
     ) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border: none !important;
     border-radius: 0.75rem !important;
     padding: 0.75rem 1.5rem !important;
     color: rgba(255, 255, 255, 0.9) !important;
@@ -180,14 +180,14 @@
     &:focus {
       outline: none !important;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      border: none !important;
     }
 
     /* Focus ring only on non-touch devices */
     @media (hover: hover) and (pointer: fine) {
       &:focus-visible {
         @apply ring-2 ring-primary-200 ring-offset-2 ring-offset-transparent;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border: none !important;
       }
     }
 
@@ -213,7 +213,7 @@
         rgba(255, 255, 255, 0.15) 0%,
         rgba(255, 255, 255, 0.08) 100%
       ) !important;
-      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      border: none !important;
       color: white !important;
       transform: scale(0.98) !important;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
@@ -231,13 +231,13 @@
         color: rgba(255, 255, 255, 0.9) !important;
         transform: none !important;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border: none !important;
       }
 
       &:focus {
         @apply ring-0;
         outline: none !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border: none !important;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
       }
     }

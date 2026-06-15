@@ -185,6 +185,23 @@ body.lg-tier-low .share-glass-btn {
   pointer-events: none;
 }
 
+/* Frost-in: the scroll dim/undim is an opacity change, and opacity < 1 suppresses
+   the ::before backdrop-filter — so on the way back to full the blur used to pop
+   in once opacity hit 1. Hold the frost at blur(0) while dimmed and ramp it with a
+   delay (~ the opacity fade) so it appears smoothly just after the button reaches
+   full opacity, instead of snapping. */
+.back-glass-btn::before,
+.share-glass-btn::before {
+  transition:
+    backdrop-filter 0.45s ease 0.4s,
+    -webkit-backdrop-filter 0.45s ease 0.4s;
+}
+.floating-controls .back-glass-btn--transparent::before,
+.floating-controls .share-glass-btn--transparent::before {
+  -webkit-backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+  backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+}
+
 /* Preserve transitions for buttons even while modal performance classes are active */
 :global(body.modal-open) .back-glass-btn,
 :global(body.modal-open) .share-glass-btn {
