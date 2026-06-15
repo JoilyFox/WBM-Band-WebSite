@@ -9,15 +9,16 @@
         'liquid-glass',
         'liquid-glass--pill',
         'liquid-glass-interactive',
-        { 'lang-switch--big': size === 'big', 'lang-switch--animating': animating }
+        { 'lang-switch--big': size === 'big', 'lang-switch--js': jsReady }
       ]"
       :aria-label="t('lang.switch_label')"
       :aria-pressed="true"
       @click="toggleLocale"
     >
-      <!-- Overlay pill — hidden at rest; only shown while sliding between labels.
-           The RESTING pill is each label's own ::before (CSS, so it's correct from
-           the first server paint with zero JS measuring). -->
+      <!-- The pill. Until JS has measured the labels it's the active label's CSS
+           ::before (present from the first server paint — no flash). After mount
+           the persistent JS thumb takes over (same spot, seamless) so it can
+           SLIDE between labels. -->
       <span ref="thumbEl" class="lang-thumb" aria-hidden="true" />
       <span
         ref="enEl"
@@ -60,20 +61,39 @@
   }
 
   // --- Liquid slide -------------------------------------------------------
-  // The active label paints its own white pill via CSS (.lang-btn.active::before)
-  // — perfectly rounded, auto-sized to the text, present from the first paint, no
-  // JS measuring. On a switch we hide that static pill and slide an absolutely-
-  // positioned overlay (the "thumb") from the old label to the new one with a
-  // WIDTH-based morph (never scaleX, which would distort the radius). The labels
-  // never move, so we can measure their boxes any time. Reduced-motion / low tier
-  // skip the slide and let the CSS pill switch instantly.
+  // A single PERSISTENT white pill (the thumb) sits over the active label and
+  // slides to the other on change. We animate WIDTH (+ translateX), never scaleX
+  // — scaling a rounded rect warps its corners; a real width change keeps the
+  // border-radius:9999px capsule perfect at any text width. Before JS measures,
+  // the active label's CSS ::before is the pill (so the button is complete on the
+  // first server-rendered paint, no flash); on mount the thumb takes over in the
+  // same spot. Reduced-motion / low tier snap instantly.
   const btnEl = ref<HTMLButtonElement | null>(null)
   const thumbEl = ref<HTMLSpanElement | null>(null)
   const enEl = ref<HTMLSpanElement | null>(null)
   const uaEl = ref<HTMLSpanElement | null>(null)
 
-  const animating = ref(false)
+  const jsReady = ref(false)
   let running: Animation | null = null
+  let ro: ResizeObserver | null = null
+
+  type Box = { left: number; top: number; w: number; h: number }
+  const boxFor = (loc: string): Box | null => {
+    const el = loc === 'en' ? enEl.value : uaEl.value
+    if (!el) return null
+    return { left: el.offsetLeft, top: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }
+  }
+
+  // Pin the thumb to a label box (its resting state — explicit size, no transform).
+  const placeThumb = (b: Box) => {
+    const t = thumbEl.value
+    if (!t) return
+    t.style.left = `${b.left}px`
+    t.style.top = `${b.top}px`
+    t.style.width = `${b.w}px`
+    t.style.height = `${b.h}px`
+    t.style.transform = 'none'
+  }
 
   const wantsMotion = () => {
     if (typeof window === 'undefined') return false
@@ -82,50 +102,60 @@
     return true
   }
 
+  onMounted(() => {
+    // Wait a frame so layout (and webfont metrics) settle before measuring, then
+    // hand the pill off from the CSS ::before to the persistent JS thumb.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        const b = boxFor(locale.value)
+        if (!b) return
+        placeThumb(b)
+        jsReady.value = true
+        ro = new ResizeObserver(() => {
+          // Re-fit (font load / container resize) without a morph.
+          const cur = boxFor(locale.value)
+          if (cur && !running) placeThumb(cur)
+        })
+        if (btnEl.value) ro.observe(btnEl.value)
+      })
+    )
+  })
+
   watch(locale, (newLoc, oldLoc) => {
-    const thumb = thumbEl.value
-    const btn = btnEl.value
-    const oldEl = oldLoc === 'en' ? enEl.value : uaEl.value
-    const newEl = newLoc === 'en' ? enEl.value : uaEl.value
-    if (!thumb || !btn || !oldEl || !newEl || !wantsMotion()) return
+    const t = thumbEl.value
+    if (!t || !jsReady.value) return
+    const from = boxFor(oldLoc)
+    const to = boxFor(newLoc)
+    if (!from || !to) return
 
-    const c = btn.getBoundingClientRect()
-    const o = oldEl.getBoundingClientRect()
-    const n = newEl.getBoundingClientRect()
+    // Settle on the destination first so the animation can drop its fill cleanly.
+    placeThumb(to)
+    if (!wantsMotion()) return
 
-    // Park the overlay on the NEW label (its resting end); the morph plays FROM
-    // the old label's box back to here, so the final frame matches the static
-    // pill that takes over when `animating` ends — a seamless handoff.
-    thumb.style.left = `${n.left - c.left}px`
-    thumb.style.top = `${n.top - c.top}px`
-    thumb.style.height = `${n.height}px`
-
-    const dx = o.left - n.left
-    const oldW = o.width
-    const newW = n.width
+    const dx = from.left - to.left
     // Stretch a touch wider than either end mid-travel + a slight vertical squash
     // — the gooey "liquid" beat — then settle with the soft overshoot easing.
-    const midW = Math.max(oldW, newW) * 1.16
+    const midW = Math.max(from.w, to.w) * 1.16
 
     running?.cancel()
-    animating.value = true
-    running = thumb.animate(
+    running = t.animate(
       [
-        { width: `${oldW}px`, transform: `translateX(${dx}px) scaleY(1)` },
+        { width: `${from.w}px`, transform: `translateX(${dx}px) scaleY(1)` },
         { width: `${midW}px`, transform: `translateX(${dx * 0.5}px) scaleY(0.88)`, offset: 0.5 },
-        { width: `${newW}px`, transform: `translateX(0px) scaleY(1)` }
+        { width: `${to.w}px`, transform: `translateX(0px) scaleY(1)` }
       ],
       { duration: 440, easing: 'cubic-bezier(0.34, 1.32, 0.46, 1)', fill: 'none' }
     )
-    const done = () => {
-      animating.value = false
+    const clear = () => {
+      if (running) running = null
     }
-    running.onfinish = done
-    running.oncancel = done
+    running.onfinish = clear
+    running.oncancel = clear
   })
 
   onBeforeUnmount(() => {
     running?.cancel()
+    ro?.disconnect()
   })
 </script>
 
@@ -168,9 +198,9 @@
     color: #000;
   }
 
-  /* RESTING pill — the active label's own background. Perfect pill (radius is a
-     full capsule, so it's round at any text width) and present from the first
-     server-rendered paint, so the button loads complete with no flash. */
+  /* First-paint pill — the active label's own background. Perfect capsule (round
+     at any text width) and present from the server-rendered HTML, so the button
+     loads complete with no flash. Handed off to the JS thumb once it's ready. */
   .lang-btn.active::before {
     content: '';
     position: absolute;
@@ -182,14 +212,12 @@
       0 1px 2px rgb(0 0 0 / 0.18),
       inset 0 0 0 0.5px rgb(255 255 255 / 0.6);
   }
-  /* While sliding, the static pill steps aside so the overlay carries the motion. */
-  .lang-switch--animating .lang-btn.active::before {
-    opacity: 0;
+  .lang-switch--js .lang-btn.active::before {
+    display: none;
   }
 
-  /* OVERLAY pill — only visible during a switch; slides + morphs (width-based) from
-     the old label to the new one. transform-origin keeps the vertical squash
-     centred; width grows from the left edge so the slide reads naturally. */
+  /* The persistent sliding pill. Hidden until JS pins it (jsReady); then it's the
+     pill and slides on switch. Width-animated, so border-radius stays perfect. */
   .lang-thumb {
     position: absolute;
     top: 0;
@@ -207,7 +235,7 @@
     z-index: 0;
     will-change: transform, width;
   }
-  .lang-switch--animating .lang-thumb {
+  .lang-switch--js .lang-thumb {
     opacity: 1;
   }
 
