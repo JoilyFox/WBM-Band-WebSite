@@ -200,9 +200,22 @@ export default defineNuxtPlugin((nuxtApp) => {
         if (!raf) raf = requestAnimationFrame(update)
       }
 
+      // ResizeObserver fires EVERY frame while an element animates its size — e.g.
+      // the release modal's links<->lyrics height tween (0.42s). Rebuilding the
+      // full-size displacement map per frame is expensive enough to freeze the
+      // main thread for ~1-2s, so debounce resize-driven rebuilds: regenerate the
+      // map once after the size settles. (The map is briefly stale for the old
+      // size mid-animation — imperceptible for the subtle refraction.) The initial
+      // build and tier-class changes below stay immediate.
+      let resizeTimer = 0
+      const scheduleAfterResize = () => {
+        if (resizeTimer) clearTimeout(resizeTimer)
+        resizeTimer = window.setTimeout(schedule, 140)
+      }
+
       // Defer the first build so layout + the async body tier class are settled.
       schedule()
-      const ro = new ResizeObserver(schedule)
+      const ro = new ResizeObserver(scheduleAfterResize)
       ro.observe(el)
       // The body tier class arrives after client detection; re-check when <body>
       // class changes (update() itself no-ops if nothing relevant changed).
@@ -211,6 +224,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
       physicsCleanups.set(el, () => {
         if (raf) cancelAnimationFrame(raf)
+        if (resizeTimer) clearTimeout(resizeTimer)
         ro.disconnect()
         tierObserver.disconnect()
         filter.remove()
