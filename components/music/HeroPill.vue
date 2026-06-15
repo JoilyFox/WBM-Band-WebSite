@@ -88,7 +88,7 @@
   // sizing; `self-center` pins align-self so a flex parent can't stretch the pill.
   // `relative` anchors the scoped ::after specular rim/sheen (added in <style>).
   const pillClass = computed(() => [
-    'music-hero-pill relative inline-flex appearance-none items-center justify-center self-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-1 text-sm font-medium leading-5 text-primary-200/70 bg-white/5 backdrop-blur-md transition-[transform,background-color] duration-100 ease-in-out hover:bg-white/10 active:scale-[0.98] active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25',
+    'music-hero-pill relative inline-flex appearance-none items-center justify-center self-center gap-2 whitespace-nowrap rounded-full px-3.5 py-1 text-sm font-medium leading-5 text-primary-200/70 bg-white/5 backdrop-blur-md transition-[transform,background-color] duration-100 ease-in-out hover:bg-white/10 active:scale-[0.98] active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25',
     { 'music-hero-pill--video': props.accent === 'video' }
   ])
 </script>
