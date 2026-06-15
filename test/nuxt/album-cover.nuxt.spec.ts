@@ -25,13 +25,14 @@ import type { MusicRelease } from '~/data/musicLibrary'
 // composer, so we assert the ENGLISH strings it actually produces and exercise
 // the Ukrainian path by explicitly flipping the shared locale (then restoring).
 //
-// AppBadge (unstyled → renders a <span>) encodes its variant in a stable Tailwind
-// background class, so we read the variant off that span. variant → class anchors:
+// AppBadge (liquid-glass) encodes its variant in a stable `app-badge--{variant}`
+// class (the per-type colour is the --lg-tint), so we read the variant off that
+// span. variant → class anchors:
 const VARIANT_CLASS = {
-  single: 'bg-blue-600/40',
-  album: 'bg-purple-600/40',
-  ep: 'bg-pink-600/40',
-  glass: 'bg-black/70'
+  single: 'app-badge--single',
+  album: 'app-badge--album',
+  ep: 'app-badge--ep',
+  glass: 'app-badge--glass'
 } as const
 
 const baseProps = (overrides: Record<string, unknown> = {}) => ({

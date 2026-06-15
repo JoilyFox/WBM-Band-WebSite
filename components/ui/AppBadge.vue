@@ -1,47 +1,60 @@
 <template>
   <span
-    class="flex items-center justify-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/25 shadow-md transition-all duration-300 md:px-3 md:py-1 max-md:px-2 max-md:py-0.5 max-md:text-[0.65rem] whitespace-nowrap"
-    :class="variantClasses"
+    class="app-badge liquid-glass flex items-center justify-center whitespace-nowrap px-3 py-1 text-xs font-bold uppercase tracking-wider text-white md:px-3 md:py-1 max-md:px-2 max-md:py-0.5 max-md:text-[0.65rem]"
+    :class="`app-badge--${variant}`"
   >
     <slot>{{ text }}</slot>
   </span>
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
-
   interface Props {
     text?: string
     variant?: 'glass' | 'presave' | 'single' | 'album' | 'ep' | 'new' | 'contrast'
   }
 
-  const props = withDefaults(defineProps<Props>(), {
+  withDefaults(defineProps<Props>(), {
     text: '',
     variant: 'glass'
-  })
-
-  const variantClasses = computed(() => {
-    switch (props.variant) {
-      case 'presave':
-        return 'bg-gradient-to-br from-purple-600/50 to-pink-600/50 text-white backdrop-blur-md shadow-purple-500/20'
-      case 'single':
-        return 'bg-blue-600/40 text-white backdrop-blur-md'
-      case 'album':
-        return 'bg-purple-600/40 text-white backdrop-blur-md'
-      case 'ep':
-        return 'bg-pink-600/40 text-white backdrop-blur-md'
-      case 'new':
-        return 'bg-green-600/40 text-white backdrop-blur-md'
-      case 'contrast':
-      case 'glass':
-      default:
-        return 'bg-black/70 text-white backdrop-blur-md'
-    }
   })
 </script>
 
 <style scoped>
-  span {
+  /* Liquid-glass badge: the frost + specular rim come from the .liquid-glass
+     material; each release type just sets its colour as the translucent tint, so
+     it frosts the artwork behind it while staying type-coded. */
+  .app-badge {
+    --lg-radius: 0.5rem;
+    --lg-blur: 6px;
+    --lg-blur-full: 9px;
+    --lg-saturate: 150%;
+    --lg-saturate-full: 165%;
+    --lg-brightness: 1.06;
+    --lg-rim: rgb(255 255 255 / 0.55);
+    --lg-rim-soft: rgb(255 255 255 / 0.18);
+    --lg-gloss: rgb(255 255 255 / 0.22);
+    /* A badge sits flat on the art — keep the elevation modest, not panel-deep. */
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.3);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .app-badge--single {
+    --lg-tint: rgb(37 99 235 / 0.46); /* blue-600 */
+  }
+  .app-badge--album {
+    --lg-tint: rgb(147 51 234 / 0.46); /* purple-600 */
+  }
+  .app-badge--ep {
+    --lg-tint: rgb(219 39 119 / 0.46); /* pink-600 */
+  }
+  .app-badge--new {
+    --lg-tint: rgb(22 163 74 / 0.46); /* green-600 */
+  }
+  .app-badge--presave {
+    --lg-tint: linear-gradient(135deg, rgb(147 51 234 / 0.52) 0%, rgb(219 39 119 / 0.52) 100%);
+  }
+  .app-badge--glass,
+  .app-badge--contrast {
+    --lg-tint: rgb(8 10 16 / 0.62);
   }
 </style>
