@@ -26,7 +26,7 @@
         <div class="share-popup-header">
           <h3 class="share-popup-title">{{ t('music.share_popup.title') }}</h3>
           <UiButton
-            variant="clear"
+            variant="dimmed"
             size="sm"
             shape="circle"
             icon-only

@@ -16,7 +16,7 @@
       <div v-if="!isModal" class="floating-controls">
         <button
           :class="[
-            'back-glass-btn',
+            'back-glass-btn liquid-glass liquid-glass--pill liquid-glass-interactive',
             {
               'back-glass-btn--transparent': backBtnTransparent
             }
@@ -47,7 +47,7 @@
 
           <button
             :class="[
-              'share-glass-btn',
+              'share-glass-btn liquid-glass liquid-glass--pill liquid-glass-interactive',
               {
                 'share-glass-btn--transparent': backBtnTransparent
               }

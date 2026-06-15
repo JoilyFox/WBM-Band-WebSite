@@ -412,6 +412,13 @@
     letter-spacing: 0.05em;
   }
 
+  /* The submit button presses DOWN slightly instead of the shared scale-up — a
+     subtler, more "form button" press. (Scoped specificity beats the global
+     .liquid-glass-interactive:active scale-up.) */
+  .submit-button:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
   /* Form Messages */
   .form-message {
     display: flex;

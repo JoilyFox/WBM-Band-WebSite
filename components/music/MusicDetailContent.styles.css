@@ -1,103 +1,119 @@
-  /* Floating fixed container that holds both buttons */
+/* Floating fixed container that holds both buttons */
+.floating-controls {
+  position: fixed;
+  top: 1.25rem;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  /* matches left/right offsets of individual buttons */
+  pointer-events: none;
+  /* let children handle interactions */
+}
+
+/* On desktop, only show back button on left */
+@media (min-width: 768px) {
   .floating-controls {
-    position: fixed;
-    top: 1.25rem;
-    left: 0;
-    right: 0;
-    z-index: 9999;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1rem;
-    /* matches left/right offsets of individual buttons */
-    pointer-events: none;
-    /* let children handle interactions */
+    justify-content: flex-start;
+    /* Align back button to left only */
   }
+}
 
-  /* On desktop, only show back button on left */
-  @media (min-width: 768px) {
-    .floating-controls {
-      justify-content: flex-start;
-      /* Align back button to left only */
-    }
-  }
+.floating-controls .back-glass-btn,
+.floating-controls .share-glass-btn {
+  pointer-events: auto;
+  /* RELATIVE (not static) so the .liquid-glass ::before resolves its containing
+       block to the BUTTON — static made it resolve against the fixed
+       .floating-controls and the frost blew up to full width. Relative flows
+       identically to static in this flex row. */
+  position: relative !important;
+  top: auto;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  /* Circular, darker tint than a default pill so the icon stays legible over
+       bright artwork. */
+  --lg-radius: 50%;
+  --lg-tint: rgb(22 24 32 / 0.46);
+  --lg-tint-flat: rgb(18 20 28 / 0.92);
+  /* Fold the scroll-opacity fade into the morph transition so both stay smooth
+       (this rule's specificity beats both .back-glass-btn and the shared
+       .liquid-glass-interactive transition). */
+  transition:
+    opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.36s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.2s ease,
+    --lg-glow 0.45s ease-out;
+}
 
-  .floating-controls .back-glass-btn,
-  .floating-controls .share-glass-btn {
-    pointer-events: auto;
-    position: static !important;
-    /* override fixed when inside container */
-    top: auto;
-    left: auto;
-    right: auto;
-    bottom: auto;
-  }
+/* Floating logo in the center */
+.floating-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  z-index: 10;
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+}
 
-  /* Floating logo in the center */
+/* Hide mobile elements on desktop as CSS safeguard */
+@media (min-width: 768px) {
   .floating-logo {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    pointer-events: auto;
-    z-index: 10;
-    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 1;
+    display: none !important;
   }
+}
 
-  /* Hide mobile elements on desktop as CSS safeguard */
-  @media (min-width: 768px) {
-    .floating-logo {
-      display: none !important;
-    }
-  }
+.floating-logo--transparent {
+  opacity: 0.2;
+  pointer-events: none;
+}
 
-  .floating-logo--transparent {
-    opacity: 0.2;
-    pointer-events: none;
-  }
+/* Logo button styles (similar to header layout) */
+.logo-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: transform 0.3s ease-out;
+}
 
-  /* Logo button styles (similar to header layout) */
-  .logo-button {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    outline: none;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    transition: transform 0.3s ease-out;
-  }
-
-  /* Hover only on devices that support it — the floating logo is shown on
+/* Hover only on devices that support it — the floating logo is shown on
      mobile, so an unguarded :hover would stick after a tap. */
-  @media (hover: hover) and (pointer: fine) {
-    .logo-button:hover {
-      transform: scale(1.05);
-    }
+@media (hover: hover) and (pointer: fine) {
+  .logo-button:hover {
+    transform: scale(1.05);
   }
+}
 
-  .logo-button:active {
-    transform: scale(0.95);
-  }
+.logo-button:active {
+  transform: scale(0.95);
+}
 
-  .logo-button:focus {
-    outline: none;
-    box-shadow: none;
-  }
+.logo-button:focus {
+  outline: none;
+  box-shadow: none;
+}
 
-  /* Floating logo image with scroll-responsive sizing */
-  .floating-logo-img {
-    width: 45px;
-    margin-top: 12px;
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
-    transition:
-      height 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-      margin-top 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-  }
+/* Floating logo image with scroll-responsive sizing */
+.floating-logo-img {
+  width: 45px;
+  margin-top: 12px;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+  transition:
+    height 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    margin-top 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
 
-  /* Alternative blend modes (comment out difference above and uncomment one below to try different effects)
+/* Alternative blend modes (comment out difference above and uncomment one below to try different effects)
 .floating-logo-img {
   mix-blend-mode: exclusion; // Softer inversion effect
   mix-blend-mode: overlay; // High contrast overlay  
@@ -105,136 +121,122 @@
 }
 */
 
-  /* Glassmorphic action buttons styles */
-  .back-glass-btn,
+/* Mobile/page back + share controls. The frost + specular rim + the shared
+     hover/press morph come from the .liquid-glass .liquid-glass--pill
+     .liquid-glass-interactive classes on the element (same engine as the other
+     clear-glass buttons). Per-button tint/radius + the combined opacity-fade +
+     morph transition live in the higher-specificity .floating-controls rule
+     above so they beat the system defaults. */
+.back-glass-btn,
+.share-glass-btn {
+  position: fixed !important;
+  /* default when rendered outside container */
+  top: 1.25rem;
+  left: 1rem;
+  z-index: 9999;
+  /* Very high z-index to ensure it stays above everything */
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  opacity: 1;
+  cursor: pointer;
+}
+
+/* Low/reduced tiers: flatten to a solid translucent circle (cheap). */
+body.lg-tier-low .back-glass-btn,
+body.lg-tier-low .share-glass-btn {
+  background: rgb(18 20 28 / 0.9);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* When not in container, keep back on left and share on right */
+.share-glass-btn {
+  left: auto;
+  right: 1rem;
+}
+
+/* Hide mobile share button on desktop as CSS safeguard */
+@media (min-width: 768px) {
   .share-glass-btn {
-    position: fixed !important;
-    /* default when rendered outside container */
-    top: 1.25rem;
-    left: 1rem;
-    z-index: 9999;
-    /* Very high z-index to ensure it stays above everything */
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    opacity: 1;
-    cursor: pointer;
-    border-radius: 50%;
-    /* Direct Liquid-Glass look (frost + specular rim painted on the element
-       itself — NOT the .liquid-glass ::before system, which can't resolve its
-       containing block on these Teleported buttons and blows up to full width).
-       Soft dark tint, low blur clear glass, bright top-left rim + faint counter
-       rim via inset shadows, plus elevation. */
-    background: rgb(22 24 32 / 0.42);
-    -webkit-backdrop-filter: blur(8px) saturate(1.5);
-    backdrop-filter: blur(8px) saturate(1.5);
-    border: 1px solid rgb(255 255 255 / 0.1);
-    box-shadow:
-      inset 1.2px 1.2px 0.5px -0.8px rgb(255 255 255 / 0.5),
-      inset -1px -1px 1px -1px rgb(255 255 255 / 0.12),
-      0 4px 16px rgb(0 0 0 / 0.3);
-    /* Keep the opacity scroll-fade that coordinates with the floating logo. */
-    transition:
-      background 0.25s ease,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.16s ease-out;
+    display: none !important;
   }
+}
 
-  /* Low/reduced tiers: flatten to a solid translucent circle (cheap). */
-  body.lg-tier-low .back-glass-btn,
-  body.lg-tier-low .share-glass-btn {
-    background: rgb(18 20 28 / 0.9);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-
-  /* When not in container, keep back on left and share on right */
-  .share-glass-btn {
-    left: auto;
-    right: 1rem;
-  }
-
-  /* Hide mobile share button on desktop as CSS safeguard */
-  @media (min-width: 768px) {
-    .share-glass-btn {
-      display: none !important;
-    }
-  }
-
-  /* Hover lifts the tint slightly; the material owns frost/rim/shadow.
+/* Hover lifts the tint slightly; the material owns frost/rim/shadow.
      .liquid-glass-interactive already gates its own hover to fine pointers. */
-  @media (hover: hover) and (pointer: fine) {
-    .back-glass-btn:hover,
-    .share-glass-btn:hover {
-      --lg-tint: rgb(40 42 54 / 0.5);
-    }
+@media (hover: hover) and (pointer: fine) {
+  .back-glass-btn:hover,
+  .share-glass-btn:hover {
+    --lg-tint: rgb(40 42 54 / 0.5);
   }
+}
 
-  .back-glass-btn--transparent {
-    opacity: 0.2;
-    pointer-events: none;
-  }
+.back-glass-btn--transparent {
+  opacity: 0.2;
+  pointer-events: none;
+}
 
-  .share-glass-btn--transparent {
-    opacity: 0.2;
-    pointer-events: none;
-  }
+.share-glass-btn--transparent {
+  opacity: 0.2;
+  pointer-events: none;
+}
 
-  /* Preserve transitions for buttons even while modal performance classes are active */
-  :global(body.modal-open) .back-glass-btn,
-  :global(body.modal-open) .share-glass-btn {
-    transition:
-      background 0.25s,
-      box-shadow 0.25s,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
+/* Preserve transitions for buttons even while modal performance classes are active */
+:global(body.modal-open) .back-glass-btn,
+:global(body.modal-open) .share-glass-btn {
+  transition:
+    background 0.25s,
+    box-shadow 0.25s,
+    opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 
-  :global(body.modal-animating) .back-glass-btn,
-  :global(body.modal-animating) .share-glass-btn {
-    transition:
-      background 0.25s,
-      box-shadow 0.25s,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
+:global(body.modal-animating) .back-glass-btn,
+:global(body.modal-animating) .share-glass-btn {
+  transition:
+    background 0.25s,
+    box-shadow 0.25s,
+    opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 
-  /* Performance optimizations */
-  .music-detail-content {
-    position: relative;
-    min-height: 600px;
-    color: white;
-    /* GPU acceleration for better performance */
-    transform: translateZ(0);
-    will-change: auto;
+/* Performance optimizations */
+.music-detail-content {
+  position: relative;
+  min-height: 600px;
+  color: white;
+  /* GPU acceleration for better performance */
+  transform: translateZ(0);
+  will-change: auto;
 
-    /* Palette-driven near-black base; the cover colours live in the
+  /* Palette-driven near-black base; the cover colours live in the
        .release-atmosphere layers painted on top. Flat fill = no repaint cost. */
-    background: var(--bloom-dark, #060606);
-  }
+  background: var(--bloom-dark, #060606);
+}
 
-  /* When used in a page context with flexbox, ensure it grows to fill space */
-  .music-detail-content {
-    flex: 1;
-    /* This will make it expand to fill available space in flex container */
-  }
+/* When used in a page context with flexbox, ensure it grows to fill space */
+.music-detail-content {
+  flex: 1;
+  /* This will make it expand to fill available space in flex container */
+}
 
-  /* Motion now lives in the atmosphere layers, not the page base. */
-  .music-detail-content.perf-high,
-  .music-detail-content.perf-medium {
-    animation: none;
-  }
+/* Motion now lives in the atmosphere layers, not the page base. */
+.music-detail-content.perf-high,
+.music-detail-content.perf-medium {
+  animation: none;
+}
 
-  /* Low performance devices get a plain dark base (no colour cast cost) */
-  .music-detail-content.perf-low,
-  .music-detail-content.simple-gradients {
-    background: linear-gradient(180deg, #050505 0%, #0d0d0f 45%, #050505 100%);
-    animation: none;
-    background-attachment: initial;
-  }
+/* Low performance devices get a plain dark base (no colour cast cost) */
+.music-detail-content.perf-low,
+.music-detail-content.simple-gradients {
+  background: linear-gradient(180deg, #050505 0%, #0d0d0f 45%, #050505 100%);
+  animation: none;
+  background-attachment: initial;
+}
 
-  /* =========================================================================
+/* =========================================================================
      Cover-driven "Ambient Bloom" atmosphere (whole page, behind all content)
 
      Performance budget — the cheap path is the default; the expensive path is
@@ -250,789 +252,793 @@
      All motion is transform-based, gated to perf-high, and killed by
      reduce-animations / prefers-reduced-motion.
      ========================================================================= */
-  .release-atmosphere {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    /* Pin to the VIEWPORT height (not the full page) so the ambient bloom stays
+.release-atmosphere {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Pin to the VIEWPORT height (not the full page) so the ambient bloom stays
        STATIC when content below grows — e.g. the lyrics swap making the page
        taller. A page-height atmosphere rescales its palette mesh and "blinks" the
        header/section on every height change. The veil fades its bottom into the
        page base (--bloom-dark), so there's no hard edge where it ends. */
-    height: 100vh;
-    height: 100lvh;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-    /* Isolate paint + layout so the colour layers never invalidate content. */
-    contain: layout paint;
+  height: 100vh;
+  height: 100lvh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  /* Isolate paint + layout so the colour layers never invalidate content. */
+  contain: layout paint;
+}
+
+.release-atmosphere > div {
+  position: absolute;
+  inset: 0;
+}
+
+/* --- Aura: palette mesh (all devices, GPU-cheap) ------------------------- */
+.atmo-aura {
+  background:
+    radial-gradient(46% 38% at 18% 16%, var(--bloom-primary, transparent), transparent 62%),
+    radial-gradient(52% 44% at 84% 12%, var(--bloom-secondary, transparent), transparent 64%),
+    radial-gradient(58% 50% at 72% 86%, var(--bloom-accent, transparent), transparent 66%),
+    radial-gradient(72% 62% at 26% 94%, var(--bloom-primary, transparent), transparent 70%);
+  opacity: calc(0.9 * var(--bloom-intensity, 1));
+}
+
+/* --- Bloom: blurred cover image (high-perf DESKTOP only) ----------------- */
+/* Default state carries no image and no filter — nothing to pay for. */
+.atmo-bloom {
+  opacity: 0;
+}
+
+/* --- Veil: readability vignette (all devices) --------------------------- */
+.atmo-veil {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, transparent 22%),
+    linear-gradient(0deg, var(--bloom-dark, #060606) 1%, transparent 32%),
+    radial-gradient(125% 82% at 50% 42%, transparent 44%, rgba(0, 0, 0, 0.46) 100%);
+}
+
+/* Muted (near-monochrome) covers: ease the mesh back so it reads intentional. */
+.atmo-muted .atmo-aura {
+  opacity: calc(0.78 * var(--bloom-intensity, 1));
+}
+
+.atmo-liquid-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* The expensive layers + motion: high-perf, wide viewport only. */
+@media (min-width: 768px) {
+  .perf-high .atmo-bloom {
+    background-image: var(--bloom-image);
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.25) translateZ(0);
+    filter: blur(56px) saturate(1.4) brightness(0.92);
+    opacity: calc(0.5 * var(--bloom-intensity, 1));
   }
 
-  .release-atmosphere>div {
-    position: absolute;
-    inset: 0;
+  .perf-high .atmo-aura {
+    animation: atmoDrift 28s ease-in-out infinite alternate;
+    will-change: transform;
   }
 
-  /* --- Aura: palette mesh (all devices, GPU-cheap) ------------------------- */
-  .atmo-aura {
-    background:
-      radial-gradient(46% 38% at 18% 16%, var(--bloom-primary, transparent), transparent 62%),
-      radial-gradient(52% 44% at 84% 12%, var(--bloom-secondary, transparent), transparent 64%),
-      radial-gradient(58% 50% at 72% 86%, var(--bloom-accent, transparent), transparent 66%),
-      radial-gradient(72% 62% at 26% 94%, var(--bloom-primary, transparent), transparent 70%);
-    opacity: calc(0.9 * var(--bloom-intensity, 1));
+  /* Bespoke 'liquid' variant: flowing displacement instead of a still bloom. */
+  .perf-high.atmo-variant-liquid .atmo-bloom {
+    filter: url(#release-liquid-distort) blur(26px) saturate(1.45) brightness(0.92);
+    transform: scale(1.35) translateZ(0);
+    opacity: calc(0.5 * var(--bloom-intensity, 1));
   }
+}
 
-  /* --- Bloom: blurred cover image (high-perf DESKTOP only) ----------------- */
-  /* Default state carries no image and no filter — nothing to pay for. */
+/* Hard stops for reduced motion / low tier. */
+.reduce-animations .atmo-aura,
+.reduce-animations .atmo-bloom {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atmo-aura,
   .atmo-bloom {
-    opacity: 0;
-  }
-
-  /* --- Veil: readability vignette (all devices) --------------------------- */
-  .atmo-veil {
-    background:
-      linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, transparent 22%),
-      linear-gradient(0deg, var(--bloom-dark, #060606) 1%, transparent 32%),
-      radial-gradient(125% 82% at 50% 42%, transparent 44%, rgba(0, 0, 0, 0.46) 100%);
-  }
-
-  /* Muted (near-monochrome) covers: ease the mesh back so it reads intentional. */
-  .atmo-muted .atmo-aura {
-    opacity: calc(0.78 * var(--bloom-intensity, 1));
-  }
-
-  .atmo-liquid-defs {
-    position: absolute;
-    width: 0;
-    height: 0;
-  }
-
-  /* The expensive layers + motion: high-perf, wide viewport only. */
-  @media (min-width: 768px) {
-    .perf-high .atmo-bloom {
-      background-image: var(--bloom-image);
-      background-size: cover;
-      background-position: center;
-      transform: scale(1.25) translateZ(0);
-      filter: blur(56px) saturate(1.4) brightness(0.92);
-      opacity: calc(0.5 * var(--bloom-intensity, 1));
-    }
-
-    .perf-high .atmo-aura {
-      animation: atmoDrift 28s ease-in-out infinite alternate;
-      will-change: transform;
-    }
-
-    /* Bespoke 'liquid' variant: flowing displacement instead of a still bloom. */
-    .perf-high.atmo-variant-liquid .atmo-bloom {
-      filter: url(#release-liquid-distort) blur(26px) saturate(1.45) brightness(0.92);
-      transform: scale(1.35) translateZ(0);
-      opacity: calc(0.5 * var(--bloom-intensity, 1));
-    }
-  }
-
-  /* Hard stops for reduced motion / low tier. */
-  .reduce-animations .atmo-aura,
-  .reduce-animations .atmo-bloom {
     animation: none !important;
   }
+}
 
-  @media (prefers-reduced-motion: reduce) {
-
-    .atmo-aura,
-    .atmo-bloom {
-      animation: none !important;
-    }
+@keyframes atmoDrift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1.02);
   }
 
-  @keyframes atmoDrift {
-    0% {
-      transform: translate3d(0, 0, 0) scale(1.02);
-    }
-
-    100% {
-      transform: translate3d(2.5%, -2%, 0) scale(1.08);
-    }
+  100% {
+    transform: translate3d(2.5%, -2%, 0) scale(1.08);
   }
+}
 
-  /* The old hero aurora/vignette pseudo-layers are superseded by the page-wide
+/* The old hero aurora/vignette pseudo-layers are superseded by the page-wide
      atmosphere on real pages — disable them (this also REMOVES a blur that used
      to run on low-end mobile). Kept intact for the modal preview. */
-  .music-detail-content:not(.modal-mode) .music-hero::before,
-  .music-detail-content:not(.modal-mode) .music-hero::after {
-    display: none;
-  }
+.music-detail-content:not(.modal-mode) .music-hero::before,
+.music-detail-content:not(.modal-mode) .music-hero::after {
+  display: none;
+}
 
-  /* Reduced animations override */
-  .music-detail-content.reduce-animations {
-    animation: none !important;
-  }
+/* Reduced animations override */
+.music-detail-content.reduce-animations {
+  animation: none !important;
+}
 
-  .music-detail-content.reduce-animations *,
-  .music-detail-content.reduce-animations *::before,
-  .music-detail-content.reduce-animations *::after {
-    animation: none !important;
-    transition: opacity 0.2s ease !important;
-  }
+.music-detail-content.reduce-animations *,
+.music-detail-content.reduce-animations *::before,
+.music-detail-content.reduce-animations *::after {
+  animation: none !important;
+  transition: opacity 0.2s ease !important;
+}
 
-  /* Simplified grain overlay for better performance (only on high-performance devices) */
-  .perf-high .music-detail-content::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.04;
-    mix-blend-mode: overlay;
-    background:
-      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size:
-      100px 100px,
-      150px 150px;
-    z-index: 0;
-  }
+/* Simplified grain overlay for better performance (only on high-performance devices) */
+.perf-high .music-detail-content::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background:
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size:
+    100px 100px,
+    150px 150px;
+  z-index: 0;
+}
 
-  /* Disable grain overlay on medium and low performance */
-  .perf-medium .music-detail-content::after,
-  .perf-low .music-detail-content::after {
-    display: none;
-  }
+/* Disable grain overlay on medium and low performance */
+.perf-medium .music-detail-content::after,
+.perf-low .music-detail-content::after {
+  display: none;
+}
 
-  /* Container optimization for better scrolling performance */
-  .music-detail-content {
-    content-visibility: auto;
-    contain: layout style;
-  }
+/* Container optimization for better scrolling performance */
+.music-detail-content {
+  content-visibility: auto;
+  contain: layout style;
+}
 
-  /* Modal-specific optimizations for smooth animations */
-  .music-detail-content.modal-mode {
-    /* TRANSPARENT so the BaseModal glass panel (frost + refraction + translucent
+/* Modal-specific optimizations for smooth animations */
+.music-detail-content.modal-mode {
+  /* TRANSPARENT so the BaseModal glass panel (frost + refraction + translucent
        tint) shows through the whole modal body — this content used to paint an
        opaque #020202→#1a1a1a fill that hid the glass entirely. */
-    background: transparent !important;
-    animation: none !important;
-    /* Force compositing layer for smoother animations */
-    transform: translateZ(0);
-    will-change: auto;
-    /* Optimize rendering performance */
-    contain: layout style paint;
-    /* Never skip-render the open modal body. The base rule sets
+  background: transparent !important;
+  animation: none !important;
+  /* Force compositing layer for smoother animations */
+  transform: translateZ(0);
+  will-change: auto;
+  /* Optimize rendering performance */
+  contain: layout style paint;
+  /* Never skip-render the open modal body. The base rule sets
        `content-visibility: auto` (a scroll perf win on the full page), but with no
        contain-intrinsic-size the browser can report this element as 0 height while
        it's "skipped" — collapsing the modal to a thin line. The modal body is always
        fully visible when open, so the optimization only hurts here. */
-    content-visibility: visible;
-  }
+  content-visibility: visible;
+}
 
-  /* Modal mode: disable grain overlay completely */
-  .music-detail-content.modal-mode::after {
-    display: none;
-  }
+/* Modal mode: disable grain overlay completely */
+.music-detail-content.modal-mode::after {
+  display: none;
+}
 
-  /* Modal hero and background optimizations */
-  .modal-hero .music-hero::before,
-  .modal-hero .music-hero::after {
-    animation: none !important;
-    transform: none !important;
-    filter: blur(15px) !important;
-  }
+/* Modal hero and background optimizations */
+.modal-hero .music-hero::before,
+.modal-hero .music-hero::after {
+  animation: none !important;
+  transform: none !important;
+  filter: blur(15px) !important;
+}
 
-  .modal-bg .music-hero::before,
-  .modal-bg .music-hero::after {
-    animation: none !important;
-    transform: none !important;
-  }
+.modal-bg .music-hero::before,
+.modal-bg .music-hero::after {
+  animation: none !important;
+  transform: none !important;
+}
 
-  /* Liquid-glass modal: the hero must read as the SAME translucent glass as the
+/* Liquid-glass modal: the hero must read as the SAME translucent glass as the
      rest of the panel, so strip the heavy dark vignette (::after) down to a
      whisper for cover separation, and keep the accent aurora (::before) as a
      faint cover-colour bloom only. !important beats the perf-tier vignette
      overrides regardless of source order. */
-  .modal-hero .music-hero::after {
-    background: radial-gradient(120% 70% at 50% 112%, rgba(0, 0, 0, 0.3), transparent 62%) !important;
-  }
+.modal-hero .music-hero::after {
+  background: radial-gradient(120% 70% at 50% 112%, rgba(0, 0, 0, 0.3), transparent 62%) !important;
+}
 
-  .modal-hero .music-hero::before {
-    opacity: 0.5 !important;
-  }
+.modal-hero .music-hero::before {
+  opacity: 0.5 !important;
+}
 
-  /* The panel is translucent now, so guarantee hero BODY text stays legible
+/* The panel is translucent now, so guarantee hero BODY text stays legible
      over any cover/backdrop with a soft shadow — WITHOUT darkening the glass.
      (The title + platforms heading already carry Tailwind drop-shadow-lg/md.) */
-  .modal-mode .music-date,
-  .modal-mode .music-countdown,
-  .modal-mode .music-description {
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
-  }
+.modal-mode .music-date,
+.modal-mode .music-countdown,
+.modal-mode .music-description {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
 
-  .modal-overlay {
-    animation: none !important;
-    /* Drop the heavy black linear that used to darken the hero band — keep only
+.modal-overlay {
+  animation: none !important;
+  /* Drop the heavy black linear that used to darken the hero band — keep only
        a faint cover-colour bloom floating over the glass (Ambient Bloom), so the
        hero shows the same translucent glass as the rest of the modal. */
-    background:
-      radial-gradient(circle at 30% 70%, var(--accent1), transparent 60%),
-      radial-gradient(circle at 70% 30%, var(--accent2), transparent 60%) !important;
-    opacity: 0.4 !important;
-    will-change: auto;
-  }
+  background:
+    radial-gradient(circle at 30% 70%, var(--accent1), transparent 60%),
+    radial-gradient(circle at 70% 30%, var(--accent2), transparent 60%) !important;
+  opacity: 0.4 !important;
+  will-change: auto;
+}
 
-  /* Modal album cover optimizations */
-  .modal-cover {
-    animation: none !important;
-    backdrop-filter: blur(6px) !important;
-    -webkit-backdrop-filter: blur(6px) !important;
-    will-change: auto;
-  }
+/* Modal album cover optimizations */
+.modal-cover {
+  animation: none !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  will-change: auto;
+}
 
-  .modal-cover::before {
-    filter: blur(10px) !important;
-    opacity: 0.3 !important;
-  }
+.modal-cover::before {
+  filter: blur(10px) !important;
+  opacity: 0.3 !important;
+}
 
-  .modal-cover::after {
-    display: none !important;
-  }
+.modal-cover::after {
+  display: none !important;
+}
 
-  /* Disable all hover effects in modal mode */
-  .modal-mode .music-album-cover:hover::after {
-    display: none !important;
-  }
+/* Disable all hover effects in modal mode */
+.modal-mode .music-album-cover:hover::after {
+  display: none !important;
+}
 
-  @media (prefers-reduced-motion: reduce) {
-
-    .music-detail-content,
-    .music-hero::before,
-    .music-hero::after,
-    .music-hero-overlay {
-      animation: none !important;
-      transition: none !important;
-      background-attachment: initial !important;
-    }
-  }
-
-  /* Hero Section and background animation remain in CSS for unique effects */
-
-  .music-hero {
-    /* Prevent layout shift by reserving minimum space */
-    min-height: 200px;
-  }
-
-  /* Desktop hero section gets fixed height to prevent content shift */
-  @media (min-width: 768px) {
-    .music-hero {
-      min-height: 400px;
-    }
-  }
-
-  /* Performance-aware hero background */
-  .music-hero::before {
-    content: '';
-    position: absolute;
-    inset: -20%;
-    background:
-      radial-gradient(60% 80% at 10% 20%, var(--accent1), transparent 60%),
-      radial-gradient(80% 60% at 90% 10%, var(--accent2), transparent 60%),
-      conic-gradient(from 180deg at 50% 50%,
-        rgba(255, 255, 255, 0.05),
-        rgba(0, 0, 0, 0) 20% 80%,
-        rgba(255, 255, 255, 0.05));
-    filter: blur(40px) saturate(110%);
-    background-size:
-      200% 200%,
-      180% 180%,
-      150% 150%;
-    z-index: 1;
-    will-change: auto;
-    backface-visibility: hidden;
-  }
-
-  /* High performance gets full animations */
-  .perf-high .music-hero::before {
-    animation:
-      auroraShift 16s ease-in-out infinite alternate,
-      auroraFloat 20s ease-in-out infinite alternate,
-      auroraPulse 12s ease-in-out infinite alternate;
-    will-change: transform, filter;
-  }
-
-  /* Medium performance gets simplified animations */
-  .perf-medium .music-hero::before {
-    animation: auroraShift 20s ease-in-out infinite alternate;
-    will-change: transform;
-  }
-
-  /* Low performance gets static background */
-  .perf-low .music-hero::before,
-  .simple-gradients .music-hero::before {
-    background: radial-gradient(60% 80% at 50% 50%, var(--accent1), transparent 70%);
-    filter: blur(20px);
-    animation: none;
-    will-change: auto;
-  }
-
-  .music-hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(120% 60% at 50% 100%, rgba(0, 0, 0, 0.75), transparent 60%),
-      radial-gradient(80% 50% at 50% -10%, rgba(0, 0, 0, 0.6), transparent 60%);
-    pointer-events: none;
-    background-size:
-      140% 140%,
-      160% 160%;
-    z-index: 2;
-    will-change: auto;
-  }
-
-  /* Performance-aware vignette animations */
-  .perf-high .music-hero::after {
-    animation: vignetteWave 18s ease-in-out infinite alternate;
-    will-change: transform;
-  }
-
-  .perf-medium .music-hero::after,
-  .perf-low .music-hero::after {
-    background: radial-gradient(100% 100% at 50% 50%, rgba(0, 0, 0, 0.6), transparent 70%);
-    animation: none;
-  }
-
+@media (prefers-reduced-motion: reduce) {
+  .music-detail-content,
+  .music-hero::before,
+  .music-hero::after,
   .music-hero-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
-      radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
-      linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%);
-    background-size:
-      130% 130%,
-      120% 120%,
-      100% 100%;
-    will-change: auto;
+    animation: none !important;
+    transition: none !important;
+    background-attachment: initial !important;
   }
+}
 
-  /* High performance gets overlay animation */
-  .perf-high .music-hero-overlay {
-    animation: overlayDrift 22s ease-in-out infinite alternate;
-    will-change: transform;
+/* Hero Section and background animation remain in CSS for unique effects */
+
+.music-hero {
+  /* Prevent layout shift by reserving minimum space */
+  min-height: 200px;
+}
+
+/* Desktop hero section gets fixed height to prevent content shift */
+@media (min-width: 768px) {
+  .music-hero {
+    min-height: 400px;
   }
+}
 
-  /* Medium and low performance get static overlay */
-  .perf-medium .music-hero-overlay,
-  .perf-low .music-hero-overlay {
-    background:
-      radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
-      radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
-      linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%);
-    animation: none;
-  }
+/* Performance-aware hero background */
+.music-hero::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(60% 80% at 10% 20%, var(--accent1), transparent 60%),
+    radial-gradient(80% 60% at 90% 10%, var(--accent2), transparent 60%),
+    conic-gradient(
+      from 180deg at 50% 50%,
+      rgba(255, 255, 255, 0.05),
+      rgba(0, 0, 0, 0) 20% 80%,
+      rgba(255, 255, 255, 0.05)
+    );
+  filter: blur(40px) saturate(110%);
+  background-size:
+    200% 200%,
+    180% 180%,
+    150% 150%;
+  z-index: 1;
+  will-change: auto;
+  backface-visibility: hidden;
+}
 
+/* High performance gets full animations */
+.perf-high .music-hero::before {
+  animation:
+    auroraShift 16s ease-in-out infinite alternate,
+    auroraFloat 20s ease-in-out infinite alternate,
+    auroraPulse 12s ease-in-out infinite alternate;
+  will-change: transform, filter;
+}
+
+/* Medium performance gets simplified animations */
+.perf-medium .music-hero::before {
+  animation: auroraShift 20s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* Low performance gets static background */
+.perf-low .music-hero::before,
+.simple-gradients .music-hero::before {
+  background: radial-gradient(60% 80% at 50% 50%, var(--accent1), transparent 70%);
+  filter: blur(20px);
+  animation: none;
+  will-change: auto;
+}
+
+.music-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 60% at 50% 100%, rgba(0, 0, 0, 0.75), transparent 60%),
+    radial-gradient(80% 50% at 50% -10%, rgba(0, 0, 0, 0.6), transparent 60%);
+  pointer-events: none;
+  background-size:
+    140% 140%,
+    160% 160%;
+  z-index: 2;
+  will-change: auto;
+}
+
+/* Performance-aware vignette animations */
+.perf-high .music-hero::after {
+  animation: vignetteWave 18s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.perf-medium .music-hero::after,
+.perf-low .music-hero::after {
+  background: radial-gradient(100% 100% at 50% 50%, rgba(0, 0, 0, 0.6), transparent 70%);
+  animation: none;
+}
+
+.music-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
+    radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
+    linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%);
+  background-size:
+    130% 130%,
+    120% 120%,
+    100% 100%;
+  will-change: auto;
+}
+
+/* High performance gets overlay animation */
+.perf-high .music-hero-overlay {
+  animation: overlayDrift 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* Medium and low performance get static overlay */
+.perf-medium .music-hero-overlay,
+.perf-low .music-hero-overlay {
+  background:
+    radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%),
+    radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%),
+    linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%);
+  animation: none;
+}
+
+.music-hero-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  max-width: 1100px;
+  width: 100%;
+  /* Prevent layout shift by reserving space */
+  min-height: 320px;
+}
+
+/* Mobile: hidden by default, shown only when expanded */
+@media (max-width: 767px) {
   .music-hero-content {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-    max-width: 1100px;
-    width: 100%;
-    /* Prevent layout shift by reserving space */
+    min-height: auto;
+    display: none;
+    /* Hidden by default on mobile */
+  }
+
+  /* Show when mobile expanded class is applied */
+  .music-hero-content.mobile-expanded {
+    display: flex !important;
+  }
+}
+
+/* Desktop: always visible with proper sizing */
+@media (min-width: 768px) {
+  .music-hero-content {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
     min-height: 320px;
   }
 
-  /* Mobile: hidden by default, shown only when expanded */
-  @media (max-width: 767px) {
-    .music-hero-content {
-      min-height: auto;
-      display: none;
-      /* Hidden by default on mobile */
-    }
-
-    /* Show when mobile expanded class is applied */
-    .music-hero-content.mobile-expanded {
-      display: flex !important;
-    }
+  .music-hero {
+    min-height: 400px;
   }
 
-  /* Desktop: always visible with proper sizing */
-  @media (min-width: 768px) {
-    .music-hero-content {
-      display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      min-height: 320px;
-    }
-
-    .music-hero {
-      min-height: 400px;
-    }
-
-    /* Disable mobile animations on desktop */
-    .music-hero-content.animate-fadeInUpSmooth,
-    .music-hero-content.animate-fadeOutDown {
-      animation: none !important;
-      opacity: 1 !important;
-      transform: none !important;
-    }
-  }
-
-  /* Optimized album cover with performance considerations */
-  .music-album-cover {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    flex-shrink: 0;
-    border-radius: 22px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow:
-      0 25px 60px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba(255, 255, 255, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    /* GPU acceleration for better performance */
-    transform: translateZ(0);
-    will-change: auto;
-    backface-visibility: hidden;
-    /* Prevent layout shift */
-    aspect-ratio: 1;
-    contain: layout size;
-  }
-
-  /* Keep shadow visible on click/focus states */
-  .music-album-cover:active,
-  .music-album-cover:focus,
-  .music-album-cover:focus-visible {
-    box-shadow:
-      0 25px 60px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba(255, 255, 255, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
-  }
-
-  /* Also keep shadow identical on hover and when children receive focus */
-  .music-album-cover:hover,
-  .music-album-cover:focus-within {
-    box-shadow:
-      0 25px 60px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba(255, 255, 255, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
-  }
-
-  /* Remove default tap highlight that can appear as a flicker on click */
-  .music-album-cover {
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  }
-
-  /* Responsive sizing with fixed dimensions to prevent layout shift */
-  /* Use Tailwind's sizing but add stability */
-  @media (max-width: 767px) {
-    .music-album-cover {
-      /* w-44 = 176px, h-44 = 176px - keep Tailwind classes working */
-      min-width: 176px;
-      min-height: 176px;
-      aspect-ratio: 1;
-    }
-  }
-
-  @media (min-width: 768px) {
-    .music-album-cover {
-      /* md:w-72 = 288px, md:h-72 = 288px */
-      width: 288px !important;
-      height: 288px !important;
-      min-width: 288px !important;
-      min-height: 288px !important;
-      aspect-ratio: 1;
-    }
-  }
-
-  /* Performance-based backdrop blur via CSS variables */
-  .music-album-cover {
-    backdrop-filter: blur(var(--perf-blur-strength, 0px));
-    -webkit-backdrop-filter: blur(var(--perf-blur-strength, 0px));
-  }
-
-  .music-album-cover::before {
-    content: '';
-    position: absolute;
-    inset: -20%;
-    border-radius: 50%;
-    /* Halo tinted with the cover's accent so the artwork lifts off a glow of
-       its own colour (falls back to a soft white glow if no palette). */
-    background: radial-gradient(closest-side,
-        var(--accent-edge, rgba(255, 255, 255, 0.15)),
-        rgba(255, 255, 255, 0) 60%);
-    filter: blur(34px);
-    opacity: var(--perf-opacity, 0.6);
-    will-change: auto;
-  }
-
-  /* Shine effect only for high-performance devices */
-  .perf-high .music-album-cover::after {
-    content: '';
-    position: absolute;
-    top: -100%;
-    left: -50%;
-    width: 200%;
-    height: 300%;
-    background: linear-gradient(75deg,
-        transparent 40%,
-        rgba(255, 255, 255, 0.35) 50%,
-        transparent 60%);
-    transform: rotate(8deg);
-    opacity: 0;
-    transition:
-      opacity 0.3s ease,
-      transform 0.4s ease;
-    will-change: opacity, transform;
-  }
-
-  /* Only enable hover effects on high-performance devices with hover capability */
-  @media (hover: hover) and (pointer: fine) {
-    .perf-high .music-album-cover:not(.modal-cover):hover::after {
-      opacity: 0.7;
-      transform: rotate(8deg) translateY(10%);
-    }
-  }
-
-  /* Disable shine effect on low/medium-performance devices */
-  .perf-medium .music-album-cover::after,
-  .perf-low .music-album-cover::after {
-    display: none;
-  }
-
-  /* Badge */
-  .music-badge {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    z-index: 10;
-  }
-
-  /* Title + text animation only */
-  .animate-titleGlow {
-    animation: titleGlow 5s ease-in-out infinite alternate;
-  }
-
-  @keyframes titleGlow {
-    0% {
-      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.28));
-    }
-
-    100% {
-      filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.5));
-    }
-  }
-
-  /* Optimized animations with performance considerations.
-     Expand/collapse run a touch longer (+0.15s) for a softer feel. */
-  .animate-fadeInUpSmooth {
-    animation: fadeInUpSmooth 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    will-change: opacity, transform;
-  }
-
-  .animate-fadeOutDown {
-    animation: fadeOutDown 0.45s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
-    will-change: opacity, transform;
-  }
-
-  .animate-slideInCompact {
-    animation: slideInCompact 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    will-change: opacity, transform;
-  }
-
-  /* First page-open entrance for the compact hero: a plain opacity fade — no
-     transform, no overshoot — so it stays smooth even while the page is still
-     mounting (no page transition covers it). slideInCompact handles the later
-     post-collapse re-appearance instead. */
-  /* Compact card sits invisible until the entrance fires post-mount (heroEntered),
-     so there's no flash of the un-animated card and the fade can't be skipped. */
-  .hero-prehidden {
-    opacity: 0;
-  }
-
-  .animate-heroFadeIn {
-    /* Deliberately slow, gentle ease-out — a pure opacity fade (no transform), so
-       it eases in super smoothly on first load and can never "jump"/blink even if
-       the mount is busy. slideInCompact handles the snappier post-collapse return. */
-    animation: heroFadeIn 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    will-change: opacity;
-  }
-
-  @keyframes heroFadeIn {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
-
-  /* Reduced motion variants */
-  .reduced-animations .animate-fadeInUpSmooth,
-  .reduced-animations .animate-fadeOutDown,
-  .reduced-animations .animate-slideInCompact,
-  .reduced-animations .animate-heroFadeIn {
+  /* Disable mobile animations on desktop */
+  .music-hero-content.animate-fadeInUpSmooth,
+  .music-hero-content.animate-fadeOutDown {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
   }
+}
 
-  /* ── Lyrics swap (platform links ⇄ song lyrics) ─────────────────────────────
+/* Optimized album cover with performance considerations */
+.music-album-cover {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  flex-shrink: 0;
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  /* GPU acceleration for better performance */
+  transform: translateZ(0);
+  will-change: auto;
+  backface-visibility: hidden;
+  /* Prevent layout shift */
+  aspect-ratio: 1;
+  contain: layout size;
+}
+
+/* Keep shadow visible on click/focus states */
+.music-album-cover:active,
+.music-album-cover:focus,
+.music-album-cover:focus-visible {
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Also keep shadow identical on hover and when children receive focus */
+.music-album-cover:hover,
+.music-album-cover:focus-within {
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Remove default tap highlight that can appear as a flicker on click */
+.music-album-cover {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* Responsive sizing with fixed dimensions to prevent layout shift */
+/* Use Tailwind's sizing but add stability */
+@media (max-width: 767px) {
+  .music-album-cover {
+    /* w-44 = 176px, h-44 = 176px - keep Tailwind classes working */
+    min-width: 176px;
+    min-height: 176px;
+    aspect-ratio: 1;
+  }
+}
+
+@media (min-width: 768px) {
+  .music-album-cover {
+    /* md:w-72 = 288px, md:h-72 = 288px */
+    width: 288px !important;
+    height: 288px !important;
+    min-width: 288px !important;
+    min-height: 288px !important;
+    aspect-ratio: 1;
+  }
+}
+
+/* Performance-based backdrop blur via CSS variables */
+.music-album-cover {
+  backdrop-filter: blur(var(--perf-blur-strength, 0px));
+  -webkit-backdrop-filter: blur(var(--perf-blur-strength, 0px));
+}
+
+.music-album-cover::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  /* Halo tinted with the cover's accent so the artwork lifts off a glow of
+       its own colour (falls back to a soft white glow if no palette). */
+  background: radial-gradient(
+    closest-side,
+    var(--accent-edge, rgba(255, 255, 255, 0.15)),
+    rgba(255, 255, 255, 0) 60%
+  );
+  filter: blur(34px);
+  opacity: var(--perf-opacity, 0.6);
+  will-change: auto;
+}
+
+/* Shine effect only for high-performance devices */
+.perf-high .music-album-cover::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: -50%;
+  width: 200%;
+  height: 300%;
+  background: linear-gradient(
+    75deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 60%
+  );
+  transform: rotate(8deg);
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    transform 0.4s ease;
+  will-change: opacity, transform;
+}
+
+/* Only enable hover effects on high-performance devices with hover capability */
+@media (hover: hover) and (pointer: fine) {
+  .perf-high .music-album-cover:not(.modal-cover):hover::after {
+    opacity: 0.7;
+    transform: rotate(8deg) translateY(10%);
+  }
+}
+
+/* Disable shine effect on low/medium-performance devices */
+.perf-medium .music-album-cover::after,
+.perf-low .music-album-cover::after {
+  display: none;
+}
+
+/* Badge */
+.music-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+}
+
+/* Title + text animation only */
+.animate-titleGlow {
+  animation: titleGlow 5s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  0% {
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.28));
+  }
+
+  100% {
+    filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.5));
+  }
+}
+
+/* Optimized animations with performance considerations.
+     Expand/collapse run a touch longer (+0.15s) for a softer feel. */
+.animate-fadeInUpSmooth {
+  animation: fadeInUpSmooth 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+.animate-fadeOutDown {
+  animation: fadeOutDown 0.45s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
+  will-change: opacity, transform;
+}
+
+.animate-slideInCompact {
+  animation: slideInCompact 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  will-change: opacity, transform;
+}
+
+/* First page-open entrance for the compact hero: a plain opacity fade — no
+     transform, no overshoot — so it stays smooth even while the page is still
+     mounting (no page transition covers it). slideInCompact handles the later
+     post-collapse re-appearance instead. */
+/* Compact card sits invisible until the entrance fires post-mount (heroEntered),
+     so there's no flash of the un-animated card and the fade can't be skipped. */
+.hero-prehidden {
+  opacity: 0;
+}
+
+.animate-heroFadeIn {
+  /* Deliberately slow, gentle ease-out — a pure opacity fade (no transform), so
+       it eases in super smoothly on first load and can never "jump"/blink even if
+       the mount is busy. slideInCompact handles the snappier post-collapse return. */
+  animation: heroFadeIn 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  will-change: opacity;
+}
+
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Reduced motion variants */
+.reduced-animations .animate-fadeInUpSmooth,
+.reduced-animations .animate-fadeOutDown,
+.reduced-animations .animate-slideInCompact,
+.reduced-animations .animate-heroFadeIn {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* ── Lyrics swap (platform links ⇄ song lyrics) ─────────────────────────────
      Both panes share one grid cell so they overlap and cross-slide as a unit:
      at the midpoint the outgoing pane tiles the left half and the incoming pane
      tiles the right half, meeting at the centre — a clean carousel swipe. Panes
      stay fully OPAQUE (the off-screen half is clipped by `overflow: hidden`), so
      the motion reads as a hard slide rather than a fade. `align-items: start`
      keeps each pane its natural height despite the links/lyrics height gap. */
-  .lyrics-swap {
-    display: grid;
-    align-items: start;
-    /* Full-bleed: spans the viewport and clips the off-screen panes at the SCREEN
+.lyrics-swap {
+  display: grid;
+  align-items: start;
+  /* Full-bleed: spans the viewport and clips the off-screen panes at the SCREEN
        edges. Resting shadows live inside each pane's padded inner container, well
        inside the screen edges, so they are never cut off. Always-on (not toggled)
        so there's no overflow flip-flop repaint when the swap starts/ends. */
-    overflow: hidden;
-  }
+  overflow: hidden;
+}
 
-  .lyrics-swap>* {
-    grid-area: 1 / 1;
-  }
+.lyrics-swap > * {
+  grid-area: 1 / 1;
+}
 
-  /* Forward (links → lyrics): lyrics slides IN from the right, links slides OUT
+/* Forward (links → lyrics): lyrics slides IN from the right, links slides OUT
      to the left. */
-  .lyrics-swap-forward-enter-from {
-    transform: translateX(100%);
-  }
+.lyrics-swap-forward-enter-from {
+  transform: translateX(100%);
+}
 
-  .lyrics-swap-forward-leave-to {
-    transform: translateX(-100%);
-  }
+.lyrics-swap-forward-leave-to {
+  transform: translateX(-100%);
+}
 
-  /* Back (lyrics → links): links slides IN from the left, lyrics slides OUT to
+/* Back (lyrics → links): links slides IN from the left, lyrics slides OUT to
      the right. */
-  .lyrics-swap-back-enter-from {
-    transform: translateX(-100%);
-  }
+.lyrics-swap-back-enter-from {
+  transform: translateX(-100%);
+}
 
-  .lyrics-swap-back-leave-to {
-    transform: translateX(100%);
-  }
+.lyrics-swap-back-leave-to {
+  transform: translateX(100%);
+}
 
-  /* Deliberate, consistent swipe timing with a snappy ease-out. `!important` so
+/* Deliberate, consistent swipe timing with a snappy ease-out. `!important` so
      the global mobile perf overrides in base.scss
      (`.mobile-standard * { transition-duration: 0.2s !important }`) can't clobber
      the intended timing on mid/flagship phones. */
-  .lyrics-swap-forward-enter-active,
-  .lyrics-swap-forward-leave-active,
-  .lyrics-swap-back-enter-active,
-  .lyrics-swap-back-leave-active {
-    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
-  }
+.lyrics-swap-forward-enter-active,
+.lyrics-swap-forward-leave-active,
+.lyrics-swap-back-enter-active,
+.lyrics-swap-back-leave-active {
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
 
-  /* Low-perf / reduced-motion fallback: a clean opacity crossfade with NO
+/* Low-perf / reduced-motion fallback: a clean opacity crossfade with NO
      horizontal travel. Paired with `mode="out-in"` in the template so the old
      pane fully fades out before the new fades in (the panes never overlap).
      `!important` keeps the fade alive even under the conservative blanket rule
      `.mobile-conservative * { transition: none !important }` in base.scss. */
-  .lyrics-fade-enter-from,
-  .lyrics-fade-leave-to {
-    opacity: 0;
-  }
+.lyrics-fade-enter-from,
+.lyrics-fade-leave-to {
+  opacity: 0;
+}
 
-  .lyrics-fade-enter-active,
-  .lyrics-fade-leave-active {
-    transition: opacity 0.2s ease !important;
-  }
+.lyrics-fade-enter-active,
+.lyrics-fade-leave-active {
+  transition: opacity 0.2s ease !important;
+}
 
-  /* --- Lyrics pill morph -------------------------------------------------- */
-  /* The single hero pill swaps between the "Lyrics" trigger (links view) and the
+/* --- Lyrics pill morph -------------------------------------------------- */
+/* The single hero pill swaps between the "Lyrics" trigger (links view) and the
      "Back to Music" control (lyrics view) as the panes cross-slide. Both faces
      are grid-stacked INSIDE the pill and clipped by it, so the pill's border and
      size never move — only the icon+text slide off/in on the right and cross-fade.
      Timing matches the 0.42s pane swipe. */
-  .lyrics-morph-pill {
-    position: relative;
-    overflow: hidden;
-    /* Drop the pill's own horizontal padding so the sliding faces are clipped at
+.lyrics-morph-pill {
+  position: relative;
+  overflow: hidden;
+  /* Drop the pill's own horizontal padding so the sliding faces are clipped at
        the BORDER, not the padding edge. The breathing room moves onto the faces
        below, so the resting label position AND the pill's outer size are
        unchanged — only the clip point moves out to the border. */
-    padding-left: 0;
-    padding-right: 0;
-  }
+  padding-left: 0;
+  padding-right: 0;
+}
 
-  .pill-morph {
-    display: grid;
-    width: 100%;
-    /* don't let the grid's widest face ("Back to Music") impose a min-width on
+.pill-morph {
+  display: grid;
+  width: 100%;
+  /* don't let the grid's widest face ("Back to Music") impose a min-width on
        the pill — that broke the links-view 50/50 on narrow phones. */
-    min-width: 0;
-    overflow: hidden;
-  }
+  min-width: 0;
+  overflow: hidden;
+}
 
-  .pill-morph__face {
-    grid-area: 1 / 1;
-    width: 100%;
-    /* the px-3.5 the pill used to carry — keeps the resting inset identical */
-    padding-inline: 0.875rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    white-space: nowrap;
-    will-change: transform, opacity;
-    /* `!important` so the blunt global mobile perf overrides in base.scss can't
+.pill-morph__face {
+  grid-area: 1 / 1;
+  width: 100%;
+  /* the px-3.5 the pill used to carry — keeps the resting inset identical */
+  padding-inline: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  will-change: transform, opacity;
+  /* `!important` so the blunt global mobile perf overrides in base.scss can't
        clobber the intended timing (same guard the pane swipe uses). */
-    transition:
-      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
-  }
+  transition:
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
 
-  /* Resting (links view): Lyrics centred & visible; Back parked off the right. */
-  .pill-morph__face--lyrics {
-    transform: translateX(0);
-    opacity: 1;
-  }
+/* Resting (links view): Lyrics centred & visible; Back parked off the right. */
+.pill-morph__face--lyrics {
+  transform: translateX(0);
+  opacity: 1;
+}
 
-  .pill-morph__face--back {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
+.pill-morph__face--back {
+  transform: translateX(-100%);
+  opacity: 0;
+}
 
-  /* Lyrics view: the Lyrics face slides OUT to the RIGHT while the Back face
+/* Lyrics view: the Lyrics face slides OUT to the RIGHT while the Back face
      slides IN from the LEFT — a true cross-slide (no overlap). Reverses on the
      way back, so the Lyrics text always travels on the RIGHT edge and the Back
      text on the LEFT edge. */
-  .pill-morph.is-back .pill-morph__face--lyrics {
-    transform: translateX(100%);
-    opacity: 0;
-  }
+.pill-morph.is-back .pill-morph__face--lyrics {
+  transform: translateX(100%);
+  opacity: 0;
+}
 
-  .pill-morph.is-back .pill-morph__face--back {
-    transform: translateX(0);
-    opacity: 1;
-  }
+.pill-morph.is-back .pill-morph__face--back {
+  transform: translateX(0);
+  opacity: 1;
+}
 
-  /* Reduced-motion / low-perf ("optimized" mode): swap the two faces INSTANTLY —
+/* Reduced-motion / low-perf ("optimized" mode): swap the two faces INSTANTLY —
      no slide and no crossfade. The opacity flips in a single frame so the label
      changes outright instead of fading in/out. */
-  .pill-morph--reduced .pill-morph__face {
+.pill-morph--reduced .pill-morph__face {
+  transform: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill-morph__face {
     transform: none !important;
     transition: none !important;
   }
+}
 
-  @media (prefers-reduced-motion: reduce) {
-    .pill-morph__face {
-      transform: none !important;
-      transition: none !important;
-    }
-  }
-
-  /* --- Lyrics-view width split ------------------------------------------- */
-  /* When both hero pills are present, opening the lyrics grows the Lyrics/Back
+/* --- Lyrics-view width split ------------------------------------------- */
+/* When both hero pills are present, opening the lyrics grows the Lyrics/Back
      pill to ~75% of the row and shrinks the Music Video pill to the rest. Driven
      by flex-grow (3:1) so the gap maths stay automatic, animated with the same
      0.42s easing as the morphing text (the existing 0.1s hover transitions are
@@ -1041,93 +1047,92 @@
      `.mobile-conservative * { transition: none }` would otherwise snap it. There,
      only the pill's inner Lyrics/Back faces are meant to change instantly, not
      the resize itself. (The prefers-reduced-motion block below still drops it.) */
-  .hero-quick-actions>.music-hero-pill {
-    transition:
-      transform 0.1s ease-in-out,
-      background-color 0.1s ease-in-out,
-      border-color 0.1s ease-in-out,
-      /* fast (0.25s) but a gentle ease — the front-loaded easeOutQuint felt rough
+.hero-quick-actions > .music-hero-pill {
+  transition:
+    transform 0.1s ease-in-out,
+    background-color 0.1s ease-in-out,
+    border-color 0.1s ease-in-out,
+    /* fast (0.25s) but a gentle ease — the front-loaded easeOutQuint felt rough
          on the width shrink; this accelerates/decelerates smoothly instead.
          flex-BASIS is animated too: the links view uses a definite basis
          (calc 50%) and the lyrics view uses 0 — without this the basis snapped
          instantly on grow, flashing a wide empty pill before the label caught up. */
       flex-grow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-      flex-basis 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-      /* the YouTube glow widens in step with the shrink */
-      background-size 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
+    flex-basis 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    /* the YouTube glow widens in step with the shrink */ background-size 0.25s
+      cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 
-  .hero-quick-actions.lyrics-active>.lyrics-morph-pill {
-    flex-grow: 3;
-  }
+.hero-quick-actions.lyrics-active > .lyrics-morph-pill {
+  flex-grow: 3;
+}
 
-  /* Music Video glow grows as the pill reduces: ~60% across the reduced (text-kept)
+/* Music Video glow grows as the pill reduces: ~60% across the reduced (text-kept)
      pill on wider phones, and the full button once it's icon-only (≤450px below). */
-  .hero-quick-actions.lyrics-active>.music-hero-pill--video {
-    background-size: 60% 100%;
-  }
+.hero-quick-actions.lyrics-active > .music-hero-pill--video {
+  background-size: 60% 100%;
+}
 
-  /* Lone lyrics pill (this release ships no Music Video): occupy ~half the row on
+/* Lone lyrics pill (this release ships no Music Video): occupy ~half the row on
      the release/links view — matching the right-hand slot a paired Lyrics pill
      would take — then grow to the full row on the lyrics view. Right-pinned via
      ml-auto so it grows leftward, animated by the shared .music-hero-pill flex
      transition above. flex-grow stays 0 in both states so it's a pure flex-basis
      grow (50% → 100%); placed AFTER the flex-grow:3 rule so it wins for --solo. */
-  .hero-quick-actions>.lyrics-morph-pill--solo {
-    flex: 0 1 calc(50% - 0.375rem);
-  }
+.hero-quick-actions > .lyrics-morph-pill--solo {
+  flex: 0 1 calc(50% - 0.375rem);
+}
 
-  .hero-quick-actions.lyrics-active>.lyrics-morph-pill--solo {
-    flex-grow: 0;
-    flex-basis: 100%;
-  }
+.hero-quick-actions.lyrics-active > .lyrics-morph-pill--solo {
+  flex-grow: 0;
+  flex-basis: 100%;
+}
 
-  @media (prefers-reduced-motion: reduce) {
-
-    /* keep the hover transitions; drop only the width animation. `!important` to
+@media (prefers-reduced-motion: reduce) {
+  /* keep the hover transitions; drop only the width animation. `!important` to
        outrank the now-!important base rule above (equal specificity, later wins),
        so an explicit reduce-motion request still snaps the resize. */
-    .hero-quick-actions>.music-hero-pill {
-      transition:
-        transform 0.1s ease-in-out,
-        background-color 0.1s ease-in-out,
-        border-color 0.1s ease-in-out !important;
-    }
+  .hero-quick-actions > .music-hero-pill {
+    transition:
+      transform 0.1s ease-in-out,
+      background-color 0.1s ease-in-out,
+      border-color 0.1s ease-in-out !important;
   }
+}
 
-  /* --- Small-phone responsiveness ---------------------------------------- */
-  /* The Music Video label sits on its own span so it can collapse to nothing,
+/* --- Small-phone responsiveness ---------------------------------------- */
+/* The Music Video label sits on its own span so it can collapse to nothing,
      leaving just the YouTube icon. Animated at the same 0.25s as the width. */
-  .mv-label {
-    display: inline-block;
-    /* Tighter cap (≈ the longest label) so the width collapse starts almost
+.mv-label {
+  display: inline-block;
+  /* Tighter cap (≈ the longest label) so the width collapse starts almost
        immediately instead of idling while max-width drops from a loose value —
        that idle-then-snap was the rough bit. The opacity/slide lead from t=0. */
-    max-width: 7rem;
-    overflow: hidden;
-    white-space: nowrap;
-    will-change: transform, opacity;
-    /* `!important` so the Music Video label keeps its fade-out (and collapse) even
+  max-width: 7rem;
+  overflow: hidden;
+  white-space: nowrap;
+  will-change: transform, opacity;
+  /* `!important` so the Music Video label keeps its fade-out (and collapse) even
        in low-perf "optimized" mode — base.scss's `.mobile-conservative` blanket
        `transition: none` would otherwise snap it. Only the Lyrics/Back faces snap
        in that mode; this label still fades out "as it was". */
-    transition:
-      max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-      margin 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
+  transition:
+    max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    margin 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 
-  /* True OS reduce-motion: collapse the label with no motion at all. The
+/* True OS reduce-motion: collapse the label with no motion at all. The
      !important above only exists to survive the low-perf conservative kill; an
      explicit reduce-motion request is honoured here instead. */
-  @media (prefers-reduced-motion: reduce) {
-    .mv-label {
-      transition: none !important;
-    }
+@media (prefers-reduced-motion: reduce) {
+  .mv-label {
+    transition: none !important;
   }
+}
 
-  /* Low-perf MOBILE: the global `.reduce-animations *` override strips the
+/* Low-perf MOBILE: the global `.reduce-animations *` override strips the
      mv-label's max-width transition (leaving only a 0.2s opacity fade) while the
      pill's own width keeps animating at 0.25s — so on the collapse/grow-back the
      label snaps to/from full width before the button finishes resizing and jolts
@@ -1136,558 +1141,550 @@
      also gives a slow device more frames to render the change smoothly. Gated to
      `no-preference` so a genuine OS reduce-motion request still snaps (handled
      above), not animates. */
-  @media (prefers-reduced-motion: no-preference) {
-    .music-detail-content.perf-low.mobile-device .hero-quick-actions>.music-hero-pill {
-      transition:
-        flex-grow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-        flex-basis 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-        background-size 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-
-    .music-detail-content.perf-low.mobile-device .mv-label {
-      transition:
-        max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-        margin 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-        opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
+@media (prefers-reduced-motion: no-preference) {
+  .music-detail-content.perf-low.mobile-device .hero-quick-actions > .music-hero-pill {
+    transition:
+      flex-grow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      flex-basis 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      background-size 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
-  /* On phones (≤450px — SE through the Pro Max widths) the 75/25 split can't fit
+  .music-detail-content.perf-low.mobile-device .mv-label {
+    transition:
+      max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      margin 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+}
+
+/* On phones (≤450px — SE through the Pro Max widths) the 75/25 split can't fit
      BOTH labels, so opening the lyrics collapses the Music Video pill to an
      icon-only ~10% button (its label slides 10px left + fades) and hands the
      Back pill the room. */
-  @media (max-width: 450px) {
-
-    /* Links view: an explicit 50/50. A definite flex-basis (½ the row minus ½ the
+@media (max-width: 450px) {
+  /* Links view: an explicit 50/50. A definite flex-basis (½ the row minus ½ the
        0.75rem gap) sidesteps the width:100% grid feedback that skewed pure
        flex-grow into ~52/44. Scoped to the links state so it never fights the
        lyrics-view split below. The `:not(--solo)` keeps this off the lone Lyrics
        pill — its flex-grow:1 would make the sole child fill the whole row (100%)
        instead of the intended half; --solo is sized by its own rule above. */
-    .hero-quick-actions:not(.lyrics-active)>.music-hero-pill:not(.lyrics-morph-pill--solo) {
-      /* definite basis → exact 50/50 (no min-width:0 needed; keeping min-width
+  .hero-quick-actions:not(.lyrics-active) > .music-hero-pill:not(.lyrics-morph-pill--solo) {
+    /* definite basis → exact 50/50 (no min-width:0 needed; keeping min-width
          at auto avoids a brief width dip at the start of the grow-back). */
-      flex: 1 1 calc(50% - 0.375rem);
-    }
+    flex: 1 1 calc(50% - 0.375rem);
+  }
 
-    /* Lyrics view: Music Video shrinks to just its YouTube icon, and the red glow
+  /* Lyrics view: Music Video shrinks to just its YouTube icon, and the red glow
        fills the whole (now icon-only) button. */
-    .hero-quick-actions.lyrics-active>.music-hero-pill--video {
-      flex-grow: 0;
-      min-width: auto;
-      background-size: 100% 100%;
-    }
-
-    /* …its label slides left and collapses away (gap absorbed by the margin). */
-    .hero-quick-actions.lyrics-active>.music-hero-pill--video .mv-label {
-      max-width: 0;
-      margin-left: -0.5rem;
-      opacity: 0;
-      transform: translateX(-10px);
-    }
+  .hero-quick-actions.lyrics-active > .music-hero-pill--video {
+    flex-grow: 0;
+    min-width: auto;
+    background-size: 100% 100%;
   }
 
-  @keyframes fadeInUpSmooth {
-    0% {
-      opacity: 0;
-      transform: translateY(20px) scale(0.96);
-    }
+  /* …its label slides left and collapses away (gap absorbed by the margin). */
+  .hero-quick-actions.lyrics-active > .music-hero-pill--video .mv-label {
+    max-width: 0;
+    margin-left: -0.5rem;
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
 
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+@keyframes fadeInUpSmooth {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
   }
 
-  @keyframes fadeOutDown {
-    0% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 
-    100% {
-      opacity: 0;
-      transform: translateY(20px) scale(0.95);
-    }
+@keyframes fadeOutDown {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 
-  @keyframes slideInCompact {
-    0% {
-      opacity: 0;
-      transform: translateY(-15px) scale(0.95);
-    }
+  100% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+}
 
-    60% {
-      opacity: 0.8;
-      transform: translateY(2px) scale(1.01);
-    }
-
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+@keyframes slideInCompact {
+  0% {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.95);
   }
 
-  /* Optimized keyframe animations with performance considerations */
-
-  @keyframes auroraShift {
-    0% {
-      transform: translate3d(0, 0, 0) scale(1);
-    }
-
-    100% {
-      transform: translate3d(-2%, 2%, 0) scale(1.06);
-    }
+  60% {
+    opacity: 0.8;
+    transform: translateY(2px) scale(1.01);
   }
 
-  /* Background gradient animations - disabled on low-performance devices */
-  @keyframes gradientFlow {
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 
-    0%,
-    100% {
-      background-position:
-        0% 0%,
-        100% 100%,
-        0% 0%;
-    }
+/* Optimized keyframe animations with performance considerations */
 
-    50% {
-      background-position:
-        100% 50%,
-        0% 50%,
-        0% 0%;
-    }
+@keyframes auroraShift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
   }
 
-  @keyframes auroraFloat {
-
-    0%,
-    100% {
-      background-position:
-        0% 0%,
-        100% 100%,
-        50% 50%;
-    }
-
-    25% {
-      background-position:
-        100% 25%,
-        25% 75%,
-        25% 75%;
-    }
-
-    50% {
-      background-position:
-        50% 100%,
-        75% 25%,
-        75% 25%;
-    }
-
-    75% {
-      background-position:
-        25% 50%,
-        50% 100%,
-        100% 50%;
-    }
+  100% {
+    transform: translate3d(-2%, 2%, 0) scale(1.06);
   }
+}
 
-  @keyframes auroraPulse {
-    0% {
-      filter: blur(40px) saturate(110%) brightness(1);
-      opacity: 0.8;
-    }
-
-    50% {
-      filter: blur(35px) saturate(130%) brightness(1.1);
-      opacity: 1;
-    }
-
-    100% {
-      filter: blur(45px) saturate(90%) brightness(0.9);
-      opacity: 0.9;
-    }
-  }
-
-  @keyframes vignetteWave {
-
-    0%,
-    100% {
-      background-position:
-        0% 100%,
-        100% 0%;
-      transform: scale(1) rotate(0deg);
-    }
-
-    33% {
-      background-position:
-        50% 50%,
-        50% 50%;
-      transform: scale(1.02) rotate(0.5deg);
-    }
-
-    66% {
-      background-position:
-        100% 0%,
-        0% 100%;
-      transform: scale(0.98) rotate(-0.5deg);
-    }
-  }
-
-  @keyframes overlayDrift {
-
-    0%,
-    100% {
-      background-position:
-        30% 70%,
-        70% 30%,
-        0% 0%;
-      transform: translateZ(0);
-    }
-
-    25% {
-      background-position:
-        60% 40%,
-        40% 60%,
-        0% 0%;
-      transform: translateZ(0) scale(1.01);
-    }
-
-    50% {
-      background-position:
-        80% 20%,
-        20% 80%,
-        0% 0%;
-      transform: translateZ(0) scale(0.99);
-    }
-
-    75% {
-      background-position:
-        45% 55%,
-        55% 45%,
-        0% 0%;
-      transform: translateZ(0) scale(1.005);
-    }
-  }
-
-  /* Performance optimizations based on device capability detection */
-  @media (prefers-reduced-motion: reduce) {
-
-    .music-detail-content,
-    .music-hero::before,
-    .music-hero::after,
-    .music-hero-overlay,
-    .music-album-cover {
-      animation: none !important;
-      transition: opacity calc(var(--perf-animation-duration, 0.2) * 1s) ease !important;
-    }
-
-    .animate-titleGlow {
-      animation: none !important;
-    }
-  }
-
-  /* Mobile device optimizations */
-  .mobile-device .music-detail-content {
-    background-size:
+/* Background gradient animations - disabled on low-performance devices */
+@keyframes gradientFlow {
+  0%,
+  100% {
+    background-position:
+      0% 0%,
       100% 100%,
+      0% 0%;
+  }
+
+  50% {
+    background-position:
+      100% 50%,
+      0% 50%,
+      0% 0%;
+  }
+}
+
+@keyframes auroraFloat {
+  0%,
+  100% {
+    background-position:
+      0% 0%,
       100% 100%,
-      100% 100%;
+      50% 50%;
   }
 
-  .mobile-device .music-hero::before {
-    filter: blur(20px) saturate(100%);
+  25% {
+    background-position:
+      100% 25%,
+      25% 75%,
+      25% 75%;
   }
 
-  .mobile-device .music-album-cover::before {
-    filter: blur(15px);
-    opacity: 0.4;
+  50% {
+    background-position:
+      50% 100%,
+      75% 25%,
+      75% 25%;
   }
 
-  /* Modal specific optimizations */
-  .music-detail-content:has(.music-hero) {
-    min-height: auto;
+  75% {
+    background-position:
+      25% 50%,
+      50% 100%,
+      100% 50%;
+  }
+}
+
+@keyframes auroraPulse {
+  0% {
+    filter: blur(40px) saturate(110%) brightness(1);
+    opacity: 0.8;
   }
 
-  /* Performance-aware modal animations */
-  :global(body.modal-open) .music-detail-content.modal-mode,
-  :global(body.modal-open) .music-detail-content.modal-mode *,
-  :global(body.modal-open) .music-detail-content.modal-mode *::before,
-  :global(body.modal-open) .music-detail-content.modal-mode *::after {
+  50% {
+    filter: blur(35px) saturate(130%) brightness(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    filter: blur(45px) saturate(90%) brightness(0.9);
+    opacity: 0.9;
+  }
+}
+
+@keyframes vignetteWave {
+  0%,
+  100% {
+    background-position:
+      0% 100%,
+      100% 0%;
+    transform: scale(1) rotate(0deg);
+  }
+
+  33% {
+    background-position:
+      50% 50%,
+      50% 50%;
+    transform: scale(1.02) rotate(0.5deg);
+  }
+
+  66% {
+    background-position:
+      100% 0%,
+      0% 100%;
+    transform: scale(0.98) rotate(-0.5deg);
+  }
+}
+
+@keyframes overlayDrift {
+  0%,
+  100% {
+    background-position:
+      30% 70%,
+      70% 30%,
+      0% 0%;
+    transform: translateZ(0);
+  }
+
+  25% {
+    background-position:
+      60% 40%,
+      40% 60%,
+      0% 0%;
+    transform: translateZ(0) scale(1.01);
+  }
+
+  50% {
+    background-position:
+      80% 20%,
+      20% 80%,
+      0% 0%;
+    transform: translateZ(0) scale(0.99);
+  }
+
+  75% {
+    background-position:
+      45% 55%,
+      55% 45%,
+      0% 0%;
+    transform: translateZ(0) scale(1.005);
+  }
+}
+
+/* Performance optimizations based on device capability detection */
+@media (prefers-reduced-motion: reduce) {
+  .music-detail-content,
+  .music-hero::before,
+  .music-hero::after,
+  .music-hero-overlay,
+  .music-album-cover {
     animation: none !important;
-    transition: none !important;
-    filter: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    transition: opacity calc(var(--perf-animation-duration, 0.2) * 1s) ease !important;
   }
 
-  /* Exception: Keep back button transitions working */
-  :global(body.modal-open) .back-glass-btn,
-  :global(body.modal-open) .share-glass-btn {
-    transition:
-      background 0.25s,
-      box-shadow 0.25s,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
-
-  /* Hard drop of effects only during the short modal transition window */
-  :global(body.modal-animating) .music-detail-content.modal-mode,
-  :global(body.modal-animating) .music-detail-content.modal-mode *,
-  :global(body.modal-animating) .music-detail-content.modal-mode *::before,
-  :global(body.modal-animating) .music-detail-content.modal-mode *::after {
+  .animate-titleGlow {
     animation: none !important;
-    transition: none !important;
-    filter: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* Mobile device optimizations */
+.mobile-device .music-detail-content {
+  background-size:
+    100% 100%,
+    100% 100%,
+    100% 100%;
+}
+
+.mobile-device .music-hero::before {
+  filter: blur(20px) saturate(100%);
+}
+
+.mobile-device .music-album-cover::before {
+  filter: blur(15px);
+  opacity: 0.4;
+}
+
+/* Modal specific optimizations */
+.music-detail-content:has(.music-hero) {
+  min-height: auto;
+}
+
+/* Performance-aware modal animations */
+:global(body.modal-open) .music-detail-content.modal-mode,
+:global(body.modal-open) .music-detail-content.modal-mode *,
+:global(body.modal-open) .music-detail-content.modal-mode *::before,
+:global(body.modal-open) .music-detail-content.modal-mode *::after {
+  animation: none !important;
+  transition: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Exception: Keep back button transitions working */
+:global(body.modal-open) .back-glass-btn,
+:global(body.modal-open) .share-glass-btn {
+  transition:
+    background 0.25s,
+    box-shadow 0.25s,
+    opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Hard drop of effects only during the short modal transition window */
+:global(body.modal-animating) .music-detail-content.modal-mode,
+:global(body.modal-animating) .music-detail-content.modal-mode *,
+:global(body.modal-animating) .music-detail-content.modal-mode *::before,
+:global(body.modal-animating) .music-detail-content.modal-mode *::after {
+  animation: none !important;
+  transition: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Exception: Keep back button transitions working during animation */
+:global(body.modal-animating) .back-glass-btn,
+:global(body.modal-animating) .share-glass-btn {
+  transition:
+    background 0.25s,
+    box-shadow 0.25s,
+    opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Lightweight image transitions in modal */
+.modal-mode .progressive-image {
+  transition: opacity 0.18s ease-out !important;
+  transform: none !important;
+}
+
+.modal-mode .progressive-image-container .gradient-placeholder {
+  display: none !important;
+}
+
+/* Platform buttons uniform sizing */
+.platforms-grid {
+  /* Ensure grid items stretch to fill available space */
+  align-items: stretch;
+}
+
+.platform-button-wrapper {
+  /* Ensure consistent button container dimensions */
+  display: flex;
+  align-items: stretch;
+}
+
+/* Make sure the platform buttons fill their containers uniformly */
+.platform-button-wrapper :deep(.platform-button) {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 80px !important;
+  flex: 1 !important;
+}
+
+/* Ensure consistent content layout within buttons */
+.platform-button-wrapper :deep(.platform-content) {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+}
+
+/* Center platform icons within their containers */
+.platform-button-wrapper :deep(.platform-icon) {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Center platform arrow icons */
+.platform-button-wrapper :deep(.platform-arrow) {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Responsive adjustments for mobile devices */
+@media (max-width: 640px) {
+  .platform-button-wrapper {
+    min-height: 70px;
   }
 
-  /* Exception: Keep back button transitions working during animation */
-  :global(body.modal-animating) .back-glass-btn,
-  :global(body.modal-animating) .share-glass-btn {
-    transition:
-      background 0.25s,
-      box-shadow 0.25s,
-      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  .platform-button-wrapper :deep(.platform-button) {
+    min-height: 70px !important;
   }
+}
 
-  /* Lightweight image transitions in modal */
-  .modal-mode .progressive-image {
-    transition: opacity 0.18s ease-out !important;
-    transform: none !important;
-  }
+/* Desktop Share Button Container */
+.desktop-share-button {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  /* Ensure proper positioning context */
+}
 
-  .modal-mode .progressive-image-container .gradient-placeholder {
+/* Hide desktop share button on mobile as CSS safeguard */
+@media (max-width: 767px) {
+  .desktop-share-button {
     display: none !important;
   }
+}
 
-  /* Platform buttons uniform sizing */
-  .platforms-grid {
-    /* Ensure grid items stretch to fill available space */
-    align-items: stretch;
-  }
-
-  .platform-button-wrapper {
-    /* Ensure consistent button container dimensions */
-    display: flex;
-    align-items: stretch;
-  }
-
-  /* Make sure the platform buttons fill their containers uniformly */
-  .platform-button-wrapper :deep(.platform-button) {
-    display: flex !important;
-    align-items: center !important;
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 80px !important;
-    flex: 1 !important;
-  }
-
-  /* Ensure consistent content layout within buttons */
-  .platform-button-wrapper :deep(.platform-content) {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    min-width: 0 !important;
-  }
-
-  /* Center platform icons within their containers */
-  .platform-button-wrapper :deep(.platform-icon) {
-    flex-shrink: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-
-  /* Center platform arrow icons */
-  .platform-button-wrapper :deep(.platform-arrow) {
-    flex-shrink: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-
-  /* Responsive adjustments for mobile devices */
-  @media (max-width: 640px) {
-    .platform-button-wrapper {
-      min-height: 70px;
-    }
-
-    .platform-button-wrapper :deep(.platform-button) {
-      min-height: 70px !important;
-    }
-  }
-
-  /* Desktop Share Button Container */
+@media (min-width: 768px) {
   .desktop-share-button {
-    display: flex;
-    justify-content: center;
-    position: relative;
-    /* Ensure proper positioning context */
+    justify-content: flex-start;
   }
+}
 
-  /* Hide desktop share button on mobile as CSS safeguard */
-  @media (max-width: 767px) {
-    .desktop-share-button {
-      display: none !important;
-    }
-  }
+.share-glassmorphic-popup {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  width: 400px;
+  max-width: 90vw;
+  color: white;
+  overflow: hidden;
+}
 
-  @media (min-width: 768px) {
-    .desktop-share-button {
-      justify-content: flex-start;
-    }
-  }
+.share-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-  .share-glassmorphic-popup {
-    background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.05) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
-    box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.05);
-    width: 400px;
-    max-width: 90vw;
+.share-popup-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.share-popup-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .share-popup-close:hover {
+    background: rgba(255, 255, 255, 0.15);
     color: white;
-    overflow: hidden;
+    transform: scale(1.05);
+  }
+}
+
+.share-popup-content {
+  padding: 1.5rem;
+}
+
+.share-popup-description {
+  margin: 0 0 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.share-popup-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.share-popup-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.share-popup-input:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.share-popup-copy-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem 1.25rem !important;
+  color: white !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  white-space: nowrap !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .share-popup-copy-btn:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+  }
+}
+
+.share-popup-copy-btn:disabled {
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+}
+
+/* Performance optimizations for low-end devices */
+@media (prefers-reduced-motion: reduce) {
+  .share-glassmorphic-popup {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
 
-  .share-popup-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.5rem 1.5rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  .share-popup-close:hover,
+  .share-popup-copy-btn:hover {
+    transform: none !important;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .share-glassmorphic-popup {
+    width: 95vw;
+    margin: 1rem;
   }
 
-  .share-popup-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
-  }
-
-  .share-popup-close {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .share-popup-close:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-      transform: scale(1.05);
-    }
-  }
-
+  .share-popup-header,
   .share-popup-content {
-    padding: 1.5rem;
-  }
-
-  .share-popup-description {
-    margin: 0 0 1.5rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
-    line-height: 1.5;
+    padding: 1.25rem;
   }
 
   .share-popup-input-group {
-    display: flex;
-    gap: 0.5rem;
-    align-items: stretch;
-  }
-
-  .share-popup-input {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.5rem;
-    padding: 0.75rem 1rem;
-    color: white;
-    font-size: 0.9rem;
-    outline: none;
-    transition: all 0.2s ease;
-  }
-
-  .share-popup-input:focus {
-    border-color: rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.08);
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
   .share-popup-copy-btn {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
-    border: none !important;
-    border-radius: 0.5rem !important;
-    padding: 0.75rem 1.25rem !important;
-    color: white !important;
-    font-size: 0.9rem !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-    white-space: nowrap !important;
-    height: auto !important;
-    min-height: auto !important;
+    justify-content: center !important;
   }
-
-  @media (hover: hover) and (pointer: fine) {
-    .share-popup-copy-btn:hover {
-      transform: translateY(-1px) !important;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
-    }
-  }
-
-  .share-popup-copy-btn:disabled {
-    opacity: 0.7 !important;
-    cursor: not-allowed !important;
-  }
-
-  /* Performance optimizations for low-end devices */
-  @media (prefers-reduced-motion: reduce) {
-    .share-glassmorphic-popup {
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-    }
-
-    .share-popup-close:hover,
-    .share-popup-copy-btn:hover {
-      transform: none !important;
-    }
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 640px) {
-    .share-glassmorphic-popup {
-      width: 95vw;
-      margin: 1rem;
-    }
-
-    .share-popup-header,
-    .share-popup-content {
-      padding: 1.25rem;
-    }
-
-    .share-popup-input-group {
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .share-popup-copy-btn {
-      justify-content: center !important;
-    }
-  }
+}

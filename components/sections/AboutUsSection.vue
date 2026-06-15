@@ -315,29 +315,40 @@
     bottom: 1.5rem !important;
   }
 
+  /* Liquid-glass dots: translucent frosted fill, a specular "light reflection"
+     rim (bright top-left inset, faint bottom-right counter-glint) instead of a
+     flat border, and a soft DROP SHADOW for depth — no outer glow. */
   :deep(.swiper-pagination-bullet) {
     width: 12px;
     height: 12px;
-    background: rgba(255, 255, 255, 0.4);
-    border: 2px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    -webkit-backdrop-filter: blur(3px) saturate(1.4);
+    backdrop-filter: blur(3px) saturate(1.4);
+    box-shadow:
+      inset 1.2px 1.2px 1.5px -0.5px rgba(255, 255, 255, 0.85),
+      inset -1px -1px 1px -0.5px rgba(255, 255, 255, 0.2),
+      0 2px 5px rgba(0, 0, 0, 0.35);
     opacity: 1;
     transition: all 0.3s ease;
   }
 
   @media (hover: hover) and (pointer: fine) {
     :deep(.swiper-pagination-bullet:hover) {
-      background: rgba(255, 255, 255, 0.6);
-      border-color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.35);
+      border-color: rgba(255, 255, 255, 0.6);
       transform: scale(1.2);
     }
   }
 
   :deep(.swiper-pagination-bullet-active) {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.95);
+    /* brighter light-reflection rim + a touch deeper depth shadow */
     box-shadow:
-      0 0 12px rgba(255, 255, 255, 0.6),
-      inset 0 0 4px rgba(255, 255, 255, 0.8);
+      inset 1.4px 1.4px 1.5px -0.3px rgba(255, 255, 255, 1),
+      inset -1px -1px 1.5px -0.5px rgba(255, 255, 255, 0.55),
+      0 2px 7px rgba(0, 0, 0, 0.45);
   }
 
   /* Text Content */

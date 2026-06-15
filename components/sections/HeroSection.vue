@@ -95,12 +95,10 @@
       </p>
 
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-scale-in">
-        <UiButton
-          variant="solid"
-          size="lg"
-          class="text-lg"
-          :icon="primaryButtonIcon"
+        <Button
           :label="t(primaryButtonLabel)"
+          class="btn-primary text-lg px-8 py-3"
+          :icon="primaryButtonIcon"
           @click="handlePrimaryAction"
         />
         <!-- <Button 
@@ -126,6 +124,7 @@
 
 <script setup lang="ts">
   import { watch } from 'vue'
+  import Button from 'primevue/button'
   import { useI18n } from 'vue-i18n'
   import { useImageLoading, IMAGE_SIZES } from '~/utils/imageHelpers'
   import { useHeroSlider, type HeroImage } from '~/composables/useHeroSlider'
