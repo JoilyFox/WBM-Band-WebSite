@@ -176,7 +176,8 @@ async function generateManifest() {
     description: 'Official website of WBM Band',
     start_url: `${config.baseURL}/`,
     display: 'standalone',
-    background_color: '#ffffff',
+    // Black splash/background to match the new black icon and theme_color.
+    background_color: '#000000',
     theme_color: config.colors.themeColor,
     icons: [
       {
@@ -242,14 +243,19 @@ async function generateSafariPinnedTab() {
   console.log('\n🦁 Generating Safari Pinned Tab...')
 
   try {
-    // Copy the source SVG as safari-pinned-tab.svg
-    // In a real implementation, you might want to optimize this SVG
-    const svgContent = await fs.readFile(config.sourceFile, 'utf8')
+    // Source the LOGO SILHOUETTE, not favicon.svg. favicon.svg now carries a
+    // solid black backing square (so Google/PWA crop to a black circle with the
+    // white mark) — recoloring that to monochrome black would yield an all-black
+    // block. Safari pinned tabs want the bare glyph in black on transparent.
+    const logoSource = path.join(__dirname, '../public/images/wbm-logo-white.svg')
+    const svgContent = await fs.readFile(logoSource, 'utf8')
 
-    // Basic optimization - make it monochrome and remove unnecessary attributes
+    // Recolor the white monogram (both the `.cls-1 { fill: #fff }` style block
+    // and any inline white fills/strokes) to black; background stays transparent.
     const optimizedSvg = svgContent
-      .replace(/fill="[^"]*"/g, 'fill="black"')
-      .replace(/stroke="[^"]*"/g, 'stroke="black"')
+      .replace(/fill:\s*#fff(?:fff)?/gi, 'fill: #000000')
+      .replace(/fill="(?:#fff(?:fff)?|white)"/gi, 'fill="#000000"')
+      .replace(/stroke="(?:#fff(?:fff)?|white)"/gi, 'stroke="#000000"')
 
     await fs.writeFile(path.join(config.outputDir, 'safari-pinned-tab.svg'), optimizedSvg)
 
