@@ -92,9 +92,9 @@ layer clips with `clip-path: inset(0 round var(--lg-radius))` and can't read
 Shared by **every** interactive glass surface (modal close, language switcher,
 swiper arrows, and `<UiButton>` glass variants) so they stay in sync:
 
-- **Hover** (fine pointer only): the specular rim brightens + a soft outer bloom
-  - a gentle inner glow; the button's **content** swells (the host can't scale —
-    see §1).
+- **Hover** (fine pointer only): the specular rim brightens, with a soft outer
+  bloom and a gentle inner glow; the button's **content** swells (the host can't
+  scale — see §1).
 - **Press**: the host nudges up (`scale(1.06)`) and settles back with a bouncy
   curve; `--lg-glow` blooms.
 
