@@ -31,15 +31,24 @@
       </div>
     </div>
 
-    <!-- Play Overlay (Desktop only) -->
+    <!-- Play Overlay (Desktop only) — clear liquid-glass play button. Decorative
+         (the card itself is the click target), so it's aria-hidden / not focusable
+         and just lets the click bubble. No scale-in transform: a persistent scale
+         on the glass host (or an ancestor) would suppress its backdrop frost while
+         hovered — the overlay's fade + the button's own morph carry it instead. -->
     <div
       class="absolute inset-0 md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 hidden"
     >
-      <div
-        class="bg-white/90 rounded-full w-12 h-12 flex items-center justify-center transform scale-75 group-hover:scale-100 transition-transform duration-300 shadow-xl"
-      >
-        <i class="pi pi-play text-surface-900 text-lg ml-0.5"></i>
-      </div>
+      <UiButton
+        variant="clear"
+        shape="circle"
+        icon-only
+        size="lg"
+        icon="pi pi-play"
+        class="album-play-btn"
+        aria-hidden="true"
+        tabindex="-1"
+      />
     </div>
 
     <!-- Release Type Badge -->
@@ -107,11 +116,6 @@
 </script>
 
 <style scoped>
-  /* Ensure perfect circle for play button */
-  .rounded-full {
-    border-radius: 50%;
-  }
-
   /* Enhanced shadow for cards */
   .shadow-lg {
     box-shadow:
@@ -119,14 +123,8 @@
       0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
 
-  /* Custom animations for play icon */
-  .pi-play {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .group:hover .pi-play {
-      transform: scale(1.1);
-    }
+  /* Optically centre the play triangle (it reads slightly left-heavy dead-centre). */
+  .album-play-btn :deep(.lg-btn__icon) {
+    margin-left: 2px;
   }
 </style>
