@@ -10,6 +10,7 @@ This directory contains documentation for all the main features of the WBM Band 
 - [Global Loading System](./global-loading-system.md) - Top bar progress indicator for async operations
 - [Snackbar Notifications](./snackbar-notifications.md) - Custom notification system with modern animations and multiple types
 - [Error Page System](./error-page-system.md) - Comprehensive error handling with custom messages and glassmorphism design
+- [Liquid Glass + `<UiButton>`](./liquid-glass.md) - The macOS-style "liquid glass" material (classes, `--lg-*` tunables, tier gating, the backdrop-root trap, the hover/press morph, `v-lg-pointer`/`v-lg-physics`) and the unified `<UiButton>` component (variants/sizes/shapes) built on it — plus which buttons are unified vs deliberately kept
 - [Image Optimization Guide](./image-optimization-guide.md) - Comprehensive image optimization implementation with static site generation support
 - [Pre‑Blurred Images](./pre-blurred-images.md) - Build-time blur/tint generation to replace runtime overlay blur
 - [Image Utilities](./image-utilities.md) - Composables and helper functions for image loading states and optimization
