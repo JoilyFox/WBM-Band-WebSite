@@ -9,14 +9,15 @@
         'liquid-glass',
         'liquid-glass--pill',
         'liquid-glass-interactive',
-        { 'lang-switch--big': size === 'big' }
+        { 'lang-switch--big': size === 'big', 'lang-switch--animating': animating }
       ]"
       :aria-label="t('lang.switch_label')"
       :aria-pressed="true"
       @click="toggleLocale"
     >
-      <!-- Liquid thumb: a white pill that morphs (slides + stretches) between
-           the two labels. Sits behind the text; driven by transform only. -->
+      <!-- Overlay pill — hidden at rest; only shown while sliding between labels.
+           The RESTING pill is each label's own ::before (CSS, so it's correct from
+           the first server paint with zero JS measuring). -->
       <span ref="thumbEl" class="lang-thumb" aria-hidden="true" />
       <span
         ref="enEl"
@@ -58,25 +59,21 @@
     await setLocale(next)
   }
 
-  // --- Liquid thumb morph -------------------------------------------------
-  // A single white pill is positioned over the active label and animated to
-  // the other label on change. We animate ONLY `transform` (translateX +
-  // scaleX/scaleY), so every frame is GPU-composited — no layout or paint.
-  // The thumb's base width = the wider label; each state fits its label via
-  // scaleX, so the pill naturally stretches/shrinks as it travels (the
-  // "liquid" morph). Reduced-motion / low-perf tier snap instantly.
+  // --- Liquid slide -------------------------------------------------------
+  // The active label paints its own white pill via CSS (.lang-btn.active::before)
+  // — perfectly rounded, auto-sized to the text, present from the first paint, no
+  // JS measuring. On a switch we hide that static pill and slide an absolutely-
+  // positioned overlay (the "thumb") from the old label to the new one with a
+  // WIDTH-based morph (never scaleX, which would distort the radius). The labels
+  // never move, so we can measure their boxes any time. Reduced-motion / low tier
+  // skip the slide and let the CSS pill switch instantly.
   const btnEl = ref<HTMLButtonElement | null>(null)
   const thumbEl = ref<HTMLSpanElement | null>(null)
   const enEl = ref<HTMLSpanElement | null>(null)
   const uaEl = ref<HTMLSpanElement | null>(null)
 
-  type Geo = { tx: number; sx: number }
-  const geo = { en: { tx: 0, sx: 1 }, ua: { tx: 0, sx: 1 } }
-  let current: Geo = { tx: 0, sx: 1 }
-  let baseW = 0
+  const animating = ref(false)
   let running: Animation | null = null
-
-  const stateFor = () => (locale.value === 'en' ? geo.en : geo.ua)
 
   const wantsMotion = () => {
     if (typeof window === 'undefined') return false
@@ -85,89 +82,50 @@
     return true
   }
 
-  const setTransform = (g: Geo) => {
-    if (thumbEl.value) thumbEl.value.style.transform = `translateX(${g.tx}px) scaleX(${g.sx})`
-  }
-
-  const measure = () => {
+  watch(locale, (newLoc, oldLoc) => {
     const thumb = thumbEl.value
-    const en = enEl.value
-    const ua = uaEl.value
-    if (!thumb || !en || !ua) return
-    const enW = en.offsetWidth
-    const uaW = ua.offsetWidth
-    baseW = Math.max(enW, uaW)
-    if (!baseW) return
-    // Pin the thumb's box to the labels' vertical band; width = the wider one.
-    thumb.style.width = `${baseW}px`
-    thumb.style.height = `${en.offsetHeight}px`
-    thumb.style.top = `${en.offsetTop}px`
-    thumb.style.left = '0px'
-    geo.en = { tx: en.offsetLeft, sx: enW / baseW }
-    geo.ua = { tx: ua.offsetLeft, sx: uaW / baseW }
-    current = { ...stateFor() }
-    setTransform(current)
-    thumb.style.opacity = '1'
-  }
+    const btn = btnEl.value
+    const oldEl = oldLoc === 'en' ? enEl.value : uaEl.value
+    const newEl = newLoc === 'en' ? enEl.value : uaEl.value
+    if (!thumb || !btn || !oldEl || !newEl || !wantsMotion()) return
 
-  const morphTo = (target: Geo) => {
-    const thumb = thumbEl.value
-    if (!thumb) return
+    const c = btn.getBoundingClientRect()
+    const o = oldEl.getBoundingClientRect()
+    const n = newEl.getBoundingClientRect()
+
+    // Park the overlay on the NEW label (its resting end); the morph plays FROM
+    // the old label's box back to here, so the final frame matches the static
+    // pill that takes over when `animating` ends — a seamless handoff.
+    thumb.style.left = `${n.left - c.left}px`
+    thumb.style.top = `${n.top - c.top}px`
+    thumb.style.height = `${n.height}px`
+
+    const dx = o.left - n.left
+    const oldW = o.width
+    const newW = n.width
+    // Stretch a touch wider than either end mid-travel + a slight vertical squash
+    // — the gooey "liquid" beat — then settle with the soft overshoot easing.
+    const midW = Math.max(oldW, newW) * 1.16
+
     running?.cancel()
-    // Persist the destination as the base value first, then play the morph
-    // over it, so the animation can drop its fill cleanly with no end-jump.
-    setTransform(target)
-    if (!wantsMotion()) {
-      current = { ...target }
-      return
-    }
-    const from = current
-    const midTx = (from.tx + target.tx) / 2
-    // Stretch wider than either endpoint mid-travel, with a slight vertical
-    // squash — the gooey "liquid" beat — then settle with a soft overshoot.
-    const midSx = Math.max(from.sx, target.sx) * 1.16
+    animating.value = true
     running = thumb.animate(
       [
-        { transform: `translateX(${from.tx}px) scaleX(${from.sx}) scaleY(1)` },
-        {
-          transform: `translateX(${midTx}px) scaleX(${midSx}) scaleY(0.88)`,
-          offset: 0.5
-        },
-        { transform: `translateX(${target.tx}px) scaleX(${target.sx}) scaleY(1)` }
+        { width: `${oldW}px`, transform: `translateX(${dx}px) scaleY(1)` },
+        { width: `${midW}px`, transform: `translateX(${dx * 0.5}px) scaleY(0.88)`, offset: 0.5 },
+        { width: `${newW}px`, transform: `translateX(0px) scaleY(1)` }
       ],
-      { duration: 440, easing: 'cubic-bezier(0.34, 1.32, 0.46, 1)' }
+      { duration: 440, easing: 'cubic-bezier(0.34, 1.32, 0.46, 1)', fill: 'none' }
     )
-    current = { ...target }
-  }
-
-  let ro: ResizeObserver | null = null
-
-  onMounted(() => {
-    // Wait a frame so layout (and webfont metrics) settle before measuring.
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        measure()
-        ro = new ResizeObserver(() => {
-          // Re-measure geometry, then re-pin the thumb to the current state
-          // without a morph (a resize isn't a user toggle).
-          measure()
-        })
-        if (btnEl.value) ro.observe(btnEl.value)
-      })
-    )
+    const done = () => {
+      animating.value = false
+    }
+    running.onfinish = done
+    running.oncancel = done
   })
 
   onBeforeUnmount(() => {
     running?.cancel()
-    ro?.disconnect()
-  })
-
-  watch(locale, () => {
-    if (!baseW) {
-      measure()
-      return
-    }
-    morphTo(stateFor())
   })
 </script>
 
@@ -186,26 +144,7 @@
     padding: 2px; /* keep container compact */
     gap: 3px;
   }
-  /* The morphing white pill. Hidden until JS measures it (first frame), then
-     positioned/animated purely via transform. transform-origin: left so scaleX
-     fits each label from its left edge with no extra offset math. */
-  .lang-thumb {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0;
-    height: 0;
-    border-radius: 9999px;
-    background: #fff;
-    box-shadow:
-      0 1px 2px rgb(0 0 0 / 0.18),
-      inset 0 0 0 0.5px rgb(255 255 255 / 0.6);
-    transform-origin: 0 50%;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 0;
-    will-change: transform;
-  }
+
   .lang-btn {
     position: relative;
     z-index: 1;
@@ -228,9 +167,52 @@
   .lang-btn.active {
     color: #000;
   }
-  /* Reduced motion: the thumb still moves (it's instant via JS), but kill the
-     will-change hint and let the color swap be immediate. */
+
+  /* RESTING pill — the active label's own background. Perfect pill (radius is a
+     full capsule, so it's round at any text width) and present from the first
+     server-rendered paint, so the button loads complete with no flash. */
+  .lang-btn.active::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: #fff;
+    border-radius: 9999px;
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.18),
+      inset 0 0 0 0.5px rgb(255 255 255 / 0.6);
+  }
+  /* While sliding, the static pill steps aside so the overlay carries the motion. */
+  .lang-switch--animating .lang-btn.active::before {
+    opacity: 0;
+  }
+
+  /* OVERLAY pill — only visible during a switch; slides + morphs (width-based) from
+     the old label to the new one. transform-origin keeps the vertical squash
+     centred; width grows from the left edge so the slide reads naturally. */
+  .lang-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-radius: 9999px;
+    background: #fff;
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.18),
+      inset 0 0 0 0.5px rgb(255 255 255 / 0.6);
+    transform-origin: 0 50%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    will-change: transform, width;
+  }
+  .lang-switch--animating .lang-thumb {
+    opacity: 1;
+  }
+
   @media (prefers-reduced-transparency: reduce) {
+    .lang-btn.active::before,
     .lang-thumb {
       box-shadow: none;
     }
