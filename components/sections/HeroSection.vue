@@ -44,13 +44,27 @@
     <div
       class="absolute inset-0 z-15 flex items-center justify-between px-4 opacity-0 hover:opacity-100 transition-opacity duration-300"
     >
-      <button class="slider-control prev-btn" :disabled="!canSlide" @click="previousSlide">
-        <i class="pi pi-chevron-left text-2xl"></i>
-      </button>
+      <UiButton
+        variant="clear"
+        shape="circle"
+        icon-only
+        size="lg"
+        icon="pi pi-chevron-left"
+        :disabled="!canSlide"
+        aria-label="Previous slide"
+        @click="previousSlide"
+      />
 
-      <button class="slider-control next-btn" :disabled="!canSlide" @click="nextSlide">
-        <i class="pi pi-chevron-right text-2xl"></i>
-      </button>
+      <UiButton
+        variant="clear"
+        shape="circle"
+        icon-only
+        size="lg"
+        icon="pi pi-chevron-right"
+        :disabled="!canSlide"
+        aria-label="Next slide"
+        @click="nextSlide"
+      />
     </div>
 
     <!-- Progress Bar -->
@@ -81,10 +95,12 @@
       </p>
 
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-scale-in">
-        <Button
-          :label="t(primaryButtonLabel)"
-          class="btn-primary text-lg px-8 py-3"
+        <UiButton
+          variant="solid"
+          size="lg"
+          class="text-lg"
           :icon="primaryButtonIcon"
+          :label="t(primaryButtonLabel)"
           @click="handlePrimaryAction"
         />
         <!-- <Button 
@@ -111,7 +127,6 @@
 <script setup lang="ts">
   import { watch } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import Button from 'primevue/button'
   import { useImageLoading, IMAGE_SIZES } from '~/utils/imageHelpers'
   import { useHeroSlider, type HeroImage } from '~/composables/useHeroSlider'
   import { useScrollTo } from '~/composables/useScrollTo'
@@ -399,34 +414,7 @@
     will-change: opacity;
   }
 
-  /* Slider controls */
-  .slider-control {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .slider-control:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.5);
-      transform: scale(1.1);
-    }
-  }
-
-  .slider-control:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  /* Slider controls are now <UiButton variant="clear" shape="circle" icon-only>. */
 
   /* Progress Bar */
   .progress-bar-container {

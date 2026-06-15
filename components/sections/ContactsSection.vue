@@ -63,10 +63,18 @@
                   ></textarea>
                 </div>
 
-                <button type="submit" class="submit-button" :disabled="isSubmitting">
-                  <span v-if="!isSubmitting">{{ t('contacts.submit_button') }}</span>
-                  <span v-else>{{ t('contacts.sending_button') }}</span>
-                </button>
+                <UiButton
+                  type="submit"
+                  variant="dimmed"
+                  size="lg"
+                  shape="rounded"
+                  block
+                  class="submit-button"
+                  :disabled="isSubmitting"
+                  :loading="isSubmitting"
+                >
+                  {{ isSubmitting ? t('contacts.sending_button') : t('contacts.submit_button') }}
+                </UiButton>
 
                 <!-- Success Message -->
                 <div v-if="submitSuccess" class="form-message form-message-success">
@@ -396,63 +404,12 @@
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
   }
 
+  /* Now <UiButton variant="dimmed" block> — material + interaction come from the
+     unified button; only the uppercase/bold text treatment stays bespoke. */
   .submit-button {
-    width: 100%;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0.08) 100%
-    );
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 1rem 2rem;
-    color: white;
-    font-size: 1rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    /* Liquid glass: clear frost + saturation + specular rim */
-    backdrop-filter: blur(6px) saturate(1.5);
-    -webkit-backdrop-filter: blur(6px) saturate(1.5);
-    box-shadow:
-      inset 1.2px 1.2px 0.5px -0.8px rgba(255, 255, 255, 0.4),
-      inset -1px -1px 1px -1px rgba(255, 255, 255, 0.1);
-  }
-
-  /* Desktop hover effects only */
-  @media (hover: hover) and (pointer: fine) {
-    .submit-button:hover:not(:disabled) {
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.25) 0%,
-        rgba(255, 255, 255, 0.15) 100%
-      );
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    }
-  }
-
-  /* Mobile and touch device active effects */
-  @media (hover: none) and (pointer: coarse) {
-    .submit-button:active:not(:disabled) {
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.25) 0%,
-        rgba(255, 255, 255, 0.15) 100%
-      );
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-      transition-duration: 0.15s;
-    }
-  }
-
-  .submit-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 
   /* Form Messages */
