@@ -2,6 +2,7 @@
 import { musicLibrary } from './data/musicLibrary'
 import { SOURCE_PREFIXES, assertNoSlugCollisions } from './utils/sourceAttribution'
 import { SITE_URL } from './constants/app'
+import ukLocale from './locales/uk.json'
 
 const LOCALES = ['ua', 'en'] as const
 const RELEASE_SLUGS = musicLibrary.map((r) => r.slug)
@@ -10,6 +11,39 @@ const LYRICS_SLUGS = musicLibrary.filter((r) => r.lyrics && r.lyrics.length > 0)
 
 // Fail the build loudly if a song slug shadows a reserved source prefix.
 assertNoSlugCollisions(RELEASE_SLUGS)
+
+// --- Root (`/`) SEO fallback -------------------------------------------------
+// The bare `/` route is a client-only redirect shell (i18n `prefix` strategy),
+// so it never runs the homepage's localized useHead — it falls back to the
+// app.head below. But `/` is ALSO the canonical Ukrainian home (the home page
+// sets `hreflang uk-UA` + canonical → the origin root), so Google indexes the
+// ROOT for Ukrainian. If the fallback is a generic English string, Google shows
+// English for "WBM" / "Woman Based Mechanics". So the fallback MUST be the
+// Ukrainian home meta — and it mirrors the live page by naming the latest
+// release, computed here at build time so it tracks musicLibrary automatically.
+const latestReleaseTitleUA = (() => {
+  const now = Date.now()
+  const latest = musicLibrary
+    .filter((r) => r.releaseDate && new Date(r.releaseDate).getTime() <= now)
+    .sort(
+      (a, b) =>
+        new Date(b.releaseDate as string).getTime() - new Date(a.releaseDate as string).getTime()
+    )[0]
+  if (!latest) return ''
+  // Resolve the localized (Ukrainian) title via the release's titleKey, falling
+  // back to the raw `title` — matches pages/index.vue's `latestReleaseTitle`.
+  const localized = latest.titleKey
+    ? latest.titleKey
+        .split('.')
+        .reduce<unknown>((o, k) => (o as Record<string, unknown>)?.[k], ukLocale)
+    : undefined
+  return (typeof localized === 'string' ? localized : latest.title) || ''
+})()
+
+const ROOT_TITLE_UA = ukLocale.app.home_title
+const ROOT_DESCRIPTION_UA = latestReleaseTitleUA
+  ? ukLocale.app.meta_description.replace('{release}', latestReleaseTitleUA)
+  : `WBM Band — ${ukLocale.app.tagline}.`
 
 const STATIC_ROUTES = [
   '/',
@@ -53,6 +87,10 @@ export default defineNuxtConfig({
     baseURL: process.env.DEPLOY_TARGET === 'github' ? '/WBM-Band-WebSite/' : '/',
     buildAssetsDir: '/_nuxt/', // Ensure consistent asset path
     head: {
+      // Default <title> for the root redirect shell (`/`) — the canonical
+      // Ukrainian home. Every content page overrides this via its own useHead.
+      title: ROOT_TITLE_UA,
+
       // Favicon and App Icon Configuration
       link: [
         // Standard favicon
@@ -228,22 +266,26 @@ export default defineNuxtConfig({
             '/browserconfig.xml'
         },
 
-        // SEO and Social Media. Fallback description for any route that doesn't
-        // set its own via useHead/useSeoMeta. Leads with the full, unambiguous
-        // name (the "WBM" acronym collides with unrelated entities) and matches
-        // the real band positioning from about.content. The legacy `keywords`
-        // meta was removed — Google has ignored it for over a decade and an
-        // auto-generated list reads as a low-quality signal.
+        // SEO and Social Media. Fallback meta for any route that doesn't set its
+        // own via useHead/useSeoMeta — in practice the bare `/` redirect shell,
+        // which is the canonical Ukrainian home (see ROOT_DESCRIPTION_UA above).
+        // So this is Ukrainian, not English, and names the latest release to
+        // mirror pages/index.vue. The legacy `keywords` meta was removed — Google
+        // has ignored it for over a decade and an auto list reads as low-quality.
         {
           name: 'description',
-          content:
-            'Woman Based Mechanics (WBM Band) — a Ukrainian alternative rock band. Listen to our latest singles and releases.'
+          content: ROOT_DESCRIPTION_UA
         },
         { name: 'author', content: 'Woman Based Mechanics' },
 
         // Open Graph
         { property: 'og:type', content: 'website' },
         { property: 'og:site_name', content: 'WBM Band' },
+        // Ukrainian title/description/locale for the root shell so social
+        // unfurls of wbmband.com match Google. Content pages override these.
+        { property: 'og:title', content: ROOT_TITLE_UA },
+        { property: 'og:description', content: ROOT_DESCRIPTION_UA },
+        { property: 'og:locale', content: 'uk_UA' },
         // Branded 1200×630 social card (absolute URL so crawlers/unfurlers
         // resolve it off the real domain, not the GitHub Pages mirror). Pages
         // that share square cover art (release pages) override this with their
@@ -257,6 +299,8 @@ export default defineNuxtConfig({
 
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: ROOT_TITLE_UA },
+        { name: 'twitter:description', content: ROOT_DESCRIPTION_UA },
         {
           name: 'twitter:image',
           content: `${SITE_URL}/images/optimized/meta-images/meta-cover.jpg`
