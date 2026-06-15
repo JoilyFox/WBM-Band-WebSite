@@ -176,7 +176,7 @@
   --lg-tint: linear-gradient(to bottom, rgb(9 11 17 / 0.32), rgb(9 11 17 / 0.16));
   --lg-tint-flat: rgb(8 10 16 / 0.9);
   /* Strength of the cross-browser faux-refraction band (see ::after). */
-  --lg-edge-blur: 14px;
+  --lg-edge-blur: 10px;
   border: none;
   /* Specular shell lives on the host box-shadow so ::after is free for the
      refraction band: top sheen rim + a bright glint at the bottom lip. */
@@ -201,29 +201,16 @@
      displacement lens on ::before for extra depth. Masked to the lower band so
      the rest of the bar stays clear. */
   inset: 0;
-  -webkit-backdrop-filter: blur(var(--lg-edge-blur)) brightness(1.13) saturate(1.35);
-  backdrop-filter: blur(var(--lg-edge-blur)) brightness(1.13) saturate(1.35);
-  /* The band stays strong and clearly visible at the bottom lip, but the mask
-     ramps in as a long gradient — so the blur eases from the bar's clear
-     (default) frost into the harder lip blur instead of switching on at a hard
-     line. Full strength only at the lip (92%); a smooth fade-in from high up
-     (transparent 18% → … → solid) keeps the upper transition borderless. */
+  -webkit-backdrop-filter: blur(var(--lg-edge-blur)) brightness(1.15) saturate(1.4);
+  backdrop-filter: blur(var(--lg-edge-blur)) brightness(1.15) saturate(1.4);
   -webkit-mask-image: linear-gradient(
     to bottom,
-    transparent 18%,
-    rgb(0 0 0 / 0.22) 42%,
-    rgb(0 0 0 / 0.55) 60%,
-    rgb(0 0 0 / 0.85) 78%,
-    #000 92%
+    transparent 50%,
+    #000 74%,
+    #000 90%,
+    transparent 100%
   );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 18%,
-    rgb(0 0 0 / 0.22) 42%,
-    rgb(0 0 0 / 0.55) 60%,
-    rgb(0 0 0 / 0.85) 78%,
-    #000 92%
-  );
+  mask-image: linear-gradient(to bottom, transparent 50%, #000 74%, #000 90%, transparent 100%);
 }
 
 /* Capsule controls: pills, round buttons, switchers */
