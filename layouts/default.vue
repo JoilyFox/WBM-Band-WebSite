@@ -100,7 +100,12 @@
     </header>
 
     <!-- Mobile Menu Overlay -->
-    <Transition name="mobile-menu">
+    <!-- Explicit :duration because the wrapper itself no longer transitions
+         opacity/transform (that would suppress the veil's frost — see the
+         .mobile-menu-* rules); Vue can't auto-detect the duration off the root,
+         so we declare it to keep the element mounted while the veil + content
+         animate. -->
+    <Transition name="mobile-menu" :duration="320">
       <div v-if="isMobileMenuOpen" class="fixed inset-0 z-50 md2:hidden" @click="closeMobileMenu">
         <!-- Backdrop -->
         <div class="liquid-glass-veil absolute inset-0"></div>
@@ -511,20 +516,32 @@
     }
   }
 
-  /* Mobile menu transitions */
-  .mobile-menu-enter-active,
-  .mobile-menu-leave-active {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Mobile menu: materialize the frosted veil rather than fading the whole
+     overlay. opacity/transform on the wrapper (an ANCESTOR of .liquid-glass-veil)
+     would make it a backdrop root and suppress the veil's backdrop-filter, so the
+     blur would pop in only after the fade finished. So the wrapper stays opacity 1
+     / transform-free; the veil ramps its own tint + blur from the first frame and
+     the menu content rises (slideInUp / slideOutDown below). */
+  .mobile-menu-enter-active .liquid-glass-veil,
+  .mobile-menu-leave-active .liquid-glass-veil {
+    transition:
+      background-color 0.26s ease,
+      backdrop-filter 0.3s cubic-bezier(0.33, 0, 0.2, 1),
+      -webkit-backdrop-filter 0.3s cubic-bezier(0.33, 0, 0.2, 1);
   }
 
-  .mobile-menu-enter-from {
-    opacity: 0;
-    transform: scale(0.98);
+  .mobile-menu-enter-from .liquid-glass-veil,
+  .mobile-menu-leave-to .liquid-glass-veil {
+    background-color: rgb(5 6 10 / 0);
+    -webkit-backdrop-filter: blur(0) saturate(140%);
+    backdrop-filter: blur(0) saturate(140%);
   }
 
-  .mobile-menu-leave-to {
-    opacity: 0;
-    transform: scale(0.98);
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-menu-enter-active .liquid-glass-veil,
+    .mobile-menu-leave-active .liquid-glass-veil {
+      transition: none;
+    }
   }
 
   /* Mobile menu content animation - removed conflicting animations */

@@ -242,27 +242,59 @@
      when (and only when) the link genuinely doesn't fit alongside the
      buttons. */
 
+  /* Materialize like the release modal (BaseModal) — NOT an opacity/transform
+     fade of the whole toast. A `transform` or `opacity < 1` on the glass host
+     makes it a backdrop root and suppresses its own ::before frost, so the blur
+     would only "pop" in once the fade finished. Instead the host stays put
+     (opacity 1, no transform) while its tint + shadow fade in, the frost ramps
+     0 -> full on ::before, and the inner content rises — all concurrently, so
+     the blur is present from the first frame. Plays in reverse on leave. */
   .cookie-toast-enter-active,
   .cookie-toast-leave-active {
+    transition:
+      background 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+  .cookie-toast-enter-active::before,
+  .cookie-toast-leave-active::before {
+    transition:
+      backdrop-filter 0.4s cubic-bezier(0.33, 0, 0.2, 1),
+      -webkit-backdrop-filter 0.4s cubic-bezier(0.33, 0, 0.2, 1);
+  }
+  .cookie-toast-enter-active :is(.cookie-toast__message, .cookie-toast__actions),
+  .cookie-toast-leave-active :is(.cookie-toast__message, .cookie-toast__actions) {
     transition:
       opacity 0.35s ease,
       transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
+  /* Hidden state (first frame of open / during close): tint + shadow gone,
+     frost at blur(0), content dropped + faded. */
   .cookie-toast-enter-from,
   .cookie-toast-leave-to {
+    background: rgb(15 15 18 / 0);
+    box-shadow: none;
+  }
+  .cookie-toast-enter-from::before,
+  .cookie-toast-leave-to::before {
+    -webkit-backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+    backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+  }
+  .cookie-toast-enter-from :is(.cookie-toast__message, .cookie-toast__actions),
+  .cookie-toast-leave-to :is(.cookie-toast__message, .cookie-toast__actions) {
     opacity: 0;
-    transform: translateY(0.75rem);
+    transform: translateY(0.5rem);
   }
 
+  /* Reduced motion: no ramp, snap straight to the frosted toast. */
   @media (prefers-reduced-motion: reduce) {
     .cookie-toast-enter-active,
-    .cookie-toast-leave-active {
-      transition: opacity 0.2s ease;
-    }
-    .cookie-toast-enter-from,
-    .cookie-toast-leave-to {
-      transform: none;
+    .cookie-toast-leave-active,
+    .cookie-toast-enter-active::before,
+    .cookie-toast-leave-active::before,
+    .cookie-toast-enter-active :is(.cookie-toast__message, .cookie-toast__actions),
+    .cookie-toast-leave-active :is(.cookie-toast__message, .cookie-toast__actions) {
+      transition: none;
     }
   }
 </style>
