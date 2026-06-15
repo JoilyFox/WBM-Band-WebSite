@@ -33,6 +33,14 @@ export interface LiquidLensOptions {
   edge?: number
   /** Convexity of the rim profile: higher = sharper magnification right at the lip. */
   curve?: number
+  /**
+   * Restrict refraction to one axis. Default `'both'`. The full-width header bar
+   * uses `'y'` so ONLY its top/bottom lip bends the backdrop: its left/right
+   * edges sit flush against the viewport sides (no real glass lip there), and
+   * refracting them paints bright vertical fringes down the page edges. `'x'` is
+   * the mirror (left/right only), kept for symmetry.
+   */
+  axis?: 'both' | 'x' | 'y'
 }
 
 export interface LiquidLensResult {
@@ -92,6 +100,7 @@ export function buildLiquidLensMap(
   }
   const edge = Math.max(2, Math.min(opts.edge ?? shortSide * 0.32, shortSide / 2))
   const curve = opts.curve ?? 1.7
+  const axis = opts.axis ?? 'both'
 
   const mw = Math.max(8, Math.min(MAP_MAX, Math.round(width / 3)))
   const mh = Math.max(8, Math.min(MAP_MAX, Math.round(height / 3)))
@@ -129,6 +138,10 @@ export function buildLiquidLensMap(
         const t = Math.pow(1 - d / edge, curve)
         dx = (gx / len) * t
         dy = (gy / len) * t
+        // Drop the off-axis component so a full-bleed edge (e.g. the bar's
+        // left/right sides at the viewport edge) emits no refraction fringe.
+        if (axis === 'y') dx = 0
+        else if (axis === 'x') dy = 0
       }
 
       const i = (py * mw + px) * 4

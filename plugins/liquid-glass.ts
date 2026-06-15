@@ -185,7 +185,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         const map = buildLiquidLensMap(rect.width, rect.height, strength, {
           radii,
           edge: opts.edge,
-          curve: opts.curve
+          curve: opts.curve,
+          axis: opts.axis
         })
         if (!map) {
           lastKey = ''
