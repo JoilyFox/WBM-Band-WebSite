@@ -11,7 +11,7 @@
         </CommonSectionSubtitle>
       </div>
 
-      <div class="relative z-10 max-w-6xl mx-auto mb-4 md:mb-14">
+      <div class="relative z-10 mx-auto mb-4 md:mb-14">
         <div class="grid md:grid-cols-2 gap-y-2 gap-x-8 lg:gap-12">
           <!-- Left Side: Contact Form (order-2 on mobile, order-1 on desktop) -->
           <div class="contact-form-wrapper order-2 md:order-1 gap-y-4 flex flex-col">
