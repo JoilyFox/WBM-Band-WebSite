@@ -26,3 +26,6 @@ dist
 gcp-*.json
 ga4-*.json
 **/*.credentials.jsonscreenshots/
+
+# Output of scripts/screenshot-devices.mjs (regenerable device captures)
+screenshots/
