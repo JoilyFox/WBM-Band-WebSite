@@ -93,6 +93,15 @@ export default defineNuxtConfig({
 
       // Favicon and App Icon Configuration
       link: [
+        // Scalable SVG icon — modern browsers use this for the TAB (the bare
+        // monogram, the historical look). Google search + PWA use the raster
+        // "badge" icons (black disc + white mark) at ≥48px below. Declared first
+        // so browsers that support SVG favicons prefer it.
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          href: (process.env.DEPLOY_TARGET === 'github' ? '/WBM-Band-WebSite' : '') + '/favicon.svg'
+        },
         // Standard favicon
         {
           rel: 'icon',

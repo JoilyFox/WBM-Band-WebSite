@@ -22,7 +22,18 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const config = {
-  sourceFile: path.join(__dirname, '../public/favicon.svg'),
+  // Browser-tab favicon source: the bare monogram on a transparent ground (the
+  // historical look). Drives the small sizes a tab actually picks (≤ tabMaxSize)
+  // plus favicon.ico and the linked SVG.
+  tabSource: path.join(__dirname, '../public/favicon.svg'),
+  // Search (Google) + mobile/PWA source: the white monogram on a solid black
+  // square, so Google's circular crop renders a black disc with the white mark.
+  // Google favours 48px-multiple icons, so everything ≥ 48 uses this.
+  badgeSource: path.join(__dirname, '../assets/favicons/favicon-badge.svg'),
+  // Largest icon still rendered from the tab (monogram) source; larger → badge.
+  tabMaxSize: 32,
+  // Logo glyph (white on transparent) used only for the Safari pinned tab.
+  logoSilhouette: path.join(__dirname, '../public/images/wbm-logo-white.svg'),
   outputDir: path.join(__dirname, '../public'),
   baseURL: '/WBM-Band-WebSite', // GitHub Pages base URL
   sizes: {
@@ -38,6 +49,10 @@ const config = {
     safariPinnedTabColor: '#000000'
   }
 }
+
+// Pick the artwork for a given pixel size: browser tabs grab the small icons
+// (bare monogram), Google search + PWA grab ≥48 (the solid black badge).
+const pngSourceFor = (size) => (size <= config.tabMaxSize ? config.tabSource : config.badgeSource)
 
 /**
  * Ensure directory exists
@@ -72,7 +87,7 @@ async function generatePngFavicons() {
   console.log('\n📱 Generating PNG favicons...')
 
   const promises = config.sizes.png.map((size) =>
-    svgToPng(config.sourceFile, path.join(config.outputDir, `favicon-${size}x${size}.png`), size)
+    svgToPng(pngSourceFor(size), path.join(config.outputDir, `favicon-${size}x${size}.png`), size)
   )
 
   await Promise.all(promises)
@@ -84,13 +99,13 @@ async function generatePngFavicons() {
 async function generateAppleTouchIcons() {
   console.log('\n🍎 Generating Apple Touch Icons...')
 
-  // Generate apple-touch-icon.png (default 180x180)
-  await svgToPng(config.sourceFile, path.join(config.outputDir, 'apple-touch-icon.png'), 180)
+  // Generate apple-touch-icon.png (default 180x180) — home-screen icon → badge.
+  await svgToPng(config.badgeSource, path.join(config.outputDir, 'apple-touch-icon.png'), 180)
 
   // Generate various sizes
   const promises = config.sizes.appleTouchIcon.map((size) =>
     svgToPng(
-      config.sourceFile,
+      config.badgeSource,
       path.join(config.outputDir, `apple-touch-icon-${size}x${size}.png`),
       size
     )
@@ -107,7 +122,7 @@ async function generateAndroidIcons() {
 
   const promises = config.sizes.androidChrome.map((size) =>
     svgToPng(
-      config.sourceFile,
+      config.badgeSource,
       path.join(config.outputDir, `android-chrome-${size}x${size}.png`),
       size
     )
@@ -124,7 +139,7 @@ async function generateMsTileIcons() {
 
   // Generate mstile icons
   const promises = config.sizes.msTile.map((size) =>
-    svgToPng(config.sourceFile, path.join(config.outputDir, `mstile-${size}x${size}.png`), size)
+    svgToPng(config.badgeSource, path.join(config.outputDir, `mstile-${size}x${size}.png`), size)
   )
 
   await Promise.all(promises)
@@ -142,13 +157,14 @@ async function generateIcoFile() {
 
     for (const size of config.sizes.ico) {
       const tempPath = path.join(config.outputDir, `temp-${size}.png`)
-      await svgToPng(config.sourceFile, tempPath, size)
+      await svgToPng(config.tabSource, tempPath, size)
       tempPngs.push(tempPath)
     }
 
+    // favicon.ico is a browser-tab / legacy icon → bare monogram (tab source).
     // For now, just use the 32x32 as the main favicon.ico
     // You can use a library like png-to-ico for proper multi-size ICO generation
-    await sharp(config.sourceFile)
+    await sharp(config.tabSource)
       .resize(32, 32)
       .png()
       .toFile(path.join(config.outputDir, 'favicon.ico'))
@@ -272,8 +288,9 @@ async function main() {
   console.log('🚀 Starting favicon generation...\n')
 
   try {
-    // Check if source file exists
-    await fs.access(config.sourceFile)
+    // Check both artwork sources exist (tab monogram + search badge)
+    await fs.access(config.tabSource)
+    await fs.access(config.badgeSource)
 
     // Ensure output directory exists
     await ensureDir(config.outputDir)
@@ -301,8 +318,10 @@ async function main() {
     console.log('\n🎯 Next: Update your Nuxt config to use these favicons!')
   } catch (error) {
     if (error.code === 'ENOENT') {
-      console.error(`✗ Source file not found: ${config.sourceFile}`)
-      console.error('Please make sure your SVG favicon exists at the specified path.')
+      console.error(
+        `✗ Source file not found (tab: ${config.tabSource} | badge: ${config.badgeSource})`
+      )
+      console.error('Please make sure both SVG favicon sources exist at the specified paths.')
     } else {
       console.error('✗ Favicon generation failed:', error.message)
     }
