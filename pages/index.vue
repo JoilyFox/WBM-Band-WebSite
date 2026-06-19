@@ -1,29 +1,33 @@
 <template>
   <div>
-    <!-- Hero Section -->
+    <!-- Hero Section — eager: it holds the LCP <h1>, so it must hydrate first. -->
     <SectionsHeroSection @primary-action="handleListenNow" @secondary-action="handleTourDates" />
 
-    <!-- Music Library Section -->
-    <SectionsMusicLibrarySection
+    <!-- Below-the-fold sections lazy-hydrate on scroll. SSR HTML still ships in
+         the prerendered page (SEO unaffected) — only JS hydration is deferred,
+         which frees the main thread so the hero LCP paints sooner. -->
+    <LazySectionsMusicLibrarySection
       :max-items="8"
+      hydrate-on-visible
       @release-click="handleReleaseClick"
       @show-more="handleShowAllMusic"
     />
 
     <CommonGradientSectionWrapper>
       <!-- About Us Section -->
-      <SectionsAboutUsSection />
+      <LazySectionsAboutUsSection hydrate-on-visible />
 
       <!-- Our Team Section (Subsection of About Us) — STILL IN DEVELOPMENT, hidden on prod.
            Re-enable by uncommenting the line below once the team section is ready. -->
       <!-- <SectionsOurTeam /> -->
 
       <!-- Contacts Section -->
-      <SectionsContactsSection />
+      <LazySectionsContactsSection hydrate-on-visible />
     </CommonGradientSectionWrapper>
 
-    <!-- Music Detail Modal -->
-    <MusicDetailModal
+    <!-- Music Detail Modal — lazy chunk, only fetched/mounted when a release is
+         clicked (v-if), so its JS stays out of the initial load. -->
+    <LazyMusicDetailModal
       v-if="selectedRelease"
       :release="selectedRelease"
       :is-visible="isModalOpen"

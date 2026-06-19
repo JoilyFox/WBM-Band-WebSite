@@ -244,13 +244,11 @@ export default defineNuxtConfig({
           href:
             (process.env.DEPLOY_TARGET === 'github' ? '/WBM-Band-WebSite' : '') +
             '/site.webmanifest'
-        },
-
-        // Font Awesome CSS
-        {
-          rel: 'stylesheet',
-          href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'
         }
+        // NOTE: Font Awesome is NOT loaded here. The old render-blocking cdnjs
+        // <link> was a duplicate — plugins/fontawesome.client.ts already bundles
+        // the same all.css. Removing the CDN link drops a render-blocking
+        // third-party request (cdnjs) with no visual change.
       ],
       meta: [
         // Standard meta tags
@@ -416,7 +414,10 @@ export default defineNuxtConfig({
       inputStyle: 'outlined'
     },
     components: {
-      include: '*' // Include all PrimeVue components
+      // Tree-shaken: only the components actually used (audited across all
+      // templates + imports — Button ×23, InputText ×2, Textarea ×1; no PrimeVue
+      // services/Dialog/Toast/Overlay anywhere). Was '*' = all ~80 components.
+      include: ['Button', 'InputText', 'Textarea']
     },
     directives: {
       include: ['Ripple', 'Tooltip', 'StyleClass']
