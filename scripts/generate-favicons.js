@@ -190,24 +190,29 @@ async function generateManifest() {
     name: 'WBM Band',
     short_name: 'WBM',
     description: 'Official website of WBM Band',
-    start_url: `${config.baseURL}/`,
+    // Relative URLs so ONE manifest is correct under BOTH deploy targets: the
+    // browser resolves them against the manifest's own URL, giving '/...' on
+    // wbmband.com and '/WBM-Band-WebSite/...' on GitHub Pages. Previously these
+    // hardcoded `${config.baseURL}` (the GitHub base), so on the production
+    // domain start_url + every icon 404'd (broken PWA install / maskable icon).
+    start_url: './',
     display: 'standalone',
     // Black splash/background to match the new black icon and theme_color.
     background_color: '#000000',
     theme_color: config.colors.themeColor,
     icons: [
       {
-        src: `${config.baseURL}/android-chrome-192x192.png`,
+        src: 'android-chrome-192x192.png',
         sizes: '192x192',
         type: 'image/png'
       },
       {
-        src: `${config.baseURL}/android-chrome-512x512.png`,
+        src: 'android-chrome-512x512.png',
         sizes: '512x512',
         type: 'image/png'
       },
       {
-        src: `${config.baseURL}/favicon-192x192.png`,
+        src: 'favicon-192x192.png',
         sizes: '192x192',
         type: 'image/png',
         purpose: 'any maskable'
@@ -236,9 +241,9 @@ async function generateBrowserConfig() {
 <browserconfig>
     <msapplication>
         <tile>
-            <square70x70logo src="${config.baseURL}/mstile-70x70.png"/>
-            <square150x150logo src="${config.baseURL}/mstile-150x150.png"/>
-            <square310x310logo src="${config.baseURL}/mstile-310x310.png"/>
+            <square70x70logo src="mstile-70x70.png"/>
+            <square150x150logo src="mstile-150x150.png"/>
+            <square310x310logo src="mstile-310x310.png"/>
             <TileColor>${config.colors.msapplicationTileColor}</TileColor>
         </tile>
     </msapplication>
