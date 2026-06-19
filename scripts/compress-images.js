@@ -11,6 +11,9 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 // Shared with utils/imageHelpers.ts (runtime srcset builder) so widths can't drift.
 import imagePresets from '../constants/imagePresets.json' with { type: 'json' }
+// Shared with scripts/autoresearch/score-images.mjs so the autoresearch loop
+// measures byte-for-byte what this pipeline produces (encoder knobs can't drift).
+import { formatOptions, applyFormat } from './lib/encode-options.mjs'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -53,31 +56,12 @@ async function compressImage(inputPath, outputDir, filename, settings) {
         const suffix = width === maxWidth ? '' : `-${width}`
         const outputPath = path.join(outputDir, `${baseFilename}${suffix}.${format}`)
 
-        let pipeline = sharp(inputPath).resize(width, height, {
+        const pipeline = sharp(inputPath).resize(width, height, {
           fit: 'cover',
           position: 'center'
         })
 
-        switch (format) {
-          case 'avif':
-            pipeline = pipeline.avif({ quality: settings.quality })
-            break
-          case 'webp':
-            pipeline = pipeline.webp({ quality: settings.quality })
-            break
-          case 'jpg':
-            pipeline = pipeline.jpeg({
-              quality: settings.quality,
-              progressive: true,
-              mozjpeg: true
-            })
-            break
-          case 'png':
-            pipeline = pipeline.png({ quality: settings.quality })
-            break
-        }
-
-        await pipeline.toFile(outputPath)
+        await applyFormat(pipeline, format, formatOptions(format, settings)).toFile(outputPath)
 
         const newStats = await fs.stat(outputPath)
         console.log(`  ${format.toUpperCase()} ${width}w: ${(newStats.size / 1024).toFixed(0)}KB`)

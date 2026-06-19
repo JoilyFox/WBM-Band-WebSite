@@ -1,0 +1,15 @@
+[
+  {
+    "name": "r4-all3",
+    "patch": {
+      "album": { "avifQuality": 79 },
+      "team": { "avifQuality": 78 },
+      "heroVertical": { "avifQuality": 77 }
+    }
+  },
+  {
+    "name": "r4-album-team",
+    "patch": { "album": { "avifQuality": 79 }, "team": { "avifQuality": 78 } }
+  },
+  { "name": "r4-album-only", "patch": { "album": { "avifQuality": 79 } } }
+]

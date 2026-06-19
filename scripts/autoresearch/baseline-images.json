@@ -1,0 +1,255 @@
+{
+  "_comment": "LOCKED production baseline for the image autoresearch loop. Per-(fixture,format) SSIM + bytes from the CURRENT imagePresets.json. The scorer anchors quality constraints to this (candidate SSIM >= baseSSIM - SSIM_MARGIN). Regenerate ONLY when you deliberately re-baseline (e.g. after shipping a loop winner or changing source images). The loop must never edit this file.",
+  "generatedFrom": "constants/imagePresets.json",
+  "ssimMargin": 0.005,
+  "fixtures": {
+    "public/images/hero-images/horizontal/hero-1.jpg": {
+      "preset": "hero",
+      "bytes": 2198436,
+      "formats": {
+        "avif": {
+          "ssim": 0.9878,
+          "bytes": 1015586
+        },
+        "webp": {
+          "ssim": 0.95979,
+          "bytes": 691722
+        },
+        "jpg": {
+          "ssim": 0.87849,
+          "bytes": 491128
+        }
+      }
+    },
+    "public/images/hero-images/horizontal/hero-7.jpg": {
+      "preset": "hero",
+      "bytes": 1836474,
+      "formats": {
+        "avif": {
+          "ssim": 0.98687,
+          "bytes": 817378
+        },
+        "webp": {
+          "ssim": 0.96647,
+          "bytes": 562702
+        },
+        "jpg": {
+          "ssim": 0.91909,
+          "bytes": 456394
+        }
+      }
+    },
+    "public/images/hero-images/vertical/hero-3.jpg": {
+      "preset": "heroVertical",
+      "bytes": 2214165,
+      "formats": {
+        "avif": {
+          "ssim": 0.98889,
+          "bytes": 990231
+        },
+        "webp": {
+          "ssim": 0.96372,
+          "bytes": 717342
+        },
+        "jpg": {
+          "ssim": 0.89105,
+          "bytes": 506592
+        }
+      }
+    },
+    "public/images/hero-images/vertical/hero-10.jpg": {
+      "preset": "heroVertical",
+      "bytes": 1245160,
+      "formats": {
+        "avif": {
+          "ssim": 0.98804,
+          "bytes": 584239
+        },
+        "webp": {
+          "ssim": 0.9621,
+          "bytes": 362810
+        },
+        "jpg": {
+          "ssim": 0.91905,
+          "bytes": 298111
+        }
+      }
+    },
+    "public/images/about-us-images/1.jpg": {
+      "preset": "about",
+      "bytes": 3028931,
+      "formats": {
+        "avif": {
+          "ssim": 0.96966,
+          "bytes": 1702057
+        },
+        "webp": {
+          "ssim": 0.84398,
+          "bytes": 734274
+        },
+        "jpg": {
+          "ssim": 0.80317,
+          "bytes": 592600
+        }
+      }
+    },
+    "public/images/about-us-images/5.jpg": {
+      "preset": "about",
+      "bytes": 1398576,
+      "formats": {
+        "avif": {
+          "ssim": 0.95169,
+          "bytes": 734793
+        },
+        "webp": {
+          "ssim": 0.86943,
+          "bytes": 338004
+        },
+        "jpg": {
+          "ssim": 0.85475,
+          "bytes": 325779
+        }
+      }
+    },
+    "public/images/albums-images/chorni-ptahy/cover.jpg": {
+      "preset": "album",
+      "bytes": 992964,
+      "formats": {
+        "avif": {
+          "ssim": 0.98868,
+          "bytes": 442344
+        },
+        "webp": {
+          "ssim": 0.96541,
+          "bytes": 327974
+        },
+        "jpg": {
+          "ssim": 0.84439,
+          "bytes": 222646
+        }
+      }
+    },
+    "public/images/albums-images/mania/cover.jpg": {
+      "preset": "album",
+      "bytes": 198186,
+      "formats": {
+        "avif": {
+          "ssim": 0.98266,
+          "bytes": 77044
+        },
+        "webp": {
+          "ssim": 0.97068,
+          "bytes": 47870
+        },
+        "jpg": {
+          "ssim": 0.97618,
+          "bytes": 73272
+        }
+      }
+    },
+    "public/images/our-team/bohdan/main-1.jpg": {
+      "preset": "team",
+      "bytes": 418320,
+      "formats": {
+        "avif": {
+          "ssim": 0.9856,
+          "bytes": 192019
+        },
+        "webp": {
+          "ssim": 0.95225,
+          "bytes": 129888
+        },
+        "jpg": {
+          "ssim": 0.89043,
+          "bytes": 96413
+        }
+      }
+    },
+    "public/images/hero-images/horizontal/hero-4.jpg": {
+      "preset": "hero",
+      "bytes": 2737717,
+      "formats": {
+        "avif": {
+          "ssim": 0.99157,
+          "bytes": 1219960
+        },
+        "webp": {
+          "ssim": 0.97334,
+          "bytes": 886012
+        },
+        "jpg": {
+          "ssim": 0.87805,
+          "bytes": 631745
+        }
+      }
+    },
+    "public/images/hero-images/vertical/hero-7.jpg": {
+      "preset": "heroVertical",
+      "bytes": 1934315,
+      "formats": {
+        "avif": {
+          "ssim": 0.98868,
+          "bytes": 895385
+        },
+        "webp": {
+          "ssim": 0.95289,
+          "bytes": 599386
+        },
+        "jpg": {
+          "ssim": 0.87804,
+          "bytes": 439544
+        }
+      }
+    },
+    "public/images/about-us-images/9.jpg": {
+      "preset": "about",
+      "bytes": 2435625,
+      "formats": {
+        "avif": {
+          "ssim": 0.97693,
+          "bytes": 1193810
+        },
+        "webp": {
+          "ssim": 0.8955,
+          "bytes": 699834
+        },
+        "jpg": {
+          "ssim": 0.82949,
+          "bytes": 541981
+        }
+      }
+    },
+    "public/images/albums-images/alina/cover.png": {
+      "preset": "album",
+      "bytes": 734607,
+      "formats": {
+        "avif": {
+          "ssim": 0.97866,
+          "bytes": 349836
+        },
+        "webp": {
+          "ssim": 0.94206,
+          "bytes": 202336
+        },
+        "jpg": {
+          "ssim": 0.90645,
+          "bytes": 182435
+        }
+      }
+    },
+    "public/images/meta-images/meta-cover.jpg": {
+      "preset": "meta",
+      "bytes": 358619,
+      "formats": {
+        "jpg": {
+          "ssim": 0.93981,
+          "bytes": 98577
+        },
+        "png": {
+          "ssim": 0.97934,
+          "bytes": 260042
+        }
+      }
+    }
+  }
+}

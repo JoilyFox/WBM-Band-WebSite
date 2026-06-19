@@ -1,0 +1,32 @@
+[
+  {
+    "name": "v1-balanced",
+    "patch": {
+      "hero": { "avifQuality": 78 },
+      "heroVertical": { "avifQuality": 78 },
+      "about": { "avifQuality": 82 },
+      "album": { "avifQuality": 80 },
+      "team": { "avifQuality": 79 }
+    }
+  },
+  {
+    "name": "v2-safe",
+    "patch": {
+      "hero": { "avifQuality": 80 },
+      "heroVertical": { "avifQuality": 80 },
+      "about": { "avifQuality": 83 },
+      "album": { "avifQuality": 81 },
+      "team": { "avifQuality": 80 }
+    }
+  },
+  {
+    "name": "v3-push",
+    "patch": {
+      "hero": { "avifQuality": 77 },
+      "heroVertical": { "avifQuality": 77 },
+      "about": { "avifQuality": 81 },
+      "album": { "avifQuality": 79 },
+      "team": { "avifQuality": 78 }
+    }
+  }
+]

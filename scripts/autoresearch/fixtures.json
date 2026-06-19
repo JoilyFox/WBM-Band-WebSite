@@ -1,0 +1,40 @@
+{
+  "_comment": "LOCKED fixture manifest for the image-encoding autoresearch loop. The scorer (score-images.mjs) re-encodes each `src` source original at its preset's widths/aspect/formats using the CANDIDATE imagePresets.json, then measures SSIM (vs an uncompressed resize of the same source) + bytes. 'train' = the optimize-against set the loop sees each round. 'holdout' = scored ONCE at the end to detect overfitting; the loop must never see it. Sources are the pre-optimization originals in public/images/ (NOT the optimized outputs). Do not let the loop edit this file.",
+  "fixtures": [
+    { "src": "public/images/hero-images/horizontal/hero-1.jpg", "preset": "hero", "set": "train" },
+    { "src": "public/images/hero-images/horizontal/hero-7.jpg", "preset": "hero", "set": "train" },
+    {
+      "src": "public/images/hero-images/vertical/hero-3.jpg",
+      "preset": "heroVertical",
+      "set": "train"
+    },
+    {
+      "src": "public/images/hero-images/vertical/hero-10.jpg",
+      "preset": "heroVertical",
+      "set": "train"
+    },
+    { "src": "public/images/about-us-images/1.jpg", "preset": "about", "set": "train" },
+    { "src": "public/images/about-us-images/5.jpg", "preset": "about", "set": "train" },
+    {
+      "src": "public/images/albums-images/chorni-ptahy/cover.jpg",
+      "preset": "album",
+      "set": "train"
+    },
+    { "src": "public/images/albums-images/mania/cover.jpg", "preset": "album", "set": "train" },
+    { "src": "public/images/our-team/bohdan/main-1.jpg", "preset": "team", "set": "train" },
+
+    {
+      "src": "public/images/hero-images/horizontal/hero-4.jpg",
+      "preset": "hero",
+      "set": "holdout"
+    },
+    {
+      "src": "public/images/hero-images/vertical/hero-7.jpg",
+      "preset": "heroVertical",
+      "set": "holdout"
+    },
+    { "src": "public/images/about-us-images/9.jpg", "preset": "about", "set": "holdout" },
+    { "src": "public/images/albums-images/alina/cover.png", "preset": "album", "set": "holdout" },
+    { "src": "public/images/meta-images/meta-cover.jpg", "preset": "meta", "set": "holdout" }
+  ]
+}

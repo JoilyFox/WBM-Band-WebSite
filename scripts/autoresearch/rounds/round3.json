@@ -1,0 +1,22 @@
+[
+  {
+    "name": "r3-album-about",
+    "patch": { "about": { "avifQuality": 81 }, "album": { "avifQuality": 79 } }
+  },
+  {
+    "name": "r3-plus-team",
+    "patch": {
+      "about": { "avifQuality": 81 },
+      "album": { "avifQuality": 79 },
+      "team": { "avifQuality": 78 }
+    }
+  },
+  {
+    "name": "r3-plus-hv",
+    "patch": {
+      "about": { "avifQuality": 81 },
+      "album": { "avifQuality": 79 },
+      "heroVertical": { "avifQuality": 77 }
+    }
+  }
+]

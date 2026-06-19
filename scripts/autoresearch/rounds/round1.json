@@ -1,0 +1,10 @@
+[
+  { "name": "avif-q82", "patch": { "*": { "avifQuality": 82 } } },
+  { "name": "avif-q80", "patch": { "*": { "avifQuality": 80 } } },
+  { "name": "avif-q78", "patch": { "*": { "avifQuality": 78 } } },
+  { "name": "avif-chroma420", "patch": { "*": { "avifChromaSubsampling": "4:2:0" } } },
+  {
+    "name": "avif-q80-chroma420",
+    "patch": { "*": { "avifQuality": 80, "avifChromaSubsampling": "4:2:0" } }
+  }
+]

@@ -29,3 +29,6 @@ ga4-*.json
 
 # Output of scripts/screenshot-devices.mjs (regenerable device captures)
 screenshots/
+
+# Autoresearch loop scratch candidates (temp presets handed to the scorer)
+scripts/autoresearch/.scratch/
