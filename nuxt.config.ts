@@ -343,6 +343,30 @@ export default defineNuxtConfig({
     prerender: {
       routes: [...STATIC_ROUTES, ...masterPageRoutes()],
       failOnError: false // Allow build to succeed even when maintenance mode returns 503 errors
+    },
+    hooks: {
+      // Preload the headline font. The LCP element on every page is the hero/page
+      // <h1> (Space Grotesk). With only font-display:swap it paints in a fallback
+      // and then re-lays-out when the web font arrives — and on a constrained
+      // connection that font queues BEHIND the hero carousel images, pushing LCP
+      // out by many seconds (measured 11.7s on prod). A high-priority preload
+      // jumps it ahead of the images so the headline settles immediately.
+      //
+      // We read the REAL hashed URL straight out of the just-generated HTML's
+      // inlined @font-face (all Space Grotesk weights resolve to the single
+      // latin file, faux-bolded), so this is robust to content-hash changes and
+      // to the DEPLOY_TARGET baseURL prefix.
+      'prerender:generate'(route) {
+        if (typeof route.contents !== 'string' || !route.fileName?.endsWith('.html')) return
+        const m = route.contents.match(
+          /url\((\/[^)"']*Space_Grotesk-normal-400-latin\.[^)"']*\.woff2)\)/
+        )
+        if (!m) return
+        const href = m[1]
+        const tag = `<link rel="preload" as="font" type="font/woff2" href="${href}" crossorigin>`
+        if (route.contents.includes(tag)) return
+        route.contents = route.contents.replace('<head>', `<head>${tag}`)
+      }
     }
   },
 
