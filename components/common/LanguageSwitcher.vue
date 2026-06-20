@@ -11,7 +11,7 @@
         'liquid-glass-interactive',
         { 'lang-switch--big': size === 'big', 'lang-switch--js': jsReady }
       ]"
-      :aria-label="t('lang.switch_label')"
+      :aria-label="t('lang.a11y_label')"
       :aria-pressed="true"
       @click="toggleLocale"
     >

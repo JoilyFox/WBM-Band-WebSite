@@ -214,7 +214,8 @@
   },
   "a11y": {
     "toggle_menu": "Перемкнути меню навігації",
-    "close_menu": "Закрити меню"
+    "close_menu": "Закрити меню",
+    "home": "WBM — на головну"
   },
   "music": {
     "section_title": "Наша музика",
@@ -316,7 +317,8 @@
   "lang": {
     "english": "English",
     "ukrainian": "Українська",
-    "switch_label": "Мова"
+    "switch_label": "Мова",
+    "a11y_label": "EN УКР, змінити мову"
   },
   "releases": {
     "mania": {

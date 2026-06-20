@@ -17,10 +17,11 @@
         }"
       >
         <UiProgressiveImage
+          v-if="loadedSlides.has(index)"
           :src="index === 0 ? lcpLandscapeSrc : image.src"
           :src-portrait="index === 0 ? lcpPortraitSrc : undefined"
           :alt="image.alt"
-          loading="eager"
+          :loading="index === 0 ? 'eager' : 'lazy'"
           :fetch-priority="index === 0 ? 'high' : 'auto'"
           :preset="isPortrait ? 'heroVertical' : 'hero'"
           portrait-preset="heroVertical"
@@ -226,6 +227,29 @@
     props.verticalImages.length > 0 ? props.verticalImages[0].src : undefined
   )
 
+  // --- Deferred slide loading -------------------------------------------
+  // Only the first slide (the LCP/above-the-fold image) loads eagerly. The rest
+  // are gated behind `loadedSlides` so they don't compete for bandwidth during
+  // the initial paint (this was ~6MB of hero images loading at once, tanking
+  // Speed Index + LCP). Remaining slides are pulled in just-in-time before they
+  // become visible and progressively on idle, so the slideshow is unaffected
+  // after the first couple of seconds. Deferring past hydration also means these
+  // load the orientation-correct (portrait) variant rather than the SSR-default
+  // landscape one.
+  const loadedSlides = ref<Set<number>>(new Set([0]))
+  const markSlideLoaded = (i: number) => {
+    if (i < 0 || i >= activeImages.value.length || loadedSlides.value.has(i)) return
+    loadedSlides.value = new Set(loadedSlides.value).add(i)
+  }
+
+  const onIdle = (cb: () => void, timeout = 1500) => {
+    if (typeof window === 'undefined') return
+    const ric = (window as unknown as { requestIdleCallback?: typeof requestIdleCallback })
+      .requestIdleCallback
+    if (ric) ric(cb, { timeout })
+    else setTimeout(cb, 200)
+  }
+
   // Hero slider functionality
   const {
     currentIndex,
@@ -264,9 +288,16 @@
     scrollToElement('music')
   }
 
-  // Watch for slide changes and emit to parent
+  // Watch for slide changes and emit to parent. Also guarantee the current slide
+  // and the one after it are loaded, so manual/auto navigation is never blocked
+  // on a not-yet-fetched image.
   watch(currentIndex, (newIndex) => {
     emit('slideChange', newIndex)
+    const len = activeImages.value.length
+    if (len > 0) {
+      markSlideLoaded(newIndex)
+      markSlideLoaded((newIndex + 1) % len)
+    }
   })
 
   // Fix dynamic mobile browser chrome (top bar) causing vh jumps
@@ -298,7 +329,18 @@
       // Wait a tick for viewport to settle
       setTimeout(setFixedSVH, 300)
     }
-    window.addEventListener('orientationchange', handleOrientation)
+    // Preload ONLY the next slide, and only after the page has loaded, so the
+    // first auto-advance has its image ready without competing with the critical
+    // above-the-fold paint. Every later slide is pulled in just-in-time by the
+    // currentIndex watcher (which loads current+next on each change), giving each
+    // a full interval of lead time. This keeps the initial payload to ~2 images
+    // instead of all ~11 (the rest were ~5MB of off-screen hero images).
+    const preloadNextSlide = () => {
+      const len = activeImages.value.length
+      if (len > 1) markSlideLoaded((currentIndex.value + 1) % len)
+    }
+    if (document.readyState === 'complete') onIdle(preloadNextSlide)
+    else window.addEventListener('load', () => onIdle(preloadNextSlide), { once: true })
 
     onBeforeUnmount(() => {
       window.removeEventListener('orientationchange', handleOrientation)
@@ -526,13 +568,14 @@
   }
 
   /* Animation keyframes */
+  /* Transform-only entrance: the headline is the LCP element, so it must paint
+     at full opacity on the first frame (an opacity 0→1 fade would push LCP out
+     by the animation duration). It still slides up for a subtle entrance. */
   @keyframes fade-in {
     from {
-      opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(16px);
     }
     to {
-      opacity: 1;
       transform: translateY(0);
     }
   }

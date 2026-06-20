@@ -4,14 +4,14 @@
     "widths": [768, 1280, 1920],
     "aspect": [16, 9],
     "quality": 85,
-    "avifQuality": 78,
+    "avifQuality": 64,
     "formats": ["avif", "webp", "jpg"]
   },
   "heroVertical": {
     "widths": [720, 1080],
     "aspect": [9, 16],
     "quality": 85,
-    "avifQuality": 78,
+    "avifQuality": 62,
     "formats": ["avif", "webp", "jpg"]
   },
   "album": {

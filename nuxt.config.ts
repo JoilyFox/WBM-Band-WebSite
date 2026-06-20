@@ -93,6 +93,13 @@ export default defineNuxtConfig({
 
       // Favicon and App Icon Configuration
       link: [
+        // Warm up the analytics origins early so gtag.js + the first /collect
+        // beacon aren't delayed by a cold DNS+TLS handshake. External absolute
+        // URLs — never carry the DEPLOY_TARGET baseURL prefix.
+        { rel: 'preconnect', href: 'https://www.googletagmanager.com', crossorigin: '' },
+        { rel: 'preconnect', href: 'https://www.google-analytics.com', crossorigin: '' },
+        { rel: 'dns-prefetch', href: 'https://www.googletagmanager.com' },
+        { rel: 'dns-prefetch', href: 'https://www.google-analytics.com' },
         // Scalable SVG icon — modern browsers use this for the TAB (the bare
         // monogram, the historical look). Google search + PWA use the raster
         // "badge" icons (black disc + white mark) at ≥48px below. Declared first
@@ -441,17 +448,18 @@ export default defineNuxtConfig({
     }
   },
 
-  // Google Fonts Configuration
+  // Google Fonts Configuration.
+  // Only the two families actually rendered are downloaded: Space Grotesk
+  // (headings, h1-h6 — incl. the LCP hero headline) and Inter (body). Both cover
+  // latin + cyrillic, so the former "Cyrillic-friendly" fallbacks (Manrope /
+  // Golos Text / Noto Sans) never actually painted — they only added ~12 font
+  // files that competed for bandwidth and delayed the headline. They remain in
+  // the CSS fallback stacks (harmless: the browser skips any unavailable name).
   googleFonts: {
     families: {
-      'Space Grotesk': [300, 400, 500, 600, 700],
-      // Primary UI font with Cyrillic support
-      Inter: [300, 400, 500, 600, 700],
-      // Cyrillic-friendly grotesks close to Space Grotesk
-      Manrope: [300, 400, 500, 600, 700],
-      'Golos Text': [400, 500, 600, 700],
-      // Add a Cyrillic-capable fallback
-      'Noto Sans': [400, 500, 600, 700]
+      'Space Grotesk': [400, 500, 600, 700],
+      // Primary UI/body font with Cyrillic support
+      Inter: [300, 400, 500, 600, 700]
     },
     display: 'swap',
     preload: true,

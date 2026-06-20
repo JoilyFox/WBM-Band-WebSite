@@ -1,5 +1,11 @@
 <template>
-  <button v-if="clickable" :class="computedContainerClass" type="button" @click="handleClick">
+  <button
+    v-if="clickable"
+    :class="computedContainerClass"
+    type="button"
+    :aria-label="ariaLabel || t('a11y.home')"
+    @click="handleClick"
+  >
     <LogoSvg :class="computedImageClass" />
   </button>
 
@@ -9,8 +15,11 @@
 </template>
 
 <script setup lang="ts">
+  import { useI18n } from 'vue-i18n'
   import { useScrollTo } from '~/composables/useScrollTo'
   import LogoSvg from './LogoSvg.vue'
+
+  const { t } = useI18n()
 
   interface Props {
     clickable?: boolean
@@ -18,6 +27,8 @@
     containerClass?: string
     imageClass?: string
     blendMode?: 'normal' | 'exclusion' | 'multiply' | 'screen' | 'overlay'
+    // Accessible name for the clickable logo button. Falls back to a11y.home.
+    ariaLabel?: string
   }
 
   const props = withDefaults(defineProps<Props>(), {
