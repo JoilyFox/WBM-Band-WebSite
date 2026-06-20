@@ -16,13 +16,18 @@
           [`transition-${transition}`]: true
         }"
       >
+        <!-- The LCP element is the headline TEXT, not the hero photo (it's
+             entropy-excluded under the dark overlay), so the image must NOT
+             outrank the preloaded headline font for bandwidth. Slide 0 stays
+             eager (loads immediately) but at default priority so the font —
+             which actually gates LCP — wins the pipe. -->
         <UiProgressiveImage
           v-if="loadedSlides.has(index)"
           :src="index === 0 ? lcpLandscapeSrc : image.src"
           :src-portrait="index === 0 ? lcpPortraitSrc : undefined"
           :alt="image.alt"
           :loading="index === 0 ? 'eager' : 'lazy'"
-          :fetch-priority="index === 0 ? 'high' : 'auto'"
+          fetch-priority="auto"
           :preset="isPortrait ? 'heroVertical' : 'hero'"
           portrait-preset="heroVertical"
           :sizes="IMAGE_SIZES.hero"
