@@ -343,30 +343,6 @@ export default defineNuxtConfig({
     prerender: {
       routes: [...STATIC_ROUTES, ...masterPageRoutes()],
       failOnError: false // Allow build to succeed even when maintenance mode returns 503 errors
-    },
-    hooks: {
-      // Preload the headline font. The LCP element on every page is the hero/page
-      // <h1> (Space Grotesk). With only font-display:swap it paints in a fallback
-      // and then re-lays-out when the web font arrives — and on a constrained
-      // connection that font queues BEHIND the hero carousel images, pushing LCP
-      // out by many seconds (measured 11.7s on prod). A high-priority preload
-      // jumps it ahead of the images so the headline settles immediately.
-      //
-      // We read the REAL hashed URL straight out of the just-generated HTML's
-      // inlined @font-face (all Space Grotesk weights resolve to the single
-      // latin file, faux-bolded), so this is robust to content-hash changes and
-      // to the DEPLOY_TARGET baseURL prefix.
-      'prerender:generate'(route) {
-        if (typeof route.contents !== 'string' || !route.fileName?.endsWith('.html')) return
-        const m = route.contents.match(
-          /url\((\/[^)"']*Space_Grotesk-normal-400-latin\.[^)"']*\.woff2)\)/
-        )
-        if (!m) return
-        const href = m[1]
-        const tag = `<link rel="preload" as="font" type="font/woff2" href="${href}" crossorigin>`
-        if (route.contents.includes(tag)) return
-        route.contents = route.contents.replace('<head>', `<head>${tag}`)
-      }
     }
   },
 
@@ -378,7 +354,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@primevue/nuxt-module',
-    '@nuxtjs/google-fonts',
+    '@nuxt/fonts',
     '@pinia/nuxt',
     [
       '@nuxtjs/i18n',
@@ -472,22 +448,28 @@ export default defineNuxtConfig({
     }
   },
 
-  // Google Fonts Configuration.
-  // Only the two families actually rendered are downloaded: Space Grotesk
-  // (headings, h1-h6 — incl. the LCP hero headline) and Inter (body). Both cover
-  // latin + cyrillic, so the former "Cyrillic-friendly" fallbacks (Manrope /
-  // Golos Text / Noto Sans) never actually painted — they only added ~12 font
-  // files that competed for bandwidth and delayed the headline. They remain in
-  // the CSS fallback stacks (harmless: the browser skips any unavailable name).
-  googleFonts: {
-    families: {
-      'Space Grotesk': [400, 500, 600, 700],
-      // Primary UI/body font with Cyrillic support
-      Inter: [300, 400, 500, 600, 700]
+  // Fonts (@nuxt/fonts). Only the two families actually rendered are provisioned:
+  // Space Grotesk (headings h1-h6, incl. the LCP hero headline) and Inter (body).
+  // Both cover latin + cyrillic, so the former "Cyrillic-friendly" fallbacks
+  // (Manrope / Golos Text / Noto Sans) never actually painted and were dropped.
+  //
+  // The key reason for using @nuxt/fonts over @nuxtjs/google-fonts: it
+  // auto-generates a SIZE-ADJUSTED fallback @font-face (metrics matched to each
+  // real font). The headline therefore paints at its final size in the fallback
+  // immediately, and swapping in the web font causes no reflow — so LCP no longer
+  // waits for the font download (this was the source of the 3s↔11s LCP swing).
+  //
+  // subsets MUST include cyrillic — the site's default locale is Ukrainian.
+  fonts: {
+    defaults: {
+      weights: [400, 500, 600, 700],
+      styles: ['normal'],
+      subsets: ['latin', 'latin-ext', 'cyrillic']
     },
-    display: 'swap',
-    preload: true,
-    subsets: ['latin', 'latin-ext', 'cyrillic']
+    families: [
+      { name: 'Inter', provider: 'google', weights: [300, 400, 500, 600, 700] },
+      { name: 'Space Grotesk', provider: 'google', weights: [400, 500, 600, 700] }
+    ]
   },
 
   // TypeScript Configuration
