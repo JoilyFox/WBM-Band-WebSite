@@ -343,6 +343,32 @@ export default defineNuxtConfig({
     prerender: {
       routes: [...STATIC_ROUTES, ...masterPageRoutes()],
       failOnError: false // Allow build to succeed even when maintenance mode returns 503 errors
+    },
+    hooks: {
+      // Preload the headline font (Space Grotesk, basic-latin). The LCP element
+      // on every page is the hero/page <h1>; the perf simulator ties that text's
+      // LCP to the font's download, which otherwise queues behind the hero
+      // images on a constrained link. A high-priority preload pulls it ahead so
+      // the headline settles fast. (@nuxt/fonts' metric fallback handles CLS /
+      // the no-reflow swap; this handles the simulator's resource-timing model.)
+      //
+      // The real hashed URL is read out of each page's own inlined @font-face —
+      // the basic-latin (U+0000-00FF) Space Grotesk face — so it survives hash
+      // and DEPLOY_TARGET baseURL changes.
+      'prerender:generate'(route) {
+        if (typeof route.contents !== 'string' || !route.fileName?.endsWith('.html')) return
+        const faces = route.contents.match(/@font-face\{[^}]*\}/g) || []
+        const face = faces.find(
+          (f) =>
+            /font-family:Space Grotesk;/.test(f) && !/Fallback/.test(f) && /U\+0000-00FF/.test(f)
+        )
+        const href = face?.match(/url\((\/[^)"']*\.woff2)\)/)?.[1]
+        if (!href) return
+        const tag = `<link rel="preload" as="font" type="font/woff2" href="${href}" crossorigin>`
+        if (!route.contents.includes(tag)) {
+          route.contents = route.contents.replace('<head>', `<head>${tag}`)
+        }
+      }
     }
   },
 
