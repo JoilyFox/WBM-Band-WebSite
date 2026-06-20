@@ -102,12 +102,23 @@ async function buildMontage(fixtureRel, qualities) {
     const dec = await rawDecode(buf)
     const s = ssim(ref.data, dec.data, ref.width, ref.height, ref.channels)
     // 1:1 crop of the decoded candidate.
-    const cropPng = await sharp(buf).extract({ left, top, width: cropW, height: cropH }).png().toBuffer()
+    const cropPng = await sharp(buf)
+      .extract({ left, top, width: cropW, height: cropH })
+      .png()
+      .toBuffer()
     const labeled = await sharp({
       create: { width: cropW, height: cropH + LABEL_H, channels: 3, background: '#111' }
     })
       .composite([
-        { input: labelSvg(`AVIF q${q}`, `${(buf.length / 1024).toFixed(0)} KB · SSIM ${s.mean.toFixed(4)}`, cropW), top: 0, left: 0 },
+        {
+          input: labelSvg(
+            `AVIF q${q}`,
+            `${(buf.length / 1024).toFixed(0)} KB · SSIM ${s.mean.toFixed(4)}`,
+            cropW
+          ),
+          top: 0,
+          left: 0
+        },
         { input: cropPng, top: LABEL_H, left: 0 }
       ])
       .png()
@@ -152,7 +163,9 @@ async function main() {
 
   for (const f of fixtures) {
     const r = await buildMontage(f, args.qualities)
-    process.stderr.write(`  montage: ${r.fixtureRel} (${r.presetKey}, 1:1 crop ${r.crop}) → ${path.relative(REPO_ROOT, r.outPath)}\n`)
+    process.stderr.write(
+      `  montage: ${r.fixtureRel} (${r.presetKey}, 1:1 crop ${r.crop}) → ${path.relative(REPO_ROOT, r.outPath)}\n`
+    )
   }
 }
 

@@ -116,7 +116,8 @@ async function main() {
   const basePath = args.base ? path.resolve(REPO_ROOT, args.base) : BEST_PRESETS
   const base = await readJson(basePath)
 
-  if (!args.candidates) throw new Error('Pass --candidates <file.json> (a JSON array of {name, patch}).')
+  if (!args.candidates)
+    throw new Error('Pass --candidates <file.json> (a JSON array of {name, patch}).')
   const candidates = await readJson(path.resolve(REPO_ROOT, args.candidates))
   if (!Array.isArray(candidates)) throw new Error('Candidates file must be a JSON array.')
 
@@ -151,7 +152,8 @@ async function main() {
         penalty: r.result.penalty
       })
     )
-  if (logLines.length) await fs.appendFile(path.join(RESULTS_DIR, 'run.jsonl'), logLines.join('\n') + '\n')
+  if (logLines.length)
+    await fs.appendFile(path.join(RESULTS_DIR, 'run.jsonl'), logLines.join('\n') + '\n')
 
   // Rank: feasible first, then lowest objective (= smallest served bytes).
   const ranked = [...rows].sort((a, b) => {
@@ -160,8 +162,12 @@ async function main() {
   })
 
   const pad = (s, n) => String(s).padEnd(n)
-  process.stderr.write(`\n  Batch over base "${path.relative(REPO_ROOT, basePath)}" — set: ${args.set}\n`)
-  process.stderr.write(`  ${pad('candidate', 24)} ${pad('objKB', 9)} ${pad('save%', 8)} ${pad('feasible', 9)} worstΔSSIM\n`)
+  process.stderr.write(
+    `\n  Batch over base "${path.relative(REPO_ROOT, basePath)}" — set: ${args.set}\n`
+  )
+  process.stderr.write(
+    `  ${pad('candidate', 24)} ${pad('objKB', 9)} ${pad('save%', 8)} ${pad('feasible', 9)} worstΔSSIM\n`
+  )
   for (const r of ranked) {
     const worst = Math.min(0, ...r.result.fixtures.map((f) => f.worstSSIMDelta))
     process.stderr.write(
@@ -180,7 +186,9 @@ async function main() {
       `\n  ➤ PROMOTED "${winner.name}" → best-presets.json  (${saved}% smaller than base this round, ${winner.result.weightedSavingsPct}% vs production)\n\n`
     )
   } else {
-    process.stderr.write(`\n  No feasible candidate beat the base this round; best-presets.json unchanged.\n\n`)
+    process.stderr.write(
+      `\n  No feasible candidate beat the base this round; best-presets.json unchanged.\n\n`
+    )
   }
 
   process.stdout.write(
