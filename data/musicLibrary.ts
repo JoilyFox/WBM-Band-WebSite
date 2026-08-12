@@ -137,6 +137,72 @@ export interface MusicRelease {
 
 export const musicLibrary: MusicRelease[] = [
   {
+    id: '4',
+    slug: 'khvyli',
+    title: 'Хвилі',
+    titleKey: 'releases.khvyli.title',
+    type: 'single',
+    releaseDate: '2026-08-20T21:00:00Z', // Midnight Kyiv time (EEST/UTC+3) → 00:00 on 2026-08-21
+    imageUrl: '/images/optimized/albums-images/khvyli/cover.avif',
+    // No `blurredImageUrl` on purpose: the artwork is already public, so the
+    // upcoming-release card shows it sharp. `enablePreSave` is on and this
+    // release has a distributor pre-save URL, so the card renders in pre-save
+    // mode, which uses `imageUrl` directly (never the blurred variant).
+    descriptionKey: 'releases.khvyli.description',
+    genre: ['Alternative rock', 'Art rock'],
+    featured: true,
+    // Auto-extracted palette (deep water blue #165fc0 / dusk violet / mauve) is
+    // vibrant and on-cover — no `theme` override needed.
+    musicPlatformLinks: {},
+    useDistributorPreSave: true,
+    distributorPreSaveUrl: 'https://kontrabass.lnk.to/khvyli',
+    // Linkfire handles the actual save off-site, so skip the synthetic
+    // distributor conversion event — only the per-source `release_view` is
+    // meaningful here.
+    skipDistributorConversionEvent: true,
+    // The same Linkfire link flips to a streaming chooser after release. Used as
+    // the "Listen on all platforms" CTA on /listen/khvyli until the individual
+    // platform links are filled in (then the grid replaces the CTA).
+    releaseSmartLink: 'https://kontrabass.lnk.to/khvyli',
+    lyrics: [
+      {
+        part: 'chorus',
+        lines: [
+          'Ти зникаєш в звуках хвиль.',
+          'Моїх бажань, твоїх зусиль.',
+          'У блакить від гріха.',
+          'Світ кричить, що я лиха.'
+        ]
+      },
+      {
+        part: 'verse',
+        lines: [
+          'і мов в тумані.',
+          'Є мотив, є алібі.',
+          'Скелі хвилями точать образи,',
+          'Що ховаються в моїй душі.',
+          'Безпричинно залишив лиш бриз.',
+          'Моя брехня лишиться зі мною.',
+          'І правда каменем на глибині,',
+          'ти забереш її з собою.'
+        ]
+      },
+      {
+        part: 'bridge',
+        lines: ['Зникни-и-и', 'А-а-а-а-а', 'Назавджи-и-и-и']
+      },
+      {
+        part: 'chorus',
+        lines: [
+          'Ти зникаєш в звуках хвиль.',
+          'Моїх бажань, твоїх зусиль.',
+          'У блакить від гріха.',
+          'Світ кричить, що я лиха-а-а-а-а'
+        ]
+      }
+    ]
+  },
+  {
     id: '3',
     slug: 'alina',
     title: 'Аліна',

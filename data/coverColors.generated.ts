@@ -50,6 +50,16 @@ export const coverColors: Record<string, CoverPalette> = {
     isDark: true,
     isMuted: true
   },
+  khvyli: {
+    primary: '#165fc0',
+    secondary: '#61587e',
+    accent: '#ae8db0',
+    dark: '#101319',
+    light: '#c9d9ed',
+    palette: ['#165fc0', '#61587e', '#ae8db0'],
+    isDark: true,
+    isMuted: false
+  },
   mania: {
     primary: '#754f87',
     secondary: '#58587e',

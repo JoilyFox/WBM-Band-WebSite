@@ -15,6 +15,7 @@ import type { MusicRelease } from '~/data/musicLibrary'
 // fixtures at the time of writing; tests that depend on specific records assert
 // against them, while invariant tests (no-mutation, type filtering) stay robust
 // to additions by deriving expectations from `musicLibrary` itself.
+const KHVYLI = '4'
 const ALINA = '3'
 const CHORNI = '2'
 const MANIA = '1'
@@ -184,8 +185,8 @@ describe('getReleasesByType', () => {
 describe('getLatestReleases', () => {
   it('sorts releases newest-first by release date', () => {
     const latest = getLatestReleases()
-    // alina (2026-06) > chorni-ptahy (2026-02) > mania (2025-11)
-    expect(idsOf(latest).slice(0, 3)).toEqual([ALINA, CHORNI, MANIA])
+    // khvyli (2026-08) > alina (2026-06) > chorni-ptahy (2026-02) > mania (2025-11)
+    expect(idsOf(latest).slice(0, 4)).toEqual([KHVYLI, ALINA, CHORNI, MANIA])
   })
 
   it('defaults to a limit of 4', () => {
@@ -198,7 +199,7 @@ describe('getLatestReleases', () => {
   })
 
   it('returns the single newest release with limit 1', () => {
-    expect(getLatestReleases(1)[0].id).toBe(ALINA)
+    expect(getLatestReleases(1)[0].id).toBe(KHVYLI)
   })
 
   it('returns an empty array with limit 0', () => {
@@ -231,7 +232,7 @@ describe('getAllReleases', () => {
   })
 
   it('sorts newest-first by release date', () => {
-    expect(idsOf(getAllReleases())).toEqual([ALINA, CHORNI, MANIA])
+    expect(idsOf(getAllReleases())).toEqual([KHVYLI, ALINA, CHORNI, MANIA])
   })
 
   it('contains exactly the same id set as the library', () => {
@@ -301,9 +302,11 @@ describe('getNearestUpcomingPreSaveRelease', () => {
   })
 
   it('treats a release whose moment exactly equals now as NOT upcoming (strict >)', () => {
-    // Frozen exactly at alina's release instant; chorni & mania are past.
-    // releaseTime > now is false for an exact match → no upcoming presave.
-    freeze('2026-06-11T21:00:00Z')
+    // Frozen exactly at khvyli's release instant (the newest release); every
+    // other release is already past. releaseTime > now is false for an exact
+    // match → no upcoming presave. Keep this pinned to the LAST release in the
+    // library, or a newer one stays ahead of `now` and the strict `>` never bites.
+    freeze('2026-08-20T21:00:00Z')
     expect(getNearestUpcomingPreSaveRelease()).toBeUndefined()
   })
 
