@@ -27,7 +27,7 @@ A release normally arrives in **two passes**: pre-save now (§1–§5), released
 
 **Slug / Latin form.** Use the **Ukrainian National System (2010)** (`х→kh`, `и→y`, `я→ia`), but the distributor's smart-link slug **wins** if it already exists — the whole point is one byte-identical Latin form across site, DSPs and MusicBrainz (see `entity-setup-guide.md` §7). `Хвилі` → `khvyli`. The EN i18n `title` is that same romanization, **not** a translation (`Khvyli`, not "Waves") — matches `Chorni Ptahy`.
 
-**Date → `releaseDate`.** Store **UTC** with a trailing comment giving the Kyiv local time. Kyiv is **UTC+3 (EEST)** from the last Sunday of March to the last Sunday of October, **UTC+2 (EET)** otherwise. Midnight Kyiv on 2026-08-21 → `'2026-08-20T21:00:00Z'`.
+**Date → `releaseDate`.** Store **UTC** with a trailing comment giving the Kyiv local time. Kyiv is **UTC+3 (EEST)** from the last Sunday of March to the last Sunday of October, **UTC+2 (EET)** otherwise. Midnight Kyiv on 2026-08-21 → `'2026-08-20T21:00:00Z'`. The JSON-LD `datePublished` re-derives the **Kyiv** calendar day from that instant (`releaseDay()` in `useStructuredData.ts`) — nothing to do by hand, but never "simplify" it back to slicing the UTC string or a midnight drop publishes a day early.
 
 ## 1. Cover art
 

@@ -145,6 +145,28 @@ interface ReleaseStructuredDataOptions {
   variant?: 'listen' | 'lyrics'
 }
 
+/**
+ * The release calendar DAY as the band publishes it — i.e. in Kyiv, not UTC.
+ * `releaseDate` is stored as a UTC instant, so a midnight-Kyiv drop lives as
+ * 21:00Z (EEST) / 22:00Z (EET) on the PREVIOUS day; slicing the raw string would
+ * emit a `datePublished` one day earlier than the date shown on the page, listed
+ * on MusicBrainz and used by every DSP — exactly the kind of drift that
+ * fragments the entity. Formatting the instant in Europe/Kyiv keeps them equal.
+ */
+const KYIV_DAY = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Europe/Kyiv',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+})
+
+function releaseDay(isoInstant: string): string {
+  const day = KYIV_DAY.format(new Date(isoInstant))
+  // en-CA formats as YYYY-MM-DD; fall back to a raw slice if a runtime ever
+  // disagrees, so a bad locale can never emit an invalid schema.org date.
+  return /^\d{4}-\d{2}-\d{2}$/.test(day) ? day : isoInstant.slice(0, 10)
+}
+
 /** Flatten a release's lyrics into a single newline-separated text block
  *  (sections separated by a blank line) for MusicComposition.lyrics. */
 function lyricsToPlainText(release: MusicRelease): string {
@@ -197,8 +219,9 @@ export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) 
         image: metaImageUrl.value,
         // The songs are sung in Ukrainian regardless of the page's UI locale.
         inLanguage: 'uk',
-        // Date only (no time) — matches the visible release date.
-        datePublished: release.releaseDate.slice(0, 10),
+        // Date only (no time) — the Kyiv calendar day, matching the visible
+        // release date (see releaseDay above).
+        datePublished: releaseDay(release.releaseDate),
         genre: release.genre && release.genre.length ? release.genre : BAND_GENRE,
         byArtist: {
           '@type': 'MusicGroup',
