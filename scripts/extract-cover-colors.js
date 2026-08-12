@@ -256,13 +256,19 @@ function refine(c) {
 // Manifest generation
 // ---------------------------------------------------------------------------
 
+// Prettier's `quoteProps: 'as-needed'` strips quotes from keys that are valid
+// identifiers, so emitting every slug quoted makes the generated file fail lint
+// (`prettier/prettier`) on every regeneration. Quote only what actually needs it
+// (e.g. 'chorni-ptahy', whose hyphen isn't identifier-legal).
+const keyLiteral = (slug) => (/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(slug) ? slug : `'${slug}'`)
+
 function serialize(map) {
   const entries = Object.keys(map)
     .sort()
     .map((slug) => {
       const p = map[slug]
       const palette = p.palette.map((c) => `'${c}'`).join(', ')
-      return `  '${slug}': {
+      return `  ${keyLiteral(slug)}: {
     primary: '${p.primary}',
     secondary: '${p.secondary}',
     accent: '${p.accent}',
