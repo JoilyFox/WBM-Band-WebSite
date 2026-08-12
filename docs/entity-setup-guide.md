@@ -69,7 +69,8 @@ Keep this open while you fill in each platform.
 | ----------- | ------------ | ---------- | ------------------------------ | ------------------ |
 | Манія       | Mania        | 2025-11-14 | album `0pjAORRhgVsS7eP4R6JbMF` | album `1849021879` |
 | Чорні Птахи | Chorni Ptahy | 2026-02-06 | track `2hujOwcGE21eCQHMz61y75` | song `1868500237`  |
-| Аліна       | Alina        | 2026-06-12 | _(after release)_              | _(after release)_  |
+| Аліна       | Alina        | 2026-06-12 | track `13UFLpXjAoVNW3IKCW6Hzf` | album `6774072720` |
+| Хвилі       | Khvyli       | 2026-08-21 | _(after release)_              | _(after release)_  |
 
 ---
 
@@ -273,7 +274,9 @@ Still optional / later: claim Spotify + Apple for Artists, request the YouTube O
 
 The entity foundation is built once. Each new release just needs a few touch-ups —
 ping Claude to drive the off-site parts in-session (log into the browser, or paste
-creds ephemerally; nothing is stored):
+creds ephemerally; nothing is stored). The whole cycle — on-site **and** this
+off-site pass — is orchestrated by the `new-release` skill
+([`.claude/skills/new-release/SKILL.md`](../.claude/skills/new-release/SKILL.md)):
 
 1. **On-site** (repo): add the release to `data/musicLibrary.ts` (pre-save →
    released state machine — see [release-states-system.md](./release-states-system.md)).
