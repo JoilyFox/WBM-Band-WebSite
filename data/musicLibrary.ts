@@ -189,7 +189,7 @@ export const musicLibrary: MusicRelease[] = [
       },
       {
         part: 'bridge',
-        lines: ['Зникни-и-и', 'А-а-а-а-а', 'Назавджи-и-и-и']
+        lines: ['Зникни-и-и', 'А-а-а-а-а', 'Назавжди-и-и-и']
       },
       {
         part: 'chorus',
