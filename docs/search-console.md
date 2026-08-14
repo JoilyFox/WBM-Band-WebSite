@@ -289,18 +289,22 @@ Worth stating plainly, because the fixes above are all upside on a healthy base:
 
 ### 5.1 Do inside Search Console
 
-| #   | Action                                                            | Where                            | Priority                      |
-| --- | ----------------------------------------------------------------- | -------------------------------- | ----------------------------- |
-| 1   | Submit `sitemap.xml`                                              | Indexing → Sitemaps              | P0 — after the soft-404 fix   |
-| 2   | Add a **Domain property** for `wbmband.com` (DNS TXT)             | Property picker → Add property   | P1                            |
-| 3   | Associate the GA4 property                                        | Settings → Associations          | P1                            |
-| 4   | Request indexing for `/`, `/en`, `/listen/alina`, `/lyrics/alina` | URL Inspection                   | P1 — after the code fix ships |
-| 5   | **Validate Fix** on _Duplicate, Google chose different canonical_ | Indexing → Pages                 | P1 — after the code fix ships |
-| 6   | Enable Bulk data export to BigQuery                               | Settings → Bulk data export      | P3                            |
-| 7   | Add a second owner                                                | Settings → Users and permissions | P3                            |
-| 8   | Leave Search generative AI on **Include**                         | Settings → AI controls           | ✅ done                       |
+All of this was executed on **14 Aug 2026**, right after the fixes were deployed to production.
+
+| #   | Action                                                            | Status                                                                                                                                                                                          |
+| --- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Submit `sitemap.xml`                                              | ✅ **Success — 22 pages discovered**, read the same day (Google previously knew 2 URLs)                                                                                                         |
+| 2   | Associate the GA4 property                                        | ✅ linked to **WBM Website `523582426`** (`G-Z8QRF6TWC2`). NOT `WBM Band 523561138` — that is the stale duplicate, see [analytics-debugging.md](./analytics-debugging.md)                       |
+| 3   | **Validate Fix** on the duplicate canonical                       | ✅ validation started 14/08/2026                                                                                                                                                                |
+| 4   | Request indexing for `/`, `/en`, `/listen/alina`, `/lyrics/alina` | ✅ all four queued. The two release URLs reported _"URL is unknown to Google"_ beforehand — confirming they had never been crawled                                                              |
+| 5   | Add a **Domain property** for `wbmband.com`                       | ⏳ created, **awaiting DNS** — listed under _Not verified_. Needs one TXT record on `wbmband.com`; reopen the property in GSC to copy the `google-site-verification=…` value, then press Verify |
+| 6   | Search generative AI on **Include**                               | ✅ already correct                                                                                                                                                                              |
+| 7   | Bulk data export to BigQuery                                      | ⏳ needs a Google Cloud project ID                                                                                                                                                              |
+| 8   | Add a second owner                                                | ⏳ needs an email address                                                                                                                                                                       |
 
 Nothing else in the console needs filling in. There is no preferred-domain setting, no geotargeting control (the International Targeting report was retired), and Change of Address does not apply.
+
+**What to watch over the next 1–2 weeks:** Page indexing "All known pages" should climb from 2 toward ~22; Crawl stats `By purpose → Discovery` should stop reading `<1%`; and the first Cyrillic queries should appear in Performance. If URLs land in _Discovered — currently not indexed_ and stay there, the remaining lever is content depth and external links, not crawling.
 
 ### 5.2 Do in the repo
 
