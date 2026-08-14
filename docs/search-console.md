@@ -299,10 +299,43 @@ All of this was executed on **14 Aug 2026**, right after the fixes were deployed
 | 4   | Request indexing for `/`, `/en`, `/listen/alina`, `/lyrics/alina` | ✅ all four queued. The two release URLs reported _"URL is unknown to Google"_ beforehand — confirming they had never been crawled                                                              |
 | 5   | Add a **Domain property** for `wbmband.com`                       | ⏳ created, **awaiting DNS** — listed under _Not verified_. Needs one TXT record on `wbmband.com`; reopen the property in GSC to copy the `google-site-verification=…` value, then press Verify |
 | 6   | Search generative AI on **Include**                               | ✅ already correct                                                                                                                                                                              |
-| 7   | Bulk data export to BigQuery                                      | ⏳ needs a Google Cloud project ID                                                                                                                                                              |
+| 7   | Bulk data export to BigQuery                                      | ⏳ blocked on one IAM grant — see below                                                                                                                                                         |
 | 8   | Add a second owner                                                | ⏳ needs an email address                                                                                                                                                                       |
 
 Nothing else in the console needs filling in. There is no preferred-domain setting, no geotargeting control (the International Targeting report was retired), and Change of Address does not apply.
+
+#### BigQuery bulk export — where it stands
+
+Groundwork done in Google Cloud (14 Aug 2026):
+
+- Billing account **`My Billing Account` (`01B96C-D461BF-828D21`)** is active, but already at its **cap of 5 billing-enabled projects** — so a fresh project cannot be linked without a quota increase. A project `wbm-search-console` was created before that limit surfaced and is left **unlinked and unused**; either request a billing-quota increase and move the export there, or delete it.
+- The export therefore targets the existing **`WBM Bot Free` → project ID `focused-poet-503715-d4`**, which already has billing _and_ the **BigQuery API already enabled**.
+
+Two steps remain, both needing a human:
+
+1. **Grant the Search Console service account access** on `focused-poet-503715-d4` — principal `search-console-data-export@system.gserviceaccount.com`, roles **BigQuery Job User** + **BigQuery Data Editor**:
+
+   ```bash
+   gcloud auth login   # gcloud is installed (SDK 570) but has no active account
+   gcloud projects add-iam-policy-binding focused-poet-503715-d4 \
+     --member="serviceAccount:search-console-data-export@system.gserviceaccount.com" \
+     --role="roles/bigquery.jobUser"
+   gcloud projects add-iam-policy-binding focused-poet-503715-d4 \
+     --member="serviceAccount:search-console-data-export@system.gserviceaccount.com" \
+     --role="roles/bigquery.dataEditor"
+   ```
+
+2. **Search Console → Settings → Bulk data export → Continue** — project ID `focused-poet-503715-d4`, dataset location **EU** (the audience is Ukraine/Europe). The export then writes a `searchconsole` dataset daily.
+
+At this traffic the daily export is kilobytes — comfortably inside BigQuery's 10 GB storage / 1 TB query monthly free tier.
+
+#### Domain property — the DNS is not in Google Cloud
+
+`wbmband.com` uses **Hosting Ukraine** nameservers (`a.ns.express`, `b.ns.works`, `c.ns.gold`; registrar Hosting Ukraine LLC, panel `adm.tools`), not Cloud DNS — so the verification TXT record must be added there. The apex already carries a TikTok verification TXT and an SPF record; the Google one is an **additional** TXT, not a replacement.
+
+Steps: adm.tools → DNS for `wbmband.com` → add a TXT on the root (`@`) with the `google-site-verification=…` value copied from the pending property in Search Console → wait for propagation → press **Verify** in GSC.
+
+Note that now the apex `301`s to `www`, the Domain property is a **nice-to-have** rather than a fix. Its remaining value is covering `http://`, any future subdomain, and seeing apex-host crawl data in one place.
 
 **What to watch over the next 1–2 weeks:** Page indexing "All known pages" should climb from 2 toward ~22; Crawl stats `By purpose → Discovery` should stop reading `<1%`; and the first Cyrillic queries should appear in Performance. If URLs land in _Discovered — currently not indexed_ and stay there, the remaining lever is content depth and external links, not crawling.
 
