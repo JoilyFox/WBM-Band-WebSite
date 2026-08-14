@@ -5,6 +5,7 @@ import { defineComponent } from 'vue'
 import { useMasterPage, type UseMasterPageOptions } from '~/composables/useMasterPage'
 import { getReleaseBySlug } from '~/data/musicLibrary'
 import { SITE_URL } from '~/constants/app'
+import { setTestLocale } from './helpers/i18n'
 
 // useMasterPage is the shared setup for the listen + pre-save "master" release
 // pages. It looks the release up in data/musicLibrary, builds localized
@@ -54,14 +55,15 @@ async function runExpectThrow(options: UseMasterPageOptions) {
   return null
 }
 
+// Sets the locale AND loads its lazy bundle — see test/nuxt/helpers/i18n.ts.
 function setLocale(locale: 'en' | 'ua') {
-  ;(useNuxtApp() as { $i18n: { locale: { value: string } } }).$i18n.locale.value = locale
+  return setTestLocale(locale)
 }
 
-beforeEach(() => {
-  // Keep the shared i18n locale at its default so this file doesn't leak 'ua'
-  // into other suites, and clear the attribution side-effect store.
-  setLocale('en')
+beforeEach(async () => {
+  // This file asserts the ENGLISH strings, so it states that explicitly rather
+  // than inheriting a runtime default. Also clears the attribution store.
+  await setLocale('en')
   window.sessionStorage.clear()
 })
 
@@ -96,7 +98,7 @@ describe('useMasterPage', () => {
     })
 
     it("resolves the Ukrainian title when the global locale is flipped to 'ua'", async () => {
-      setLocale('ua')
+      await setLocale('ua')
       const { title } = await run({ slug: 'mania', pageType: 'listen' })
       expect(title).toBe('Манія')
     })
@@ -104,7 +106,7 @@ describe('useMasterPage', () => {
     it('localizes a different release independently (chorni-ptahy)', async () => {
       const en = await run({ slug: 'chorni-ptahy', pageType: 'pre-save' })
       expect(en.title).toBe('Chorni Ptahy')
-      setLocale('ua')
+      await setLocale('ua')
       const ua = await run({ slug: 'chorni-ptahy', pageType: 'pre-save' })
       expect(ua.title).toBe('Чорні Птахи')
     })
@@ -121,7 +123,7 @@ describe('useMasterPage', () => {
     })
 
     it('resolves the Ukrainian description when locale is ua', async () => {
-      setLocale('ua')
+      await setLocale('ua')
       const { description } = await run({ slug: 'mania', pageType: 'listen' })
       expect(description).toContain('тонку межу між любов')
     })
@@ -163,7 +165,7 @@ describe('useMasterPage', () => {
     })
 
     it('builds a ua listen URL when the locale is ua', async () => {
-      setLocale('ua')
+      await setLocale('ua')
       const { pageUrl } = await run({ slug: 'mania', pageType: 'listen' })
       expect(pageUrl).toBe(`${SITE_URL}/ua/listen/mania`)
     })

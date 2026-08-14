@@ -41,7 +41,7 @@ npm run generate-favicons  # Generate multi-platform icons from source
 - **Default locale**: `ua` (Ukrainian)
 - **Translation keys**: Defined in `locales/en.json` and `locales/uk.json`
 - **Non-localized routes**: `/pre-save/*` and `/listen/*` work without locale prefix via `scripts/create-nonlocalized-aliases.js` (copies `/ua/pre-save/*` to `/pre-save/*` in build output)
-- **Middleware**: `i18n-root-redirect.global.ts` redirects `/` to localized home
+- **Root `/`**: serves the Ukrainian home (build copies `ua/index.html` → `index.html`); no browser-language redirect — see `docs/search-console.md`
 
 ### Configuration System
 
@@ -108,7 +108,7 @@ Files: `utils/cache.ts`, `utils/api.ts`, `composables/useApi.ts`
 ### Route Middleware Execution Order
 
 1. `redirect-share-urls.global.ts`: Converts old share URLs to new format
-2. `i18n-root-redirect.global.ts`: Redirects `/` to localized home
+2. (removed) `i18n-root-redirect.global.ts` — `/` now serves the Ukrainian build output directly
 3. `presave-access.ts`: Validates pre-save access and redirects to `/listen/*` if released
 4. `listen-access.ts`: Validates listen page access
 

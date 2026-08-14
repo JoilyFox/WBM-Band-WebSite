@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MusicCard from '~/components/ui/MusicCard.vue'
 import type { MusicRelease } from '~/data/musicLibrary'
+import { setTestLocale } from './helpers/i18n'
 
 // MusicCard renders a release card: a localized title, a localized (optional)
 // description, a Kyiv-zone formatted release date, and click-to-open behaviour.
@@ -39,19 +40,16 @@ const makeRelease = (overrides: Partial<MusicRelease> = {}): MusicRelease =>
     ...overrides
   }) as MusicRelease
 
-// Set the GLOBAL i18n locale (the scope MusicCard reads). useNuxtApp() is only
-// valid inside a test/hook; $i18n is getter-only but $i18n.locale is a writable
-// Vue ref. Mirrors the helper in presave-access.nuxt.spec.ts. Callers mount AFTER
-// this so the computed title/date observe the chosen locale.
-const setLocale = (loc: 'ua' | 'en') => {
-  ;(useNuxtApp() as { $i18n: { locale: { value: string } } }).$i18n.locale.value = loc
-}
+// Set the GLOBAL i18n locale (the scope MusicCard reads) AND make sure that
+// locale's lazy-loaded bundle is in memory first — see test/nuxt/helpers/i18n.ts.
+// Callers mount AFTER awaiting this so the computed title/date observe it.
+const setLocale = (loc: 'ua' | 'en') => setTestLocale(loc)
 
 describe('MusicCard.vue', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     // Default locale for the suite; individual tests override and the next
     // beforeEach resets, so tests don't leak locale into each other.
-    setLocale('ua')
+    await setLocale('ua')
   })
 
   describe('displayTitle', () => {
@@ -65,7 +63,7 @@ describe('MusicCard.vue', () => {
     })
 
     it('renders the localized title in English when the global locale is en', async () => {
-      setLocale('en')
+      await setLocale('en')
       const w = await mountSuspended(MusicCard, {
         props: { release: makeRelease() }
       })
@@ -170,7 +168,7 @@ describe('MusicCard.vue', () => {
     })
 
     it('formats the release date in English when locale is en', async () => {
-      setLocale('en')
+      await setLocale('en')
       const w = await mountSuspended(MusicCard, {
         props: { release: makeRelease({ releaseDate: '2025-11-14T12:00:00Z' }) }
       })
@@ -188,7 +186,7 @@ describe('MusicCard.vue', () => {
     })
 
     it('applies the Europe/Kyiv timezone (UTC instant that is the NEXT day in Kyiv)', async () => {
-      setLocale('en')
+      await setLocale('en')
       // 2025-12-31T23:30:00Z is still December in UTC, but 01:30 on 2026-01-01 in
       // Kyiv (UTC+2). The component must render 'January 2026' — proving the
       // timeZone option is actually honoured rather than defaulting to UTC/local.

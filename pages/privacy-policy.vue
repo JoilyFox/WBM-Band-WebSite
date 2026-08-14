@@ -331,10 +331,12 @@
       { property: 'og:locale:alternate', content: locale.value === 'ua' ? 'en_US' : 'uk_UA' }
     ],
     link: [
-      { rel: 'canonical', href: `${SITE_URL}/${locale.value}/privacy-policy` },
-      { rel: 'alternate', hreflang: 'uk-UA', href: `${SITE_URL}/ua/privacy-policy` },
+      // Ukrainian is the unprefixed default locale, so its URL is the clean
+      // `/privacy-policy` — never `/ua/privacy-policy`, which is not a route.
+      { rel: 'canonical', href: `${SITE_URL}${locale.value === 'en' ? '/en' : ''}/privacy-policy` },
+      { rel: 'alternate', hreflang: 'uk-UA', href: `${SITE_URL}/privacy-policy` },
       { rel: 'alternate', hreflang: 'en-US', href: `${SITE_URL}/en/privacy-policy` },
-      { rel: 'alternate', hreflang: 'x-default', href: `${SITE_URL}/ua/privacy-policy` }
+      { rel: 'alternate', hreflang: 'x-default', href: `${SITE_URL}/privacy-policy` }
     ]
   })
 

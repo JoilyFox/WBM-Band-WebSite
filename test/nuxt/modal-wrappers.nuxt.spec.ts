@@ -5,6 +5,7 @@ import MusicDetailModal from '~/components/music/MusicDetailModal.vue'
 import TeamMemberModal from '~/components/team/TeamMemberModal.vue'
 import type { MusicRelease } from '~/data/musicLibrary'
 import type { TeamMember } from '~/data/teamMembers'
+import { setTestLocale } from './helpers/i18n'
 
 // Both wrappers are thin adapters over CommonBaseModal (components/common/BaseModal.vue):
 //   - MusicDetailModal forwards :aria-label="release?.title || 'Release details'"
@@ -61,17 +62,15 @@ const MusicDetailContentStub = {
     '<div class="mdc-stub" :data-pre-save="String(isPreSave)" :data-is-modal="String(isModal)" />'
 }
 
-// Set the GLOBAL i18n locale that TeamMemberModal's $t reads. useNuxtApp() is
-// only valid inside a test/hook; $i18n is getter-only but $i18n.locale is a
-// writable Vue ref. Mirrors the helper in music-card.nuxt.spec.ts.
-const setLocale = (loc: 'ua' | 'en') => {
-  ;(useNuxtApp() as { $i18n: { locale: { value: string } } }).$i18n.locale.value = loc
-}
+// Set the GLOBAL i18n locale that TeamMemberModal's $t reads, loading that
+// locale's lazy bundle first — see test/nuxt/helpers/i18n.ts.
+const setLocale = (loc: 'ua' | 'en') => setTestLocale(loc)
 
 describe('modal wrappers', () => {
-  beforeEach(() => {
-    // Reset to English (the runtime default) so locale never leaks between tests.
-    setLocale('en')
+  beforeEach(async () => {
+    // This file asserts English strings, so state the locale explicitly (and
+    // reset it every test so it never leaks between them).
+    await setLocale('en')
   })
 
   afterEach(() => {
@@ -195,7 +194,7 @@ describe('modal wrappers', () => {
     })
 
     it('uses the Ukrainian translation when the global locale is ua', async () => {
-      setLocale('ua')
+      await setLocale('ua')
       const w = await mountSuspended(TeamMemberModal, {
         props: { member: makeMember(), isVisible: true }
       })

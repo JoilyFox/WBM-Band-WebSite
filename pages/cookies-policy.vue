@@ -236,10 +236,12 @@
       { property: 'og:locale:alternate', content: locale.value === 'ua' ? 'en_US' : 'uk_UA' }
     ],
     link: [
-      { rel: 'canonical', href: `${SITE_URL}/${locale.value}/cookies-policy` },
-      { rel: 'alternate', hreflang: 'uk-UA', href: `${SITE_URL}/ua/cookies-policy` },
+      // Ukrainian is the unprefixed default locale, so its URL is the clean
+      // `/cookies-policy` — never `/ua/cookies-policy`, which is not a route.
+      { rel: 'canonical', href: `${SITE_URL}${locale.value === 'en' ? '/en' : ''}/cookies-policy` },
+      { rel: 'alternate', hreflang: 'uk-UA', href: `${SITE_URL}/cookies-policy` },
       { rel: 'alternate', hreflang: 'en-US', href: `${SITE_URL}/en/cookies-policy` },
-      { rel: 'alternate', hreflang: 'x-default', href: `${SITE_URL}/ua/cookies-policy` }
+      { rel: 'alternate', hreflang: 'x-default', href: `${SITE_URL}/cookies-policy` }
     ]
   })
 

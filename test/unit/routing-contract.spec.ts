@@ -54,16 +54,15 @@ describe('sitemap generator', () => {
     expect(has('scripts', 'generate-sitemap.js')).toBe(true)
   })
 
-  it('is wired into the `generate` npm script (runs after alias creation)', () => {
+  it('is wired into the `generate` npm script', () => {
     const pkg = JSON.parse(read('package.json'))
     const gen = pkg.scripts.generate as string
     expect(gen).toContain('scripts/generate-sitemap.js')
-    expect(gen).toContain('scripts/create-nonlocalized-aliases.js')
-    // The sitemap lists /listen/<slug> clean URLs, which only exist after the
-    // non-localized aliases are copied — order matters.
-    expect(gen.indexOf('create-nonlocalized-aliases.js')).toBeLessThan(
-      gen.indexOf('generate-sitemap.js')
-    )
+    // Ukrainian is the unprefixed default locale, so /listen/<slug> is a route
+    // the prerenderer emits directly. The old create-nonlocalized-aliases.js
+    // copy step (ua/listen -> listen) is gone and must not come back.
+    expect(gen).not.toContain('create-nonlocalized-aliases')
+    expect(has('scripts', 'create-nonlocalized-aliases.js')).toBe(false)
   })
 
   it('emits a sitemap keyed off SITE_URL, not DEPLOY_TARGET (no staging mirror)', () => {
@@ -98,22 +97,29 @@ describe('share-URL routing intent (.htaccess vs _redirects)', () => {
       return
     }
     const htaccess = read('public', '.htaccess')
-    // The catch-all internal rewrite that serves /ua content for clean URLs.
-    expect(htaccess).toMatch(/RewriteRule\s+\^pre-save\/\(\.\*\)\$\s+\/ua\/pre-save\//)
-    expect(htaccess).toMatch(/RewriteRule\s+\^listen\/\(\.\*\)\$\s+\/ua\/listen\//)
+    // Share URLs are served in place from the prerendered directory — never
+    // rewritten into a /ua/ prefix, which is no longer a route.
+    expect(htaccess).toMatch(
+      /RewriteRule\s+\^\(listen\|pre-save\|lyrics\)\/\(\.\*\)\$\s+\/\$1\/\$2\/index\.html/
+    )
+    expect(htaccess).not.toMatch(/RewriteRule\s+\S+\s+\/ua\/(?:listen|pre-save|lyrics)/)
+    // The legacy prefix must 301 to the clean URL rather than 404.
+    expect(htaccess).toMatch(/RewriteRule\s+\^ua\/\(\.\*\)\$\s+\/\$1\s+\[R=301,L\]/)
     expect(htaccess).toMatch(/RewriteEngine\s+On/)
   })
 
-  it('IF _redirects exists, it routes the SAME share paths to the SAME ua locale', () => {
+  it('IF _redirects exists, it leaves the clean share URLs alone and retires /ua', () => {
     if (!redirectsExists) {
       // Optional file — assert its absence explicitly rather than throwing.
       expect(redirectsExists).toBe(false)
       return
     }
     const redirects = read('public', '_redirects')
-    // Both share entrypoints must be present and target /ua/<type>/:splat.
-    expect(redirects).toMatch(/^\/pre-save\/\*\s+\/ua\/pre-save\/:splat\b/im)
-    expect(redirects).toMatch(/^\/listen\/\*\s+\/ua\/listen\/:splat\b/im)
+    // The clean share URLs ARE canonical Ukrainian now — redirecting them would
+    // point Google away from the URL every page declares as its canonical.
+    expect(redirects).not.toMatch(/^\/(?:pre-save|listen|lyrics)\/\*/im)
+    // The retired prefix collapses onto the clean form.
+    expect(redirects).toMatch(/^\/ua\/\*\s+\/:splat\s+301\b/im)
   })
 
   it('both routing files agree the default locale for share URLs is `ua`', () => {
@@ -124,22 +130,24 @@ describe('share-URL routing intent (.htaccess vs _redirects)', () => {
     const htaccess = read('public', '.htaccess')
     const redirects = read('public', '_redirects')
 
-    // Neither file may route share URLs to a non-default locale (e.g. /en).
-    for (const type of ['pre-save', 'listen']) {
-      // .htaccess: every rewrite target for bare /<type>/ goes to /ua/<type>/.
-      const htRule = new RegExp(`RewriteRule\\s+\\^${type}\\/\\(\\.\\*\\)\\$\\s+\\/en\\/`)
+    // Neither file may route a bare share URL into a locale prefix at all —
+    // unprefixed IS Ukrainian now, and /en would be the wrong language.
+    for (const type of ['pre-save', 'listen', 'lyrics']) {
+      const htRule = new RegExp(`RewriteRule\\s+\\^${type}\\/\\(\\.\\*\\)\\$\\s+\\/(?:en|ua)\\/`)
       expect(htaccess).not.toMatch(htRule)
-      // _redirects: same — no /en target for the bare share path.
-      const reRule = new RegExp(`^\\/${type}\\/\\*\\s+\\/en\\/`, 'im')
+      const reRule = new RegExp(`^\\/${type}\\/\\*\\s+\\/(?:en|ua)\\/`, 'im')
       expect(redirects).not.toMatch(reRule)
     }
   })
 
-  it('the non-localized alias generator agrees: ua/* is copied to bare /pre-save and /listen', () => {
-    const alias = read('scripts', 'create-nonlocalized-aliases.js')
-    // The alias mappings are the runtime equivalent of the .htaccess rewrites.
-    expect(alias).toMatch(/from:\s*'ua\/pre-save',\s*to:\s*'pre-save'/)
-    expect(alias).toMatch(/from:\s*'ua\/listen',\s*to:\s*'listen'/)
+  it('the build emits share URLs natively — no alias copy step survives', () => {
+    // Ukrainian is the unprefixed default locale, so `/listen/<slug>` is a real
+    // prerendered route. The alias script that used to fake it (copying
+    // ua/listen -> listen after the build) is deleted; if it reappears, the
+    // clean URLs are duplicates again and canonical drift follows.
+    expect(has('scripts', 'create-nonlocalized-aliases.js')).toBe(false)
+    const nuxt = read('nuxt.config.ts')
+    expect(nuxt).toMatch(/strategy:\s*'prefix_except_default'/)
   })
 
   it('.htaccess share-URL rewrite targets reference paths the build actually produces', () => {
@@ -154,13 +162,16 @@ describe('share-URL routing intent (.htaccess vs _redirects)', () => {
     const declaredLocales = Array.from(nuxt.matchAll(/code:\s*'([a-z]{2})'/g)).map((m) => m[1])
     expect(declaredLocales).toEqual(expect.arrayContaining(['ua', 'en']))
 
+    // Only English carries a locale segment now; Ukrainian is unprefixed. Any
+    // /xx/ segment appearing in a share rewrite must be a declared locale.
     const targets = Array.from(
-      htaccess.matchAll(/RewriteRule\s+\S+\s+\/([a-z]{2})\/(?:pre-save|listen)\b/g)
+      htaccess.matchAll(/RewriteRule\s+\S+\s+\/([a-z]{2})\/(?:pre-save|listen|lyrics)\b/g)
     ).map((m) => m[1])
-    expect(targets.length).toBeGreaterThan(0)
     for (const localeSeg of targets) {
       expect(declaredLocales).toContain(localeSeg)
     }
+    // And the unprefixed form must be handled explicitly.
+    expect(htaccess).toMatch(/\^\(listen\|pre-save\|lyrics\)/)
   })
 })
 
@@ -224,25 +235,32 @@ describe('nuxt.config.ts DEPLOY_TARGET head-prefixing invariant', () => {
 describe('prerender route list covers both locales for static pages', () => {
   const config = read('nuxt.config.ts')
 
-  it('declares the prefix i18n strategy with default locale ua', () => {
-    expect(config).toMatch(/strategy:\s*'prefix'/)
+  it('declares the unprefixed-default i18n strategy with default locale ua', () => {
+    // Ukrainian must stay UNPREFIXED: its canonical URLs are the clean ones
+    // (`/`, `/listen/x`), and under the old `'prefix'` strategy those were not
+    // real routes — they client-redirected to `/ua/...` while claiming to be
+    // canonical. See docs/search-console.md.
+    expect(config).toMatch(/strategy:\s*'prefix_except_default'/)
     expect(config).toMatch(/defaultLocale:\s*'ua'/)
   })
 
-  it('STATIC_ROUTES include both /ua and /en variants for each policy page', () => {
-    // Pull the STATIC_ROUTES array literal and assert symmetry across locales.
+  it('STATIC_ROUTES cover every policy page in BOTH locales (ua unprefixed)', () => {
     const block = config.match(/const STATIC_ROUTES = \[([\s\S]*?)\]/)?.[1]
     expect(block, 'STATIC_ROUTES literal must exist').toBeTruthy()
     const routes = Array.from((block as string).matchAll(/'([^']+)'/g)).map((m) => m[1])
 
-    const policyPages = routes
-      .filter((r) => /^\/(ua|en)\//.test(r))
-      .map((r) => r.replace(/^\/(ua|en)\//, ''))
+    // No route may carry the retired /ua prefix.
+    expect(routes.filter((r) => r === '/ua' || r.startsWith('/ua/'))).toEqual([])
 
-    // Every localized policy page must exist for BOTH locales.
-    const uaPages = new Set(routes.filter((r) => r.startsWith('/ua/')).map((r) => r.slice(4)))
     const enPages = new Set(routes.filter((r) => r.startsWith('/en/')).map((r) => r.slice(4)))
-    expect(policyPages.length).toBeGreaterThan(0)
+    const uaPages = new Set(
+      routes.filter((r) => r !== '/' && r !== '/en' && !r.startsWith('/en/')).map((r) => r.slice(1))
+    )
+    expect(uaPages.size).toBeGreaterThan(0)
+    // Every localized page exists for both locales: unprefixed for ua, /en/ for en.
     expect([...uaPages].sort()).toEqual([...enPages].sort())
+    // And both home pages are prerendered.
+    expect(routes).toContain('/')
+    expect(routes).toContain('/en')
   })
 })

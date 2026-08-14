@@ -251,10 +251,15 @@
       { property: 'og:locale:alternate', content: locale.value === 'ua' ? 'en_US' : 'uk_UA' }
     ],
     link: [
-      { rel: 'canonical', href: `${SITE_URL}/${locale.value}/terms-of-service` },
-      { rel: 'alternate', hreflang: 'uk-UA', href: `${SITE_URL}/ua/terms-of-service` },
+      // Ukrainian is the unprefixed default locale, so its URL is the clean
+      // `/terms-of-service` — never `/ua/terms-of-service`, which is not a route.
+      {
+        rel: 'canonical',
+        href: `${SITE_URL}${locale.value === 'en' ? '/en' : ''}/terms-of-service`
+      },
+      { rel: 'alternate', hreflang: 'uk-UA', href: `${SITE_URL}/terms-of-service` },
       { rel: 'alternate', hreflang: 'en-US', href: `${SITE_URL}/en/terms-of-service` },
-      { rel: 'alternate', hreflang: 'x-default', href: `${SITE_URL}/ua/terms-of-service` }
+      { rel: 'alternate', hreflang: 'x-default', href: `${SITE_URL}/terms-of-service` }
     ]
   })
 

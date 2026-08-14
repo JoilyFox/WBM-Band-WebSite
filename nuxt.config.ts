@@ -45,15 +45,18 @@ const ROOT_DESCRIPTION_UA = latestReleaseTitleUA
   ? ukLocale.app.meta_description.replace('{release}', latestReleaseTitleUA)
   : `WBM Band — ${ukLocale.app.tagline}.`
 
+// Ukrainian (the default locale) has no route prefix — see the i18n `strategy`
+// note below. `localeRoute()` builds these: '' for ua, '/en' for en.
+const localePrefix = (locale: string) => (locale === 'ua' ? '' : `/${locale}`)
+
 const STATIC_ROUTES = [
   '/',
-  '/ua',
   '/en',
-  '/ua/privacy-policy',
+  '/privacy-policy',
   '/en/privacy-policy',
-  '/ua/terms-of-service',
+  '/terms-of-service',
   '/en/terms-of-service',
-  '/ua/cookies-policy',
+  '/cookies-policy',
   '/en/cookies-policy'
 ]
 
@@ -61,18 +64,19 @@ const masterPageRoutes = (): string[] => {
   const routes: string[] = []
   const prefixes = Object.keys(SOURCE_PREFIXES)
   for (const locale of LOCALES) {
+    const p = localePrefix(locale)
     for (const slug of RELEASE_SLUGS) {
       for (const pageType of ['listen', 'pre-save']) {
-        routes.push(`/${locale}/${pageType}/${slug}`)
+        routes.push(`${p}/${pageType}/${slug}`)
         for (const prefix of prefixes) {
-          routes.push(`/${locale}/${pageType}/${prefix}/${slug}`)
+          routes.push(`${p}/${pageType}/${prefix}/${slug}`)
         }
       }
     }
     // Dedicated lyrics pages — only for releases that actually ship lyrics, and
     // clean URL only (no source-prefix attribution variants for lyrics).
     for (const slug of LYRICS_SLUGS) {
-      routes.push(`/${locale}/lyrics/${slug}`)
+      routes.push(`${p}/lyrics/${slug}`)
     }
   }
   return routes
@@ -357,6 +361,23 @@ export default defineNuxtConfig({
       // and DEPLOY_TARGET baseURL changes.
       'prerender:generate'(route) {
         if (typeof route.contents !== 'string' || !route.fileName?.endsWith('.html')) return
+
+        // Routes that a middleware redirects away from (an unreleased
+        // /listen/<slug> → /404, a disabled /pre-save/<slug>) are emitted by
+        // Nitro as a 200-status meta-refresh stub with no content. Google reads
+        // that as a soft 404. Mark those stubs noindex so a crawl of a shared
+        // pre-release link can't put an empty page in the index.
+        // See docs/search-console.md.
+        if (
+          /http-equiv="refresh"/i.test(route.contents) &&
+          !/name="robots"/i.test(route.contents)
+        ) {
+          route.contents = route.contents.replace(
+            '<head>',
+            '<head><meta name="robots" content="noindex">'
+          )
+        }
+
         const faces = route.contents.match(/@font-face\{[^}]*\}/g) || []
         const face = faces.find(
           (f) =>
@@ -392,14 +413,30 @@ export default defineNuxtConfig({
         lazy: true,
         langDir: 'locales',
         defaultLocale: 'ua',
-        strategy: 'prefix',
-        detectBrowserLanguage: {
-          useCookie: true,
-          cookieKey: 'i18n_redirected',
-          redirectOn: 'root',
-          alwaysRedirect: true,
-          fallbackLocale: 'ua'
-        },
+        // Ukrainian is served WITHOUT a prefix (`/`, `/listen/x`, `/lyrics/x`),
+        // English under `/en/...`. Those clean URLs are what every UA page
+        // declares as its canonical and what the sitemap lists, so the routes
+        // must actually BE them. Under the previous `'prefix'` strategy they
+        // were not: `/ua/...` were the real routes and the clean URLs existed
+        // only as post-build file copies, so every clean URL client-redirected
+        // to its `/ua/...` twin while claiming to be canonical — exactly the
+        // canonical-vs-rendered conflict that produced the duplicate-canonical
+        // bug on the home page. See docs/search-console.md.
+        // `public/.htaccess` 301s the legacy `/ua/...` URLs to their clean form.
+        strategy: 'prefix_except_default',
+        // Browser-language auto-redirect is DELIBERATELY OFF.
+        //
+        // With `redirectOn: 'root'` the bare `/` bounced visitors to their
+        // browser's locale. Googlebot crawls with an English Accept-Language,
+        // so it rendered the ENGLISH home at `/` — Google's stored copy of
+        // https://www.wbmband.com/ literally read `<html lang="en-US">` with the
+        // English title. `/en` then rendered identically and was deduped into
+        // `/` ("Duplicate, Google chose different canonical than user"), leaving
+        // the Ukrainian home with NO indexable URL while Ukraine is ~75% of
+        // clicks. Google's localized-versions guidance recommends explicit
+        // hreflang plus a visible selector over Accept-Language redirects —
+        // `<CommonLanguageSwitcher>` is that selector. See docs/search-console.md.
+        detectBrowserLanguage: false,
         locales: [
           { code: 'en', language: 'en-US', name: 'English', file: 'en.json' },
           { code: 'ua', language: 'uk-UA', name: 'Українська', file: 'uk.json' }

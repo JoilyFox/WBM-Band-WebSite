@@ -2,87 +2,63 @@
   RewriteEngine On
   RewriteBase /
 
+  # Canonical host: apex -> www (301).
+  #
+  # https://wbmband.com/ used to answer 200 and serve the whole site with no
+  # redirect, so the same content lived on two hosts. Every page already
+  # self-canonicalises to the www host, but a canonical is only a hint — a
+  # redirect is the strongest consolidation signal Google accepts, and the
+  # Search Console property is scoped to the www host, so anything crawled on
+  # the apex was invisible in the reports. See docs/search-console.md.
+  RewriteCond %{HTTP_HOST} !^$
+  RewriteCond %{HTTP_HOST} !^www\.wbmband\.com$ [NC]
+  RewriteCond %{HTTP_HOST} !^localhost [NC]
+  RewriteCond %{HTTP_HOST} !^127\.0\.0\.1 [NC]
+  RewriteRule ^ https://www.wbmband.com%{REQUEST_URI} [R=301,L]
+
   # Disable automatic directory slash redirect
   DirectorySlash Off
 
-  # Internal rewrite for /pre-save/<slug> AND /pre-save/<source>/<slug> to index.html.
-  # The optional group matches the source-prefix attribution paths (e.g. /pre-save/i/<slug>).
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/pre-save/[^/]+(/[^/]+)?$
-  RewriteRule ^pre-save/(.*)$ /ua/pre-save/$1/index.html [L]
+  # Legacy locale prefix: /ua/... -> /... (301).
+  #
+  # Ukrainian used to be a prefixed locale, so /ua/listen/x and friends were real
+  # URLs that the clean URLs were merely file-copies of. Ukrainian is now the
+  # UNPREFIXED default locale (nuxt.config i18n `strategy: 'prefix_except_default'`),
+  # so /ua/* no longer exists — redirect the old form to the canonical clean one
+  # instead of 404ing shared links and anything Google already knows.
+  RewriteRule ^ua$ / [R=301,L]
+  RewriteRule ^ua/(.*)$ /$1 [R=301,L]
 
-  # Internal rewrite for /listen/<slug> AND /listen/<source>/<slug> to index.html.
+  # Share/attribution URLs: /listen/<slug>, /listen/<source>/<slug> and the
+  # /pre-save + /lyrics equivalents are prerendered directories, but Apache only
+  # finds their index.html when the request maps to a real path. These serve it
+  # internally so the clean URL is preserved (no redirect).
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/listen/[^/]+(/[^/]+)?$
-  RewriteRule ^listen/(.*)$ /ua/listen/$1/index.html [L]
+  RewriteCond %{REQUEST_URI} ^/(listen|pre-save|lyrics)/[^/]+(/[^/]+)?$
+  RewriteRule ^(listen|pre-save|lyrics)/(.*)$ /$1/$2/index.html [L]
 
-  # Internal rewrite for /ua/pre-save/<slug> AND /ua/pre-save/<source>/<slug> to index.html
+  # Same for the English variants.
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/ua/pre-save/[^/]+(/[^/]+)?$
-  RewriteRule ^ua/pre-save/(.*)$ /ua/pre-save/$1/index.html [L]
-
-  # Internal rewrite for /ua/listen/<slug> AND /ua/listen/<source>/<slug> to index.html
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/ua/listen/[^/]+(/[^/]+)?$
-  RewriteRule ^ua/listen/(.*)$ /ua/listen/$1/index.html [L]
-
-  # Internal rewrite for /en/pre-save/<slug> AND /en/pre-save/<source>/<slug> to index.html
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/en/pre-save/[^/]+(/[^/]+)?$
-  RewriteRule ^en/pre-save/(.*)$ /en/pre-save/$1/index.html [L]
-
-  # Internal rewrite for /en/listen/<slug> AND /en/listen/<source>/<slug> to index.html
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/en/listen/[^/]+(/[^/]+)?$
-  RewriteRule ^en/listen/(.*)$ /en/listen/$1/index.html [L]
-
-  # Internal rewrite for /lyrics/<slug> to index.html (clean, non-localized).
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/lyrics/[^/]+(/[^/]+)?$
-  RewriteRule ^lyrics/(.*)$ /ua/lyrics/$1/index.html [L]
-
-  # Internal rewrite for /ua/lyrics/<slug> to index.html
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/ua/lyrics/[^/]+(/[^/]+)?$
-  RewriteRule ^ua/lyrics/(.*)$ /ua/lyrics/$1/index.html [L]
-
-  # Internal rewrite for /en/lyrics/<slug> to index.html
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} ^/en/lyrics/[^/]+(/[^/]+)?$
-  RewriteRule ^en/lyrics/(.*)$ /en/lyrics/$1/index.html [L]
-
-  # Internal rewrite (not redirect) for /pre-save/* to serve /ua/pre-save/* content
-  # This keeps the URL the same but serves the localized content
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_URI} ^/pre-save/
-  RewriteRule ^pre-save/(.*)$ /ua/pre-save/$1 [L]
-  
-  # Internal rewrite (not redirect) for /listen/* to serve /ua/listen/* content
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_URI} ^/listen/
-  RewriteRule ^listen/(.*)$ /ua/listen/$1 [L]
-
-  # Internal rewrite (not redirect) for /lyrics/* to serve /ua/lyrics/* content
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_URI} ^/lyrics/
-  RewriteRule ^lyrics/(.*)$ /ua/lyrics/$1 [L]
+  RewriteCond %{REQUEST_URI} ^/en/(listen|pre-save|lyrics)/[^/]+(/[^/]+)?$
+  RewriteRule ^en/(listen|pre-save|lyrics)/(.*)$ /en/$1/$2/index.html [L]
 
   # DirectorySlash is Off (above), so a real directory requested WITHOUT a
-  # trailing slash (e.g. /ua, /en) never reaches its DirectoryIndex and Apache
+  # trailing slash (e.g. /en, /privacy-policy) never reaches its DirectoryIndex and Apache
   # returns 403. Serve that directory's index.html internally — no redirect, so
-  # the clean URL is preserved (matching how the app links to /ua and /en).
+  # the clean URL is preserved (matching how the app links to /en and the
+  # unprefixed Ukrainian routes).
   RewriteCond %{REQUEST_URI} !/$
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteCond %{REQUEST_FILENAME}/index.html -f
   RewriteRule ^(.+)$ /$1/index.html [L]
 
-  # SPA Fallback - serve index.html for all routes (only for non-existing files)
+  # SPA Fallback - serve the empty SPA shell for unknown routes (only for
+  # non-existing files). This is 200.html, NOT index.html: index.html is now a
+  # real prerendered document (the Ukrainian home), so falling back to it would
+  # flash homepage content before the client router resolves the real page.
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^ index.html [L]
+  RewriteRule ^ 200.html [L]
 </IfModule>
 
 # Disable directory browsing

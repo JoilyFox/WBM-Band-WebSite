@@ -14,7 +14,7 @@
  * One-time:  node node_modules/playwright-core/cli.js install webkit chromium
  * Usage:     npm run dev   (in another terminal)
  *            npm run screenshots                 # home + a release page
- *            SCREENSHOT_URL=https://joilyfox.github.io npm run screenshots /ua
+ *            SCREENSHOT_URL=https://joilyfox.github.io npm run screenshots /
  */
 import { webkit, chromium, devices } from 'playwright-core'
 import { mkdir } from 'node:fs/promises'
@@ -31,7 +31,7 @@ const TARGETS = [
 ]
 
 const argPaths = process.argv.slice(2)
-const PATHS = argPaths.length ? argPaths : ['/ua', '/ua/listen/chorni-ptahy']
+const PATHS = argPaths.length ? argPaths : ['/', '/listen/chorni-ptahy']
 
 await mkdir(OUT, { recursive: true })
 

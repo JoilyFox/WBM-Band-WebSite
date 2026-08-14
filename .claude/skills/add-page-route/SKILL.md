@@ -1,11 +1,11 @@
 ---
 name: add-page-route
-description: 'Use when adding a new page/route or top-level nav link to the WBM Nuxt site: ua/en parity, nitro.prerender STATIC_ROUTES, useLocalePath, locales/uk.json + en.json keys, non-localized /listen + /pre-save share aliases.'
+description: 'Use when adding a new page/route or top-level nav link to the WBM Nuxt site: ua/en parity (ua is UNPREFIXED), nitro.prerender STATIC_ROUTES, useLocalePath, locales/uk.json + en.json keys, non-localized /listen + /pre-save share aliases.'
 ---
 
 ## When to use
 
-Adding a new top-level page/route (e.g. `/about`, `/tour`) or a new top-level nav link to the WBM Nuxt 3 static site. Covers ua/en parity, the prerender allow-list, `useLocalePath()`, and non-localized share aliases.
+Adding a new top-level page/route (e.g. `/about`, `/tour`) or a new top-level nav link to the WBM Nuxt 3 static site. Covers ua/en parity (ua is UNPREFIXED), the prerender allow-list, `useLocalePath()`, and non-localized share aliases.
 
 ## Steps
 
@@ -41,5 +41,5 @@ Adding a new top-level page/route (e.g. `/about`, `/tour`) or a new top-level na
 
 ## Related
 
-- Agent `i18n-checker` — validates ua/en parity, `useLocalePath()` usage, and prerender-list coverage; run it after this skill.
+- Agent `i18n-checker` — validates ua/en parity (ua is UNPREFIXED), `useLocalePath()` usage, and prerender-list coverage; run it after this skill.
 - Commands: `npm run generate` (SSG + aliases), `npm run dev`.

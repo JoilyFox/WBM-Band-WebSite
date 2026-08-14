@@ -1,8 +1,9 @@
 // @vitest-environment nuxt
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MusicLibrarySection from '~/components/sections/MusicLibrarySection.vue'
 import type { MusicRelease } from '~/data/musicLibrary'
+import { setTestLocale } from './helpers/i18n'
 
 // MusicLibrarySection renders the "Our Music" grid. Its interesting logic lives in
 // a cluster of gating computeds, all of which read two EXPLICIT imports:
@@ -125,6 +126,15 @@ const setLibrary = (releases: MusicRelease[]) => {
   state.library.length = 0
   state.library.push(...releases)
 }
+
+// This file asserts the ENGLISH copy, so it states the locale explicitly and
+// loads that bundle ONCE, before any test installs fake timers. It used to
+// inherit English by accident via browser-language detection — the same
+// mechanism that made Googlebot render the English home at `/`, now switched
+// off (docs/search-console.md). The app's real default locale is 'ua'.
+beforeAll(async () => {
+  await setTestLocale('en')
+})
 
 describe('MusicLibrarySection.vue', () => {
   beforeEach(() => {

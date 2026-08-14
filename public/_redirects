@@ -1,7 +1,10 @@
-# Netlify/Vercel redirects file
-# Redirect non-localized share URLs to Ukrainian version (default locale)
-/pre-save/*  /ua/pre-save/:splat  301
-/listen/*    /ua/listen/:splat    301
+# Netlify/Vercel redirects file (unused by the current Apache/FTP + GitHub Pages
+# deploys — kept so a move to such a host preserves the routing contract).
+#
+# Ukrainian is the UNPREFIXED default locale, so /listen/* and /lyrics/* ARE the
+# canonical Ukrainian URLs — they must not be redirected anywhere. Only the
+# retired /ua prefix redirects, to the clean form.
+/ua/*  /:splat  301
 
-# SPA fallback for client-side routing
-/*  /index.html  200
+# SPA fallback for client-side routing (the empty shell, not the home page).
+/*  /200.html  200

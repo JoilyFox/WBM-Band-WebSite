@@ -1,10 +1,11 @@
 // @vitest-environment nuxt
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { defineComponent, h } from 'vue'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { useI18n } from 'vue-i18n'
 import AlbumCover from '~/components/ui/AlbumCover.vue'
 import type { MusicRelease } from '~/data/musicLibrary'
+import { setTestLocale } from './helpers/i18n'
 
 // AlbumCover renders a release cover via <ProgressiveImage>, an optional
 // release-type badge (<AppBadge>), and swaps to a "no image" fallback block when
@@ -18,12 +19,12 @@ import type { MusicRelease } from '~/data/musicLibrary'
 //   • handleImageError  → flips an internal flag, hiding ProgressiveImage and
 //                          showing the fallback block.
 //
-// IMPORTANT — observed runtime locale: in this nuxt Vitest environment the GLOBAL
-// vue-i18n composer resolves to ENGLISH by default (a mounted AlbumCover with
-// type 'single' renders the badge text "Single", and the fallback copy is
-// "No Image"). The component-under-test reads `t`/`locale` from the same global
-// composer, so we assert the ENGLISH strings it actually produces and exercise
-// the Ukrainian path by explicitly flipping the shared locale (then restoring).
+// IMPORTANT — locale: this file asserts the ENGLISH strings, so it SETS the
+// global locale to 'en' before every test rather than inheriting whatever the
+// runtime happens to default to. (It used to inherit English by accident, via
+// browser-language detection — the same mechanism that made Googlebot render
+// the English home at `/`; see docs/search-console.md. The app's real default
+// is 'ua'.) The Ukrainian path is exercised by flipping the shared locale.
 //
 // AppBadge (liquid-glass) encodes its variant in a stable `app-badge--{variant}`
 // class (the per-type colour is the --lg-tint), so we read the variant off that
@@ -46,6 +47,9 @@ const baseProps = (overrides: Record<string, unknown> = {}) => ({
 // flip the shared global locale through a throwaway component and restore it
 // after each test that touches it.
 const setGlobalLocale = async (value: 'ua' | 'en') => {
+  // Load the lazy bundle first (see test/nuxt/helpers/i18n.ts), then flip the
+  // shared composer through a throwaway component.
+  await setTestLocale(value)
   const Probe = defineComponent({
     setup() {
       const { locale } = useI18n({ useScope: 'global' })
@@ -57,8 +61,14 @@ const setGlobalLocale = async (value: 'ua' | 'en') => {
 }
 
 describe('AlbumCover', () => {
+  beforeEach(async () => {
+    // Tests share one global i18n composer; set the locale this file asserts
+    // BEFORE each test so the suite is order-independent and never depends on
+    // whatever the previous file left behind.
+    await setGlobalLocale('en')
+  })
+
   afterEach(async () => {
-    // Tests share one global i18n composer; keep the suite order-independent.
     await setGlobalLocale('en')
   })
 

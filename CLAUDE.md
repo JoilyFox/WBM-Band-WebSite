@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 npm run dev                # Dev server on 0.0.0.0:3000
-npm run generate           # SSG build + create non-localized route aliases (use this, not `build`)
+npm run generate           # SSG build + sitemap + bio-link sheet (use this, not `build`)
 npm run build:production   # Alias for `npm run generate` (production output)
 npm run deploy:github      # SSG build for GitHub Pages (sets DEPLOY_TARGET=github → /WBM-Band-WebSite/ baseURL)
 npm run deploy:production  # Build + FTP upload to wbmband.com (requires .env.production)
@@ -36,16 +36,18 @@ Nuxt 3 (Vue 3 Composition API, TypeScript, Tailwind, PrimeVue unstyled, Pinia) s
 
 When adding head links/meta with paths, follow the same conditional-prefix pattern that already exists in `nuxt.config.ts`.
 
-### i18n (prefix strategy, default `ua`)
+### i18n (`prefix_except_default`, default `ua`)
 
-- Locales: `ua` (Ukrainian, default, file `locales/uk.json`) and `en` (`locales/en.json`). Config in `i18n/i18n.config.ts`.
-- All internal navigation must use `useLocalePath()` — never hardcode `/en/...` or `/ua/...`.
-- `middleware/i18n-root-redirect.global.ts` redirects bare `/` to the localized home (client-only).
-- Non-localized share URLs: `/pre-save/*` and `/listen/*` work without a locale prefix because `scripts/create-nonlocalized-aliases.js` (run by `npm run generate`) copies the built `ua/pre-save/*` and `ua/listen/*` directories to root. The runtime middleware `redirect-share-urls.global.ts` is intentionally disabled — server-side `.htaccess` handles it. Don't re-enable it.
+- Locales: `ua` (Ukrainian, **default and unprefixed**, file `locales/uk.json`) and `en` (`/en/...`, `locales/en.json`). Config in `i18n/i18n.config.ts`.
+- **Ukrainian URLs carry no prefix**: `/`, `/listen/<slug>`, `/lyrics/<slug>`, `/privacy-policy`. There is no `/ua/...` — `public/.htaccess` 301s the retired prefix to the clean form. English is `/en/...`.
+- All internal navigation must use `useLocalePath()` — never hardcode `/en/...`.
+- `detectBrowserLanguage` is **`false`** and must stay that way. With it on, Googlebot (English `Accept-Language`) rendered the English home at `/` and Google indexed `<html lang="en-US">` at the Ukrainian canonical URL. Language choice is `<CommonLanguageSwitcher>`. See `docs/search-console.md`.
+- The empty SPA shell is `200.html` — that is what the `.htaccess` fallback serves. `index.html` is the real Ukrainian home.
+- The runtime middleware `redirect-share-urls.global.ts` is intentionally disabled — the routes are native now. Don't re-enable it.
 
 ### Static generation & prerender list
 
-`nitro.prerender.routes` in `nuxt.config.ts` is the explicit list of pages that get generated. **When adding a new page, add both `/en/path` and `/ua/path` entries** — otherwise the route won't be in the static output. `failOnError: false` is set so maintenance mode (returning 503) doesn't break the build.
+`nitro.prerender.routes` in `nuxt.config.ts` is the explicit list of pages that get generated. **When adding a new page, add both `/path` (Ukrainian, unprefixed) and `/en/path` entries** — otherwise the route won't be in the static output. `failOnError: false` is set so maintenance mode (returning 503) doesn't break the build.
 
 `experimental.appManifest: false` is intentional — disabled to prevent 404s for build-metadata requests on static hosts.
 
@@ -92,19 +94,20 @@ Prettier (`.prettierrc`): no semis, single quotes, 2-space, no trailing commas, 
 
 Feature work starts with the task-oriented **skills** in [`.claude/skills/`](.claude/skills/) — each is auto-triggered by its description, bundles the procedure + the exact helper files, and links the deep-dive `docs/*.md` that remain the **source of truth** for API, edge-cases, and gotchas. Follow the matching skill instead of reading every doc. Full doc index + the new-doc template: [`docs/README.md`](docs/README.md). When you add a feature/system: add its doc to `docs/`, link it from `docs/README.md`, and fold it into the relevant skill (or add a new skill).
 
-| Skill (`.claude/skills/`) | Covers — see linked `docs/*.md` for depth                                                                       |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `new-release`             | **end-to-end release cycle** — intake → cover → data → verify → deploy → off-site catalogues → release-day flip |
-| `add-release`             | release in `musicLibrary.ts`, preview/pre-save/released state, cover theming, lyrics                            |
-| `work-with-images`        | AVIF/WebP/JPEG pipeline, `<UiProgressiveImage>`, blur placeholders, favicons                                    |
-| `add-page-route`          | new page/route, i18n (ua/en) parity, prerender list, `useLocalePath`                                            |
-| `analytics-tracking`      | GA4 events, path-prefix source attribution (`useAnalytics`)                                                     |
-| `ui-feedback`             | global loading bar, snackbars, contextual `/404` error pages                                                    |
-| `performance`             | device-tier perf system, `--perf-*` CSS vars, reduced-motion                                                    |
-| `state-data-api`          | `useApi` + `ApiCache`, Pinia stores, `getConfig` config access                                                  |
-| `ship-deploy`             | tests/lint, `npm run generate`, FTP + GitHub Pages, `DEPLOY_TARGET`                                             |
-| `seo-entity`              | JSON-LD, MusicBrainz/Wikidata entity (never add llms.txt / Review schema)                                       |
-| `contact-form`            | Web3Forms contact submission                                                                                    |
+| Skill (`.claude/skills/`) | Covers — see linked `docs/*.md` for depth                                                                                                |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `new-release`             | **end-to-end release cycle** — intake → cover → data → verify → deploy → off-site catalogues → release-day flip                          |
+| `add-release`             | release in `musicLibrary.ts`, preview/pre-save/released state, cover theming, lyrics                                                     |
+| `work-with-images`        | AVIF/WebP/JPEG pipeline, `<UiProgressiveImage>`, blur placeholders, favicons                                                             |
+| `add-page-route`          | new page/route, i18n (ua/en) parity, prerender list, `useLocalePath`                                                                     |
+| `analytics-tracking`      | GA4 events, path-prefix source attribution (`useAnalytics`)                                                                              |
+| `ui-feedback`             | global loading bar, snackbars, contextual `/404` error pages                                                                             |
+| `performance`             | device-tier perf system, `--perf-*` CSS vars, reduced-motion                                                                             |
+| `state-data-api`          | `useApi` + `ApiCache`, Pinia stores, `getConfig` config access                                                                           |
+| `ship-deploy`             | tests/lint, `npm run generate`, FTP + GitHub Pages, `DEPLOY_TARGET`                                                                      |
+| `search-console`          | **Google Search Console** — reading reports, indexing diagnostics, sitemap submission, post-release indexing pass, console configuration |
+| `seo-entity`              | JSON-LD, MusicBrainz/Wikidata entity (never add llms.txt / Review schema)                                                                |
+| `contact-form`            | Web3Forms contact submission                                                                                                             |
 
 ## Other pointers
 

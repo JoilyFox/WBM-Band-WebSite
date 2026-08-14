@@ -11,9 +11,13 @@ import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 //
 // `navigateTo` is a SHARED mock that Nuxt's own route/i18n middleware also call
 // while the app boots during the dynamic `import()` below. We therefore import
-// each middleware ONCE at top level and `mockClear()` in beforeEach so those
-// boot-time calls never pollute a per-test assertion. (Verified empirically: a
-// single bare-'/' invocation then yields exactly one navigateTo call.)
+// the middleware ONCE at top level and `mockClear()` in beforeEach so those
+// boot-time calls never pollute a per-test assertion.
+//
+// The former `i18n-root-redirect.global` suite lived here too. That middleware
+// was DELETED (2026-08) because it made Googlebot render the English home at
+// `/`; see docs/search-console.md. Bare `/` now serves the Ukrainian build
+// output directly, with no client-side locale bounce.
 // ---------------------------------------------------------------------------
 
 const { navigateTo, localePathImpl } = vi.hoisted(() => ({
@@ -31,12 +35,10 @@ vi.mock('#i18n', () => ({
 }))
 
 // Imported once; see isolation note above.
-const rootRedirect = (await import('~/middleware/i18n-root-redirect.global')).default
 const shareRedirect = (await import('~/middleware/redirect-share-urls.global')).default
 
-// Tiny helpers to build the route-location-ish objects the middlewares read.
+// Tiny helper to build the route-location-ish objects the middleware reads.
 const route = (path: string) => ({ path }) as any
-const callRoot = (path: string) => (rootRedirect as any)(route(path), route('/'))
 const callShare = (path: string) => (shareRedirect as any)(route(path), route('/'))
 
 beforeEach(() => {
@@ -76,56 +78,5 @@ describe('redirect-share-urls.global middleware (regression: must stay INERT)', 
     // Across every input above, navigateTo is never invoked — the guard so this
     // middleware is never silently re-enabled (server-side .htaccess owns it).
     expect(navigateTo).not.toHaveBeenCalled()
-  })
-})
-
-describe('i18n-root-redirect.global middleware', () => {
-  it('exports a callable handler (defineNuxtRouteMiddleware unwrapped)', () => {
-    expect(typeof rootRedirect).toBe('function')
-  })
-
-  describe('bare "/" on the client', () => {
-    it('redirects to the localized home via navigateTo with { replace: true }', async () => {
-      await callRoot('/')
-      expect(navigateTo).toHaveBeenCalledTimes(1)
-      expect(navigateTo).toHaveBeenCalledWith('/ua', { replace: true })
-    })
-
-    it('resolves the target through useLocalePath("/")', async () => {
-      await callRoot('/')
-      expect(localePathImpl).toHaveBeenCalledTimes(1)
-      expect(localePathImpl).toHaveBeenCalledWith('/')
-    })
-
-    it('forwards exactly what useLocalePath returns (no hardcoded prefix)', async () => {
-      localePathImpl.mockReturnValueOnce('/custom-home')
-      await callRoot('/')
-      expect(navigateTo).toHaveBeenCalledWith('/custom-home', { replace: true })
-    })
-
-    it('returns the navigateTo result so Nuxt aborts the original navigation', async () => {
-      const sentinel = Symbol('redirect')
-      navigateTo.mockReturnValueOnce(sentinel as any)
-      const result = await callRoot('/')
-      expect(result).toBe(sentinel)
-    })
-  })
-
-  describe('non-"/" paths short-circuit with no redirect', () => {
-    it.each([
-      ['/ua', 'localized home'],
-      ['/en', 'localized home (en)'],
-      ['/ua/about', 'localized inner page'],
-      ['/en/listen/mania', 'localized listen page'],
-      ['/pre-save/mania', 'non-localized share URL'],
-      ['', 'empty path'],
-      ['//', 'double slash (not exactly "/")'],
-      ['/ ', 'slash + space']
-    ])('does not redirect for %s (%s)', async (path) => {
-      const result = await callRoot(path)
-      expect(navigateTo).not.toHaveBeenCalled()
-      expect(localePathImpl).not.toHaveBeenCalled()
-      expect(result).toBeUndefined()
-    })
   })
 })

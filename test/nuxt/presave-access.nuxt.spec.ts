@@ -218,7 +218,10 @@ describe('presave-access middleware', () => {
       )
       isUpcomingRelease.mockReturnValue(true)
       await mw({ params: { slug: 'mania' } } as any, {} as any)
-      expect(formatReleaseDate).toHaveBeenCalledWith('2026-07-01', 'en-US')
+      // No locale is set here, so this is the app's real default: 'ua' → 'uk-UA'.
+      // (It used to read 'en-US' because browser-language detection booted the
+      // suite in English; that detection is off now — docs/search-console.md.)
+      expect(formatReleaseDate).toHaveBeenCalledWith('2026-07-01', 'uk-UA')
       expect(navigateTo).toHaveBeenCalledTimes(1)
       expect(navigateTo).toHaveBeenCalledWith(
         {

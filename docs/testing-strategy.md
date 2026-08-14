@@ -196,11 +196,11 @@ Each wave is independently shippable and leaves CI green.
 | `configHelpers.formatReleaseDate()`                                        | P2  | S   | date-vs-datetime branch (`T`/`:`); locale output.                                                                   |
 | `configHelpers.getConfig()` + `shouldShowNextReleasePreview()`             | P2  | S   | Flag reads middleware depends on.                                                                                   |
 | `middleware/redirect-share-urls.global.ts`                                 | P1  | S   | **Stays inert** (unconditional early `return`); regression guard so it isn't re-enabled.                            |
-| `middleware/i18n-root-redirect.global.ts`                                  | P2  | S   | bare `/`→localized home; non-`/` and SSR short-circuit.                                                             |
-| `pages/index.vue` maintenance gate + `latestRelease`                       | P2  | M   | `maintenanceMode`→`createError 503`; `new Date(undefined)` edge.                                                    |
-| `pages/pre-save/[slug].vue` + `[source]/[slug].vue` distributor redirect   | P1  | L   | `willAutoRedirect`/`showRedirectScreen` onMounted flow (component-level).                                           |
-| `pages/pre-save/index.vue` redirect dispatcher                             | P1  | M   | 3-way: disabled/no-release→home; distributor→external; else nearest presave.                                        |
-| `server/middleware/dev-base-redirect.ts`                                   | P3  | S   | Dev-only strip of `/WBM-Band-WebSite` prefix (307); no-op in prod.                                                  |
+
+| `pages/index.vue` maintenance gate + `latestRelease` | P2 | M | `maintenanceMode`→`createError 503`; `new Date(undefined)` edge. |
+| `pages/pre-save/[slug].vue` + `[source]/[slug].vue` distributor redirect | P1 | L | `willAutoRedirect`/`showRedirectScreen` onMounted flow (component-level). |
+| `pages/pre-save/index.vue` redirect dispatcher | P1 | M | 3-way: disabled/no-release→home; distributor→external; else nearest presave. |
+| `server/middleware/dev-base-redirect.ts` | P3 | S | Dev-only strip of `/WBM-Band-WebSite` prefix (307); no-op in prod. |
 
 ### 5.6 Stores + data integrity + i18n parity — `unit`
 

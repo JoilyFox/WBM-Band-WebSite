@@ -15,7 +15,7 @@ You enforce the bilingual / static-generation contract for the WBM site (default
 2. **All internal navigation uses `useLocalePath()`.** Hardcoded `/en/...` or `/ua/...` in `<NuxtLink>`, `router.push`, `navigateTo`, `<a href>` — flag every occurrence.
 3. **Every new translation key exists in BOTH `locales/uk.json` and `locales/en.json`.** Missing-key warnings are silenced (`missingWarn: false`), so this never errors at runtime — diff the two keysets yourself.
 4. **Non-localized share URLs** (`/pre-save/*`, `/listen/*` without locale prefix) are produced at generate-time by `scripts/create-nonlocalized-aliases.js` copying the `ua` build. Don't re-enable `redirect-share-urls.global.ts` middleware (intentionally disabled — `.htaccess` handles it server-side).
-5. **`useLocalePath()` is client-aware** — bare `/` is redirected by `middleware/i18n-root-redirect.global.ts` (client-only). Don't add SSR-time redirects there.
+5. **Bare `/` is the Ukrainian home**, not a redirect — the build copies `ua/index.html` to `index.html` and `detectBrowserLanguage` is `false`. Never reintroduce a browser-language redirect on `/`: it made Googlebot render and index the ENGLISH home at the Ukrainian canonical URL (`docs/search-console.md`).
 
 ## What to do when invoked
 

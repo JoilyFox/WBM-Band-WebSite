@@ -8,7 +8,25 @@
       <h3
         class="text-white font-semibold text-sm group-hover:text-primary-400 transition-colors duration-300 line-clamp-1"
       >
-        {{ displayTitle }}
+        <!-- Real <a> so Google has a crawlable path from the home page to every
+             release page — the card itself can't be an anchor because it also
+             contains the streaming links, and <a> inside <a> is invalid HTML.
+             A plain left click is prevented so the card's own handler still
+             opens the modal exactly as before; modified clicks (cmd/ctrl/shift)
+             stop propagation and let the browser open the real URL.
+             See docs/search-console.md. -->
+        <NuxtLink
+          v-if="listenPath"
+          :to="listenPath"
+          class="release-title-link"
+          @click.exact.prevent
+          @click.meta.stop
+          @click.ctrl.stop
+          @click.shift.stop
+        >
+          {{ displayTitle }}
+        </NuxtLink>
+        <template v-else>{{ displayTitle }}</template>
       </h3>
       <p class="text-white/60 text-xs">
         {{ formattedDate }}
@@ -34,6 +52,7 @@
   import { computed } from 'vue'
   import type { MusicRelease } from '~/data/musicLibrary'
   import { useI18n } from 'vue-i18n'
+  import { isUpcomingRelease } from '~/utils/configHelpers'
 
   interface Props {
     release: MusicRelease
@@ -79,12 +98,30 @@
     return formatted.charAt(0).toUpperCase() + formatted.slice(1)
   })
 
+  // Canonical release URL for the current locale: the UA hub is the CLEAN
+  // non-localized path (that is what /ua/listen/<slug> canonicalises to), EN is
+  // its own /en/... URL. Linking to anything else would point Google at a
+  // non-canonical duplicate. Unreleased tracks get no link — their /listen page
+  // redirects to /404 and is a soft 404 until release day.
+  const listenPath = computed(() => {
+    if (isUpcomingRelease(props.release.releaseDate)) return ''
+    const prefix = locale.value === 'en' ? '/en' : ''
+    return `${prefix}/listen/${props.release.slug}`
+  })
+
   const handleClick = () => {
     emit('click', props.release)
   }
 </script>
 
 <style scoped>
+  /* The title link exists for crawlability, not decoration — it must be
+     visually indistinguishable from the plain <h3> text it replaced. */
+  .release-title-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
   /* Music Card Animations */
   .music-card {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

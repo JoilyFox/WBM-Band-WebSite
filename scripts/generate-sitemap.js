@@ -4,8 +4,11 @@
  * Sitemap generator.
  *
  * Emits .output/public/sitemap.xml listing the canonical, indexable URLs of the
- * site. Runs as part of `npm run generate` (production) AFTER the non-localized
- * aliases are created, so /listen/<slug> exists.
+ * site. Runs as part of `npm run generate` (production).
+ *
+ * Ukrainian is the unprefixed default locale (`strategy: 'prefix_except_default'`),
+ * so its URLs are the clean ones: `/`, `/listen/x`, `/privacy-policy`. English
+ * lives under `/en/...`. There is no `/ua/...`.
  *
  * Only canonical URLs are included:
  *   - localized homes and policy pages
@@ -13,6 +16,12 @@
  *     canonical (each locale self-canonicalizes; see composables/useReleaseHead.ts)
  * Source-attribution variants (/listen/<prefix>/<slug>) are `noindex` and the
  * transient pre-save pages are deliberately excluded.
+ *
+ * A release whose date is still in the FUTURE is excluded from the /listen
+ * entries: middleware/listen-access.ts redirects those to /404 (or /pre-save),
+ * which Nitro prerenders as a 200-status meta-refresh stub — a soft 404. Listing
+ * it would hand Google a dead URL on the first sitemap read. The /lyrics page is
+ * a real document either way, so it stays.
  *
  * The host is always the production origin (SITE_URL) — a sitemap must point at
  * the real domain, never the GitHub Pages staging mirror — so this is keyed off
@@ -42,6 +51,12 @@ function extractSiteUrl() {
   return m[1].replace(/\/+$/, '')
 }
 
+function isFutureDate(value) {
+  if (!value) return false
+  const t = new Date(value).getTime()
+  return Number.isFinite(t) && t > Date.now()
+}
+
 function extractReleases() {
   const src = readRepoFile('data', 'musicLibrary.ts')
   const blocks = src.split(/\{\s*id:/).slice(1)
@@ -61,6 +76,9 @@ function extractReleases() {
 const LOCALES = ['ua', 'en']
 const POLICY_PATHS = ['privacy-policy', 'terms-of-service', 'cookies-policy']
 
+// '' for the unprefixed default locale, '/en' for English.
+const localePrefix = (locale) => (locale === 'ua' ? '' : `/${locale}`)
+
 function buildSitemap(siteUrl, releases) {
   /** @type {{ loc: string, lastmod?: string }[]} */
   const entries = []
@@ -73,7 +91,7 @@ function buildSitemap(siteUrl, releases) {
   // Policy pages, both locales.
   for (const locale of LOCALES) {
     for (const p of POLICY_PATHS) {
-      entries.push({ loc: `${siteUrl}/${locale}/${p}` })
+      entries.push({ loc: `${siteUrl}${localePrefix(locale)}/${p}` })
     }
   }
 
@@ -82,6 +100,10 @@ function buildSitemap(siteUrl, releases) {
   // ua/en language pairing itself lives in each page's <head> hreflang (one
   // method — we don't duplicate hreflang into the sitemap).
   for (const release of releases) {
+    if (isFutureDate(release.releaseDate)) {
+      console.log(`   ↳ skipping /listen/${release.slug} — not released yet (soft 404 until then)`)
+      continue
+    }
     const lastmod = release.releaseDate ? release.releaseDate.slice(0, 10) : undefined
     entries.push({ loc: `${siteUrl}/listen/${release.slug}`, lastmod })
     entries.push({ loc: `${siteUrl}/en/listen/${release.slug}`, lastmod })

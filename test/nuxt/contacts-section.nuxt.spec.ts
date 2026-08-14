@@ -106,11 +106,14 @@ describe('ContactsSection.vue', () => {
       await w.vm.$nextTick()
 
       // In flight: button disabled and shows the "sending" label.
-      // NOTE: the test-runtime i18n resolves to the English locale, so the live
-      // $t() values are the en.json strings here (see behaviorNotes).
+      // NOTE: these assert the UKRAINIAN copy because 'ua' is the app's real
+      // defaultLocale, which is what this runtime now boots at. (It used to read
+      // en.json because browser-language detection switched the suite to English
+      // — the same mechanism that made Googlebot render the English home at `/`,
+      // now switched off. See docs/search-console.md.)
       const btn = w.get('button[type="submit"]').element as HTMLButtonElement
       expect(btn.disabled).toBe(true)
-      expect(w.get('button[type="submit"]').text()).toBe('Sending...')
+      expect(w.get('button[type="submit"]').text()).toBe('Надсилання...')
 
       resolveFetch(okResponse(true))
       await submit
@@ -121,7 +124,7 @@ describe('ContactsSection.vue', () => {
       // Settled: button re-enabled and back to the idle label.
       const btnAfter = w.get('button[type="submit"]').element as HTMLButtonElement
       expect(btnAfter.disabled).toBe(false)
-      expect(w.get('button[type="submit"]').text()).toBe('Send Message')
+      expect(w.get('button[type="submit"]').text()).toBe('Надіслати')
     })
 
     it('posts the filled fields and access key to the Web3Forms endpoint', async () => {
@@ -174,7 +177,7 @@ describe('ContactsSection.vue', () => {
 
       expect(w.find('.form-message-success').exists()).toBe(true)
       expect(w.find('.form-message-error').exists()).toBe(false)
-      expect(w.get('.form-message-success').text()).toContain('successfully')
+      expect(w.get('.form-message-success').text()).toContain('успішно надіслано')
     })
 
     it('clears the form fields after a successful submit', async () => {
@@ -219,7 +222,7 @@ describe('ContactsSection.vue', () => {
 
       expect(w.find('.form-message-error').exists()).toBe(true)
       expect(w.find('.form-message-success').exists()).toBe(false)
-      expect(w.get('.form-message-error').text()).toContain('Something went wrong')
+      expect(w.get('.form-message-error').text()).toContain('Щось пішло не так')
     })
 
     it('does NOT clear the form fields when the submit fails', async () => {

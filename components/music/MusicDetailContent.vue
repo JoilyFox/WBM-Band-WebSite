@@ -340,12 +340,14 @@
              via the pill's responsive label. -->
         <MusicHeroPill
           v-if="lyricsAvailable"
+          :as="lyricsMorphHref ? 'a' : 'button'"
+          :href="lyricsMorphHref || undefined"
           :aria-label="showLyrics ? lyricsBackLabel : t('music.a11y.show_lyrics')"
           :class="[
             'lyrics-morph-pill',
             bothActions ? 'flex-1 justify-center' : 'lyrics-morph-pill--solo ml-auto'
           ]"
-          @click="toggleLyrics"
+          @click="onLyricsPillClick"
         >
           <!-- Morphing content: the SAME pill is the Lyrics trigger (links view)
                and the "Back to Music" control (lyrics view). Both faces are
@@ -682,6 +684,32 @@
       syncLyricsUrl('links', 'replace')
       emit('view-change', 'links')
     }
+  }
+
+  // The morph pill renders as a NATIVE <a> on the real listen/lyrics pages (the
+  // same pages that opt into URL syncing), so Google finally has a crawlable
+  // path to /lyrics/<slug> — before this the lyrics pages had no inbound
+  // internal link anywhere and were sitemap-only. It stays a <button> in the
+  // modal / pre-save / source-prefix variants, which have no stable URL to point
+  // at. The href is the CANONICAL form for the locale — the clean non-prefixed
+  // path for UA, /en/... for EN — never `route.path`, which on a prerendered
+  // page is the /ua/... duplicate. See docs/search-console.md.
+  const lyricsMorphHref = computed(() => {
+    if (!props.lyricsUrlSync) return ''
+    const prefix = locale.value === 'en' ? '/en' : ''
+    const section = showLyrics.value ? 'listen' : 'lyrics'
+    return `${prefix}/${section}/${props.release.slug}`
+  })
+
+  // A plain left click keeps the in-place cross-slide morph (no navigation, no
+  // remount — that animation is the whole point of the History-API sync below).
+  // Modified clicks (cmd/ctrl/shift/middle) are left alone so the browser can
+  // open the real URL in a new tab.
+  const onLyricsPillClick = (event: MouseEvent) => {
+    const modified = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
+    if (lyricsMorphHref.value && modified) return
+    event.preventDefault()
+    toggleLyrics()
   }
 
   // The morphing hero pill is the single open/close control (the in-pane back

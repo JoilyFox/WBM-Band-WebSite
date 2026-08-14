@@ -1,5 +1,5 @@
 // @vitest-environment nuxt
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
 import { nextTick } from 'vue'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import TeamMemberCard from '~/components/team/TeamMemberCard.vue'
@@ -9,6 +9,7 @@ import {
   TRANSITION_DURATION_MS,
   AUTO_ROTATION_INTERVAL_MS
 } from '~/constants/teamConfig'
+import { setTestLocale } from './helpers/i18n'
 
 // TeamMemberCard renders a square portrait with a hover/role overlay. It is a
 // role="button" tabindex="0" element so it must be operable by keyboard: Enter
@@ -67,6 +68,15 @@ const stubMatchMedia = (isMobile: boolean) => {
   })) as unknown as typeof window.matchMedia
 }
 
+// This file asserts the ENGLISH copy, so it states the locale explicitly and
+// loads that bundle ONCE, before any test installs fake timers. It used to
+// inherit English by accident via browser-language detection — the same
+// mechanism that made Googlebot render the English home at `/`, now switched
+// off (docs/search-console.md). The app's real default locale is 'ua'.
+beforeAll(async () => {
+  await setTestLocale('en')
+})
+
 describe('TeamMemberCard.vue', () => {
   beforeEach(() => {
     // Desktop by default; mobile-specific tests override this before mounting.
@@ -79,7 +89,7 @@ describe('TeamMemberCard.vue', () => {
   })
 
   describe('rendering', () => {
-    it('renders the localized name and role (English default locale)', async () => {
+    it('renders the localized name and role (locale pinned to en)', async () => {
       const w = await mountCard()
       expect(w.get('.member-name').text()).toBe('Bohdan')
       expect(w.get('.member-role').text()).toBe('Solo Guitarist')
