@@ -70,7 +70,7 @@ Keep this open while you fill in each platform.
 | Манія       | Mania        | 2025-11-14 | album `0pjAORRhgVsS7eP4R6JbMF` | album `1849021879` |
 | Чорні Птахи | Chorni Ptahy | 2026-02-06 | track `2hujOwcGE21eCQHMz61y75` | song `1868500237`  |
 | Аліна       | Alina        | 2026-06-12 | track `13UFLpXjAoVNW3IKCW6Hzf` | album `6774072720` |
-| Хвилі       | Khvyli       | 2026-08-21 | _(after release)_              | _(after release)_  |
+| Хвилі       | Khvyli       | 2026-08-21 | track `1xR3GJBaTDBEjbPfP1GZKA` | album `6798661748` |
 
 ---
 

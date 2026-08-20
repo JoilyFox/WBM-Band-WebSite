@@ -144,16 +144,22 @@ export const musicLibrary: MusicRelease[] = [
     type: 'single',
     releaseDate: '2026-08-20T21:00:00Z', // Midnight Kyiv time (EEST/UTC+3) → 00:00 on 2026-08-21
     imageUrl: '/images/optimized/albums-images/khvyli/cover.avif',
-    // No `blurredImageUrl` on purpose: the artwork is already public, so the
-    // upcoming-release card shows it sharp. `enablePreSave` is on and this
-    // release has a distributor pre-save URL, so the card renders in pre-save
-    // mode, which uses `imageUrl` directly (never the blurred variant).
+    // No `blurredImageUrl` on purpose: the artwork was already public before the
+    // drop, so the card always showed it sharp — first in pre-save mode, now in
+    // released mode. Both use `imageUrl` directly (never the blurred variant).
     descriptionKey: 'releases.khvyli.description',
     genre: ['Alternative rock', 'Art rock'],
     featured: true,
     // Auto-extracted palette (deep water blue #165fc0 / dusk violet / mauve) is
     // vibrant and on-cover — no `theme` override needed.
-    musicPlatformLinks: {},
+    musicPlatformLinks: {
+      spotify: 'https://open.spotify.com/track/1xR3GJBaTDBEjbPfP1GZKA?si=f6099a20ebe84d04',
+      appleMusic:
+        'https://music.apple.com/ua/album/%D1%85%D0%B2%D0%B8%D0%BB%D1%96/6798661748?i=6798661787',
+      youtubeMusic:
+        'https://music.youtube.com/playlist?list=OLAK5uy_ngUYnTMnsohOXKCGixPVj7HWBy7BhGw9M&si=MCB2mOqeXizHV7gj',
+      deezer: 'https://www.deezer.com/track/4207536592'
+    },
     useDistributorPreSave: true,
     distributorPreSaveUrl: 'https://kontrabass.lnk.to/khvyli',
     // Linkfire handles the actual save off-site, so skip the synthetic
