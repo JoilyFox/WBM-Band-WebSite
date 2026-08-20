@@ -1,4 +1,5 @@
 import { getOrPersistSourcePlatform, type SourcePlatform } from '~/utils/sourceAttribution'
+import { getOrPersistCampaign, NO_CAMPAIGN } from '~/utils/campaignAttribution'
 import { isLikelyBot } from '~/utils/isLikelyBot'
 
 export type MasterPageType = 'listen' | 'pre-save'
@@ -61,6 +62,16 @@ export function useAnalytics() {
   }
 
   /**
+   * Promo-campaign id from `?c=…` (first-touch, session-persisted), or
+   * `'none'`. Orthogonal to the source platform: the platform says WHERE the
+   * visitor came from, the campaign says WHICH placement on it.
+   */
+  function getCampaignId(): string {
+    if (typeof window === 'undefined') return NO_CAMPAIGN
+    return getOrPersistCampaign()
+  }
+
+  /**
    * Fire a GA4 event and resolve once gtag confirms it was dispatched (via
    * `event_callback`) or a safety timeout elapses. Callers that navigate away
    * immediately afterwards (the pre-save distributor redirect) MUST await this,
@@ -91,17 +102,20 @@ export function useAnalytics() {
   function trackReleaseView({ releaseSlug, pageType }: ReleaseViewParams): Promise<void> {
     if (typeof window === 'undefined') return Promise.resolve()
     const source = getSourcePlatform()
-    // Dedup per session AND per source: the same release opened from two bio
-    // links (e.g. /listen/i/<slug> then /listen/tt/<slug>) is two distinct
-    // source views and must both be counted. Keying on pageType:slug alone
-    // would silently drop the second source.
-    const key = `${pageType}:${releaseSlug}:${source}`
+    const campaign = getCampaignId()
+    // Dedup per session AND per source AND per campaign: the same release
+    // opened from two bio links (e.g. /listen/i/<slug> then /listen/tt/<slug>)
+    // — or from two different campaign links on the same platform — is two
+    // distinct views and both must count. Keying on pageType:slug alone would
+    // silently drop the second one.
+    const key = `${pageType}:${releaseSlug}:${source}:${campaign}`
     if (getSeenViews().includes(key)) return Promise.resolve()
     markViewSeen(key)
     return sendEvent('release_view', {
       release_slug: releaseSlug,
       page_type: pageType,
-      source_platform: source
+      source_platform: source,
+      campaign_id: campaign
     })
   }
 
@@ -116,12 +130,14 @@ export function useAnalytics() {
       platform_name: platformName,
       release_slug: releaseSlug,
       page_type: pageType,
-      source_platform: getSourcePlatform()
+      source_platform: getSourcePlatform(),
+      campaign_id: getCampaignId()
     })
   }
 
   return {
     getSourcePlatform,
+    getCampaignId,
     trackReleaseView,
     trackPlatformClick
   }

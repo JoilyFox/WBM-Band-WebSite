@@ -13,6 +13,8 @@
     "generate-blurred": "node scripts/generate-blurred-image.js",
     "extract-colors": "node scripts/extract-cover-colors.js",
     "generate-favicons": "node scripts/generate-favicons.js",
+    "campaigns": "node scripts/campaigns.mjs",
+    "campaigns:export": "node scripts/campaigns.mjs export",
     "analyze": "nuxt build --analyze",
     "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html",
     "test:perf": "node scripts/perf/lighthouse-check.mjs",

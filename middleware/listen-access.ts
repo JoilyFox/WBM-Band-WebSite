@@ -28,7 +28,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (enablePreSave && hasPreSaveLinks) {
     const localePath = useLocalePath()
     const target = sourcePrefix ? `/pre-save/${sourcePrefix}/${slug}` : `/pre-save/${slug}`
-    return navigateTo(localePath(target), { redirectCode: 302 })
+    // Carry the query across: it holds the promo-campaign id (`?c=…`), which
+    // would otherwise be dropped by the redirect.
+    return navigateTo({ path: localePath(target), query: to.query ?? {} }, { redirectCode: 302 })
   }
 
   const i18nLocale = useNuxtApp()?.$i18n?.locale?.value

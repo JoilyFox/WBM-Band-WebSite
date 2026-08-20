@@ -1,8 +1,9 @@
 import { getOrPersistSourcePlatform } from '~/utils/sourceAttribution'
+import { getOrPersistCampaign } from '~/utils/campaignAttribution'
 
 /**
- * Lock in first-touch source attribution as soon as the app boots and make it
- * ride every subsequent GA4 event.
+ * Lock in first-touch source + promo-campaign attribution as soon as the app
+ * boots and make both ride every subsequent GA4 event.
  *
  * Carriers (both set, on purpose):
  *   1. gtag('set', { source_platform })           → a DEFAULT EVENT PARAMETER
@@ -34,12 +35,19 @@ const PRODUCTION_HOSTS = ['wbmband.com', 'www.wbmband.com']
 export default defineNuxtPlugin((nuxtApp) => {
   const { gtag } = useGtag()
 
+  // Read the campaign id from the LANDING url, in the plugin body — route
+  // middleware (pre-save → listen, unknown-prefix → clean url) runs later and
+  // may replace the url; by then `?c=…` could be gone. Persisting it here means
+  // the redirect target still reports the campaign. Everything else can wait
+  // for app:mounted, where gtag is live.
+  const campaign = getOrPersistCampaign()
+
   nuxtApp.hook('app:mounted', () => {
     if (!PRODUCTION_HOSTS.includes(window.location.hostname)) {
       gtag('set', { traffic_type: 'internal' })
     }
     const source = getOrPersistSourcePlatform()
-    gtag('set', { source_platform: source })
-    gtag('set', 'user_properties', { source_platform: source })
+    gtag('set', { source_platform: source, campaign_id: campaign })
+    gtag('set', 'user_properties', { source_platform: source, campaign_id: campaign })
   })
 })

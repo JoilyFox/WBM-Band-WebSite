@@ -100,7 +100,7 @@ Feature work starts with the task-oriented **skills** in [`.claude/skills/`](.cl
 | `add-release`             | release in `musicLibrary.ts`, preview/pre-save/released state, cover theming, lyrics                                                     |
 | `work-with-images`        | AVIF/WebP/JPEG pipeline, `<UiProgressiveImage>`, blur placeholders, favicons                                                             |
 | `add-page-route`          | new page/route, i18n (ua/en) parity, prerender list, `useLocalePath`                                                                     |
-| `analytics-tracking`      | GA4 events, path-prefix source attribution (`useAnalytics`)                                                                              |
+| `analytics-tracking`      | GA4 events, path-prefix source attribution (`useAnalytics`), promo-campaign `?c=` links (`npm run campaigns`)                            |
 | `ui-feedback`             | global loading bar, snackbars, contextual `/404` error pages                                                                             |
 | `performance`             | device-tier perf system, `--perf-*` CSS vars, reduced-motion                                                                             |
 | `state-data-api`          | `useApi` + `ApiCache`, Pinia stores, `getConfig` config access                                                                           |

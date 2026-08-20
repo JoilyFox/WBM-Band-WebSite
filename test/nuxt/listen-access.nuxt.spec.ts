@@ -39,7 +39,8 @@ vi.mock('#i18n', () => ({ useLocalePath: () => localePath }))
 const mw = (await import('~/middleware/listen-access')).default
 
 // Convenience: the middleware only ever reads `to.params`.
-const route = (params: Record<string, unknown>) => ({ params }) as any
+const route = (params: Record<string, unknown>, query: Record<string, string> = {}) =>
+  ({ params, query }) as any
 
 const released = {
   id: '1',
@@ -154,29 +155,54 @@ describe('listen-access middleware — upcoming with pre-save → redirect', () 
   it('redirects to the localized /pre-save/<slug> with redirectCode 302 (no source prefix)', async () => {
     await mw(route({ slug: 'future' }), {} as any)
     expect(navigateTo).toHaveBeenCalledTimes(1)
-    expect(navigateTo).toHaveBeenCalledWith('/en/pre-save/future', { redirectCode: 302 })
+    expect(navigateTo).toHaveBeenCalledWith(
+      { path: '/en/pre-save/future', query: {} },
+      { redirectCode: 302 }
+    )
   })
 
   it('includes a valid source prefix in the pre-save target', async () => {
     await mw(route({ slug: 'future', source: 'i' }), {} as any)
-    expect(navigateTo).toHaveBeenCalledWith('/en/pre-save/i/future', { redirectCode: 302 })
+    expect(navigateTo).toHaveBeenCalledWith(
+      { path: '/en/pre-save/i/future', query: {} },
+      { redirectCode: 302 }
+    )
   })
 
   it('uses the first element when source is an array', async () => {
     await mw(route({ slug: 'future', source: ['tt', 'x'] }), {} as any)
-    expect(navigateTo).toHaveBeenCalledWith('/en/pre-save/tt/future', { redirectCode: 302 })
+    expect(navigateTo).toHaveBeenCalledWith(
+      { path: '/en/pre-save/tt/future', query: {} },
+      { redirectCode: 302 }
+    )
   })
 
   it('ignores an unrecognised source prefix (falls back to prefix-less target)', async () => {
     await mw(route({ slug: 'future', source: 'bogus' }), {} as any)
-    expect(navigateTo).toHaveBeenCalledWith('/en/pre-save/future', { redirectCode: 302 })
+    expect(navigateTo).toHaveBeenCalledWith(
+      { path: '/en/pre-save/future', query: {} },
+      { redirectCode: 302 }
+    )
   })
 
   it('passes the target through useLocalePath before navigating', async () => {
     localePath.mockImplementation((p: string) => `/ua${p}`)
     await mw(route({ slug: 'future' }), {} as any)
     expect(localePath).toHaveBeenCalledWith('/pre-save/future')
-    expect(navigateTo).toHaveBeenCalledWith('/ua/pre-save/future', { redirectCode: 302 })
+    expect(navigateTo).toHaveBeenCalledWith(
+      { path: '/ua/pre-save/future', query: {} },
+      { redirectCode: 302 }
+    )
+  })
+
+  it('carries the promo-campaign query across the redirect', async () => {
+    // Without this the `?c=` id is lost on the listen → pre-save bounce and the
+    // whole visit reports as untagged.
+    await mw(route({ slug: 'future', source: 'i' }, { c: 'khvyli-promo-0821' }), {} as any)
+    expect(navigateTo).toHaveBeenCalledWith(
+      { path: '/en/pre-save/i/future', query: { c: 'khvyli-promo-0821' } },
+      { redirectCode: 302 }
+    )
   })
 
   it('reads the enablePreSave flag from config with a false fallback', async () => {

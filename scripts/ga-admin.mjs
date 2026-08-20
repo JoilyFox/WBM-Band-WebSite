@@ -37,6 +37,9 @@ const DESIRED_DIMENSIONS = [
   { parameterName: 'release_slug', displayName: 'Release Slug', scope: 'EVENT' },
   { parameterName: 'page_type', displayName: 'Page Type', scope: 'EVENT' },
   { parameterName: 'platform_name', displayName: 'Platform Name', scope: 'EVENT' },
+  // Promo campaign: which paid/barter placement the visit came from ('none' when
+  // untagged). Registry of ids + costs: data/campaigns.json.
+  { parameterName: 'campaign_id', displayName: 'Promo Campaign', scope: 'EVENT' },
   // Optional user-scoped twin (only created with --apply). Comment out if unwanted.
   { parameterName: 'source_platform', displayName: 'Source Platform User', scope: 'USER' }
 ]

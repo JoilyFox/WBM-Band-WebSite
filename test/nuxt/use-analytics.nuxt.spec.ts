@@ -108,7 +108,7 @@ describe('useAnalytics()', () => {
       const raw = window.sessionStorage.getItem(DEDUP_KEY)
       expect(raw).toBeTruthy()
       // Dedup key is pageType:slug:source (source mock defaults to 'instagram').
-      expect(JSON.parse(raw as string)).toEqual(['listen:mania:instagram'])
+      expect(JSON.parse(raw as string)).toEqual(['listen:mania:instagram:none'])
     })
 
     it('treats a different pageType for the same slug as a distinct view', () => {
@@ -119,8 +119,8 @@ describe('useAnalytics()', () => {
 
       expect(gtag).toHaveBeenCalledTimes(2)
       expect(JSON.parse(window.sessionStorage.getItem(DEDUP_KEY) as string)).toEqual([
-        'listen:mania:instagram',
-        'pre-save:mania:instagram'
+        'listen:mania:instagram:none',
+        'pre-save:mania:instagram:none'
       ])
     })
 
@@ -147,8 +147,8 @@ describe('useAnalytics()', () => {
 
       expect(gtag).toHaveBeenCalledTimes(2)
       expect(JSON.parse(window.sessionStorage.getItem(DEDUP_KEY) as string)).toEqual([
-        'listen:mania:instagram',
-        'listen:mania:tiktok'
+        'listen:mania:instagram:none',
+        'listen:mania:tiktok:none'
       ])
     })
 
@@ -165,7 +165,7 @@ describe('useAnalytics()', () => {
     })
 
     it('survives a pre-seeded dedup list and only fires for unseen keys', () => {
-      window.sessionStorage.setItem(DEDUP_KEY, JSON.stringify(['listen:mania:instagram']))
+      window.sessionStorage.setItem(DEDUP_KEY, JSON.stringify(['listen:mania:instagram:none']))
       const { trackReleaseView } = useAnalytics()
 
       trackReleaseView({ releaseSlug: 'mania', pageType: 'listen' })

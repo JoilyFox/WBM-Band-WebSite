@@ -35,7 +35,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (!isUpcomingRelease(release.releaseDate)) {
     const localePath = useLocalePath()
     const target = sourcePrefix ? `/listen/${sourcePrefix}/${slug}` : `/listen/${slug}`
-    return navigateTo(localePath(target), { redirectCode: 302 })
+    // Carry the query across: it holds the promo-campaign id (`?c=…`), which
+    // would otherwise be dropped by the redirect.
+    return navigateTo({ path: localePath(target), query: to.query ?? {} }, { redirectCode: 302 })
   }
 
   const hasPreSaveLinks = Boolean(

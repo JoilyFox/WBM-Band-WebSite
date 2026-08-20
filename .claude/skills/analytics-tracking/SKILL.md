@@ -1,6 +1,6 @@
 ---
 name: analytics-tracking
-description: 'Use when adding/changing GA4 events (release_view, platform_click), conversion tracking, custom dimensions, source attribution, or consent — touching useAnalytics, sourceAttribution, isLikelyBot, SOURCE_PREFIXES, /listen|/pre-save prefixed routes, plugins/analytics.client.ts, or cookie-consent gtag — OR when a GA4 report looks wrong/empty.'
+description: 'Use when adding/changing GA4 events (release_view, platform_click), conversion tracking, custom dimensions, source attribution, promo-campaign links (?c=, data/campaigns.json), or consent — touching useAnalytics, sourceAttribution, isLikelyBot, SOURCE_PREFIXES, /listen|/pre-save prefixed routes, plugins/analytics.client.ts, or cookie-consent gtag — OR when a GA4 report looks wrong/empty.'
 ---
 
 ## When to use
@@ -34,15 +34,21 @@ every event use `gtag('set', {param})`, not just `user_properties`.
 3. New conversion-style event: gate with `isLikelyBot()` like `trackPlatformClick`. If it's a **click-then-same-tab-
    navigate** (distributor pre-save), real beacon transport matters — `transport_type` as an event _param_ does NOT
    switch transport; verify delivery in DebugView (step 8 of the runbook).
-4. Always attach `source_platform: getSourcePlatform()`. First-touch source lives in `sessionStorage`
-   (`wbm_source_platform`). Dedup keys for views MUST include source (`pageType:slug:source`).
+4. Always attach `source_platform: getSourcePlatform()` **and** `campaign_id: getCampaignId()`. First-touch source
+   lives in `sessionStorage` (`wbm_source_platform`), the promo campaign in `wbm_campaign_id`. Dedup keys for views
+   MUST include both (`pageType:slug:source:campaign`).
 5. Adding a source channel: add the prefix to `SOURCE_PREFIXES` (and referrer/UA maps) in `utils/sourceAttribution.ts`
    — the route generator and detector share that one constant. Prefix-aware pages call `setExplicitSourcePlatform()`
    in `useMasterPage()` setup.
-6. New release slug must NOT collide with a prefix key (`i`, `tt`, `qr`, `em`, …); `assertNoSlugCollisions()` guards.
-7. New event param → register it as an Event-scoped custom dimension in GA4 Admin **with the matching carrier**
+6. Promo campaign for a paid/barter placement: never hand-edit `data/campaigns.json` — run
+   `npm run campaigns -- add --release <slug> --media "<outlet>" --channel i --cost <n>`, which validates, generates
+   the id and prints the `?c=<id>` URL. Read results with `node scripts/ga-report.mjs --campaigns`. Full procedure:
+   `docs/analytics-campaigns.md`.
+7. New release slug must NOT collide with a prefix key (`i`, `tt`, `qr`, `em`, …); `assertNoSlugCollisions()` guards.
+8. New event param → register it as an Event-scoped custom dimension in GA4 Admin **with the matching carrier**
    (event param ⇒ Event scope). Then **validate in GA** (runbook below) — don't assume it works.
-8. After code changes: `npx vitest run test/nuxt/use-analytics.nuxt.spec.ts test/unit/source-attribution*.spec.ts`,
+9. After code changes: `npx vitest run test/nuxt/use-analytics.nuxt.spec.ts test/unit/source-attribution*.spec.ts
+test/unit/campaign-attribution.spec.ts`,
    lint, then `npm run generate` (emits `.output/bio-links.md`).
 
 ## Validate in GA before claiming it works (the never-skip step)
@@ -56,9 +62,11 @@ Custom definitions. Build the attribution Exploration (filter `^(release_view|pl
 ## Key files
 
 - `composables/useAnalytics.ts` — sole GA4 surface: `{ getSourcePlatform, trackReleaseView, trackPlatformClick }`.
-  View dedup key = `pageType:slug:source` (sessionStorage `wbm_release_views_seen`).
+  View dedup key = `pageType:slug:source:campaign` (sessionStorage `wbm_release_views_seen`).
 - `utils/sourceAttribution.ts` — `SOURCE_PREFIXES`, `SourcePlatform`, `detect*`, `getOrPersistSourcePlatform`,
   `setExplicitSourcePlatform`, `resetSourcePlatform`, `assertNoSlugCollisions`.
+- `utils/campaignAttribution.ts` — `?c=` / `utm_campaign` → normalized `campaign_id`, first-touch in sessionStorage
+  (`wbm_campaign_id`); `'none'` when untagged. Registry of ids/costs: `data/campaigns.json` via `scripts/campaigns.mjs`.
 - `utils/isLikelyBot.ts` — suppresses conversion events from synthetic/crawler traffic.
 - `composables/useMasterPage.ts` — locks source in setup; shared master-page SEO/render.
 - `plugins/analytics.client.ts` — `app:mounted`: sets `source_platform` as **both** a default event param
@@ -82,7 +90,9 @@ Custom definitions. Build the attribution Exploration (filter `^(release_view|pl
   modeled data never shows in Explorations.
 - `transport_type` passed as an event _parameter_ does NOT enable `sendBeacon`; it lands as `ep.transport_type` noise.
   Click-then-external-navigate conversions (distributor pre-save) can be lost on unload — verify in DebugView.
-- `trackReleaseView` dedups per session via `sessionStorage`, key `pageType:slug:source` — re-mounts won't
+- The listen↔pre-save middlewares redirect with `{ path, query: to.query }` — dropping the query would lose `?c=` on
+  release day. Keep any new redirect query-preserving.
+- `trackReleaseView` dedups per session via `sessionStorage`, key `pageType:slug:source:campaign` — re-mounts won't
   double-count, but a different source DOES re-fire (multi-bio-link same release).
 - Path-prefix ALWAYS overrides stored source (a fresh bio-link click resets mid-session); referrer/UA only set
   first-touch. A non-empty unmatched referrer yields `'other'`; empty everything yields `'direct'` — not bugs.
@@ -94,6 +104,7 @@ Custom definitions. Build the attribution Exploration (filter `^(release_view|pl
 
 ## Related
 
+- Promo campaigns: `docs/analytics-campaigns.md` (link scheme, `npm run campaigns`, cost-per-click, Looker page).
 - Deep dive: `docs/analytics-debugging.md` (mental model, consent reality, validation runbook, Admin-API/MCP access,
   root-cause table) · `docs/analytics-implementation-tasks.md` (build plan + GA4 admin steps).
 - Review agent: `analytics-reviewer`. Sibling agents: `i18n-checker`, `release-coordinator`.

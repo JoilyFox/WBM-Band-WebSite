@@ -3,7 +3,8 @@
 > Three ways to see per-song / per-source numbers: a zero-UI **CLI report**, additions to your existing **GA4
 > Explorations**, and a **Looker Studio master dashboard** (the recommended "one page for everything" with a dynamic
 > song picker). Property = **WBM Website `523582426` (`G-Z8QRF6TWC2`)**. Background + why reports go empty:
-> [`analytics-debugging.md`](analytics-debugging.md).
+> [`analytics-debugging.md`](analytics-debugging.md). Per-placement (paid/barter) numbers live in
+> [`analytics-campaigns.md`](analytics-campaigns.md) — same dashboard, its own page.
 
 > **Reading the numbers:** `release_view` is deduped per session+source (one visit = one view); `platform_click` is
 > NOT deduped (a visitor can click several platforms). So "conv%" = clicks ÷ views can exceed 100% — treat it as

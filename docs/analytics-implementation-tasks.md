@@ -175,6 +175,30 @@ Approach: tiny ~320×140px card in the bottom-left corner. Three buttons: Accept
 
 ---
 
+## Phase 9 — Promo campaigns (per-placement tracking, 2026-08-18)
+
+Goal: hand a media outlet one link and later answer "was that placement worth the money". Design + procedure:
+[`analytics-campaigns.md`](analytics-campaigns.md).
+
+- [x] **9.1** — `utils/campaignAttribution.ts`: `?c=<id>` (alias `utm_campaign`) → normalized `campaign_id`,
+      first-touch persisted in `sessionStorage` (`wbm_campaign_id`), `'none'` when untagged. Query param rather than a
+      path segment because campaigns are ad hoc and a path segment would need a prerendered route per campaign.
+- [x] **9.2** — `useAnalytics` attaches `campaign_id` to `release_view` + `platform_click`; view dedup key is now
+      `pageType:slug:source:campaign`. Plugin captures the id in its body (before route middleware can redirect the
+      query away) and sets it as a default event param + user property.
+- [x] **9.3** — `middleware/listen-access.ts` + `presave-access.ts` redirect with the query preserved, so the
+      release-day pre-save → listen bounce no longer drops `?c=`.
+- [x] **9.4** — Registry `data/campaigns.json` (outlet, release, channel, medium, cost, dates, notes) + generator
+      `scripts/campaigns.mjs` (`add` / `list` / `links` / `export`), exposed as `npm run campaigns`.
+- [x] **9.5** — `scripts/ga-report.mjs --campaigns` / `--campaign <id>`: views, clicks, conv%, cost per click, joined
+      with the registry. Untagged (`none`) excluded as baseline.
+- [ ] **9.6** — Register the `campaign_id` Event-scoped dimension: `node scripts/ga-admin.mjs --apply` (it's already in
+      `DESIRED_DIMENSIONS`). Forward-only + 24–48 h latency ⇒ do it BEFORE the first campaign goes live.
+- [ ] **9.7** — Add the "Промокампанії" page to the Looker Studio report (steps: `analytics-campaigns.md` §5).
+      Optional cost/ROI blend via `npm run campaigns:export` → Google Sheets.
+
+---
+
 ## Resolved decisions (session 1, 2026-05-02)
 
 - ✅ GA4 measurement ID: `G-Z8QRF6TWC2` (was wrongly `G-T4G4XTP2QZ` in code).

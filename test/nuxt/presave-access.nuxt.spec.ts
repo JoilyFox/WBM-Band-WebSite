@@ -175,7 +175,10 @@ describe('presave-access middleware', () => {
       expect(isUpcomingRelease).toHaveBeenCalledWith('2020-01-01')
       expect(localePath).toHaveBeenCalledWith('/listen/mania')
       expect(navigateTo).toHaveBeenCalledTimes(1)
-      expect(navigateTo).toHaveBeenCalledWith('/listen/mania', { redirectCode: 302 })
+      expect(navigateTo).toHaveBeenCalledWith(
+        { path: '/listen/mania', query: {} },
+        { redirectCode: 302 }
+      )
     })
 
     it('includes a valid source prefix in the listen target', async () => {
@@ -184,7 +187,10 @@ describe('presave-access middleware', () => {
       // 'i' is a real SOURCE_PREFIXES key (instagram) — left unmocked
       await mw({ params: { slug: 'mania', source: 'i' } } as any, {} as any)
       expect(localePath).toHaveBeenCalledWith('/listen/i/mania')
-      expect(navigateTo).toHaveBeenCalledWith('/listen/i/mania', { redirectCode: 302 })
+      expect(navigateTo).toHaveBeenCalledWith(
+        { path: '/listen/i/mania', query: {} },
+        { redirectCode: 302 }
+      )
     })
 
     it('ignores an unrecognized source prefix and omits it from the target', async () => {
@@ -192,7 +198,10 @@ describe('presave-access middleware', () => {
       isUpcomingRelease.mockReturnValue(false)
       await mw({ params: { slug: 'mania', source: 'bogus' } } as any, {} as any)
       expect(localePath).toHaveBeenCalledWith('/listen/mania')
-      expect(navigateTo).toHaveBeenCalledWith('/listen/mania', { redirectCode: 302 })
+      expect(navigateTo).toHaveBeenCalledWith(
+        { path: '/listen/mania', query: {} },
+        { redirectCode: 302 }
+      )
     })
 
     it('uses the first element when source is an array', async () => {
@@ -207,7 +216,25 @@ describe('presave-access middleware', () => {
       isUpcomingRelease.mockReturnValue(false)
       localePath.mockImplementation((p: string) => `/en${p}`)
       await mw({ params: { slug: 'mania' } } as any, {} as any)
-      expect(navigateTo).toHaveBeenCalledWith('/en/listen/mania', { redirectCode: 302 })
+      expect(navigateTo).toHaveBeenCalledWith(
+        { path: '/en/listen/mania', query: {} },
+        { redirectCode: 302 }
+      )
+    })
+
+    it('carries the promo-campaign query across the redirect', async () => {
+      // Without this the `?c=` id is lost on the pre-save → listen bounce that
+      // happens on release day, and the whole visit reports as untagged.
+      getReleaseBySlug.mockReturnValue(makeRelease())
+      isUpcomingRelease.mockReturnValue(false)
+      await mw(
+        { params: { slug: 'mania', source: 'i' }, query: { c: 'mania-promo-0821' } } as any,
+        {} as any
+      )
+      expect(navigateTo).toHaveBeenCalledWith(
+        { path: '/listen/i/mania', query: { c: 'mania-promo-0821' } },
+        { redirectCode: 302 }
+      )
     })
   })
 
