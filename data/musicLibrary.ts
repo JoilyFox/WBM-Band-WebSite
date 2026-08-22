@@ -158,7 +158,8 @@ export const musicLibrary: MusicRelease[] = [
         'https://music.apple.com/ua/album/%D1%85%D0%B2%D0%B8%D0%BB%D1%96/6798661748?i=6798661787',
       youtubeMusic:
         'https://music.youtube.com/playlist?list=OLAK5uy_ngUYnTMnsohOXKCGixPVj7HWBy7BhGw9M&si=MCB2mOqeXizHV7gj',
-      deezer: 'https://www.deezer.com/track/4207536592'
+      deezer: 'https://www.deezer.com/track/4207536592',
+      musicVideo: 'https://www.youtube.com/watch?v=O16BONZgf6E'
     },
     useDistributorPreSave: true,
     distributorPreSaveUrl: 'https://kontrabass.lnk.to/khvyli',
