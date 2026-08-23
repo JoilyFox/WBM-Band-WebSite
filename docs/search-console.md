@@ -22,6 +22,47 @@ Fixing these two is the whole game. Everything else in this document is second-o
 
 ---
 
+## 1b. Follow-up audit — 23 Aug 2026 (post-release, GSC data through 17/08)
+
+Triggered by three GSC alert emails (Aug 17 ×2, Aug 19). **The 14 Aug fixes worked**: indexed pages went
+**1 → 12**, clicks 4 → 15, and `sitemap.xml` is submitted and re-read (last read 21/08, 24 URLs, Success).
+Of the four "not indexed" reasons, two were stale reporting and two were real defects.
+
+| Reported reason                                       | Pages | Verdict                                                                                                                                                                                                                                                                                        |
+| ----------------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Duplicate, Google chose different canonical than user | 1     | `/en`. **Root cause real, report stale.** `/en` and `/en/` both answered `200` with identical bytes. URL Inspection on 23/08 already says _Page is indexed_ — the 15/08 validation failure predates the recrawl.                                                                               |
+| Excluded by 'noindex' tag                             | 2     | `/lyrics/chorni-ptahy`, `/en/listen/mania`. **Real, self-healed.** Both are canonical sitemap pages that were served as `noindex` around 15/08 — stale files left by the i18n restructure, cleared by the 21/08 deploy (75 orphans removed). Live pages are clean; validation restarted 23/08. |
+| Alternative page with proper canonical tag            | 1     | `/en/` — the slashed twin of the row above. Correct behaviour, and the 301 now removes the twin entirely.                                                                                                                                                                                      |
+| Discovered – currently not indexed                    | 7     | Never crawled (`Last crawl: N/A`). Normal for a low-authority site; requested indexing for the two that matter.                                                                                                                                                                                |
+
+### Defects found and fixed in the repo (deployed 23/08)
+
+1. **Every URL existed twice.** `DirectorySlash Off` plus the internal directory rewrites meant `/en` **and** `/en/`
+   both returned `200`. `public/.htaccess` now `301`s `/path/` → `/path`; the root is excluded because the pattern
+   requires a segment before the slash. Verified live: `/` = 200 with zero redirects, `/en/` → 301 → `/en`.
+2. **`og:url` published the retired `/ua/` prefix.** `useMasterPage.buildPageUrl()` still mapped the `ua` locale to a
+   `/ua/` segment, so every Ukrainian source-prefixed share page advertised `https://www.wbmband.com/ua/listen/i/<slug>`
+   — a URL that 301s. Those are exactly the links in the band's social bios, so scrapers were consolidating shares onto
+   a dead URL. Now unprefixed.
+3. **Prefixed English pages canonicalised across locales.** Both `[source]/[slug].vue` pages hardcoded
+   `${SITE_URL}/listen/${slug}` (the Ukrainian clean URL). They now use a locale-aware `canonicalUrl` from the
+   composable, so `/en/listen/i/<slug>` points at `/en/listen/<slug>`.
+
+The existing tests asserted the buggy `/ua/...` output as _expected_, so they encoded the defect instead of catching
+it. Updated, plus new guards: the retired prefix can't come back, and the slash rule can't swallow `/`.
+
+### Actions taken in the console (23/08)
+
+- Started validation for **Excluded by 'noindex' tag**.
+- Requested indexing: `/listen/khvyli` (content changed on release day), `/lyrics/khvyli`, `/listen/chorni-ptahy`.
+- Confirmed `/en` and `/listen/khvyli` are indexed; `/listen/khvyli` has a valid `BreadcrumbList`.
+- Sitemap needed no resubmission.
+
+**Re-check ~6 Sep 2026:** the noindex validation should pass, and the three requested URLs should leave
+"Discovered – currently not indexed".
+
+---
+
 ## 1a. Status — what shipped on 14 Aug 2026
 
 All repo fixes below are **implemented, built and verified locally** (44 test files / 1105 tests green, ESLint 0 errors, `npm run generate` clean). **Not yet deployed** — none of it reaches Google until `npm run deploy:production` runs.

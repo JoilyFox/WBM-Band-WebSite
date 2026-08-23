@@ -66,6 +66,8 @@ Work outside-in — most "we're not ranking" questions are actually indexing que
 - **The apex `wbmband.com`** now `301`s to `www` via `public/.htaccess` (Aug 2026). The URL-prefix property still cannot see the apex — add a Domain property to monitor both.
 - **`Search Appearance: No data` is expected.** Google publishes no rich result for music or lyrics schema; `BreadcrumbList` on `/lyrics/*` is the only earnable card. Do not report this as a defect.
 - **The Indexing API does not apply.** It supports only `JobPosting` and `BroadcastEvent`. Never suggest it as a way to push release pages into the index.
+- **Check the trailing-slash twin before blaming the canonical tag.** `DirectorySlash Off` + the directory rewrites in `.htaccess` once let `/en` AND `/en/` both answer `200` with identical bytes, so every URL existed twice. A `301` from the slashed form now collapses them (`test/unit/routing-contract.spec.ts` guards it, including that the rule can't swallow `/`). `curl -o /dev/null -w '%{http_code} %{redirect_url}'` on both forms is the 5-second check.
+- **The Page-indexing report lags by days.** "Last update" on the report is the data date, not today. Before treating a reason as live, URL-Inspect one of its example URLs — on 23/08 both flagged `/en` and the two `noindex` pages were already fine.
 - **`Duplicate, Google chose different canonical than user` is not a canonical-tag bug.** Google read the tag and overruled it. Change what the page renders, or add a redirect — redirects are the strongest canonical signal, `rel=canonical` is a hint, sitemap inclusion is weak.
 
 ## Post-release checklist
