@@ -140,6 +140,21 @@ describe('share-URL routing intent (.htaccess vs _redirects)', () => {
     }
   })
 
+  it('.htaccess 301s the trailing-slash twin of every URL onto the canonical form', () => {
+    if (!htaccessExists) {
+      expect(htaccessExists).toBe(false)
+      return
+    }
+    const htaccess = read('public', '.htaccess')
+    // DirectorySlash is Off and directories are served internally, so without
+    // this rule BOTH /en and /en/ answer 200 with the same bytes — every URL
+    // exists twice and Google picks its own canonical (it did, for /en).
+    expect(htaccess).toMatch(/RewriteRule\s+\^\(\.\+\)\/\$\s+\/\$1\s+\[R=301,L\]/)
+    // It must not swallow the root: `.+` guarantees a segment before the slash,
+    // so "/" is untouched. A `.*` here would 301 / onto itself forever.
+    expect(htaccess).not.toMatch(/RewriteRule\s+\^\(\.\*\)\/\$/)
+  })
+
   it('the build emits share URLs natively — no alias copy step survives', () => {
     // Ukrainian is the unprefixed default locale, so `/listen/<slug>` is a real
     // prerendered route. The alias script that used to fake it (copying

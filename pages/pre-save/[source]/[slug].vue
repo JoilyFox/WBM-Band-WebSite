@@ -13,7 +13,6 @@
   import { useMasterPage } from '~/composables/useMasterPage'
   import { useAnalytics } from '~/composables/useAnalytics'
   import { isUpcomingRelease } from '~/utils/configHelpers'
-  import { SITE_URL } from '~/constants/app'
   import { SOURCE_PREFIXES } from '~/utils/sourceAttribution'
 
   definePageMeta({
@@ -30,11 +29,12 @@
     await navigateTo(localePath(`/pre-save/${slug}`), { redirectCode: 302 })
   }
 
-  const { release, localizedTitle, localizedDescription, metaImageUrl } = useMasterPage({
-    slug,
-    pageType: 'pre-save',
-    sourcePrefix
-  })
+  const { release, localizedTitle, localizedDescription, metaImageUrl, canonicalUrl } =
+    useMasterPage({
+      slug,
+      pageType: 'pre-save',
+      sourcePrefix
+    })
 
   if (!isUpcomingRelease(release.releaseDate)) {
     const localePath = useLocalePath()
@@ -117,7 +117,7 @@
   })
 
   useHead({
-    link: [{ rel: 'canonical', href: `${SITE_URL}/pre-save/${slug}` }]
+    link: [{ rel: 'canonical', href: canonicalUrl }]
   })
 </script>
 

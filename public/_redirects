@@ -6,5 +6,8 @@
 # retired /ua prefix redirects, to the clean form.
 /ua/*  /:splat  301
 
+# No trailing-slash rule needed here: Netlify/Vercel normalise /path/ to /path
+# themselves. Apache does not, so public/.htaccess carries an explicit 301.
+
 # SPA fallback for client-side routing (the empty shell, not the home page).
 /*  /200.html  200

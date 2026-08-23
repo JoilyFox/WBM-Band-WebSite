@@ -115,8 +115,15 @@ describe('canonical/OG URL builders reference SITE_URL (single source)', () => {
 
   it('useMasterPage imports SITE_URL and builds page URLs from it', () => {
     expect(masterPageSrc).toMatch(/import \{ SITE_URL \} from '~\/constants\/app'/)
-    expect(masterPageSrc).toContain('${SITE_BASE_URL}/')
+    expect(masterPageSrc).toContain('${SITE_BASE_URL}${localeSegment}')
     expect(masterPageSrc).not.toContain('wbmband.com')
+  })
+
+  it('useMasterPage never emits the retired /ua locale prefix', () => {
+    // Ukrainian is the UNPREFIXED default locale. Emitting `/ua/...` published a
+    // URL that 301s as the og:url of every Ukrainian share link.
+    expect(masterPageSrc).not.toMatch(/locale === 'ua' \? 'ua'/)
+    expect(masterPageSrc).toMatch(/locale === 'en' \? '\/en' : ''/)
   })
 
   it('index page derives og:url from SITE_URL, not a literal host', () => {
@@ -130,12 +137,16 @@ describe('canonical/OG URL builders reference SITE_URL (single source)', () => {
     expect(codeLines).not.toContain("'https://wbmband.com")
   })
 
-  it('source-prefixed listen/pre-save pages build canonical hrefs from SITE_URL', () => {
+  it('source-prefixed listen/pre-save pages canonicalise via the composable', () => {
     for (const src of [listenSourcePage, presaveSourcePage]) {
-      expect(src).toMatch(/import \{ SITE_URL \} from '~\/constants\/app'/)
-      expect(src).toMatch(/rel: 'canonical'[\s\S]*\$\{SITE_URL\}/)
-      // canonical must be the clean (non-source-prefixed) URL.
-      expect(src).toMatch(/\$\{SITE_URL\}\/(listen|pre-save)\/\$\{slug\}/)
+      // These used to hardcode `${SITE_URL}/listen/${slug}`, which is the
+      // UKRAINIAN clean URL — so the English variants canonicalised across
+      // locales. canonicalUrl keeps the locale and drops only the prefix.
+      expect(src).toMatch(/rel: 'canonical', href: canonicalUrl/)
+      expect(src).toMatch(
+        /canonicalUrl \} =\s*\n?\s*useMasterPage\(|, canonicalUrl \} = useMasterPage\(/
+      )
+      expect(src).not.toMatch(/\$\{SITE_URL\}\/(listen|pre-save)\/\$\{slug\}/)
     }
   })
 })

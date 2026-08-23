@@ -9,7 +9,6 @@
   import { computed, onMounted } from 'vue'
   import { useMasterPage } from '~/composables/useMasterPage'
   import { useAnalytics } from '~/composables/useAnalytics'
-  import { SITE_URL } from '~/constants/app'
   import { SOURCE_PREFIXES, type SourcePrefix } from '~/utils/sourceAttribution'
 
   definePageMeta({
@@ -28,11 +27,12 @@
     await navigateTo(localePath(`/listen/${slug}`), { redirectCode: 302 })
   }
 
-  const { release, localizedTitle, localizedDescription, metaImageUrl, pageUrl } = useMasterPage({
-    slug,
-    pageType: 'listen',
-    sourcePrefix
-  })
+  const { release, localizedTitle, localizedDescription, metaImageUrl, pageUrl, canonicalUrl } =
+    useMasterPage({
+      slug,
+      pageType: 'listen',
+      sourcePrefix
+    })
 
   const pageTitle = computed(() => `${localizedTitle.value} | WBM Band`)
   const platformLabel = SOURCE_PREFIXES[sourcePrefix as SourcePrefix]
@@ -62,7 +62,7 @@
     link: [
       // Canonical points at the clean URL so search engines consolidate
       // ranking signals there instead of splitting them across prefixes.
-      { rel: 'canonical', href: `${SITE_URL}/listen/${slug}` }
+      { rel: 'canonical', href: canonicalUrl }
     ]
   })
 

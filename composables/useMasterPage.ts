@@ -25,6 +25,8 @@ export interface UseMasterPageReturn {
   localizedDescription: ReturnType<typeof computed<string>>
   metaImageUrl: ReturnType<typeof computed<string>>
   pageUrl: ReturnType<typeof computed<string>>
+  /** Clean prefix-less URL for this locale — use as `rel=canonical`. */
+  canonicalUrl: ReturnType<typeof computed<string>>
   resolvedSource: SourcePlatform | null
 }
 
@@ -37,15 +39,30 @@ function normalizeImageUrl(imageUrl: string): string {
   return normalized.startsWith('http') ? normalized : `${SITE_BASE_URL}${normalized}`
 }
 
+/**
+ * Absolute URL of the page as actually served. Ukrainian is the UNPREFIXED
+ * default locale (`prefix_except_default`), so only `en` carries a segment —
+ * emitting `/ua/...` here published the RETIRED prefix, which now 301s, as the
+ * `og:url` of every Ukrainian share link. See docs/search-console.md.
+ */
 function buildPageUrl(
   locale: string,
   pageType: MasterPageType,
   slug: string,
   sourcePrefix?: string
 ): string {
-  const localeSegment = locale === 'ua' ? 'ua' : locale
+  const localeSegment = locale === 'en' ? '/en' : ''
   const prefixSegment = sourcePrefix ? `/${sourcePrefix}` : ''
-  return `${SITE_BASE_URL}/${localeSegment}/${pageType}${prefixSegment}/${slug}`
+  return `${SITE_BASE_URL}${localeSegment}/${pageType}${prefixSegment}/${slug}`
+}
+
+/**
+ * The clean, prefix-less twin of this page — what a source-prefixed variant
+ * must declare as its canonical. Locale-aware: an English variant consolidates
+ * onto the English clean URL, never across locales onto the Ukrainian one.
+ */
+function buildCanonicalUrl(locale: string, pageType: MasterPageType, slug: string): string {
+  return buildPageUrl(locale, pageType, slug)
 }
 
 /**
@@ -99,6 +116,7 @@ export function useMasterPage(options: UseMasterPageOptions): UseMasterPageRetur
   const metaImageUrl = computed<string>(() => normalizeImageUrl(release.imageUrl))
 
   const pageUrl = computed<string>(() => buildPageUrl(locale.value, pageType, slug, sourcePrefix))
+  const canonicalUrl = computed<string>(() => buildCanonicalUrl(locale.value, pageType, slug))
 
   let resolvedSource: SourcePlatform | null = null
   if (
@@ -135,6 +153,7 @@ export function useMasterPage(options: UseMasterPageOptions): UseMasterPageRetur
     localizedDescription,
     metaImageUrl,
     pageUrl,
+    canonicalUrl,
     resolvedSource
   }
 }

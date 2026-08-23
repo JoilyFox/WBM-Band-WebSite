@@ -40,6 +40,7 @@ async function run(options: UseMasterPageOptions) {
     description: master.localizedDescription.value,
     metaImageUrl: master.metaImageUrl.value,
     pageUrl: master.pageUrl.value,
+    canonicalUrl: master.canonicalUrl.value,
     resolvedSource: master.resolvedSource
   }
 }
@@ -164,10 +165,29 @@ describe('useMasterPage', () => {
       expect(pageUrl).toBe(`${SITE_URL}/en/listen/mania`)
     })
 
-    it('builds a ua listen URL when the locale is ua', async () => {
+    it('builds an UNPREFIXED url when the locale is ua (ua is the default locale)', async () => {
+      // Regression: this used to emit `/ua/listen/<slug>`, the RETIRED prefix.
+      // It shipped as the og:url of every Ukrainian share link, so social
+      // scrapers consolidated shares onto a URL that now 301s away.
       await setLocale('ua')
       const { pageUrl } = await run({ slug: 'mania', pageType: 'listen' })
-      expect(pageUrl).toBe(`${SITE_URL}/ua/listen/mania`)
+      expect(pageUrl).toBe(`${SITE_URL}/listen/mania`)
+      expect(pageUrl).not.toContain('/ua/')
+    })
+
+    it('canonicalUrl drops the source prefix but KEEPS the locale', async () => {
+      // A prefixed English variant must consolidate onto the English clean URL,
+      // never across locales onto the Ukrainian one.
+      const { canonicalUrl } = await run({
+        slug: 'mania',
+        pageType: 'listen',
+        sourcePrefix: 'i'
+      })
+      expect(canonicalUrl).toBe(`${SITE_URL}/en/listen/mania`)
+
+      await setLocale('ua')
+      const ua = await run({ slug: 'mania', pageType: 'listen', sourcePrefix: 'i' })
+      expect(ua.canonicalUrl).toBe(`${SITE_URL}/listen/mania`)
     })
 
     it('uses the pre-save page-type segment for pre-save pages', async () => {
@@ -258,6 +278,7 @@ describe('useMasterPage', () => {
           'localizedDescription',
           'metaImageUrl',
           'pageUrl',
+          'canonicalUrl',
           'resolvedSource'
         ].sort()
       )
