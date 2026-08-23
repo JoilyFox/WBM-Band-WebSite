@@ -106,9 +106,15 @@ node scripts/ga-admin.mjs           # dry run: shows what's missing
 node scripts/ga-admin.mjs --apply   # creates the missing dimensions
 ```
 
+**Done — `campaign_id` was created as an Event-scoped dimension ("Promo Campaign") on 23 Aug 2026**, before any
+campaign existed. Nothing to do here unless the property is rebuilt.
+
 Then: **custom dimensions are forward-only (no backfill) and take 24–48 h to populate.** Register it _before_ the first
 campaign goes live, or that campaign's first day is unreadable in the UI. (`scripts/ga-report.mjs` queries the Data API
 and is affected by the same latency.)
+
+If `ga-admin.mjs` fails with `invalid_grant` or `insufficient authentication scopes`, the ADC needs re-authenticating
+with the Analytics scopes — recipe in [`analytics-debugging.md`](analytics-debugging.md) §5.
 
 ---
 

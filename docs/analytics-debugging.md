@@ -154,9 +154,21 @@ Used to (a) **verify** config + query data programmatically and via the MCP, and
 >
 > 1. A self-owned OAuth **Desktop** client was created in GCP project `wbm-social-publisher` (consent screen in
 >    _Testing_ mode, owner added as a test user) — needed because gcloud's built-in client is blocked from requesting
->    the (sensitive) Analytics scopes.
-> 2. `gcloud auth application-default login --client-id-file=<that client>.json --scopes=…/cloud-platform,…/analytics.readonly,…/analytics.edit`
+>    the (sensitive) Analytics scopes. It is named **"WBM GA Desktop"** in APIs & Services → Credentials, and the
+>    client file now lives at **`~/.config/gcloud/oauth-clients/wbm-ga-desktop.json`** (mode `600`, outside the repo).
+> 2. `gcloud auth application-default login --client-id-file=~/.config/gcloud/oauth-clients/wbm-ga-desktop.json --scopes=openid,…/userinfo.email,…/cloud-platform,…/analytics.readonly,…/analytics.edit`
 >    → ADC saved to `~/.config/gcloud/application_default_credentials.json`.
+>
+>    **The ADC expires** (`invalid_grant: Bad Request` from every GA call, including the `ga4` MCP) — just re-run that
+>    command. A plain `gcloud auth application-default login` **is not enough**: it succeeds but yields
+>    `PERMISSION_DENIED: Request had insufficient authentication scopes`, because gcloud's own client cannot ask for
+>    the Analytics scopes. Always pass `--client-id-file` **and** `--scopes`.
+>
+>    **Since ~Aug 2026 Google no longer lets you download an existing client's secret** ("Viewing and downloading
+>    client secrets is no longer available"). If the JSON is lost, open the client → **+ Add secret** → download the
+>    new one from its ⬇ icon (max two secrets per client; disable/delete the stale one once the new one works). The
+>    client ID itself is unchanged, so the consent screen and test users stay as they were.
+>
 > 3. The Node client libs and `scripts/ga-admin.mjs` auto-discover that ADC. Because they're **user** creds, set the
 >    quota project via env: **`GOOGLE_CLOUD_QUOTA_PROJECT=wbm-social-publisher`** (Cloud Resource Manager API is
 >    disabled in the project, so `set-quota-project` fails — the env var sidesteps it). Run:

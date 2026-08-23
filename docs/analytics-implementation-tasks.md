@@ -192,8 +192,8 @@ Goal: hand a media outlet one link and later answer "was that placement worth th
       `scripts/campaigns.mjs` (`add` / `list` / `links` / `export`), exposed as `npm run campaigns`.
 - [x] **9.5** — `scripts/ga-report.mjs --campaigns` / `--campaign <id>`: views, clicks, conv%, cost per click, joined
       with the registry. Untagged (`none`) excluded as baseline.
-- [ ] **9.6** — Register the `campaign_id` Event-scoped dimension: `node scripts/ga-admin.mjs --apply` (it's already in
-      `DESIRED_DIMENSIONS`). Forward-only + 24–48 h latency ⇒ do it BEFORE the first campaign goes live.
+- [x] **9.6** — Registered the `campaign_id` Event-scoped dimension ("Promo Campaign") via `ga-admin.mjs --apply` on
+      2026-08-23, before any campaign existed. Needed an ADC re-auth with the Analytics scopes first (docs §5).
 - [ ] **9.7** — Add the "Промокампанії" page to the Looker Studio report (steps: `analytics-campaigns.md` §5).
       Optional cost/ROI blend via `npm run campaigns:export` → Google Sheets.
 
