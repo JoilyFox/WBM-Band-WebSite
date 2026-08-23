@@ -72,6 +72,18 @@ Keep this open while you fill in each platform.
 | Аліна       | Alina        | 2026-06-12 | track `13UFLpXjAoVNW3IKCW6Hzf` | album `6774072720` |
 | Хвилі       | Khvyli       | 2026-08-21 | track `1xR3GJBaTDBEjbPfP1GZKA` | album `6798661748` |
 
+**MusicBrainz release MBIDs** (all four singles are on the artist as of 23 Aug 2026 — never create a second artist):
+
+| Single      | Release MBID                           | Recording MBID                         |
+| ----------- | -------------------------------------- | -------------------------------------- |
+| Манія       | `07c97515-d0d1-4dfc-8175-93f03ef8e3f6` | —                                      |
+| Чорні Птахи | `fdf23639-79ad-4af3-9884-145313674928` | —                                      |
+| Аліна       | `813c450e-e4f4-4277-b252-754bca905f3b` | `1bfe9661-186c-4a6e-99f9-4b00bac2222a` |
+| Хвилі       | `400d48c2-b345-45b2-823f-5b76b7c6897a` | `886aa083-41f0-4058-84a2-8a799db6ad25` |
+
+Both Аліна and Хвилі carry Spotify / Apple Music / Deezer at release level and per-track at recording level;
+Хвилі also has the YouTube Music album playlist and the official video, Аліна the YouTube Music track.
+
 ---
 
 ## 1. MusicBrainz (do this first — it produces the MBID Wikidata needs)
