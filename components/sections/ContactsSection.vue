@@ -87,6 +87,19 @@
                   <i class="pi pi-times-circle"></i>
                   <span>{{ t('contacts.error_message') }}</span>
                 </div>
+
+                <!-- Spam honeypot: Web3Forms drops any submission with `botcheck` set.
+                     Off-screen (not display:none, which bots skip) and last in the form,
+                     so the space-y spacing of the real fields is unchanged. -->
+                <input
+                  v-model="botcheck"
+                  type="checkbox"
+                  name="botcheck"
+                  tabindex="-1"
+                  autocomplete="off"
+                  aria-hidden="true"
+                  class="absolute -left-[9999px] h-px w-px opacity-0"
+                />
               </form>
             </div>
 
@@ -241,6 +254,7 @@
     email: '',
     message: ''
   })
+  const botcheck = ref(false)
 
   const isSubmitting = ref(false)
   const submitSuccess = ref(false)
@@ -269,7 +283,8 @@
           name: formData.name,
           email: formData.email,
           message: formData.message,
-          subject: `New Contact Form Submission from ${formData.name}`
+          subject: `New Contact Form Submission from ${formData.name}`,
+          botcheck: botcheck.value
         })
       })
 
