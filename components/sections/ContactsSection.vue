@@ -20,7 +20,9 @@
                 {{ t('contacts.form_title') }}
               </h3>
 
-              <form class="space-y-5" @submit.prevent="handleSubmit">
+              <!-- novalidate: validation is ours (localized, aria-invalid + role=alert) instead of the
+                   browser's English/OS-language bubbles. `required` stays for semantics. -->
+              <form ref="formEl" class="space-y-5" novalidate @submit.prevent="handleSubmit">
                 <div class="form-group">
                   <label for="name" class="form-label">
                     {{ t('contacts.name_label') }}
@@ -29,10 +31,19 @@
                     id="name"
                     v-model="formData.name"
                     type="text"
+                    name="name"
+                    autocomplete="name"
                     class="form-input"
                     :placeholder="t('contacts.name_placeholder')"
                     required
+                    :aria-invalid="errors.name ? 'true' : undefined"
+                    :aria-describedby="errors.name ? 'name-error' : undefined"
+                    @input="clearError('name')"
                   />
+                  <p v-if="errors.name" id="name-error" class="field-error" role="alert">
+                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+                    <span>{{ t(errors.name) }}</span>
+                  </p>
                 </div>
 
                 <div class="form-group">
@@ -43,10 +54,20 @@
                     id="email"
                     v-model="formData.email"
                     type="email"
+                    name="email"
+                    autocomplete="email"
+                    inputmode="email"
                     class="form-input"
                     :placeholder="t('contacts.email_placeholder')"
                     required
+                    :aria-invalid="errors.email ? 'true' : undefined"
+                    :aria-describedby="errors.email ? 'email-error' : undefined"
+                    @input="clearError('email')"
                   />
+                  <p v-if="errors.email" id="email-error" class="field-error" role="alert">
+                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+                    <span>{{ t(errors.email) }}</span>
+                  </p>
                 </div>
 
                 <div class="form-group">
@@ -57,10 +78,18 @@
                     id="message"
                     v-model="formData.message"
                     rows="5"
+                    name="message"
                     class="form-input resize-none"
                     :placeholder="t('contacts.message_placeholder')"
                     required
+                    :aria-invalid="errors.message ? 'true' : undefined"
+                    :aria-describedby="errors.message ? 'message-error' : undefined"
+                    @input="clearError('message')"
                   ></textarea>
+                  <p v-if="errors.message" id="message-error" class="field-error" role="alert">
+                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+                    <span>{{ t(errors.message) }}</span>
+                  </p>
                 </div>
 
                 <UiButton
@@ -77,15 +106,23 @@
                 </UiButton>
 
                 <!-- Success Message -->
-                <div v-if="submitSuccess" class="form-message form-message-success">
-                  <i class="pi pi-check-circle"></i>
+                <div v-if="submitSuccess" class="form-message form-message-success" role="status">
+                  <i class="pi pi-check-circle" aria-hidden="true"></i>
                   <span>{{ t('contacts.success_message') }}</span>
                 </div>
 
                 <!-- Error Message -->
-                <div v-if="submitError" class="form-message form-message-error">
-                  <i class="pi pi-times-circle"></i>
-                  <span>{{ t('contacts.error_message') }}</span>
+                <!-- Stays until the next submit (no auto-hide): a vanished error looks like the
+                     message was sent. Names the contact email as a fallback. -->
+                <div v-if="submitError" class="form-message form-message-error" role="alert">
+                  <i class="pi pi-times-circle" aria-hidden="true"></i>
+                  <span>
+                    {{ t('contacts.error_message') }}
+                    {{ t('contacts.error_fallback') }}
+                    <a :href="`mailto:${contactEmail}`" class="form-message-link">{{
+                      contactEmail
+                    }}</a>
+                  </span>
                 </div>
 
                 <!-- Spam honeypot: Web3Forms drops any submission with `botcheck` set.
@@ -174,7 +211,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, computed, onBeforeUnmount } from 'vue'
+  import { ref, reactive, computed, nextTick, onBeforeUnmount } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { getConfig } from '~/utils/configHelpers'
   import { useAnalytics } from '~/composables/useAnalytics'
@@ -255,6 +292,29 @@
     message: ''
   })
   const botcheck = ref(false)
+  const formEl = ref<HTMLFormElement | null>(null)
+
+  // Inline validation. Values are i18n keys (resolved with t() in the template) so the
+  // messages follow the site language instead of the browser's.
+  type FieldName = 'name' | 'email' | 'message'
+  const errors = reactive<Record<FieldName, string>>({ name: '', email: '', message: '' })
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+  const validate = (): FieldName | null => {
+    errors.name = formData.name.trim() ? '' : 'contacts.name_required'
+    errors.email = !formData.email.trim()
+      ? 'contacts.email_required'
+      : EMAIL_RE.test(formData.email.trim())
+        ? ''
+        : 'contacts.email_invalid'
+    errors.message = formData.message.trim() ? '' : 'contacts.message_required'
+    return (['name', 'email', 'message'] as const).find((f) => errors[f]) ?? null
+  }
+
+  // Once a field is being corrected, drop its error immediately.
+  const clearError = (field: FieldName) => {
+    if (errors[field]) errors[field] = ''
+  }
 
   const isSubmitting = ref(false)
   const submitSuccess = ref(false)
@@ -267,9 +327,18 @@
   const handleSubmit = async () => {
     if (isSubmitting.value) return
 
-    isSubmitting.value = true
     submitSuccess.value = false
     submitError.value = false
+
+    const firstInvalid = validate()
+    if (firstInvalid) {
+      // Move focus to the first problem so keyboard / screen-reader users land on it.
+      await nextTick()
+      formEl.value?.querySelector<HTMLElement>(`#${firstInvalid}`)?.focus()
+      return
+    }
+
+    isSubmitting.value = true
 
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
@@ -317,11 +386,6 @@
           description: reason
         })
         submitError.value = true
-        resetTimers.push(
-          setTimeout(() => {
-            submitError.value = false
-          }, 5000)
-        )
       }
     } catch (error) {
       console.error('Form submission error:', error)
@@ -331,11 +395,6 @@
         description: error instanceof Error ? error.message : undefined
       })
       submitError.value = true
-      resetTimers.push(
-        setTimeout(() => {
-          submitError.value = false
-        }, 5000)
-      )
     } finally {
       isSubmitting.value = false
     }
@@ -436,6 +495,43 @@
     background: rgba(0, 0, 0, 0.4);
     border-color: rgba(255, 255, 255, 0.3);
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+  }
+
+  /* Inline validation */
+  .form-input[aria-invalid='true'] {
+    border-color: rgba(239, 68, 68, 0.55);
+    background: rgba(239, 68, 68, 0.06);
+  }
+
+  .form-input[aria-invalid='true']:focus {
+    border-color: rgba(248, 113, 113, 0.75);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+  }
+
+  .field-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: rgb(252, 165, 165);
+    animation: slideIn 0.25s ease-out;
+  }
+
+  .field-error i {
+    margin-top: 0.15rem;
+    font-size: 0.9rem;
+    color: rgb(248, 113, 113);
+  }
+
+  .form-message-link {
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
   }
 
   /* Now <UiButton variant="dimmed" block> — material + interaction come from the

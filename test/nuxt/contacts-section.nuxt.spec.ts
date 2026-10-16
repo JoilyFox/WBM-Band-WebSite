@@ -348,7 +348,7 @@ describe('ContactsSection.vue', () => {
       expect(btn.disabled).toBe(false)
     })
 
-    it('auto-hides the error message after the 5s timeout', async () => {
+    it('keeps the error message visible (no auto-hide) and names the contact email', async () => {
       ;(globalThis.fetch as any).mockResolvedValue(okResponse(false))
 
       const w = await mountSuspended(ContactsSection)
@@ -356,11 +356,101 @@ describe('ContactsSection.vue', () => {
       await w.get('form').trigger('submit')
       await w.vm.$nextTick()
       await w.vm.$nextTick()
+      const box = w.get('.form-message-error')
+      expect(box.attributes('role')).toBe('alert')
+      expect(box.get('a').attributes('href')).toBe('mailto:wbmbandofficial@gmail.com')
+      expect(box.text()).toContain('wbmbandofficial@gmail.com')
+
+      vi.advanceTimersByTime(60_000)
+      await w.vm.$nextTick()
       expect(w.find('.form-message-error').exists()).toBe(true)
 
-      vi.advanceTimersByTime(5000)
+      // ...and goes away on the next submit attempt
+      ;(globalThis.fetch as any).mockResolvedValue(okResponse(true))
+      await w.get('form').trigger('submit')
+      await w.vm.$nextTick()
       await w.vm.$nextTick()
       expect(w.find('.form-message-error').exists()).toBe(false)
+    })
+  })
+
+  describe('inline validation (U-12)', () => {
+    const submitForm = async (w: any) => {
+      await w.get('form').trigger('submit')
+      await w.vm.$nextTick()
+      await w.vm.$nextTick()
+    }
+
+    it('opts out of native browser validation and sets autocomplete hints', async () => {
+      const w = await mountSuspended(ContactsSection)
+      expect(w.get('form').attributes('novalidate')).toBeDefined()
+      expect(w.get('#name').attributes('autocomplete')).toBe('name')
+      expect(w.get('#email').attributes('autocomplete')).toBe('email')
+    })
+
+    it('shows localized per-field errors and does not call fetch when empty', async () => {
+      const w = await mountSuspended(ContactsSection)
+      await submitForm(w)
+
+      expect(globalThis.fetch).not.toHaveBeenCalled()
+      for (const f of ['name', 'email', 'message']) {
+        const input = w.get(`#${f}`)
+        expect(input.attributes('aria-invalid')).toBe('true')
+        expect(input.attributes('aria-describedby')).toBe(`${f}-error`)
+        const err = w.get(`#${f}-error`)
+        expect(err.attributes('role')).toBe('alert')
+        expect(err.text().length).toBeGreaterThan(0)
+      }
+      // Ukrainian copy (the suite's real default locale)
+      expect(w.get('#name-error').text()).toContain("ім'я")
+    })
+
+    it('flags a malformed email separately from a missing one', async () => {
+      const w = await mountSuspended(ContactsSection)
+      await w.get('#name').setValue('Ada')
+      await w.get('#email').setValue('not-an-email')
+      await w.get('#message').setValue('Hi')
+      await submitForm(w)
+
+      expect(globalThis.fetch).not.toHaveBeenCalled()
+      expect(w.get('#email').attributes('aria-invalid')).toBe('true')
+      expect(w.get('#email-error').text()).toContain('name@example.com')
+      expect(w.find('#name-error').exists()).toBe(false)
+      expect(w.find('#message-error').exists()).toBe(false)
+    })
+
+    it('treats whitespace-only fields as empty', async () => {
+      const w = await mountSuspended(ContactsSection)
+      await w.get('#name').setValue('   ')
+      await w.get('#email').setValue('ada@example.com')
+      await w.get('#message').setValue('   ')
+      await submitForm(w)
+      expect(globalThis.fetch).not.toHaveBeenCalled()
+      expect(w.find('#name-error').exists()).toBe(true)
+      expect(w.find('#message-error').exists()).toBe(true)
+      expect(w.find('#email-error').exists()).toBe(false)
+    })
+
+    it('clears a field error as soon as the visitor edits that field', async () => {
+      const w = await mountSuspended(ContactsSection)
+      await submitForm(w)
+      expect(w.find('#name-error').exists()).toBe(true)
+      await w.get('#name').setValue('Ada')
+      expect(w.find('#name-error').exists()).toBe(false)
+      expect(w.get('#name').attributes('aria-invalid')).toBeUndefined()
+      // other fields keep theirs
+      expect(w.find('#email-error').exists()).toBe(true)
+    })
+
+    it('submits normally once every field is valid', async () => {
+      ;(globalThis.fetch as any).mockResolvedValue(okResponse(true))
+      const w = await mountSuspended(ContactsSection)
+      await submitForm(w)
+      await fillForm(w)
+      await w.get('form').trigger('submit')
+      await w.vm.$nextTick()
+      expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+      expect(w.find('#name-error').exists()).toBe(false)
     })
   })
 })
