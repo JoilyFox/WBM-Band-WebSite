@@ -11,17 +11,56 @@ import {
 } from '~/data/musicLibrary'
 import type { MusicRelease } from '~/data/musicLibrary'
 
-// The library is a static module-level array. These ids/slugs are the known
-// fixtures at the time of writing; tests that depend on specific records assert
-// against them, while invariant tests (no-mutation, type filtering) stay robust
-// to additions by deriving expectations from `musicLibrary` itself.
-const SLIPA = '5'
-const KHVYLI = '4'
+// The library is a static module-level array. The lookup tests below pin a few
+// stable ids from the real data; everything that depends on ORDER or on the CURRENT
+// DATE (latest/all/nearest-upcoming) runs against a fixture library instead, so
+// adding a release to data/musicLibrary.ts never breaks this file.
 const ALINA = '3'
 const CHORNI = '2'
 const MANIA = '1'
 
 const idsOf = (releases: MusicRelease[]) => releases.map((r) => r.id)
+
+const fixtureRelease = (
+  id: string,
+  releaseDate: string,
+  extra: Partial<MusicRelease> = {}
+): MusicRelease => ({
+  id,
+  slug: `fixture-${id}`,
+  title: `Fixture ${id}`,
+  type: 'single',
+  releaseDate,
+  imageUrl: '/images/fixture.jpg',
+  musicPlatformLinks: {},
+  ...extra
+})
+
+// Newest -> oldest: F_LAST, F_DIST, F_LINKS, F_NOLINKS.
+const F_NOLINKS = fixtureRelease('f-nolinks', '2029-12-01T00:00:00Z')
+const F_LINKS = fixtureRelease('f-links', '2030-01-10T00:00:00Z', {
+  preSaveMusicPlatformLinks: { spotify: 'https://example.com/presave' }
+})
+// Distributor-only pre-save (no preSaveMusicPlatformLinks) must still qualify.
+const F_DIST = fixtureRelease('f-dist', '2030-03-20T00:00:00Z', {
+  distributorPreSaveUrl: 'https://example.com/distributor'
+})
+const F_LAST = fixtureRelease('f-last', '2030-06-01T22:00:00Z', {
+  distributorPreSaveUrl: 'https://example.com/last'
+})
+const FIXTURE: MusicRelease[] = [F_NOLINKS, F_LINKS, F_DIST, F_LAST]
+const NEWEST_FIRST = [F_LAST.id, F_DIST.id, F_LINKS.id, F_NOLINKS.id]
+
+/** Swap the shared module-level library for FIXTURE around each test, then restore it. */
+const useFixtureLibrary = () => {
+  let saved: MusicRelease[] = []
+  beforeEach(() => {
+    saved = musicLibrary.splice(0, musicLibrary.length, ...FIXTURE)
+  })
+  afterEach(() => {
+    musicLibrary.splice(0, musicLibrary.length, ...saved)
+  })
+}
 
 describe('musicLibrary (module-level data)', () => {
   it('exposes a non-empty array of releases', () => {
@@ -184,10 +223,10 @@ describe('getReleasesByType', () => {
 })
 
 describe('getLatestReleases', () => {
+  useFixtureLibrary()
+
   it('sorts releases newest-first by release date', () => {
-    const latest = getLatestReleases()
-    // slipa-vulytsya (2026-10) > khvyli (2026-08) > alina (2026-06) > chorni-ptahy (2026-02) > mania (2025-11)
-    expect(idsOf(latest).slice(0, 4)).toEqual([SLIPA, KHVYLI, ALINA, CHORNI])
+    expect(idsOf(getLatestReleases())).toEqual(NEWEST_FIRST)
   })
 
   it('defaults to a limit of 4', () => {
@@ -200,7 +239,7 @@ describe('getLatestReleases', () => {
   })
 
   it('returns the single newest release with limit 1', () => {
-    expect(getLatestReleases(1)[0].id).toBe(SLIPA)
+    expect(getLatestReleases(1)[0].id).toBe(F_LAST.id)
   })
 
   it('returns an empty array with limit 0', () => {
@@ -228,12 +267,14 @@ describe('getLatestReleases', () => {
 })
 
 describe('getAllReleases', () => {
+  useFixtureLibrary()
+
   it('returns every release', () => {
     expect(getAllReleases()).toHaveLength(musicLibrary.length)
   })
 
   it('sorts newest-first by release date', () => {
-    expect(idsOf(getAllReleases())).toEqual([SLIPA, KHVYLI, ALINA, CHORNI, MANIA])
+    expect(idsOf(getAllReleases())).toEqual(NEWEST_FIRST)
   })
 
   it('contains exactly the same id set as the library', () => {
@@ -264,66 +305,62 @@ describe('no-mutation invariant across repeated sorter calls', () => {
 })
 
 describe('getNearestUpcomingPreSaveRelease', () => {
+  useFixtureLibrary()
   afterEach(() => {
     vi.useRealTimers()
   })
 
-  const freeze = (iso: string) => {
+  const freeze = (iso: string | number) => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(iso))
   }
+  const time = (r: MusicRelease) => new Date(r.releaseDate as string).getTime()
 
   it('returns the soonest future release that has pre-save links', () => {
-    // 2026-01-01: chorni-ptahy (Feb) and alina (Jun) are future; mania is past.
-    // chorni-ptahy is sooner → it wins.
-    freeze('2026-01-01T00:00:00Z')
-    const result = getNearestUpcomingPreSaveRelease()
-    expect(result?.id).toBe(CHORNI)
+    // Just after F_NOLINKS: F_LINKS, F_DIST and F_LAST are future; F_LINKS is soonest.
+    freeze(time(F_NOLINKS) + 1)
+    expect(getNearestUpcomingPreSaveRelease()?.id).toBe(F_LINKS.id)
   })
 
-  it('returns the very nearest when all releases are still in the future', () => {
-    // Before everything: mania (Nov 2025) is the nearest upcoming.
-    freeze('2025-01-01T00:00:00Z')
-    expect(getNearestUpcomingPreSaveRelease()?.id).toBe(MANIA)
+  it('skips an earlier future release that has no pre-save links', () => {
+    // Before everything: F_NOLINKS is the soonest release but cannot be pre-saved.
+    freeze(time(F_NOLINKS) - 86_400_000)
+    expect(getNearestUpcomingPreSaveRelease()?.id).toBe(F_LINKS.id)
   })
 
   it('counts a release with only a distributorPreSaveUrl as having pre-save links', () => {
-    // 2026-03-01: only alina is future. alina has NO preSaveMusicPlatformLinks,
-    // only distributorPreSaveUrl — it must still qualify.
-    freeze('2026-03-01T00:00:00Z')
+    freeze(time(F_LINKS) + 1)
     const result = getNearestUpcomingPreSaveRelease()
-    expect(result?.id).toBe(ALINA)
+    expect(result?.id).toBe(F_DIST.id)
     expect(result?.preSaveMusicPlatformLinks).toBeUndefined()
     expect(result?.distributorPreSaveUrl).toBeTruthy()
   })
 
   it('returns undefined when every release date is in the past', () => {
-    freeze('2027-01-01T00:00:00Z')
+    freeze(time(F_LAST) + 86_400_000)
     expect(getNearestUpcomingPreSaveRelease()).toBeUndefined()
   })
 
   it('treats a release whose moment exactly equals now as NOT upcoming (strict >)', () => {
-    // Frozen exactly at slipa-vulytsya's release instant (the newest release); every
-    // other release is already past. releaseTime > now is false for an exact
-    // match → no upcoming presave. Keep this pinned to the LAST release in the
-    // library, or a newer one stays ahead of `now` and the strict `>` never bites.
-    freeze('2026-10-29T22:00:00Z')
+    // Frozen exactly at the newest release's instant, every other release is already
+    // past; releaseTime > now is false for an exact match -> no upcoming pre-save.
+    freeze(time(F_LAST))
     expect(getNearestUpcomingPreSaveRelease()).toBeUndefined()
   })
 
-  it('returns alina one millisecond before its release instant', () => {
-    freeze('2026-06-11T20:59:59.999Z')
-    expect(getNearestUpcomingPreSaveRelease()?.id).toBe(ALINA)
+  it('returns the release one millisecond before its release instant', () => {
+    freeze(time(F_DIST) - 1)
+    expect(getNearestUpcomingPreSaveRelease()?.id).toBe(F_DIST.id)
   })
 
   it('returns a record held by reference within the library', () => {
-    freeze('2026-01-01T00:00:00Z')
+    freeze(time(F_NOLINKS) + 1)
     const result = getNearestUpcomingPreSaveRelease()
     expect(musicLibrary).toContain(result)
   })
 
   it('does not mutate the library order while sorting upcoming candidates', () => {
-    freeze('2025-01-01T00:00:00Z')
+    freeze(time(F_NOLINKS) - 86_400_000)
     const before = idsOf(musicLibrary)
     getNearestUpcomingPreSaveRelease()
     expect(idsOf(musicLibrary)).toEqual(before)
