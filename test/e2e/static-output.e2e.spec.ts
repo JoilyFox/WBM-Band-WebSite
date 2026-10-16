@@ -5,7 +5,7 @@ import { musicLibrary } from '~/data/musicLibrary'
 import { SOURCE_PREFIXES } from '~/utils/sourceAttribution'
 
 // Prerender-completeness e2e: assert the static `.output/public` that `npm run
-// generate` produces actually contains every share URL, alias, and SEO file.
+// generate` produces actually contains every share URL and SEO file.
 // This is the single biggest static-output gap (testing-strategy §6): add a
 // release / a source prefix / a locale and forget to regenerate → shared links
 // 404 with only a build warning. Pure node fs — no browser, no flakiness.
@@ -13,8 +13,16 @@ import { SOURCE_PREFIXES } from '~/utils/sourceAttribution'
 const OUT = resolve(process.cwd(), '.output/public')
 const SLUGS = musicLibrary.map((r) => r.slug)
 const PREFIXES = Object.keys(SOURCE_PREFIXES)
-const LOCALE_DIRS = ['ua', 'en'] // prefix strategy, default ua
+// `prefix_except_default`: Ukrainian (default) is served from the output root, English from en/.
+const LOCALE_DIRS = ['', 'en']
 const PAGE_TYPES = ['listen', 'pre-save'] as const
+
+// A release is "released" once its date has passed; before that /listen/<slug> is a redirect
+// stub (middleware/listen-access.ts) and the sitemap deliberately omits it.
+const isReleased = (r: { releaseDate?: string }) =>
+  Boolean(r.releaseDate) && new Date(r.releaseDate as string).getTime() <= Date.now()
+const RELEASED = musicLibrary.filter(isReleased)
+const UPCOMING = musicLibrary.filter((r) => !isReleased(r))
 
 const page = (...segs: string[]) => resolve(OUT, ...segs, 'index.html')
 const html = (...segs: string[]) => readFileSync(page(...segs), 'utf8')
@@ -55,8 +63,10 @@ describe('prerender completeness — localized release pages', () => {
   })
 })
 
-describe('non-localized share-URL aliases (create-nonlocalized-aliases.js ran)', () => {
-  it('mirrors clean {listen,pre-save}/{slug} at the root', () => {
+describe('Ukrainian pages are native (prefix_except_default)', () => {
+  it('serves the Ukrainian pages from the root and has no retired ua/ copy', () => {
+    expect(existsSync(page())).toBe(true)
+    expect(existsSync(resolve(OUT, 'ua')), 'ua/ directory must not exist').toBe(false)
     for (const type of PAGE_TYPES) {
       for (const slug of SLUGS) {
         expect(existsSync(page(type, slug)), `root ${type}/${slug}`).toBe(true)
@@ -64,43 +74,52 @@ describe('non-localized share-URL aliases (create-nonlocalized-aliases.js ran)',
     }
   })
 
-  it('mirrors {listen,pre-save}/{prefix}/{slug} at the root for every prefix', () => {
-    const missing: string[] = []
-    for (const type of PAGE_TYPES) {
-      for (const prefix of PREFIXES) {
-        for (const slug of SLUGS) {
-          if (!existsSync(page(type, prefix, slug))) missing.push(`${type}/${prefix}/${slug}`)
-        }
-      }
-    }
-    expect(missing, `missing root aliases: ${missing.join(', ')}`).toEqual([])
-  })
-
-  it('root alias HTML mirrors the ua build (same prerendered body)', () => {
-    // create-nonlocalized-aliases.js copies ua/listen → listen, so a clean listen
-    // page at the root must be byte-identical to its ua counterpart.
-    for (const slug of SLUGS) {
-      expect(html('listen', slug)).toBe(html('ua', 'listen', slug))
-    }
+  it('declares the Ukrainian home as <html lang="uk"> (not the English shell)', () => {
+    expect(html()).toMatch(/<html[^>]*lang="uk/i)
   })
 })
 
-describe('distributor seamless redirect (regression guard for commit 74dd10a)', () => {
-  // alina uses the distributor pre-save flow — its prerendered body must be the
-  // minimal redirect screen (PreSaveRedirect / role="status"), NOT the full
-  // link-less pre-save body, so the hop to the distributor never flashes.
-  const distributorSlug = 'alina'
+describe('redirect stubs are noindex (soft-404 guard)', () => {
+  it.each(UPCOMING.map((r) => r.slug))(
+    'unreleased /listen/%s is a noindex refresh stub',
+    (slug) => {
+      const body = html('listen', slug)
+      expect(body).toMatch(/http-equiv="refresh"/i)
+      expect(body).toMatch(/<meta name="robots" content="noindex">/)
+    }
+  )
 
-  it('prerenders the redirect screen into the alina pre-save page', () => {
-    if (!SLUGS.includes(distributorSlug)) return
-    const body = html('pre-save', distributorSlug)
-    expect(body).toMatch(/PreSaveRedirect|role="status"|redirecting/i)
-  })
+  it.each(RELEASED.map((r) => r.slug))(
+    'released /pre-save/%s is a noindex stub to /listen',
+    (slug) => {
+      const body = html('pre-save', slug)
+      expect(body).toMatch(/http-equiv="refresh"/i)
+      expect(body).toMatch(/<meta name="robots" content="noindex">/)
+    }
+  )
+})
 
-  it('keeps a released listen page free of the redirect screen', () => {
-    const body = html('listen', 'mania')
-    expect(body).not.toMatch(/PreSaveRedirect/)
-  })
+describe('distributor seamless redirect (regression guard)', () => {
+  // An upcoming release that uses the distributor pre-save flow must prerender the minimal
+  // redirect screen (PreSaveRedirect / role="status"), NOT the full link-less pre-save body,
+  // so the hop to the distributor never flashes.
+  const distributor = UPCOMING.find((r) => r.useDistributorPreSave && r.distributorPreSaveUrl)
+
+  it.skipIf(!distributor)(
+    'prerenders the redirect screen into the distributor pre-save page',
+    () => {
+      const body = html('pre-save', distributor!.slug)
+      expect(body).toMatch(/PreSaveRedirect|role="status"|redirecting/i)
+    }
+  )
+
+  it.skipIf(RELEASED.length === 0)(
+    'keeps a released listen page free of the redirect screen',
+    () => {
+      const body = html('listen', RELEASED[0].slug)
+      expect(body).not.toMatch(/PreSaveRedirect/)
+    }
+  )
 })
 
 describe('SEO files', () => {
@@ -115,9 +134,13 @@ describe('SEO files', () => {
     const sitemap = readFileSync(resolve(OUT, 'sitemap.xml'), 'utf8')
     expect(sitemap).toMatch(/^<\?xml/)
     expect(sitemap).toContain('<urlset')
-    expect(sitemap).toMatch(/<loc>https?:\/\/[^<]+\/<\/loc>/) // root home
-    for (const slug of SLUGS) {
-      expect(sitemap, `sitemap missing /listen/${slug}`).toContain(`/listen/${slug}`)
+    expect(sitemap).toMatch(/<loc>https:\/\/www\.wbmband\.com<\/loc>/) // Ukrainian home, no trailing slash
+    for (const r of RELEASED) {
+      expect(sitemap, `sitemap missing /listen/${r.slug}`).toContain(`/listen/${r.slug}`)
+    }
+    // Unreleased listen pages are redirect stubs (soft 404): never listed.
+    for (const r of UPCOMING) {
+      expect(sitemap, `sitemap must not list /listen/${r.slug}`).not.toContain(`/listen/${r.slug}`)
     }
     // No source-prefixed variants in the sitemap (they carry noindex).
     for (const prefix of PREFIXES) {
@@ -149,7 +172,7 @@ describe('DEPLOY_TARGET — production build uses the apex baseURL', () => {
     // NB: the bare substring also appears in the i18n payload as the repo's absolute
     // build path (…/@Repositories/WBM-Band-WebSite/locales/…), so anchor the check on
     // quoted href=/src= asset attributes — that's where the real baseURL would surface.
-    const home = html('ua')
+    const home = html()
     expect(home).not.toMatch(/(?:href|src)="\/WBM-Band-WebSite\//)
     // Positive control: Nuxt assets are served from the apex root.
     expect(home).toMatch(/(?:href|src)="\/_nuxt\//)
