@@ -3,6 +3,9 @@ import prettier from 'eslint-plugin-prettier'
 import prettierConfig from 'eslint-config-prettier'
 
 export default withNuxt(
+  // Agent worktrees (.claude/worktrees) and other local tooling dirs hold full
+  // repo copies; linting them multiplies every warning.
+  { ignores: ['.claude/**', '.agents/**', '.codex/**', 'coverage/**', 'dist/**'] },
   // Prettier integration
   {
     plugins: {
