@@ -362,11 +362,18 @@ export default defineNuxtConfig({
       'prerender:generate'(route) {
         if (typeof route.contents !== 'string' || !route.fileName?.endsWith('.html')) return
 
-        // Routes that a middleware redirects away from (an unreleased
-        // /listen/<slug> → /404, a disabled /pre-save/<slug>) are emitted by
-        // Nitro as a 200-status meta-refresh stub with no content. Google reads
-        // that as a soft 404. Mark those stubs noindex so a crawl of a shared
-        // pre-release link can't put an empty page in the index.
+        // Routes that a middleware redirects away from DURING PRERENDER (a
+        // disabled /pre-save/<slug>, a released /pre-save/<slug> → /listen) are
+        // emitted by Nitro as a 200-status meta-refresh stub with no content.
+        // Google reads that as a soft 404. Mark those stubs noindex so a crawl of
+        // a shared link can't put an empty page in the index.
+        //
+        // NOT in this list any more: an upcoming /listen/<slug>.
+        // middleware/listen-access.ts skips its redirect while prerendering
+        // (`import.meta.prerender`), so that route is a REAL page with the app JS
+        // (noindex comes from useReleaseHead while the release is upcoming) and
+        // the client decides pre-save / locked / show at runtime - a frozen stub
+        // here would keep a released track "locked" until the next deploy.
         // See docs/search-console.md.
         if (
           /http-equiv="refresh"/i.test(route.contents) &&

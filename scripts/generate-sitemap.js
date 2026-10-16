@@ -18,10 +18,17 @@
  * transient pre-save pages are deliberately excluded.
  *
  * A release whose date is still in the FUTURE is excluded from the /listen
- * entries: middleware/listen-access.ts redirects those to /404 (or /pre-save),
- * which Nitro prerenders as a 200-status meta-refresh stub — a soft 404. Listing
- * it would hand Google a dead URL on the first sitemap read. The /lyrics page is
- * a real document either way, so it stays.
+ * entries: that page is prerendered as a real page but is `noindex` until
+ * release day (composables/useReleaseHead.ts) and the client sends visitors to
+ * the pre-save / locked page, so it is not a destination to hand Google. The
+ * /lyrics page is a real, indexable document either way, so it stays.
+ *
+ * <lastmod> is the date of the last repository commit that touched the source of
+ * the page (data/musicLibrary.ts for releases, the page file for static pages),
+ * or the build date when history is unavailable or the source has uncommitted
+ * changes (deploy:production builds from the working tree). It is never the
+ * release date: Google ignores an inaccurate lastmod, so a made-up one is worse
+ * than none.
  *
  * The host is always the production origin (SITE_URL) — a sitemap must point at
  * the real domain, never the GitHub Pages staging mirror — so this is keyed off
@@ -30,6 +37,7 @@
 
 import fs from 'fs'
 import path from 'path'
+import { execFileSync } from 'child_process'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -49,6 +57,29 @@ function extractSiteUrl() {
   const m = readRepoFile('constants', 'app.ts').match(/export const SITE_URL = '([^']+)'/)
   if (!m) throw new Error('generate-sitemap: could not locate SITE_URL in constants/app.ts')
   return m[1].replace(/\/+$/, '')
+}
+
+const buildDate = new Date().toISOString().slice(0, 10)
+
+/**
+ * YYYY-MM-DD of the newest commit touching any of `paths` (repo-relative), or
+ * the build date when there is no history, nothing is tracked there, or any of
+ * them has uncommitted changes.
+ */
+function lastModified(...paths) {
+  const run = (args) =>
+    execFileSync('git', args, {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim()
+  try {
+    if (run(['status', '--porcelain', '--', ...paths])) return buildDate
+    const day = run(['log', '-1', '--format=%cs', '--', ...paths])
+    return /^\d{4}-\d{2}-\d{2}$/.test(day) ? day : buildDate
+  } catch {
+    return buildDate
+  }
 }
 
 function isFutureDate(value) {
@@ -85,13 +116,17 @@ function buildSitemap(siteUrl, releases) {
 
   // Localized homes (ua canonical is the bare origin — no trailing slash, to
   // match the <link rel="canonical"> + hreflang in pages/index.vue).
-  entries.push({ loc: `${siteUrl}` })
-  entries.push({ loc: `${siteUrl}/en` })
+  const homeLastmod = lastModified('pages/index.vue', 'components/sections', 'data/musicLibrary.ts')
+  entries.push({ loc: `${siteUrl}`, lastmod: homeLastmod })
+  entries.push({ loc: `${siteUrl}/en`, lastmod: homeLastmod })
 
   // Policy pages, both locales.
   for (const locale of LOCALES) {
     for (const p of POLICY_PATHS) {
-      entries.push({ loc: `${siteUrl}${localePrefix(locale)}/${p}` })
+      entries.push({
+        loc: `${siteUrl}${localePrefix(locale)}/${p}`,
+        lastmod: lastModified(`pages/${p}.vue`)
+      })
     }
   }
 
@@ -99,12 +134,13 @@ function buildSitemap(siteUrl, releases) {
   // non-localized URL, EN = /en/...), so BOTH are listed for discovery; the
   // ua/en language pairing itself lives in each page's <head> hreflang (one
   // method — we don't duplicate hreflang into the sitemap).
+  const releasesLastmod = lastModified('data/musicLibrary.ts')
   for (const release of releases) {
     if (isFutureDate(release.releaseDate)) {
-      console.log(`   ↳ skipping /listen/${release.slug} — not released yet (soft 404 until then)`)
+      console.log(`   ↳ skipping /listen/${release.slug} — not released yet (noindex until then)`)
       continue
     }
-    const lastmod = release.releaseDate ? release.releaseDate.slice(0, 10) : undefined
+    const lastmod = releasesLastmod
     entries.push({ loc: `${siteUrl}/listen/${release.slug}`, lastmod })
     entries.push({ loc: `${siteUrl}/en/listen/${release.slug}`, lastmod })
   }
@@ -113,7 +149,7 @@ function buildSitemap(siteUrl, releases) {
   // per-locale canonical each lyrics page declares + the prerender list).
   for (const release of releases) {
     if (!release.hasLyrics) continue
-    const lastmod = release.releaseDate ? release.releaseDate.slice(0, 10) : undefined
+    const lastmod = releasesLastmod
     entries.push({ loc: `${siteUrl}/lyrics/${release.slug}`, lastmod })
     entries.push({ loc: `${siteUrl}/en/lyrics/${release.slug}`, lastmod })
   }
