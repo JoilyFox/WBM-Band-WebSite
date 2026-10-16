@@ -1,3 +1,4 @@
+import { storeToRefs } from 'pinia'
 import { useGlobalLoadingStore } from '~/store/globalLoading'
 
 /**
@@ -6,6 +7,8 @@ import { useGlobalLoadingStore } from '~/store/globalLoading'
  */
 export const useGlobalLoading = () => {
   const store = useGlobalLoadingStore()
+  // Refs, not a snapshot: destructuring these in a component keeps them live.
+  const { isLoading, loadingProgress } = storeToRefs(store)
 
   /**
    * Show global loading progress bar
@@ -69,8 +72,8 @@ export const useGlobalLoading = () => {
     withLoading,
 
     // State (reactive)
-    isLoading: store.isLoading,
-    loadingProgress: store.loadingProgress,
+    isLoading,
+    loadingProgress,
 
     // Getters
     getLoadingState: store.getLoadingState

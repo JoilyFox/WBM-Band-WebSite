@@ -170,7 +170,9 @@
 
           <!-- Compact Info -->
           <div class="flex-1 min-w-0">
-            <h1 class="text-lg font-bold text-primary-50 mb-[2px] truncate">{{ displayTitle }}</h1>
+            <p class="mini-header-title text-lg font-bold text-primary-50 mb-[2px] truncate">
+              {{ displayTitle }}
+            </p>
             <p class="text-sm text-primary-200 opacity-70 font-base leading-[1.2]">
               <span class="inline-flex mr-1">
                 <span>{{ compactInfoPrimary }}</span>

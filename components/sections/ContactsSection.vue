@@ -164,8 +164,10 @@
   import { ref, reactive, computed, onBeforeUnmount } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { getConfig } from '~/utils/configHelpers'
+  import { useAnalytics } from '~/composables/useAnalytics'
 
   const { t } = useI18n({ useScope: 'global' })
+  const { trackFormError } = useAnalytics()
 
   const contactEmail = computed(() => getConfig('general.contact.email'))
 
@@ -273,7 +275,7 @@
 
       const result = await response.json()
 
-      if (result.success) {
+      if (response.ok && result.success) {
         submitSuccess.value = true
         // Reset form
         formData.name = ''
@@ -287,6 +289,18 @@
           }, 5000)
         )
       } else {
+        // Web3Forms answers {success:false, message} for a bad key, rate limit or
+        // spam filter - surface why instead of swallowing it.
+        const reason = typeof result?.message === 'string' ? result.message : undefined
+        if (import.meta.dev) {
+          console.warn('Contact form rejected:', { status: response.status, message: reason })
+        }
+        trackFormError({
+          formName: 'contact',
+          errorType: response.ok ? 'api' : 'http',
+          status: response.status,
+          description: reason
+        })
         submitError.value = true
         resetTimers.push(
           setTimeout(() => {
@@ -296,6 +310,11 @@
       }
     } catch (error) {
       console.error('Form submission error:', error)
+      trackFormError({
+        formName: 'contact',
+        errorType: 'network',
+        description: error instanceof Error ? error.message : undefined
+      })
       submitError.value = true
       resetTimers.push(
         setTimeout(() => {

@@ -143,6 +143,44 @@ export function detectSourcePlatform(inputs: AttributionInputs): SourcePlatform 
 
 const STORAGE_KEY = 'wbm_source_platform'
 
+// sessionStorage can THROW (SecurityError) when site data is blocked — Chrome's
+// "block all cookies", some in-app WebViews (Instagram, TikTok) — and setItem can
+// throw on quota. Attribution is best-effort, so never let that crash a page's
+// setup: fall back to a per-page-load in-memory copy instead.
+let memoryStored: SourcePlatform | null = null
+let storageBroken = false
+
+function readStored(): SourcePlatform | null {
+  if (!storageBroken) {
+    try {
+      return window.sessionStorage.getItem(STORAGE_KEY) as SourcePlatform | null
+    } catch {
+      storageBroken = true
+    }
+  }
+  return memoryStored
+}
+
+function writeStored(platform: SourcePlatform): void {
+  memoryStored = platform
+  if (storageBroken) return
+  try {
+    window.sessionStorage.setItem(STORAGE_KEY, platform)
+  } catch {
+    storageBroken = true
+  }
+}
+
+function clearStored(): void {
+  memoryStored = null
+  if (storageBroken) return
+  try {
+    window.sessionStorage.removeItem(STORAGE_KEY)
+  } catch {
+    storageBroken = true
+  }
+}
+
 /**
  * Read first-touch source from sessionStorage, or detect-and-persist on
  * first call. A path-prefix match always overrides any stored value —
@@ -154,11 +192,11 @@ export function getOrPersistSourcePlatform(inputs?: Partial<AttributionInputs>):
   const path = inputs?.path ?? window.location.pathname
   const fromPath = detectFromPath(path)
   if (fromPath) {
-    window.sessionStorage.setItem(STORAGE_KEY, fromPath)
+    writeStored(fromPath)
     return fromPath
   }
 
-  const stored = window.sessionStorage.getItem(STORAGE_KEY) as SourcePlatform | null
+  const stored = readStored()
   if (stored) return stored
 
   const detected = detectSourcePlatform({
@@ -166,18 +204,18 @@ export function getOrPersistSourcePlatform(inputs?: Partial<AttributionInputs>):
     referrer: inputs?.referrer ?? document.referrer,
     userAgent: inputs?.userAgent ?? navigator.userAgent
   })
-  window.sessionStorage.setItem(STORAGE_KEY, detected)
+  writeStored(detected)
   return detected
 }
 
 export function setExplicitSourcePlatform(platform: SourcePlatform): void {
   if (typeof window === 'undefined') return
-  window.sessionStorage.setItem(STORAGE_KEY, platform)
+  writeStored(platform)
 }
 
 export function resetSourcePlatform(): void {
   if (typeof window === 'undefined') return
-  window.sessionStorage.removeItem(STORAGE_KEY)
+  clearStored()
 }
 
 /**

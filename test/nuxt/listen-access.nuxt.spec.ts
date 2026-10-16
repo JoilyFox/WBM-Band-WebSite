@@ -3,37 +3,28 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 
 // listen-access.ts classifies its imports as follows:
-//   • AUTO-IMPORTS (mockNuxtImport): navigateTo, useNuxtApp
+//   • AUTO-IMPORTS (mockNuxtImport): navigateTo
 //   • EXPLICIT IMPORTS (vi.mock): useLocalePath (#i18n), getReleaseBySlug
-//     (~/data/musicLibrary), getConfig/isUpcomingRelease/formatReleaseDate
-//     (~/utils/configHelpers)
+//     (~/data/musicLibrary), getConfig/isUpcomingRelease (~/utils/configHelpers)
+//     — branch logic only; the REAL date boundaries are covered by
+//     listen-access.integration.nuxt.spec.ts.
 //   • SOURCE_PREFIXES (~/utils/sourceAttribution) is left REAL so the
 //     source-prefix branch exercises the genuine prefix table (i, tt, yt, ...).
 
-const {
-  navigateTo,
-  getReleaseBySlug,
-  getConfig,
-  isUpcomingRelease,
-  formatReleaseDate,
-  localePath
-} = vi.hoisted(() => ({
-  navigateTo: vi.fn(),
-  getReleaseBySlug: vi.fn(),
-  getConfig: vi.fn(),
-  isUpcomingRelease: vi.fn(),
-  formatReleaseDate: vi.fn(() => 'June 1, 2026'),
-  localePath: vi.fn((p: string) => `/en${p}`)
-}))
+const { navigateTo, getReleaseBySlug, getConfig, isUpcomingRelease, localePath } = vi.hoisted(
+  () => ({
+    navigateTo: vi.fn(),
+    getReleaseBySlug: vi.fn(),
+    getConfig: vi.fn(),
+    isUpcomingRelease: vi.fn(),
+    localePath: vi.fn((p: string) => `/en${p}`)
+  })
+)
 
-// NOTE: we deliberately do NOT mock useNuxtApp — replacing it breaks the
-// @nuxt/test-utils setupNuxt harness (it calls useRouter().afterEach on the real
-// app). Instead we read the real nuxtApp in beforeEach and assign $i18n directly
-// to drive the locale-normalization branches.
 mockNuxtImport('navigateTo', () => navigateTo)
 
 vi.mock('~/data/musicLibrary', () => ({ getReleaseBySlug }))
-vi.mock('~/utils/configHelpers', () => ({ getConfig, isUpcomingRelease, formatReleaseDate }))
+vi.mock('~/utils/configHelpers', () => ({ getConfig, isUpcomingRelease }))
 vi.mock('#i18n', () => ({ useLocalePath: () => localePath }))
 
 const mw = (await import('~/middleware/listen-access')).default
@@ -71,21 +62,8 @@ beforeEach(() => {
   // Sensible defaults; each test overrides what it cares about.
   getConfig.mockReturnValue(true)
   isUpcomingRelease.mockReturnValue(false)
-  formatReleaseDate.mockReturnValue('June 1, 2026')
   localePath.mockImplementation((p: string) => `/en${p}`)
-  // Default locale = 'en' so the 404 branch normalizes to 'en-US' unless a test
-  // overrides it via mockUseNuxtAppLocale().
-  mockUseNuxtAppLocale('en')
 })
-
-// The middleware reads useNuxtApp()?.$i18n?.locale?.value. On the real test-env
-// nuxtApp, $i18n is a non-configurable getter but $i18n.locale is a writable ref,
-// so we drive the locale-normalization branches by mutating locale.value.
-// An empty string makes i18nLocale falsy, exercising the `|| 'en-US'` fallback.
-function mockUseNuxtAppLocale(value: string) {
-  const nuxtApp = useNuxtApp() as any
-  nuxtApp.$i18n.locale.value = value
-}
 
 describe('listen-access middleware — slug guard', () => {
   it('returns (pass-through) when no slug param is present', async () => {
@@ -126,7 +104,7 @@ describe('listen-access middleware — unknown release', () => {
   })
 })
 
-describe('listen-access middleware — already released (asymmetry vs presave)', () => {
+describe('listen-access middleware — already released', () => {
   it('passes through (stays on listen page) for a past release, never redirecting', async () => {
     getReleaseBySlug.mockReturnValue(released)
     isUpcomingRelease.mockReturnValue(false)
@@ -211,44 +189,45 @@ describe('listen-access middleware — upcoming with pre-save → redirect', () 
   })
 })
 
-describe('listen-access middleware — upcoming but no redirect → 404', () => {
-  it('404s when enablePreSave is false even if links exist', async () => {
+describe('listen-access middleware — upcoming but no redirect → localized locked page', () => {
+  const locked = (date: string) => [
+    { path: '/en/404', query: { reason: 'release_locked', date } },
+    { replace: true }
+  ]
+
+  it('locks when enablePreSave is false even if links exist', async () => {
     getReleaseBySlug.mockReturnValue(upcomingWithLinks)
     isUpcomingRelease.mockReturnValue(true)
     getConfig.mockReturnValue(false)
-    formatReleaseDate.mockReturnValue('January 1, 2099')
 
     await mw(route({ slug: 'future' }), {} as any)
     expect(navigateTo).toHaveBeenCalledTimes(1)
-    expect(navigateTo).toHaveBeenCalledWith(
-      {
-        path: '/404',
-        query: {
-          title: 'Release Not Available',
-          message: 'This track unlocks on January 1, 2099. Please check back soon.',
-          buttonText: 'Go to Home',
-          buttonLink: '/',
-          buttonIcon: 'pi pi-home'
-        }
-      },
-      { replace: true }
-    )
+    // A reason CODE + ISO date, not English prose: ErrorPage localizes it.
+    expect(navigateTo.mock.calls[0]).toEqual(locked('2099-01-01'))
   })
 
-  it('404s when enablePreSave is true but there are no pre-save links (empty object)', async () => {
+  it('builds the locked page through useLocalePath (EN visitors stay on /en)', async () => {
+    getReleaseBySlug.mockReturnValue(upcomingNoLinks)
+    isUpcomingRelease.mockReturnValue(true)
+    getConfig.mockReturnValue(true)
+    localePath.mockImplementation((p: string) => `/ua${p}`)
+
+    await mw(route({ slug: 'soon' }), {} as any)
+    expect(localePath).toHaveBeenCalledWith('/404')
+    expect(navigateTo.mock.calls[0][0].path).toBe('/ua/404')
+  })
+
+  it('locks when enablePreSave is true but there are no pre-save links (empty object)', async () => {
     getReleaseBySlug.mockReturnValue(upcomingNoLinks)
     isUpcomingRelease.mockReturnValue(true)
     getConfig.mockReturnValue(true)
 
     await mw(route({ slug: 'soon' }), {} as any)
     expect(navigateTo).toHaveBeenCalledTimes(1)
-    const arg = navigateTo.mock.calls[0][0]
-    expect(arg.path).toBe('/404')
-    expect(arg.query.title).toBe('Release Not Available')
-    expect(navigateTo.mock.calls[0][1]).toEqual({ replace: true })
+    expect(navigateTo.mock.calls[0]).toEqual(locked('2099-06-01'))
   })
 
-  it('404s when preSaveMusicPlatformLinks is undefined', async () => {
+  it('locks when preSaveMusicPlatformLinks is undefined', async () => {
     getReleaseBySlug.mockReturnValue({
       id: '4',
       slug: 'nolinks',
@@ -259,12 +238,10 @@ describe('listen-access middleware — upcoming but no redirect → 404', () => 
     getConfig.mockReturnValue(true)
 
     await mw(route({ slug: 'nolinks' }), {} as any)
-    expect(navigateTo).toHaveBeenCalledWith(expect.objectContaining({ path: '/404' }), {
-      replace: true
-    })
+    expect(navigateTo.mock.calls[0]).toEqual(locked('2099-12-01'))
   })
 
-  it('404s when all pre-save link values are falsy', async () => {
+  it('locks when all pre-save link values are falsy', async () => {
     getReleaseBySlug.mockReturnValue({
       id: '5',
       slug: 'falsy',
@@ -276,14 +253,24 @@ describe('listen-access middleware — upcoming but no redirect → 404', () => 
     getConfig.mockReturnValue(true)
 
     await mw(route({ slug: 'falsy' }), {} as any)
-    expect(navigateTo).toHaveBeenCalledWith(expect.objectContaining({ path: '/404' }), {
-      replace: true
-    })
+    expect(navigateTo.mock.calls[0]).toEqual(locked('2099-12-01'))
   })
 
-  it('does NOT treat distributorPreSaveUrl as a valid pre-save link (listen asymmetry)', async () => {
-    // Unlike presave-access, listen-access ignores distributorPreSaveUrl when
-    // deciding whether to redirect, so a distributor-only upcoming release 404s.
+  it('does not crash for an undated (TBA) upcoming release', async () => {
+    getReleaseBySlug.mockReturnValue({ id: '8', slug: 'tba', title: 'TBA' })
+    isUpcomingRelease.mockReturnValue(true)
+    getConfig.mockReturnValue(true)
+
+    await mw(route({ slug: 'tba' }), {} as any)
+    expect(navigateTo.mock.calls[0]).toEqual([
+      { path: '/en/404', query: { reason: 'release_locked' } },
+      { replace: true }
+    ])
+  })
+})
+
+describe('listen-access middleware — distributor-only pre-save (B-02 symmetry)', () => {
+  it('treats distributorPreSaveUrl as a valid pre-save target, like presave-access does', async () => {
     getReleaseBySlug.mockReturnValue({
       id: '6',
       slug: 'dist',
@@ -296,60 +283,26 @@ describe('listen-access middleware — upcoming but no redirect → 404', () => 
     getConfig.mockReturnValue(true)
 
     await mw(route({ slug: 'dist' }), {} as any)
-    expect(navigateTo).toHaveBeenCalledWith(expect.objectContaining({ path: '/404' }), {
-      replace: true
-    })
-  })
-
-  it('formats the unlock date using the localized message', async () => {
-    getReleaseBySlug.mockReturnValue(upcomingNoLinks)
-    isUpcomingRelease.mockReturnValue(true)
-    getConfig.mockReturnValue(true)
-    formatReleaseDate.mockReturnValue('the future')
-
-    await mw(route({ slug: 'soon' }), {} as any)
-    expect(formatReleaseDate).toHaveBeenCalledWith('2099-06-01', 'en-US')
-    const arg = navigateTo.mock.calls[0][0]
-    expect(arg.query.message).toBe('This track unlocks on the future. Please check back soon.')
+    expect(navigateTo).toHaveBeenCalledWith(
+      { path: '/en/pre-save/dist', query: {} },
+      { redirectCode: 302 }
+    )
   })
 })
 
-describe('listen-access middleware — locale normalization for the 404 path', () => {
-  const upcoming404 = {
-    id: '7',
-    slug: 'loc',
-    title: 'Loc',
-    releaseDate: '2099-06-01',
-    preSaveMusicPlatformLinks: {}
-  }
+describe('listen-access middleware — source prefix lookup is own-property only (B-07)', () => {
+  it.each(['constructor', 'toString', '__proto__', 'hasOwnProperty'])(
+    'does not treat the inherited key %s as a source prefix',
+    async (bogus) => {
+      getReleaseBySlug.mockReturnValue(upcomingWithLinks)
+      isUpcomingRelease.mockReturnValue(true)
+      getConfig.mockReturnValue(true)
 
-  beforeEach(() => {
-    getReleaseBySlug.mockReturnValue(upcoming404)
-    isUpcomingRelease.mockReturnValue(true)
-    getConfig.mockReturnValue(true)
-  })
-
-  it("maps i18n locale 'ua' to 'uk-UA'", async () => {
-    mockUseNuxtAppLocale('ua')
-    await mw(route({ slug: 'loc' }), {} as any)
-    expect(formatReleaseDate).toHaveBeenCalledWith('2099-06-01', 'uk-UA')
-  })
-
-  it("maps i18n locale 'en' to 'en-US'", async () => {
-    mockUseNuxtAppLocale('en')
-    await mw(route({ slug: 'loc' }), {} as any)
-    expect(formatReleaseDate).toHaveBeenCalledWith('2099-06-01', 'en-US')
-  })
-
-  it('passes through any other locale verbatim', async () => {
-    mockUseNuxtAppLocale('de')
-    await mw(route({ slug: 'loc' }), {} as any)
-    expect(formatReleaseDate).toHaveBeenCalledWith('2099-06-01', 'de')
-  })
-
-  it("falls back to 'en-US' when the i18n locale is empty/falsy", async () => {
-    mockUseNuxtAppLocale('')
-    await mw(route({ slug: 'loc' }), {} as any)
-    expect(formatReleaseDate).toHaveBeenCalledWith('2099-06-01', 'en-US')
-  })
+      await mw(route({ slug: 'future', source: bogus }), {} as any)
+      expect(navigateTo).toHaveBeenCalledWith(
+        { path: '/en/pre-save/future', query: {} },
+        { redirectCode: 302 }
+      )
+    }
+  )
 })

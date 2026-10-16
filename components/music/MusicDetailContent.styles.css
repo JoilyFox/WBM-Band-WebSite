@@ -1705,3 +1705,21 @@ body.lg-tier-low .share-glass-btn {
     justify-content: center !important;
   }
 }
+
+/* Sticky mini-header title: a <p> (the page has one <h1>, in the hero) that must still
+   render with the heading typeface it had as an <h1> (see assets/css/base.scss). */
+.mini-header-title {
+  font-family:
+    'Space Grotesk',
+    'Manrope',
+    'Golos Text',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Noto Sans',
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+}

@@ -189,12 +189,12 @@ function lyricsToPlainText(release: MusicRelease): string {
 export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) {
   const { release, localizedTitle, metaImageUrl } = options
   const isLyrics = options.variant === 'lyrics'
-  const { t } = useI18n({ useScope: 'global' })
-  // Self-referential canonical for this page variant. Matches the canonical
-  // declared by the page (pages/listen/[slug].vue or pages/lyrics/[slug].vue).
-  const listenUrl = `${SITE_URL}/listen/${release.slug}`
-  const lyricsUrl = `${SITE_URL}/lyrics/${release.slug}`
-  const canonicalUrl = isLyrics ? lyricsUrl : listenUrl
+  const { t, locale } = useI18n({ useScope: 'global' })
+  // Language-INDEPENDENT anchors: one stable @id per recording / composition,
+  // always the Ukrainian (default-locale, unprefixed) URL, so /listen, /lyrics
+  // and their /en twins all describe the SAME entity instead of four.
+  const recordingId = `${SITE_URL}/listen/${release.slug}#recording`
+  const compositionId = `${SITE_URL}/lyrics/${release.slug}#composition`
   // Story key derived from the (correct) description key — some slugs use hyphens
   // while their i18n keys use underscores (e.g. chorni-ptahy → chorni_ptahy).
   const storyKey = (release.descriptionKey || `releases.${release.slug}.description`).replace(
@@ -204,6 +204,14 @@ export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) 
 
   useHead(
     computed(() => {
+      // Locale-aware page URLs — the same ones the page declares as canonical
+      // (composables/useReleaseHead.ts): Ukrainian is the clean unprefixed URL,
+      // English lives under /en. `url` and the breadcrumb must agree with them.
+      const base = locale.value === 'en' ? `${SITE_URL}/en` : SITE_URL
+      const listenUrl = `${base}/listen/${release.slug}`
+      const lyricsUrl = `${base}/lyrics/${release.slug}`
+      const canonicalUrl = isLyrics ? lyricsUrl : listenUrl
+
       // The band's first-hand "about the song" prose lives ONLY in the structured
       // data — it feeds search + AI crawlers without any visible change to the
       // page, and without the spam risk that visually-hidden body text carries
@@ -213,15 +221,15 @@ export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) 
       const story = t(storyKey) as string
       const recording: Record<string, unknown> = {
         '@type': 'MusicRecording',
-        '@id': `${canonicalUrl}#recording`,
+        '@id': recordingId,
         name: localizedTitle.value,
         url: canonicalUrl,
         image: metaImageUrl.value,
         // The songs are sung in Ukrainian regardless of the page's UI locale.
         inLanguage: 'uk',
         // Date only (no time) — the Kyiv calendar day, matching the visible
-        // release date (see releaseDay above).
-        datePublished: releaseDay(release.releaseDate),
+        // release date (see releaseDay above). Omitted for an undated (TBA) release.
+        ...(release.releaseDate ? { datePublished: releaseDay(release.releaseDate) } : {}),
         genre: release.genre && release.genre.length ? release.genre : BAND_GENRE,
         byArtist: {
           '@type': 'MusicGroup',
@@ -238,7 +246,7 @@ export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) 
         if (lyricsText) {
           recording.recordingOf = {
             '@type': 'MusicComposition',
-            '@id': `${lyricsUrl}#composition`,
+            '@id': compositionId,
             name: localizedTitle.value,
             inLanguage: 'uk',
             lyrics: {
@@ -255,7 +263,7 @@ export function useReleaseStructuredData(options: ReleaseStructuredDataOptions) 
           '@type': 'ListItem',
           position: 1,
           name: generalConfig.fullBandName,
-          item: SITE_URL
+          item: base
         },
         {
           '@type': 'ListItem',

@@ -45,7 +45,7 @@ export function useImageLoading() {
    */
   const handleImageLoad = (event?: Event) => {
     imageLoaded.value = true
-    if (import.meta.client) {
+    if (import.meta.dev) {
       const target = event?.target as HTMLImageElement | undefined
       console.log('[ProgressiveImage] loaded', target?.currentSrc || target?.src || 'unknown')
     }
@@ -71,7 +71,7 @@ export function useImageLoading() {
   const resetImageStates = () => {
     imageLoadError.value = false
     imageLoaded.value = false
-    if (import.meta.client) {
+    if (import.meta.dev) {
       console.log('[ProgressiveImage] states reset')
     }
   }
@@ -95,7 +95,7 @@ export function useImageLoading() {
           if (entry.isIntersecting) {
             isIntersecting.value = true
             observer.disconnect()
-            if (import.meta.client) {
+            if (import.meta.dev) {
               console.log('[ProgressiveImage] intersecting, begin load')
             }
           }
@@ -115,14 +115,14 @@ export function useImageLoading() {
       if (isInViewport) {
         isIntersecting.value = true
         observer.disconnect()
-        if (import.meta.client) {
+        if (import.meta.dev) {
           console.log('[ProgressiveImage] already in viewport, begin load')
         }
       }
     } else {
       // Fallback for browsers without IntersectionObserver
       isIntersecting.value = true
-      if (import.meta.client) {
+      if (import.meta.dev) {
         console.log('[ProgressiveImage] IntersectionObserver unavailable, load immediately')
       }
     }

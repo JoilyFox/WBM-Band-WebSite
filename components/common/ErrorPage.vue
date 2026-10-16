@@ -49,6 +49,9 @@
 
 <script setup lang="ts">
   import { useI18n } from 'vue-i18n'
+  import { useLocalePath } from '#i18n'
+  import { formatReleaseDate } from '~/utils/configHelpers'
+  import { RELEASE_GATE_REASONS, isSafeInternalPath } from '~/utils/releaseGate'
 
   interface Props {
     title?: string
@@ -58,12 +61,15 @@
     buttonIcon?: string
   }
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const localePath = useLocalePath()
   const props = withDefaults(defineProps<Props>(), {
     title: undefined,
     message: undefined,
     buttonText: undefined,
-    buttonLink: '/',
+    // undefined = "go to the localized home"; an explicit '' hides the button
+    // (maintenance mode).
+    buttonLink: undefined,
     buttonIcon: 'pi pi-home'
   })
 
@@ -73,40 +79,62 @@
   // Get the current route
   const route = useRoute()
 
+  const queryString = (key: string): string | undefined => {
+    const raw = route?.query?.[key]
+    const value = Array.isArray(raw) ? raw[0] : raw
+    return typeof value === 'string' && value ? value : undefined
+  }
+
+  // Middleware gates (unreleased track, disabled pre-save) pass a machine
+  // readable `reason` (+ ISO `date`) instead of English prose, so the copy is
+  // rendered in the visitor's locale. Explicit title/message query params still
+  // win for backwards compatibility with older links and callers.
+  const reasonKey = computed(() => {
+    const reason = queryString('reason')
+    return reason && Object.hasOwn(RELEASE_GATE_REASONS, reason) ? reason : undefined
+  })
+
+  const reasonDate = computed(() => {
+    const raw = queryString('date')
+    if (!raw || Number.isNaN(new Date(raw).getTime())) return t('errors.date_tba') as string
+    const loc = locale?.value === 'en' ? 'en-US' : 'uk-UA'
+    return formatReleaseDate(raw, loc, { includeTime: false })
+  })
+
+  const reasonText = (field: 'title' | 'message'): string | undefined =>
+    reasonKey.value
+      ? (t(`errors.${reasonKey.value}.${field}`, { date: reasonDate.value }) as string)
+      : undefined
+
   // Handle query parameters for custom error messages
   const title = computed(() => {
-    if (route?.query?.title) {
-      return route.query.title as string
-    }
-    return props.title || t('errors.default_title')
+    return queryString('title') || reasonText('title') || props.title || t('errors.default_title')
   })
 
   const message = computed(() => {
-    if (route?.query?.message) {
-      return route.query.message as string
-    }
-    return props.message || t('errors.default_message')
+    return (
+      queryString('message') ||
+      reasonText('message') ||
+      props.message ||
+      t('errors.default_message')
+    )
   })
 
   const buttonText = computed(() => {
-    if (route?.query?.buttonText) {
-      return route.query.buttonText as string
-    }
-    return props.buttonText || t('errors.go_home')
+    return queryString('buttonText') || props.buttonText || t('errors.go_home')
   })
 
+  // Only same-origin absolute paths may come from the query string — anything
+  // else (`//evil.example`, `https://…`, `javascript:`) falls back to the
+  // default so /404?buttonLink=… can't be turned into an open redirect.
   const buttonLink = computed(() => {
-    if (route?.query?.buttonLink) {
-      return route.query.buttonLink as string
-    }
-    return props.buttonLink
+    const fromQuery = queryString('buttonLink')
+    if (fromQuery && isSafeInternalPath(fromQuery)) return fromQuery
+    return props.buttonLink ?? localePath('/')
   })
 
   const buttonIcon = computed(() => {
-    if (route?.query?.buttonIcon) {
-      return route.query.buttonIcon as string
-    }
-    return props.buttonIcon
+    return queryString('buttonIcon') || props.buttonIcon
   })
 
   // Determine error code based on title or URL
@@ -126,7 +154,7 @@
     if (
       titleValue.includes('not found') ||
       titleValue.includes('знайдено') ||
-      routePath === '/404'
+      /^(\/en)?\/404\/?$/.test(routePath)
     ) {
       return '404'
     }

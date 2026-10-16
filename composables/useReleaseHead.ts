@@ -1,6 +1,11 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { SITE_URL } from '~/constants/app'
+import { getReleaseBySlug } from '~/data/musicLibrary'
+import { isUpcomingRelease } from '~/utils/configHelpers'
+
+/** Real pixel size of the square release cover JPEGs used for og:image. */
+const COVER_IMAGE_SIZE = 800
 
 export type ReleaseView = 'links' | 'lyrics'
 
@@ -39,6 +44,8 @@ export function useReleaseHead(opts: UseReleaseHeadOptions) {
   useHead(
     computed(() => {
       const isLyrics = opts.view.value === 'lyrics'
+      // Only the listen view: a lyrics page is a real, sitemap-listed document either way.
+      const isUpcoming = !isLyrics && isUpcomingRelease(getReleaseBySlug(opts.slug)?.releaseDate)
       const songName = opts.localizedTitle.value
       const isEn = locale.value === 'en'
       const path = isLyrics ? `/lyrics/${opts.slug}` : `/listen/${opts.slug}`
@@ -62,8 +69,10 @@ export function useReleaseHead(opts: UseReleaseHeadOptions) {
           { property: 'og:title', content: title },
           { property: 'og:description', content: description },
           { property: 'og:image', content: opts.metaImageUrl.value },
-          { property: 'og:image:width', content: '1200' },
-          { property: 'og:image:height', content: '1200' },
+          // Release covers are 800x800 JPEGs (public/images/optimized/albums-images)
+          // — declare the real size so Facebook/LinkedIn don't crop or stretch.
+          { property: 'og:image:width', content: String(COVER_IMAGE_SIZE) },
+          { property: 'og:image:height', content: String(COVER_IMAGE_SIZE) },
           { property: 'og:type', content: 'music.song' },
           { property: 'og:url', content: canonical },
           // OG locale uses underscores (uk_UA), unlike hreflang's hyphen.
@@ -74,7 +83,12 @@ export function useReleaseHead(opts: UseReleaseHeadOptions) {
           { name: 'twitter:card', content: 'summary' },
           { name: 'twitter:title', content: title },
           { name: 'twitter:description', content: description },
-          { name: 'twitter:image', content: opts.metaImageUrl.value }
+          { name: 'twitter:image', content: opts.metaImageUrl.value },
+          // While the release is still upcoming, /listen/<slug> is prerendered as
+          // a real page but is NOT the public destination yet (visitors are sent
+          // to the pre-save / locked page at runtime). Keep it out of the index
+          // until it is released.
+          ...(isUpcoming ? [{ name: 'robots', content: 'noindex' }] : [])
         ],
         link: [
           { rel: 'canonical', href: canonical },

@@ -25,7 +25,12 @@
                 : 'new-release-preview cursor-pointer'
             ]"
             :style="{ transitionDelay: '0ms' }"
+            :role="shouldShowPreSaveCard ? 'link' : undefined"
+            :tabindex="shouldShowPreSaveCard ? 0 : undefined"
+            :aria-label="shouldShowPreSaveCard ? presaveCardAriaLabel : undefined"
             @click="handleUpcomingReleaseClick"
+            @keydown.enter.prevent="shouldShowPreSaveCard && handleUpcomingReleaseClick()"
+            @keydown.space.prevent="shouldShowPreSaveCard && handleUpcomingReleaseClick()"
           >
             <div :class="shouldShowPreSaveCard ? 'presave-content' : 'new-release-content'">
               <!-- Album Cover with Progressive Loading -->
@@ -138,6 +143,7 @@
   import type { MusicRelease } from '~/data/musicLibrary'
   import { getLatestReleases, getAllReleases, musicLibrary } from '~/data/musicLibrary'
   import { getConfig, isUpcomingRelease } from '~/utils/configHelpers'
+  import { hasPreSaveLinks } from '~/utils/preSave'
   import { getLocalizedCountdown } from '~/utils/countdown'
   import { useSnackbar } from '~/composables/useSnackbar'
 
@@ -246,12 +252,7 @@
   const shouldShowPreSaveCard = computed(() => {
     if (!enablePreSave.value) return false
     const release = upcomingRelease.value
-    return (
-      release !== null &&
-      ((release.preSaveMusicPlatformLinks &&
-        Object.keys(release.preSaveMusicPlatformLinks).length > 0) ||
-        !!release.distributorPreSaveUrl)
-    )
+    return release !== null && hasPreSaveLinks(release)
   })
 
   // Next Release Preview functionality - shows non-clickable preview card
@@ -325,8 +326,12 @@
     return translated
   })
 
-  // Calculate days remaining until release
+  // Calculate days remaining until release. Empty while hydrating: the static
+  // HTML is built days/weeks before it is read, so a build-time "in 14 days"
+  // would go stale (and mismatch the client's value) — the countdown is computed
+  // only after mount, like `upcomingReleaseTitle`.
   const daysRemainingText = computed(() => {
+    if (isHydrating.value) return ''
     const releaseDate = upcomingReleaseData.value?.releaseDate
     if (!releaseDate) return ''
 
@@ -336,6 +341,18 @@
       t
     })
   })
+
+  // Accessible name for the pre-save card, which is a role="link" div (it opens
+  // the pre-save modal/page), e.g. "Пресейв: Сліпа вулиця, Реліз 30 жовтня".
+  const presaveCardAriaLabel = computed(() =>
+    [
+      `${t('music.presave.card_title_fallback') as string}: ${upcomingReleaseTitle.value}`,
+      upcomingReleaseComingText.value,
+      daysRemainingText.value
+    ]
+      .filter(Boolean)
+      .join(', ')
+  )
 
   // Use a pre-blurred variant of the upcoming release image to avoid runtime backdrop blur
   const blurredUpcomingReleaseImageUrl = computed(() => {
@@ -879,6 +896,13 @@
   /* Pre-save Card (clickable, similar to new-release-preview but with different styling) */
   .presave-card {
     @include card-sizing-large;
+  }
+
+  /* Keyboard focus ring (the card is a role="link" div, so it needs its own). */
+  .presave-card:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.9);
+    outline-offset: 4px;
+    border-radius: 16px;
   }
 
   .presave-content {

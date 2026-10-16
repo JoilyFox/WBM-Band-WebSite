@@ -57,19 +57,39 @@ const ERROR_STRINGS: Record<string, string> = {
   'errors.default_title': UK.defaultTitle,
   'errors.default_message': UK.defaultMessage,
   'errors.go_home': UK.goHome,
-  'errors.support_hint': UK.supportHint
+  'errors.support_hint': UK.supportHint,
+  'errors.date_tba': 'найближчим часом',
+  'errors.release_locked.title': 'Реліз ще недоступний',
+  'errors.release_locked.message': 'Цей трек стане доступним {date}.',
+  'errors.presave_disabled.title': 'Пресейв вимкнено',
+  'errors.presave_disabled.message': 'Пресейв цього релізу наразі вимкнено.',
+  'errors.presave_not_ready.title': 'Пресейв ще не готовий',
+  'errors.presave_not_ready.message': 'Спробуйте ще раз ближче до {date}.'
 }
+
+// The active locale is mutable so a test can render the English variant.
+const i18nState = vi.hoisted(() => ({ locale: 'ua' }))
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => ERROR_STRINGS[key] ?? key
+    locale: { value: i18nState.locale },
+    t: (key: string, params?: Record<string, string>) =>
+      (ERROR_STRINGS[key] ?? key).replace('{date}', params?.date ?? '')
   })
+}))
+
+// `useLocalePath` is an explicit import; the real one needs the real vue-i18n
+// instance this file replaces, so mirror its contract: `/en` prefix for English.
+vi.mock('#i18n', () => ({
+  useLocalePath: () => (path: string) =>
+    i18nState.locale === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path
 }))
 
 beforeEach(() => {
   vi.clearAllMocks()
   routeState.query = {}
   routeState.path = '/'
+  i18nState.locale = 'ua'
 })
 
 describe('ErrorPage.vue', () => {
@@ -270,6 +290,74 @@ describe('ErrorPage.vue', () => {
       expect(w.findAll('.floating-shape')).toHaveLength(4)
       expect(w.find('.grid-overlay').exists()).toBe(true)
       expect(w.find('.error-divider').exists()).toBe(true)
+    })
+  })
+
+  describe('reason codes (release gates)', () => {
+    it('renders the localized title + message for a reason, formatting the date in Kyiv time', async () => {
+      // 22:00Z on 29 Oct is already 30 Oct in Kyiv (EET, UTC+2).
+      routeState.query = { reason: 'release_locked', date: '2026-10-29T22:00:00Z' }
+      const w = await mountSuspended(ErrorPage)
+      expect(w.get('.error-title').text()).toBe('Реліз ще недоступний')
+      expect(w.get('.error-message').text()).toContain('30 жовтня 2026')
+    })
+
+    it('renders English copy under the en locale', async () => {
+      i18nState.locale = 'en'
+      routeState.query = { reason: 'release_locked', date: '2026-10-29T22:00:00Z' }
+      const w = await mountSuspended(ErrorPage)
+      expect(w.get('.error-message').text()).toContain('October 30, 2026')
+    })
+
+    it('falls back to the localized TBA word for a missing / invalid date', async () => {
+      routeState.query = { reason: 'presave_not_ready', date: 'not-a-date' }
+      const w = await mountSuspended(ErrorPage)
+      expect(w.get('.error-message').text()).toContain('найближчим часом')
+    })
+
+    it('ignores unknown reasons (incl. prototype keys) and keeps the defaults', async () => {
+      routeState.query = { reason: 'constructor' }
+      const w = await mountSuspended(ErrorPage)
+      expect(w.get('.error-title').text()).toBe(UK.defaultTitle)
+    })
+
+    it('keeps backwards compat: explicit title/message query params beat the reason', async () => {
+      routeState.query = { reason: 'release_locked', title: 'Legacy', message: 'Legacy msg' }
+      const w = await mountSuspended(ErrorPage)
+      expect(w.get('.error-title').text()).toBe('Legacy')
+      expect(w.get('.error-message').text()).toBe('Legacy msg')
+    })
+
+    it('derives 404 for the localized /en/404 path too', async () => {
+      routeState.path = '/en/404'
+      const w = await mountSuspended(ErrorPage)
+      expect(w.get('.code-number').text()).toBe('404')
+    })
+  })
+
+  describe('buttonLink hardening (open-redirect guard)', () => {
+    it.each(['//evil.example', '/\\evil.example', 'https://evil.example', 'javascript:alert(1)'])(
+      'rejects the unsafe query buttonLink %s and uses the default home',
+      async (bad) => {
+        routeState.query = { buttonLink: bad }
+        const w = await mountSuspended(ErrorPage)
+        await w.get('.error-button').trigger('click')
+        expect(pushMock).toHaveBeenCalledWith('/')
+      }
+    )
+
+    it('accepts an internal path from the query', async () => {
+      routeState.query = { buttonLink: '/listen/khvyli' }
+      const w = await mountSuspended(ErrorPage)
+      await w.get('.error-button').trigger('click')
+      expect(pushMock).toHaveBeenCalledWith('/listen/khvyli')
+    })
+
+    it('defaults the home button to the LOCALIZED home (/en for English)', async () => {
+      i18nState.locale = 'en'
+      const w = await mountSuspended(ErrorPage)
+      await w.get('.error-button').trigger('click')
+      expect(pushMock).toHaveBeenCalledWith('/en')
     })
   })
 })

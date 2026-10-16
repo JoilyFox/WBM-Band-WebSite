@@ -7,7 +7,7 @@ export default defineNuxtPlugin(() => {
   // Set up global image optimization preferences
   if (import.meta.client) {
     // Enable native lazy loading for supported browsers
-    if ('loading' in HTMLImageElement.prototype) {
+    if (import.meta.dev && 'loading' in HTMLImageElement.prototype) {
       // Native lazy loading is supported
       console.log('✅ Native lazy loading supported')
     }
@@ -34,7 +34,9 @@ export default defineNuxtPlugin(() => {
 
     // Test format support and log results
     Promise.all([testAvif(), testWebp()]).then(([supportsAvif, supportsWebp]) => {
-      console.log(`✅ Image format support - AVIF: ${supportsAvif}, WebP: ${supportsWebp}`)
+      if (import.meta.dev) {
+        console.log(`✅ Image format support - AVIF: ${supportsAvif}, WebP: ${supportsWebp}`)
+      }
 
       // Store format support for optimization decisions
       if (import.meta.client && window) {
@@ -52,7 +54,7 @@ export default defineNuxtPlugin(() => {
         const entries = list.getEntries()
         const lcpEntry = entries[entries.length - 1] as any
 
-        if (lcpEntry && lcpEntry.element && lcpEntry.element.tagName === 'IMG') {
+        if (import.meta.dev && lcpEntry && lcpEntry.element && lcpEntry.element.tagName === 'IMG') {
           console.log(
             `📊 LCP Image detected: ${lcpEntry.startTime.toFixed(2)}ms`,
             lcpEntry.element.src
@@ -63,7 +65,7 @@ export default defineNuxtPlugin(() => {
       try {
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] })
       } catch (e) {
-        console.log('LCP observer not supported')
+        if (import.meta.dev) console.log('LCP observer not supported')
       }
 
       // Monitor layout shifts from images
@@ -76,7 +78,7 @@ export default defineNuxtPlugin(() => {
           }
         })
 
-        if (clsValue > 0.1) {
+        if (import.meta.dev && clsValue > 0.1) {
           console.warn(`⚠️ Layout shift detected: ${clsValue.toFixed(4)}`)
         }
       })
@@ -84,7 +86,7 @@ export default defineNuxtPlugin(() => {
       try {
         clsObserver.observe({ entryTypes: ['layout-shift'] })
       } catch (e) {
-        console.log('CLS observer not supported')
+        if (import.meta.dev) console.log('CLS observer not supported')
       }
     }
 
