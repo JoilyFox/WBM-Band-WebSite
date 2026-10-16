@@ -118,12 +118,14 @@
 
     <!-- Scroll indicator -->
     <div class="absolute z-20 bottom-8 left-0 right-0 flex justify-center">
-      <div
-        class="opacity-80 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300"
+      <button
+        type="button"
+        class="opacity-80 animate-bounce motion-reduce:animate-none cursor-pointer hover:scale-110 transition-transform duration-300"
+        :aria-label="t('a11y_ui.scroll_down')"
         @click="handleScrollDown"
       >
         <i class="pi pi-chevron-down text-white text-2xl"></i>
-      </div>
+      </button>
     </div>
   </section>
 </template>
@@ -133,7 +135,11 @@
   import Button from 'primevue/button'
   import { useI18n } from 'vue-i18n'
   import { useImageLoading, IMAGE_SIZES } from '~/utils/imageHelpers'
-  import { useHeroSlider, type HeroImage } from '~/composables/useHeroSlider'
+  import {
+    useHeroSlider,
+    isConstrainedConnection,
+    type HeroImage
+  } from '~/composables/useHeroSlider'
   import { useScrollTo } from '~/composables/useScrollTo'
   import { getConfig } from '~/utils/configHelpers'
 
@@ -341,6 +347,10 @@
     // a full interval of lead time. This keeps the initial payload to ~2 images
     // instead of all ~11 (the rest were ~5MB of off-screen hero images).
     const preloadNextSlide = () => {
+      // Save-Data / 2g / 3g: don't spend the visitor's bandwidth on slides that
+      // autoplay no longer rotates to (see useHeroSlider); manual navigation
+      // still loads the target slide on demand via the currentIndex watcher.
+      if (isConstrainedConnection()) return
       const len = activeImages.value.length
       if (len > 1) markSlideLoaded((currentIndex.value + 1) % len)
     }
@@ -561,6 +571,17 @@
     }
     100% {
       transform: translateX(100%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .progress-bar.animate {
+      animation: none;
+      width: 0%;
+    }
+
+    .progress-bar::before {
+      animation: none;
     }
   }
 

@@ -80,7 +80,7 @@
                 <div class="usage-icon">
                   <i class="pi pi-envelope"></i>
                 </div>
-                <h4 class="usage-title">{{ t('pages.privacy.use_communication_title') }}</h4>
+                <h3 class="usage-title">{{ t('pages.privacy.use_communication_title') }}</h3>
                 <p class="usage-description">
                   {{ t('pages.privacy.use_communication_desc') }}
                 </p>
@@ -90,7 +90,7 @@
                 <div class="usage-icon">
                   <i class="pi pi-shield"></i>
                 </div>
-                <h4 class="usage-title">{{ t('pages.privacy.use_security_title') }}</h4>
+                <h3 class="usage-title">{{ t('pages.privacy.use_security_title') }}</h3>
                 <p class="usage-description">
                   {{ t('pages.privacy.use_security_desc') }}
                 </p>
@@ -111,14 +111,14 @@
 
             <div class="sharing-list">
               <div class="sharing-item">
-                <h4 class="sharing-title">{{ t('pages.privacy.share_providers_title') }}</h4>
+                <h3 class="sharing-title">{{ t('pages.privacy.share_providers_title') }}</h3>
                 <p class="sharing-description">
                   {{ t('pages.privacy.share_providers_desc') }}
                 </p>
               </div>
 
               <div class="sharing-item">
-                <h4 class="sharing-title">{{ t('pages.privacy.share_legal_title') }}</h4>
+                <h3 class="sharing-title">{{ t('pages.privacy.share_legal_title') }}</h3>
                 <p class="sharing-description">
                   {{ t('pages.privacy.share_legal_desc') }}
                 </p>
@@ -142,7 +142,7 @@
                 <div class="rights-icon">
                   <i class="pi pi-eye"></i>
                 </div>
-                <h4 class="rights-title">{{ t('pages.privacy.rights_access_title') }}</h4>
+                <h3 class="rights-title">{{ t('pages.privacy.rights_access_title') }}</h3>
                 <p class="rights-description">{{ t('pages.privacy.rights_access_desc') }}</p>
               </div>
 
@@ -150,7 +150,7 @@
                 <div class="rights-icon">
                   <i class="pi pi-pencil"></i>
                 </div>
-                <h4 class="rights-title">{{ t('pages.privacy.rights_rectification_title') }}</h4>
+                <h3 class="rights-title">{{ t('pages.privacy.rights_rectification_title') }}</h3>
                 <p class="rights-description">{{ t('pages.privacy.rights_rectification_desc') }}</p>
               </div>
 
@@ -158,7 +158,7 @@
                 <div class="rights-icon">
                   <i class="pi pi-trash"></i>
                 </div>
-                <h4 class="rights-title">{{ t('pages.privacy.rights_erasure_title') }}</h4>
+                <h3 class="rights-title">{{ t('pages.privacy.rights_erasure_title') }}</h3>
                 <p class="rights-description">{{ t('pages.privacy.rights_erasure_desc') }}</p>
               </div>
 
@@ -166,7 +166,7 @@
                 <div class="rights-icon">
                   <i class="pi pi-times-circle"></i>
                 </div>
-                <h4 class="rights-title">{{ t('pages.privacy.rights_objection_title') }}</h4>
+                <h3 class="rights-title">{{ t('pages.privacy.rights_objection_title') }}</h3>
                 <p class="rights-description">{{ t('pages.privacy.rights_objection_desc') }}</p>
               </div>
             </div>
@@ -377,7 +377,7 @@
 
   // Lifecycle
   onMounted(() => {
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
   })
 
   onUnmounted(() => {

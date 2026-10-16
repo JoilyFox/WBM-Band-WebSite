@@ -420,7 +420,11 @@ body.lg-tier-low .share-glass-btn {
 
 /* Container optimization for better scrolling performance */
 .music-detail-content {
-  content-visibility: auto;
+  /* No `content-visibility: auto` here: this element IS the page (always on
+     screen), so skipping gains nothing, and on first paint Chrome sizes the
+     flex:1 box as if skipped (footer-height remainder, 495px) before expanding
+     it to its real height one frame later, which dragged the footer down by
+     ~220px (CLS 0.106 on /listen, 0.33 on /lyrics). */
   contain: layout style;
 }
 

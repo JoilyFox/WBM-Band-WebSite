@@ -42,14 +42,14 @@
 
           <!-- Privacy Policy Links Row -->
           <div class="flex space-x-6 text-sm white !mt-6 justify-center gap-y-3 flex-wrap">
-            <button
+            <NuxtLink
               v-for="legal in legalLinks"
               :key="legal.action"
+              :to="legal.to"
               class="legal-link-minimal whitespace-nowrap"
-              @click="handleLegalLink(legal.action)"
             >
               {{ t(legal.label) }}
-            </button>
+            </NuxtLink>
           </div>
 
           <!-- Developer Credit -->
@@ -108,14 +108,14 @@
           <!-- Right Section: Legal Links and Developer Credit -->
           <div class="flex flex-col items-end space-y-2">
             <div class="flex space-x-6 text-sm items-center">
-              <button
+              <NuxtLink
                 v-for="legal in legalLinks"
                 :key="legal.action"
+                :to="legal.to"
                 class="legal-link-minimal whitespace-nowrap"
-                @click="handleLegalLink(legal.action)"
               >
                 {{ legal.label }}
-              </button>
+              </NuxtLink>
             </div>
             <div class="flex items-center justify-between w-full gap-8">
               <!-- Developer Credit -->
@@ -263,14 +263,14 @@
               class="flex flex-col md2:flex-row items-center md2:space-x-6 space-y-3 md2:space-y-0"
             >
               <div class="flex items-center space-x-6">
-                <button
+                <NuxtLink
                   v-for="legal in legalLinks"
                   :key="legal.label"
+                  :to="legal.to"
                   class="legal-link whitespace-nowrap"
-                  @click="handleLegalLink(legal.action)"
                 >
                   {{ legal.label }}
-                </button>
+                </NuxtLink>
               </div>
               <div
                 class="text-white/50 md2:text-white/30 text-xs !mt-[26px] min-w-[150px] md2:!mt-0 two-line-clamp"
@@ -426,27 +426,10 @@
 
   // Legal links (labels reactive to locale changes)
   const legalLinks = computed(() => [
-    { label: t('footer.privacy'), action: 'privacy' },
-    { label: t('footer.terms'), action: 'terms' },
-    { label: t('footer.cookies'), action: 'cookies' }
+    { label: t('footer.privacy'), action: 'privacy', to: localePath('/privacy-policy') },
+    { label: t('footer.terms'), action: 'terms', to: localePath('/terms-of-service') },
+    { label: t('footer.cookies'), action: 'cookies', to: localePath('/cookies-policy') }
   ])
-
-  // Legal link handler
-  const handleLegalLink = (action: string) => {
-    switch (action) {
-      case 'privacy':
-        navigateTo(localePath('/privacy-policy'))
-        break
-      case 'terms':
-        navigateTo(localePath('/terms-of-service'))
-        break
-      case 'cookies':
-        navigateTo(localePath('/cookies-policy'))
-        break
-      default:
-        console.warn('Unknown legal link action:', action)
-    }
-  }
 
   // Logo click handler for smooth scrolling to hero section
   const scrollToHero = () => {

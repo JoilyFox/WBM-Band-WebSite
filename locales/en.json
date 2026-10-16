@@ -325,6 +325,16 @@
       "youtube_title": "Watch on YouTube"
     }
   },
+  "a11y_ui": {
+    "skip_to_content": "Skip to main content",
+    "scroll_down": "Scroll down",
+    "close_modal": "Close dialog",
+    "dialog": "Dialog",
+    "release_details": "Release details",
+    "team_member": "Team member",
+    "previous_slide": "Previous slide",
+    "next_slide": "Next slide"
+  },
   "lang": {
     "english": "English",
     "ukrainian": "Українська",

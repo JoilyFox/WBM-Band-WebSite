@@ -106,7 +106,9 @@
       :class="[
         'music-hero flex flex-col items-center justify-center relative overflow-hidden',
         {
-          'pt-20 pb-3 px-4 md:py-16 md:px-8': !isHeroExpanded && !isDesktop && !isModal,
+          // md:pt-16 md:pb-8 (not md:py-16) so the SSR/pre-hydration desktop hero already
+          // has the padding of the `isDesktop` branch below — no -32px jump on mount.
+          'pt-20 pb-3 px-4 md:pt-16 md:pb-8 md:px-8': !isHeroExpanded && !isDesktop && !isModal,
           'py-4 px-4': !isHeroExpanded && !isDesktop && isModal,
           'pt-16 pb-3 md:pb-8 px-4 md:px-8': isHeroExpanded || isDesktop,
           'modal-hero': isModal
@@ -275,11 +277,9 @@
           <!-- Desktop hero action row: an optional Lyrics button alongside Share,
                in the shared glassmorphic design. Music Video stays in the platform
                grid below (not here). Share drops to icon-only once it shares the
-               row with the Lyrics button. Client + desktop only. -->
-          <div
-            v-if="isDesktop && isClient"
-            class="desktop-share-button mt-6 items-center gap-3 flex-wrap"
-          >
+               row with the Lyrics button. Rendered in SSR too (no hydration shift);
+               `.desktop-share-button` is display:none below 768px in the styles. -->
+          <div class="desktop-share-button mt-6 items-center gap-3 flex-wrap">
             <MusicActionButton
               v-if="lyricsAvailable"
               :icon="

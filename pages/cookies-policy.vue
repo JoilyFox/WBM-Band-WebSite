@@ -108,7 +108,7 @@
                   <i class="pi pi-check"></i>
                 </div>
                 <div class="consent-content">
-                  <h4 class="consent-title">{{ t('pages.cookies.consent_accept_title') }}</h4>
+                  <h3 class="consent-title">{{ t('pages.cookies.consent_accept_title') }}</h3>
                   <p class="consent-description">
                     {{ t('pages.cookies.consent_accept_desc') }}
                   </p>
@@ -120,7 +120,7 @@
                   <i class="pi pi-times"></i>
                 </div>
                 <div class="consent-content">
-                  <h4 class="consent-title">{{ t('pages.cookies.consent_essential_title') }}</h4>
+                  <h3 class="consent-title">{{ t('pages.cookies.consent_essential_title') }}</h3>
                   <p class="consent-description">
                     {{ t('pages.cookies.consent_essential_desc') }}
                   </p>
@@ -282,7 +282,7 @@
 
   // Lifecycle
   onMounted(() => {
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
   })
 
   onUnmounted(() => {

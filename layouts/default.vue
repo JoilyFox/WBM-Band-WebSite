@@ -2,6 +2,11 @@
   <div class="min-h-screen bg-surface-950">
     <NuxtRouteAnnouncer />
 
+    <!-- Skip link: first focusable element; visible only while focused (WCAG 2.4.1). -->
+    <a href="#main-content" class="skip-link" @click.prevent="skipToContent">
+      {{ t('a11y_ui.skip_to_content') }}
+    </a>
+
     <!-- Header: Liquid Glass bar with JS physics refraction (docs/liquid-glass.md).
          v-lg-physics generates a Snell's-law displacement map from the bar's real
          geometry (Chromium only); falls back to the static lens / faux-bend. -->
@@ -151,7 +156,7 @@
     </Transition>
 
     <!-- Main Content with top padding to account for fixed header -->
-    <main class="">
+    <main id="main-content" tabindex="-1" class="">
       <slot />
     </main>
 
@@ -204,6 +209,12 @@
     reducedMotionRespect: true, // Respect user's accessibility preferences
     performanceMode: 'auto' // Let the composable decide the best performance mode
   })
+
+  // Skip link: move focus to <main> without a router hash navigation/scroll jump.
+  const skipToContent = () => {
+    const main = document.getElementById('main-content')
+    main?.focus({ preventScroll: false })
+  }
 
   // Mobile menu state
   const isMobileMenuOpen = ref(false)
@@ -301,6 +312,40 @@
 </script>
 
 <style scoped>
+  /* Visually hidden until keyboard-focused. */
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 100;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #0a0a0a;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transform: translateY(-200%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.6);
+  }
+
+  #main-content:focus,
+  #main-content:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
   /* Custom component classes */
   .nav-link-desktop {
     position: relative;
@@ -347,8 +392,10 @@
     transform: scale(0.95);
   }
 
-  .logo-button:focus {
-    outline: none;
+  /* Keyboard focus only (WCAG 2.4.7) — mouse/touch focus stays invisible. */
+  .logo-button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
     box-shadow: none;
   }
 
@@ -359,8 +406,9 @@
     }
   }
 
-  .nav-link-desktop:focus {
-    outline: none;
+  .nav-link-desktop:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
     box-shadow: none;
   }
 
@@ -417,8 +465,14 @@
     transform: scale(0.95);
   }
 
-  .nav-link-mobile:focus {
+  .nav-link-mobile:focus:not(:focus-visible) {
     outline: none;
+    box-shadow: none;
+  }
+
+  .nav-link-mobile:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
     box-shadow: none;
   }
 
@@ -463,8 +517,14 @@
     background-color: rgba(255, 255, 255, 0.1);
   }
 
-  .mobile-menu-button:focus {
+  .mobile-menu-button:focus:not(:focus-visible) {
     outline: none;
+    box-shadow: none;
+  }
+
+  .mobile-menu-button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
     box-shadow: none;
   }
 
@@ -476,12 +536,20 @@
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   }
 
-  /* Remove all focus rings and outlines */
+  /* No rings for pointer/touch focus. Keyboard focus (:focus-visible) is left alone
+     so the explicit rings below (and the global *:focus-visible ring) can show —
+     the old blanket `outline:none !important` on every a/button/:focus hid them
+     all (WCAG 2.4.7). */
+  a:not(:focus-visible),
+  button:not(:focus-visible),
+  *:focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   a,
   button,
   *:focus {
-    outline: none !important;
-    box-shadow: none !important;
     -webkit-tap-highlight-color: transparent;
   }
 

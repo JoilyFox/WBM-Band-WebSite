@@ -79,7 +79,7 @@
                 <div class="rights-icon">
                   <i class="pi pi-volume-up"></i>
                 </div>
-                <h4 class="rights-title">{{ t('pages.terms.ip_music_title') }}</h4>
+                <h3 class="rights-title">{{ t('pages.terms.ip_music_title') }}</h3>
                 <p class="rights-description">
                   {{ t('pages.terms.ip_music_desc', { bandName }) }}
                 </p>
@@ -89,7 +89,7 @@
                 <div class="rights-icon">
                   <i class="pi pi-image"></i>
                 </div>
-                <h4 class="rights-title">{{ t('pages.terms.ip_visual_title') }}</h4>
+                <h3 class="rights-title">{{ t('pages.terms.ip_visual_title') }}</h3>
                 <p class="rights-description">
                   {{ t('pages.terms.ip_visual_desc') }}
                 </p>
@@ -99,7 +99,7 @@
                 <div class="rights-icon">
                   <i class="pi pi-globe"></i>
                 </div>
-                <h4 class="rights-title">{{ t('pages.terms.ip_brand_title') }}</h4>
+                <h3 class="rights-title">{{ t('pages.terms.ip_brand_title') }}</h3>
                 <p class="rights-description">
                   {{ t('pages.terms.ip_brand_desc') }}
                 </p>
@@ -116,23 +116,23 @@
           <div class="card-content">
             <div class="disclaimer-types">
               <div class="disclaimer-type">
-                <h4 class="disclaimer-title">
+                <h3 class="disclaimer-title">
                   {{ t('pages.terms.disclaimer_availability_title') }}
-                </h4>
+                </h3>
                 <p class="disclaimer-description">
                   {{ t('pages.terms.disclaimer_availability_desc') }}
                 </p>
               </div>
 
               <div class="disclaimer-type">
-                <h4 class="disclaimer-title">{{ t('pages.terms.disclaimer_links_title') }}</h4>
+                <h3 class="disclaimer-title">{{ t('pages.terms.disclaimer_links_title') }}</h3>
                 <p class="disclaimer-description">
                   {{ t('pages.terms.disclaimer_links_desc') }}
                 </p>
               </div>
 
               <div class="disclaimer-type">
-                <h4 class="disclaimer-title">{{ t('pages.terms.disclaimer_liability_title') }}</h4>
+                <h3 class="disclaimer-title">{{ t('pages.terms.disclaimer_liability_title') }}</h3>
                 <p class="disclaimer-description">
                   {{ t('pages.terms.disclaimer_liability_desc', { bandName }) }}
                 </p>
@@ -300,7 +300,7 @@
 
   // Lifecycle
   onMounted(() => {
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
   })
 
   onUnmounted(() => {
