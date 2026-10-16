@@ -183,6 +183,33 @@ inconsistency — convert only on request):
 - **Streaming mini-buttons** (`StreamingButtons`) — brand-coloured logos.
 - **Text nav / legal / footer links** — links, not button controls; converting
   risks the header glass/scroll-animation system for no visual gain.
+- **Mobile hero quick-actions** (`MusicHeroPill` Music Video + Lyrics⇄Back morph in
+  `MusicDetailContent`) — see below.
+
+### Mobile hero quick-actions morph (one animated number)
+
+The Music Video ⇄ Lyrics/Back morph on `/listen/<slug>` (<md) is driven by ONE
+registered `<number>`, `--hqa-p` (0 = links view, 1 = lyrics view), declared with
+`@property` in `MusicDetailContent.styles.css`. It is the only thing that
+transitions (`0.42s cubic-bezier(.4,0,.2,1)` on `.hero-quick-actions`, same length as
+the pane swipe). Everything else is `calc()` on it: the Music Video width is an
+explicit lerp, the Lyrics/Back pill is `flex: 1` (always exactly the remainder of the
+row), the label collapse, icon↔label gap and the two faces' slide + cross-fade are
+affine in p — so every element has the same progress curve, starts/ends on the same
+frame, is monotonic and cannot collide with a sibling. **Do not** add per-element
+`transition`s, `flex-*` animation, `max-width` transitions or `%`-based `translateX`
+to these elements — that is exactly what made the old version overshoot/stall.
+
+- The Music Video label's natural width is measured in JS (`measureMvLabel`, a
+  Range) into `--mv-label-w` on the row; CSS falls back to `7rem`.
+- Perf/motion policy: the global `.mobile-conservative * { transition: none }` /
+  `.reduce-animations * { transition: opacity .2s }` rules are beaten with
+  specificity + `!important` only for `--hqa-p` (low-perf keeps the movement; its
+  blanket `transform: none` turns the slide into a cross-fade). The p-derived
+  opacities must NOT have their own transition (they would lag behind p). A real OS
+  reduce-motion request gets an instant swap (faces still fade 0.2s).
+- No `will-change`/`contain`/`transform` on ancestors of the pills (backdrop-root
+  trap, §1).
 
 When adding a button: reach for `<UiButton>`. Only drop to bespoke CSS for a
 genuinely distinct identity, and if it's glass, build on `.liquid-glass` +

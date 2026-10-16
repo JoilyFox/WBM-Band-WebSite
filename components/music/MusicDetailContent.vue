@@ -312,10 +312,16 @@
            (md:hidden) so the music video stays reachable whether the hero is
            collapsed or expanded — it is removed from the platform grid below at
            this breakpoint, while desktop keeps it in the grid and hides this row. -->
+      <!-- ONE animated number (`--hqa-p`, 0 → 1, see the "Hero quick-actions
+           morph" block in the styles) drives the whole open/close morph: the Music
+           Video width, the Lyrics/Back width (the remainder of the row), the icon
+           and label travel and both faces' cross-fade are all derived from it, so
+           they share one easing and one duration and cannot fight each other. -->
       <div
         v-if="!isModal && showHeroActions"
+        ref="heroActionsEl"
         class="hero-quick-actions md:hidden relative z-10 mt-3 flex w-full max-w-[500px] mx-auto items-center gap-3"
-        :class="{ 'lyrics-active': showLyrics }"
+        :class="{ 'lyrics-active': showLyrics, 'hqa--pair': bothActions }"
       >
         <MusicHeroPill
           v-if="musicVideoUrl"
@@ -325,7 +331,6 @@
           rel="noopener noreferrer"
           accent="video"
           :aria-label="t('music.buttons.watch_video')"
-          :class="{ 'flex-1 justify-center': bothActions }"
           @click="handleMusicVideoClick"
         >
           <!-- Slotted (not the icon/label props) so the label can collapse to an
@@ -345,22 +350,16 @@
           :as="lyricsMorphHref ? 'a' : 'button'"
           :href="lyricsMorphHref || undefined"
           :aria-label="showLyrics ? lyricsBackLabel : t('music.a11y.show_lyrics')"
-          :class="[
-            'lyrics-morph-pill',
-            bothActions ? 'flex-1 justify-center' : 'lyrics-morph-pill--solo ml-auto'
-          ]"
+          :class="['lyrics-morph-pill', { 'lyrics-morph-pill--solo ml-auto': !bothActions }]"
           @click="onLyricsPillClick"
         >
           <!-- Morphing content: the SAME pill is the Lyrics trigger (links view)
                and the "Back to Music" control (lyrics view). Both faces are
-               grid-stacked and clipped by the pill; only the icon+text slide
-               (out/in on the right) + cross-fade, synced to the 0.42s pane swap.
+               grid-stacked and clipped by the pill; both slide one short step
+               together (a filmstrip) while they cross-fade, driven by --hqa-p.
                The pill's border/size never change. Faces are aria-hidden — the
                button's dynamic aria-label is the authoritative accessible name. -->
-          <span
-            class="pill-morph"
-            :class="{ 'is-back': showLyrics, 'pill-morph--reduced': shouldReduceAnimations }"
-          >
+          <span class="pill-morph" :class="{ 'is-back': showLyrics }">
             <span class="pill-morph__face pill-morph__face--lyrics" aria-hidden="true">
               <i class="pi pi-align-left text-base leading-none"></i>
               <UiResponsiveText
@@ -714,10 +713,29 @@
     toggleLyrics()
   }
 
+  // --- Hero quick-actions morph: label geometry --------------------------------
+  // The Music Video label collapses (≤450px) / the pill settles to its natural
+  // width (>450px) by interpolating real lengths, so CSS needs the label's natural
+  // text width. Measure it with a Range (fractional px, independent of the label's
+  // own max-width collapse) and expose it as `--mv-label-w` on the row. The CSS
+  // falls back to 7rem (≥ the longest label) until this runs, so SSR and first
+  // paint are identical to the at-rest layout.
+  const heroActionsEl = ref<HTMLElement | null>(null)
+  const measureMvLabel = () => {
+    const row = heroActionsEl.value
+    const label = row?.querySelector<HTMLElement>('.mv-label')
+    if (!row || !label || !import.meta.client) return
+    const range = document.createRange()
+    range.selectNodeContents(label)
+    const width = range.getBoundingClientRect().width
+    if (width > 0) row.style.setProperty('--mv-label-w', `${width}px`)
+  }
+
   // The morphing hero pill is the single open/close control (the in-pane back
   // button was removed): open the lyrics when on the links view, close them when
   // on the lyrics view. The floating top-left back-arrow still closes too.
   const toggleLyrics = () => {
+    measureMvLabel() // keep the morph's label geometry exact for the current font/locale
     // A real tap on the pill is the "interaction" that earns the visitor the
     // context for the "Back to Music" label (vs the cold-entry "Listen to the
     // Song"). Persisted ~2h so it survives refreshes/navigation in this session.
@@ -740,6 +758,9 @@
     // Promote the cold "Listen to the Song" label to "Back to Music" if this
     // visitor has interacted with the toggle within the TTL (client-only read).
     hydrateMusicNavContext()
+    measureMvLabel()
+    // Web fonts swap in after first paint and change the label's width.
+    if (document.fonts?.ready) document.fonts.ready.then(measureMvLabel).catch(() => {})
     if (import.meta.client && props.lyricsUrlSync) {
       window.addEventListener('popstate', handleLyricsPopState)
     }
@@ -747,6 +768,9 @@
   onBeforeUnmount(() => {
     if (import.meta.client) window.removeEventListener('popstate', handleLyricsPopState)
   })
+
+  // The label text (and so its width) changes with the locale.
+  watch(locale, () => nextTick(measureMvLabel))
 
   // Optimized scroll handling
   const { isScrolled } = useOptimizedScroll({ threshold: 60 })

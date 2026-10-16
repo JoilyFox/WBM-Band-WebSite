@@ -997,19 +997,50 @@ body.lg-tier-low .share-glass-btn {
   transition: opacity 0.2s ease !important;
 }
 
-/* --- Lyrics pill morph -------------------------------------------------- */
-/* The single hero pill swaps between the "Lyrics" trigger (links view) and the
-     "Back to Music" control (lyrics view) as the panes cross-slide. Both faces
-     are grid-stacked INSIDE the pill and clipped by it, so the pill's border and
-     size never move — only the icon+text slide off/in on the right and cross-fade.
-     Timing matches the 0.42s pane swipe. */
+/* --- Hero quick-actions morph ------------------------------------------- */
+/* ONE source of truth. The whole Music Video / Lyrics⇄Back morph is a function
+     of a single registered number, `--hqa-p` (0 = links view, 1 = lyrics view;
+     the @property just below), which is the ONLY thing that
+     transitions. Every width, offset and opacity below is plain calc() on it, so
+     all of them share one duration and one easing curve, start and end on the
+     same frame, and — being affine in p — move monotonically with identical
+     progress curves. Nothing here animates `flex-*`, `max-width` or `%`-translate
+     on its own any more: the old per-property transitions (0.25s widths vs 0.42s
+     faces vs flex re-solving with min-content clamps vs translateX(±100%) of a
+     width that was itself changing) are what made siblings collide, stall and
+     overshoot. The Music Video width is explicit; the Lyrics/Back pill is
+     `flex: 1` (the remainder of the row), so the two can never overlap or leave
+     a gap, whatever the frame timing. Reversing mid-flight is just the number
+     retargeting. */
+@property --hqa-p {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.hero-quick-actions {
+  --hqa-dur: 0.42s; /* = the pane swipe + height tween, so everything lands together */
+  --hqa-ease: cubic-bezier(0.4, 0, 0.2, 1); /* smooth ease-in-out */
+  --hqa-slide: 1.25rem; /* travel of the Lyrics⇄Back label filmstrip */
+  --hqa-pad: 0.875rem; /* the pill's px-3.5 */
+  --hqa-icon: 1.25rem; /* UiIcon is 1.25em wide at text-base */
+  --hqa-gap: 0.5rem; /* pill gap-2 between icon and label */
+  --hqa-half: calc(50% - 0.375rem); /* half the row minus half the gap-3 */
+  --mv-label: var(--mv-label-w, 7rem); /* natural label width, measured in JS */
+  --mv-icon-only: calc(var(--hqa-pad) * 2 + var(--hqa-icon));
+  --mv-full: calc(var(--mv-icon-only) + var(--hqa-gap) + var(--mv-label));
+  transition: --hqa-p var(--hqa-dur) var(--hqa-ease);
+}
+
+.hero-quick-actions.lyrics-active {
+  --hqa-p: 1;
+}
+
+/* Lyrics/Back pill: clip the sliding faces at the BORDER (the breathing room
+     lives on the faces), exactly as before. */
 .lyrics-morph-pill {
   position: relative;
   overflow: hidden;
-  /* Drop the pill's own horizontal padding so the sliding faces are clipped at
-       the BORDER, not the padding edge. The breathing room moves onto the faces
-       below, so the resting label position AND the pill's outer size are
-       unchanged — only the clip point moves out to the border. */
   padding-left: 0;
   padding-right: 0;
 }
@@ -1017,8 +1048,6 @@ body.lg-tier-low .share-glass-btn {
 .pill-morph {
   display: grid;
   width: 100%;
-  /* don't let the grid's widest face ("Back to Music") impose a min-width on
-       the pill — that broke the links-view 50/50 on narrow phones. */
   min-width: 0;
   overflow: hidden;
 }
@@ -1026,213 +1055,104 @@ body.lg-tier-low .share-glass-btn {
 .pill-morph__face {
   grid-area: 1 / 1;
   width: 100%;
-  /* the px-3.5 the pill used to carry — keeps the resting inset identical */
   padding-inline: 0.875rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   white-space: nowrap;
-  will-change: transform, opacity;
-  /* `!important` so the blunt global mobile perf overrides in base.scss can't
-       clobber the intended timing (same guard the pane swipe uses). */
-  transition:
-    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
-/* Resting (links view): Lyrics centred & visible; Back parked off the right. */
+/* The two faces move as ONE filmstrip: both shift left by --hqa-slide as p goes
+     0→1 (the way the pane swipe travels on "forward"), reversing on the way back.
+     Their offset is always exactly one --hqa-slide apart and they ride inside a
+     pill whose centre is itself moving monotonically, so no label ever travels
+     one way and then returns. The cross-fade is linear in p as well, in two
+     overlapping windows (out: p 0→.6, in: p .4→1) so the two labels never show
+     as a legible double-exposure — opacity is clamped to [0,1] by the browser. */
 .pill-morph__face--lyrics {
-  transform: translateX(0);
-  opacity: 1;
+  opacity: calc(1 - var(--hqa-p) * 1.6667);
+  transform: translateX(calc(var(--hqa-p) * var(--hqa-slide) * -1));
 }
 
 .pill-morph__face--back {
-  transform: translateX(-100%);
-  opacity: 0;
+  opacity: calc((var(--hqa-p) - 0.4) * 1.6667);
+  transform: translateX(calc((1 - var(--hqa-p)) * var(--hqa-slide)));
 }
 
-/* Lyrics view: the Lyrics face slides OUT to the RIGHT while the Back face
-     slides IN from the LEFT — a true cross-slide (no overlap). Reverses on the
-     way back, so the Lyrics text always travels on the RIGHT edge and the Back
-     text on the LEFT edge. */
-.pill-morph.is-back .pill-morph__face--lyrics {
-  transform: translateX(100%);
-  opacity: 0;
+/* --- Paired layout (Music Video + Lyrics) ------------------------------- */
+/* Music Video: explicit width, interpolated from half the row to its lyrics-view
+     width. >450px that is its natural width (label kept); ≤450px (below) it is
+     icon-only. The YouTube glow widens in step. */
+.hqa--pair > .music-hero-pill--video {
+  --mv-end: var(--mv-full);
+  --mv-glow-add: 15%; /* 45% → 60% */
+  flex: none;
+  width: calc(var(--hqa-half) + (var(--mv-end) - var(--hqa-half)) * var(--hqa-p));
+  background-size: calc(45% + var(--mv-glow-add) * var(--hqa-p)) 100%;
 }
 
-.pill-morph.is-back .pill-morph__face--back {
-  transform: translateX(0);
-  opacity: 1;
+/* Lyrics/Back: whatever the Music Video leaves of the row. */
+.hqa--pair > .lyrics-morph-pill {
+  flex: 1 1 0%;
+  min-width: 0;
 }
 
-/* Reduced-motion / low-perf ("optimized" mode): swap the two faces INSTANTLY —
-     no slide and no crossfade. The opacity flips in a single frame so the label
-     changes outright instead of fading in/out. */
-.pill-morph--reduced .pill-morph__face {
-  transform: none !important;
-  transition: none !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pill-morph__face {
-    transform: none !important;
-    transition: none !important;
-  }
-}
-
-/* --- Lyrics-view width split ------------------------------------------- */
-/* When both hero pills are present, opening the lyrics grows the Lyrics/Back
-     pill to ~75% of the row and shrinks the Music Video pill to the rest. Driven
-     by flex-grow (3:1) so the gap maths stay automatic, animated with the same
-     0.42s easing as the morphing text (the existing 0.1s hover transitions are
-     preserved in the list). `!important` so the width grow/shrink keeps its
-     MOVEMENT even in low-perf "optimized" mode — base.scss's
-     `.mobile-conservative * { transition: none }` would otherwise snap it. There,
-     only the pill's inner Lyrics/Back faces are meant to change instantly, not
-     the resize itself. (The prefers-reduced-motion block below still drops it.) */
-.hero-quick-actions > .music-hero-pill {
-  transition:
-    transform 0.1s ease-in-out,
-    background-color 0.1s ease-in-out,
-    border-color 0.1s ease-in-out,
-    /* fast (0.25s) but a gentle ease — the front-loaded easeOutQuint felt rough
-         on the width shrink; this accelerates/decelerates smoothly instead.
-         flex-BASIS is animated too: the links view uses a definite basis
-         (calc 50%) and the lyrics view uses 0 — without this the basis snapped
-         instantly on grow, flashing a wide empty pill before the label caught up. */
-      flex-grow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    flex-basis 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    /* the YouTube glow widens in step with the shrink */ background-size 0.25s
-      cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.hero-quick-actions.lyrics-active > .lyrics-morph-pill {
-  flex-grow: 3;
-}
-
-/* Music Video glow grows as the pill reduces: ~60% across the reduced (text-kept)
-     pill on wider phones, and the full button once it's icon-only (≤450px below). */
-.hero-quick-actions.lyrics-active > .music-hero-pill--video {
-  background-size: 60% 100%;
-}
-
-/* Lone lyrics pill (this release ships no Music Video): occupy ~half the row on
-     the release/links view — matching the right-hand slot a paired Lyrics pill
-     would take — then grow to the full row on the lyrics view. Right-pinned via
-     ml-auto so it grows leftward, animated by the shared .music-hero-pill flex
-     transition above. flex-grow stays 0 in both states so it's a pure flex-basis
-     grow (50% → 100%); placed AFTER the flex-grow:3 rule so it wins for --solo. */
+/* Lone Lyrics pill (no Music Video on this release): half the row on the links
+     view (right-pinned via ml-auto), growing leftward to the full row. */
 .hero-quick-actions > .lyrics-morph-pill--solo {
-  flex: 0 1 calc(50% - 0.375rem);
+  flex: none;
+  width: calc(var(--hqa-half) + (100% - var(--hqa-half)) * var(--hqa-p));
 }
 
-.hero-quick-actions.lyrics-active > .lyrics-morph-pill--solo {
-  flex-grow: 0;
-  flex-basis: 100%;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* keep the hover transitions; drop only the width animation. `!important` to
-       outrank the now-!important base rule above (equal specificity, later wins),
-       so an explicit reduce-motion request still snaps the resize. */
-  .hero-quick-actions > .music-hero-pill {
-    transition:
-      transform 0.1s ease-in-out,
-      background-color 0.1s ease-in-out,
-      border-color 0.1s ease-in-out !important;
-  }
-}
-
-/* --- Small-phone responsiveness ---------------------------------------- */
 /* The Music Video label sits on its own span so it can collapse to nothing,
-     leaving just the YouTube icon. Animated at the same 0.25s as the width. */
+     leaving just the YouTube icon (≤450px, below). */
 .mv-label {
   display: inline-block;
-  /* Tighter cap (≈ the longest label) so the width collapse starts almost
-       immediately instead of idling while max-width drops from a loose value —
-       that idle-then-snap was the rough bit. The opacity/slide lead from t=0. */
-  max-width: 7rem;
   overflow: hidden;
   white-space: nowrap;
-  will-change: transform, opacity;
-  /* `!important` so the Music Video label keeps its fade-out (and collapse) even
-       in low-perf "optimized" mode — base.scss's `.mobile-conservative` blanket
-       `transition: none` would otherwise snap it. Only the Lyrics/Back faces snap
-       in that mode; this label still fades out "as it was". */
-  transition:
-    max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    margin 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* True OS reduce-motion: collapse the label with no motion at all. The
-     !important above only exists to survive the low-perf conservative kill; an
-     explicit reduce-motion request is honoured here instead. */
-@media (prefers-reduced-motion: reduce) {
-  .mv-label {
+/* On phones (≤450px — SE through the Pro Max widths) the lyrics view cannot fit
+     BOTH labels, so the Music Video pill shrinks to an icon-only button: its label
+     width and the icon↔label gap interpolate to 0 while it fades out. All
+     lengths and opacities are linear in p. */
+@media (max-width: 450px) {
+  .hqa--pair > .music-hero-pill--video {
+    --mv-end: var(--mv-icon-only);
+    --mv-glow-add: 55%; /* 45% → 100%: the glow fills the icon-only button */
+  }
+
+  .hqa--pair .mv-label {
+    max-width: calc(var(--mv-label) * (1 - var(--hqa-p)));
+    margin-left: calc(var(--hqa-gap) * var(--hqa-p) * -1);
+    opacity: calc(1 - var(--hqa-p) * 1.6667);
+  }
+}
+
+/* --- Motion policy ------------------------------------------------------- */
+/* The global perf/reduced-motion rules (`.mobile-conservative * { transition:
+     none }`, `.reduce-animations * { transition: opacity .2s }`) would freeze the
+     morph or lag the label opacities behind p. Re-assert it with enough
+     specificity + !important: only `--hqa-p` transitions (cheap — two tiny pills,
+     no layout outside the row), and the p-derived opacities must NOT run their
+     own transition on top of it. Low-perf mobile still gets the movement (the
+     blanket `transform: none` there turns the label slide into a pure cross-fade).
+     A genuine OS reduce-motion request gets an instant swap instead. */
+@media (prefers-reduced-motion: no-preference) {
+  .music-detail-content .hero-quick-actions.hero-quick-actions {
+    transition: --hqa-p var(--hqa-dur) var(--hqa-ease) !important;
+  }
+
+  .music-detail-content .hero-quick-actions .pill-morph__face,
+  .music-detail-content .hero-quick-actions .mv-label {
     transition: none !important;
   }
 }
 
-/* Low-perf MOBILE: the global `.reduce-animations *` override strips the
-     mv-label's max-width transition (leaving only a 0.2s opacity fade) while the
-     pill's own width keeps animating at 0.25s — so on the collapse/grow-back the
-     label snaps to/from full width before the button finishes resizing and jolts
-     it. Re-assert ONE slightly longer (0.4s), shared timing on both the pill width
-     and the label so they move together and the snap is gone. The extra duration
-     also gives a slow device more frames to render the change smoothly. Gated to
-     `no-preference` so a genuine OS reduce-motion request still snaps (handled
-     above), not animates. */
-@media (prefers-reduced-motion: no-preference) {
-  .music-detail-content.perf-low.mobile-device .hero-quick-actions > .music-hero-pill {
-    transition:
-      flex-grow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      flex-basis 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      background-size 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
-
-  .music-detail-content.perf-low.mobile-device .mv-label {
-    transition:
-      max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      margin 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
-}
-
-/* On phones (≤450px — SE through the Pro Max widths) the 75/25 split can't fit
-     BOTH labels, so opening the lyrics collapses the Music Video pill to an
-     icon-only ~10% button (its label slides 10px left + fades) and hands the
-     Back pill the room. */
-@media (max-width: 450px) {
-  /* Links view: an explicit 50/50. A definite flex-basis (½ the row minus ½ the
-       0.75rem gap) sidesteps the width:100% grid feedback that skewed pure
-       flex-grow into ~52/44. Scoped to the links state so it never fights the
-       lyrics-view split below. The `:not(--solo)` keeps this off the lone Lyrics
-       pill — its flex-grow:1 would make the sole child fill the whole row (100%)
-       instead of the intended half; --solo is sized by its own rule above. */
-  .hero-quick-actions:not(.lyrics-active) > .music-hero-pill:not(.lyrics-morph-pill--solo) {
-    /* definite basis → exact 50/50 (no min-width:0 needed; keeping min-width
-         at auto avoids a brief width dip at the start of the grow-back). */
-    flex: 1 1 calc(50% - 0.375rem);
-  }
-
-  /* Lyrics view: Music Video shrinks to just its YouTube icon, and the red glow
-       fills the whole (now icon-only) button. */
-  .hero-quick-actions.lyrics-active > .music-hero-pill--video {
-    flex-grow: 0;
-    min-width: auto;
-    background-size: 100% 100%;
-  }
-
-  /* …its label slides left and collapses away (gap absorbed by the margin). */
-  .hero-quick-actions.lyrics-active > .music-hero-pill--video .mv-label {
-    max-width: 0;
-    margin-left: -0.5rem;
-    opacity: 0;
-    transform: translateX(-10px);
+@media (prefers-reduced-motion: reduce) {
+  .music-detail-content .hero-quick-actions.hero-quick-actions {
+    transition: none !important;
   }
 }
 
