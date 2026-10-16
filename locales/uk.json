@@ -314,6 +314,16 @@
       "youtube_title": "Дивитися на YouTube"
     }
   },
+  "a11y_ui": {
+    "skip_to_content": "Перейти до основного вмісту",
+    "scroll_down": "Прокрутити вниз",
+    "close_modal": "Закрити вікно",
+    "dialog": "Діалогове вікно",
+    "release_details": "Деталі релізу",
+    "team_member": "Учасник гурту",
+    "previous_slide": "Попередній слайд",
+    "next_slide": "Наступний слайд"
+  },
   "lang": {
     "english": "English",
     "ukrainian": "Українська",

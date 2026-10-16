@@ -12,7 +12,7 @@ import BaseModal from '~/components/common/BaseModal.vue'
 //
 // Contract under test (bug #5 a11y fix):
 //   • role="dialog", aria-modal="true", tabindex="-1" on .modal-container
-//   • :aria-label bound to the ariaLabel prop (default 'Dialog')
+//   • :aria-label bound to the ariaLabel prop (default: localized a11y_ui.dialog)
 //   • Escape (while isVisible) emits 'close'; ignored while hidden
 //   • Tab focus trap wraps last→first / first→last and preventDefault()s
 //   • focus moves INTO the dialog on open; restored to the opener on close
@@ -90,9 +90,9 @@ describe('BaseModal', () => {
       expect(dialog!.getAttribute('tabindex')).toBe('-1')
     })
 
-    it('defaults aria-label to "Dialog" when the prop is omitted', async () => {
+    it('falls back to the localized dialog label when the prop is omitted', async () => {
       await mountModal({ isVisible: true })
-      expect(dialogEl()!.getAttribute('aria-label')).toBe('Dialog')
+      expect(dialogEl()!.getAttribute('aria-label')).toBe('Діалогове вікно')
     })
 
     it('applies a custom ariaLabel prop to the dialog container', async () => {
@@ -102,7 +102,7 @@ describe('BaseModal', () => {
 
     it('renders the close button with an accessible label and the slot content', async () => {
       const w = await mountModal({ isVisible: true })
-      expect(closeBtn()!.getAttribute('aria-label')).toBe('Close modal')
+      expect(closeBtn()!.getAttribute('aria-label')).toBe('Закрити вікно')
       // Slot content is teleported into the dialog.
       expect(dialogEl()!.querySelector('.first-btn')).not.toBeNull()
       expect(dialogEl()!.querySelector('.last-btn')).not.toBeNull()

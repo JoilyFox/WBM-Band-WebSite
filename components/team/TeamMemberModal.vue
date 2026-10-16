@@ -1,7 +1,7 @@
 <template>
   <CommonBaseModal
     :is-visible="isVisible"
-    :aria-label="member ? $t(member.nameKey) : 'Team member'"
+    :aria-label="member ? $t(member.nameKey) : $t('a11y_ui.team_member')"
     @close="emit('close')"
   >
     <div class="member-modal-body">

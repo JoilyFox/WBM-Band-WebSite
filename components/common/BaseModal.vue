@@ -20,7 +20,7 @@
           :class="{ 'is-animating': isAnimating, 'content-ready': contentReady }"
           role="dialog"
           aria-modal="true"
-          :aria-label="ariaLabel"
+          :aria-label="ariaLabel || t('a11y_ui.dialog')"
           tabindex="-1"
           @click.stop
         >
@@ -36,7 +36,7 @@
           >
             <button
               class="modal-close-btn liquid-glass liquid-glass--pill liquid-glass-interactive"
-              aria-label="Close modal"
+              :aria-label="t('a11y_ui.close_modal')"
               @click="$emit('close')"
             >
               <i class="pi pi-times"></i>
@@ -54,6 +54,9 @@
 
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   interface Props {
     isVisible: boolean
@@ -68,7 +71,7 @@
 
   const props = withDefaults(defineProps<Props>(), {
     preloadImageUrl: undefined,
-    ariaLabel: 'Dialog'
+    ariaLabel: undefined
   })
   const emit = defineEmits<Emits>()
 
