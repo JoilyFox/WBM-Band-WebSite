@@ -13,7 +13,7 @@ Adding or tuning visual effects (blur, gradients, floating/parallax, animations)
 2. In styles, gate effects with the emitted classes (`.perf-high`, `.no-backdrop-blur`, `.no-floating`, `.no-parallax`, `.reduce-animations`) and read values from `--perf-blur-strength`, `--perf-animation-duration`, `--perf-opacity` — never hardcode blur/duration.
 3. For conditional rendering/logic, use the computed booleans (`isHighPerformanceDevice`, `shouldReduceAnimations`, `shouldUseMobileFallback`) rather than re-detecting.
 4. For scroll: header/logo shrink uses `useScrollAnimation()` (exposes `isScrolled`, `logoSizeClass`, etc.); generic visibility/RAF-throttled scroll uses `useOptimizedScroll()`.
-5. Manually verify at `/performance-test` (dev: tier + score logged to console). Honor `prefers-reduced-motion` in any new keyframe/transition.
+5. Manually verify by emulating/forcing the tier classes (`perf-low mobile-device reduce-animations`) in DevTools. Honor `prefers-reduced-motion` in any new keyframe/transition.
 
 ## Source of truth
 
@@ -26,7 +26,6 @@ Adding or tuning visual effects (blur, gradients, floating/parallax, animations)
 - `composables/useOptimizedScroll.ts` — `useOptimizedScroll(opts)`; RAF-throttled `scrollY`/`isScrolled`/`scrollDirection` + `observeElement`/`isElementVisible`.
 - `assets/css/base.scss` — defines `--perf-*` vars + `.perf-low/medium/high` and `prefers-reduced-motion` rules.
 - `assets/css/components/scroll-animations.scss` — `gpu-accelerated`, `transition-transform-gpu`, `transition-spacing` classes used by scroll composables.
-- `pages/performance-test.vue` — manual verification page.
 
 ## Gotchas
 

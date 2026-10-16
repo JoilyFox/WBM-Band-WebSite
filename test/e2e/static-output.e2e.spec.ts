@@ -156,15 +156,12 @@ describe('DEPLOY_TARGET — production build uses the apex baseURL', () => {
   })
 })
 
-describe('FINDING — dev/test pages currently ship to the static output', () => {
-  // NOTE: these dev-only pages are presently prerendered into production output.
-  // testing-strategy §5.8 suggests they SHOULD be excluded. This characterization
-  // test documents current reality; if they get excluded from the prerender list,
-  // flip these to .toBe(false). Surfaced to the maintainer for a decision.
-  it('detects the dev pages in the build (test / performance-test)', () => {
-    const present = ['test', 'performance-test'].filter((p) =>
-      LOCALE_DIRS.some((loc) => existsSync(page(loc, p)))
-    )
-    expect(present).toEqual(['test', 'performance-test'])
+describe('dev/test pages are not shipped to the static output', () => {
+  // pages/test.vue and pages/performance-test.vue were removed (audit Q-01); they must
+  // never come back into production output (indexable template page under the band's domain).
+  it.each(['test', 'performance-test'])('has no /%s (root, ua, en)', (p) => {
+    for (const dir of ['', ...LOCALE_DIRS]) {
+      expect(existsSync(page(dir, p)), `${dir}/${p}`).toBe(false)
+    }
   })
 })
