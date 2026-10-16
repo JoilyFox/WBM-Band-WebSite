@@ -31,8 +31,14 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Unit + Nuxt tests
-        run: npm run test
+      # Non-blocking until the audit branches (MusicCard / listen-access /
+      # useStructuredData type fixes) merge; then drop continue-on-error.
+      - name: Typecheck (vue-tsc)
+        run: npm run typecheck
+        continue-on-error: true
+
+      - name: Unit + Nuxt tests (with coverage thresholds)
+        run: npm run coverage
 
   # E2E builds the static site and drives a real browser — slower, so it runs
   # only after the fast suites pass.

@@ -19,7 +19,13 @@ const namedArrays = {
 const allArrays = [...leftNavigation, ...rightNavigation, ...footerNavigation]
 
 // Resolve a dot-notation key (e.g. 'nav.music') against a locale object.
-const lookup = (obj, key) => key.split('.').reduce((acc, part) => acc && acc[part], obj)
+type Dict = { [k: string]: Dict | string }
+const lookup = (obj: Dict, key: string): Dict | string | undefined =>
+  key
+    .split('.')
+    .reduce<
+      Dict | string | undefined
+    >((acc, part) => (acc && typeof acc === 'object' ? acc[part] : undefined), obj)
 
 describe('navigation exports — shape', () => {
   it('every exported nav value is a non-empty array', () => {
@@ -96,7 +102,7 @@ describe('navigation label keys (i18n drift guard)', () => {
     for (const item of footerNavigation) {
       const value = lookup(uk, item.label)
       expect(typeof value, `${item.label} missing in uk.json`).toBe('string')
-      expect(value.length).toBeGreaterThan(0)
+      expect((value as string).length).toBeGreaterThan(0)
     }
   })
 
@@ -104,7 +110,7 @@ describe('navigation label keys (i18n drift guard)', () => {
     for (const item of footerNavigation) {
       const value = lookup(en, item.label)
       expect(typeof value, `${item.label} missing in en.json`).toBe('string')
-      expect(value.length).toBeGreaterThan(0)
+      expect((value as string).length).toBeGreaterThan(0)
     }
   })
 })

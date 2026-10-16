@@ -47,7 +47,9 @@ vi.mock('vue-i18n', () => ({
 
 // ── useErrorPage router mock ────────────────────────────────────────────────
 const { pushMock, routerStub } = vi.hoisted(() => {
-  const pushMock = vi.fn(() => Promise.resolve())
+  const pushMock = vi.fn((_to: { path: string; query: Record<string, string> }) =>
+    Promise.resolve()
+  )
   return {
     pushMock,
     routerStub: {
@@ -83,7 +85,7 @@ async function mountShare() {
   capturedApi = null
   const w = await mountSuspended(ShareHarness)
   const store = useSnackbarStore()
-  return { w, api: capturedApi as ShareApi, store }
+  return { w, api: capturedApi as unknown as ShareApi, store }
 }
 
 // ── Global stub bookkeeping ─────────────────────────────────────────────────

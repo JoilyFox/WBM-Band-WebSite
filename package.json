@@ -21,6 +21,7 @@
     "build:production": "npm run generate",
     "deploy:production": "npm run build:production && bash scripts/deploy-production-vps.sh",
     "deploy:github": "DEPLOY_TARGET=github npm run generate:base",
+    "typecheck": "vue-tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
