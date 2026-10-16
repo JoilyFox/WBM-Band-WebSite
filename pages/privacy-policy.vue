@@ -1,5 +1,5 @@
 <template>
-  <div class="privacy-policy-page">
+  <div class="privacy-policy-page legal-page">
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-background"></div>
@@ -305,6 +305,7 @@
   import { ref, onMounted, onUnmounted, computed } from 'vue'
   import { getConfig } from '~/utils/configHelpers'
   import { formatLegalDate } from '~/utils/legalDate'
+  import '~/assets/css/legal.scss'
   import { useI18n } from 'vue-i18n'
   import { useLocalePath } from '#i18n'
   import { SITE_URL } from '~/constants/app'
@@ -380,201 +381,6 @@
 </script>
 
 <style scoped>
-  /* Variables for consistent theming */
-  .privacy-policy-page {
-    --glassmorphic-bg: rgba(255, 255, 255, 0.05);
-    --glassmorphic-border: rgba(255, 255, 255, 0.1);
-    --glassmorphic-hover: rgba(255, 255, 255, 0.08);
-    --text-primary: rgba(255, 255, 255, 0.95);
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --text-muted: rgba(255, 255, 255, 0.5);
-    --accent-gradient: linear-gradient(135deg, #7877c6 0%, #ff77c6 100%);
-    --blur-amount: 20px;
-  }
-
-  .privacy-policy-page {
-    min-height: 100vh;
-    background:
-      linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%),
-      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.05) 0%, transparent 50%);
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  .privacy-policy-page::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.015'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: -1;
-  }
-
-  /* Hero Section */
-  .hero-section {
-    position: relative;
-    min-height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-
-  .hero-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-      radial-gradient(circle at 30% 70%, rgba(120, 119, 198, 0.2) 0%, transparent 60%),
-      radial-gradient(circle at 70% 30%, rgba(255, 119, 198, 0.15) 0%, transparent 60%);
-    filter: blur(40px);
-    z-index: 1;
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    padding: 4rem 0;
-  }
-
-  .hero-glassmorphic-card {
-    background: var(--glassmorphic-bg);
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    border: 1px solid var(--glassmorphic-border);
-    border-radius: 24px;
-    padding: 3rem 2rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-glassmorphic-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--accent-gradient);
-    opacity: 0.05;
-    border-radius: 24px;
-  }
-
-  .hero-title {
-    font-size: 3.5rem;
-    font-weight: 700;
-    color: #fff; /* solid fallback: stays readable if the gradient/clip is unsupported */
-    background: var(--accent-gradient);
-    background-clip: text;
-    -webkit-background-clip: text;
-    text-align: center;
-    margin-bottom: 1rem;
-    position: relative;
-    z-index: 2;
-  }
-
-  .hero-subtitle {
-    color: var(--text-secondary);
-    font-size: 1.25rem;
-    line-height: 1.6;
-    text-align: center;
-    margin-bottom: 2rem;
-    position: relative;
-    z-index: 2;
-  }
-
-  .hero-meta {
-    display: flex;
-    justify-content: center;
-    position: relative;
-    z-index: 2;
-  }
-
-  .last-updated {
-    color: var(--text-muted);
-    font-size: 0.875rem;
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-  }
-
-  /* Content Section */
-  .content-section {
-    padding: 4rem 0;
-    position: relative;
-    z-index: 2;
-  }
-
-  .content-card {
-    background: var(--glassmorphic-bg);
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    border: 1px solid var(--glassmorphic-border);
-    border-radius: 20px;
-    margin-bottom: 2rem;
-    overflow: hidden;
-    position: relative;
-    transition: all 0.3s ease;
-  }
-
-  /* Only apply hover effects on devices that support hovering (not touch devices) */
-  @media (hover: hover) {
-    .content-card:hover {
-      background: var(--glassmorphic-hover);
-      border-color: rgba(255, 255, 255, 0.15);
-      transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-    }
-  }
-
-  .card-header {
-    padding: 2rem 2rem 0 2rem;
-    position: relative;
-  }
-
-  .section-title {
-    font-size: 2rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-    position: relative;
-  }
-
-  .section-title::after {
-    content: '';
-    position: absolute;
-    bottom: -0.5rem;
-    left: 0;
-    width: 3rem;
-    height: 2px;
-    background: var(--accent-gradient);
-    border-radius: 1px;
-  }
-
-  .card-content {
-    padding: 1rem 2rem 2rem 2rem;
-  }
-
-  .text-content {
-    color: var(--text-secondary);
-    font-size: 1rem;
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-  }
-
-  .text-content:last-child {
-    margin-bottom: 0;
-  }
-
   /* Subsections */
   .subsection {
     margin-bottom: 2rem;
@@ -800,102 +606,6 @@
     text-align: center;
   }
 
-  /* Contact Information */
-  .contact-info {
-    margin: 1.5rem 0;
-  }
-
-  .contact-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-  }
-
-  .contact-item:last-child {
-    margin-bottom: 0;
-  }
-
-  .contact-item i {
-    color: rgba(120, 119, 198, 0.8);
-    width: 1.25rem;
-    text-align: center;
-  }
-
-  .contact-link {
-    color: rgba(120, 119, 198, 0.9);
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-
-  @media (hover: hover) {
-    .contact-link:hover {
-      color: rgba(120, 119, 198, 1);
-      text-decoration: underline;
-    }
-  }
-
-  .response-time {
-    margin-top: 2rem;
-    padding: 1rem;
-    background: rgba(120, 119, 198, 0.1);
-    border: 1px solid rgba(120, 119, 198, 0.2);
-    border-radius: 12px;
-  }
-
-  .response-text {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
-  }
-
-  .response-text i {
-    color: rgba(120, 119, 198, 0.8);
-  }
-
-  /* Back to Top Button */
-  .back-to-top {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    width: 3rem;
-    height: 3rem;
-    background: var(--glassmorphic-bg);
-    backdrop-filter: blur(var(--blur-amount));
-    -webkit-backdrop-filter: blur(var(--blur-amount));
-    border: 1px solid var(--glassmorphic-border);
-    border-radius: 50%;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    opacity: 0;
-    transform: translateY(20px);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-  }
-
-  .back-to-top.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  @media (hover: hover) {
-    .back-to-top:hover {
-      background: var(--glassmorphic-hover);
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    }
-  }
-
   /* Mobile Responsive */
   @media (max-width: 768px) {
     .hero-title {
@@ -1010,12 +720,6 @@
     .rights-description,
     .cookie-description {
       color: #ffffff;
-    }
-  }
-
-  @supports ((-webkit-background-clip: text) or (background-clip: text)) {
-    .hero-title {
-      -webkit-text-fill-color: transparent;
     }
   }
 </style>
