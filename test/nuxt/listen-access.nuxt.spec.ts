@@ -7,7 +7,7 @@ import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 //   • EXPLICIT IMPORTS (vi.mock): useLocalePath (#i18n), getReleaseBySlug
 //     (~/data/musicLibrary), getConfig/isUpcomingRelease (~/utils/configHelpers)
 //     — branch logic only; the REAL date boundaries are covered by
-//     middleware-integration.nuxt.spec.ts.
+//     listen-access.integration.nuxt.spec.ts.
 //   • SOURCE_PREFIXES (~/utils/sourceAttribution) is left REAL so the
 //     source-prefix branch exercises the genuine prefix table (i, tt, yt, ...).
 

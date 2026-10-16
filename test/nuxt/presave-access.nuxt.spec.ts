@@ -8,7 +8,7 @@ import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 //                   so we override only the real app's `$i18n` per test instead of mocking it.
 //   EXPLICIT      → useLocalePath (#i18n), getReleaseBySlug (~/data/musicLibrary),
 //                   getConfig/isUpcomingRelease (~/utils/configHelpers) → vi.mock
-//                   (branch logic only; REAL date boundaries: middleware-integration.nuxt.spec.ts)
+//                   (branch logic only; REAL date boundaries: presave-access.integration.nuxt.spec.ts)
 //   REAL          → SOURCE_PREFIXES (pure const, drives the source-prefix branch)
 
 const { navigateTo, getReleaseBySlug, getConfig, isUpcomingRelease, localePath } = vi.hoisted(
