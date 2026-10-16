@@ -4,6 +4,7 @@ import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { computed, defineComponent, ref, unref, type Ref } from 'vue'
 import { useReleaseHead, type ReleaseView } from '~/composables/useReleaseHead'
 import { SITE_URL } from '~/constants/app'
+import { musicLibrary } from '~/data/musicLibrary'
 import { setTestLocale } from './helpers/i18n'
 
 // T-01: canonical / hreflang / og / noindex of the release + lyrics pages.
@@ -15,12 +16,17 @@ mockNuxtImport('useHead', () => (input: unknown) => {
 })
 
 const Harness = defineComponent({
-  props: { slug: { type: String, required: true }, view: { type: Object, required: true } },
+  props: {
+    slug: { type: String, required: true },
+    view: { type: Object, required: true },
+    description: { type: String, default: 'Опис' },
+    songName: { type: String, default: 'Хвилі' }
+  },
   setup(props) {
     useReleaseHead({
       slug: props.slug,
-      localizedTitle: computed(() => 'Хвилі'),
-      localizedDescription: computed(() => 'Опис'),
+      localizedTitle: computed(() => props.songName),
+      localizedDescription: computed(() => props.description),
       metaImageUrl: computed(() => `${SITE_URL}/images/cover.jpg`),
       view: props.view as Ref<ReleaseView>
     })
@@ -28,10 +34,22 @@ const Harness = defineComponent({
   }
 })
 
-async function head(slug: string, view: ReleaseView = 'links') {
+async function head(
+  slug: string,
+  view: ReleaseView = 'links',
+  description?: string,
+  songName?: string
+) {
   heads.length = 0
   const viewRef = ref<ReleaseView>(view)
-  await mountSuspended(Harness, { props: { slug, view: viewRef } })
+  await mountSuspended(Harness, {
+    props: {
+      slug,
+      view: viewRef,
+      ...(description ? { description } : {}),
+      ...(songName ? { songName } : {})
+    }
+  })
   const h = unref(heads[heads.length - 1] as any)
   const meta = (key: string, attr: 'name' | 'property' = 'property') =>
     (h.meta as any[]).find((m) => m[attr] === key)?.content as string | undefined
@@ -128,6 +146,59 @@ describe('useReleaseHead', () => {
       vi.useFakeTimers({ toFake: ['Date'] })
       vi.setSystemTime(new Date('2026-10-01T00:00:00Z'))
       expect((await head('slipa-vulytsya', 'lyrics')).meta('robots', 'name')).toBeUndefined()
+    })
+  })
+  // SEO-05 / SEO-06: titles name the song AND the band; descriptions land in the
+  // 120-155 char window, mention the band, and are localized.
+  describe('title + description copy', () => {
+    // Real runtime strings: importing the locale JSON here would yield the compiled
+    // message AST that @nuxtjs/i18n's build plugin produces, not plain text.
+    const copyFor = (slug: string) => {
+      const { t } = (useNuxtApp() as unknown as { $i18n: { t: (k: string) => string } }).$i18n
+      const key = slug.replace(/-/g, '_')
+      return { title: t(`releases.${key}.title`), description: t(`releases.${key}.description`) }
+    }
+
+    for (const locale of ['ua', 'en'] as const) {
+      for (const release of musicLibrary) {
+        it(`${locale} ${release.slug}: listen title + description are search-ready`, async () => {
+          await setTestLocale(locale)
+          const { title: songName, description } = copyFor(release.slug)
+          const { h, meta } = await head(release.slug, 'links', description, songName)
+          const title = unref(h.title) as string
+          expect(title).toContain(songName)
+          expect(title).toContain('Woman Based Mechanics')
+          expect(title.length).toBeLessThanOrEqual(60)
+          expect(meta('og:title')).toBe(title)
+
+          const desc = meta('description', 'name')!
+          expect(desc.length).toBeGreaterThanOrEqual(120)
+          expect(desc.length).toBeLessThanOrEqual(155)
+          expect(desc).toContain('WBM')
+          expect(meta('og:description')).toBe(desc)
+        })
+      }
+    }
+
+    it('lyrics titles keep the compact "<song> ... | WBM" pattern', async () => {
+      const { h } = await head('khvyli', 'lyrics')
+      expect(h.title).toBe('Хвилі — слова пісні | WBM')
+      await setTestLocale('en')
+      expect((await head('khvyli', 'lyrics', undefined, 'Khvyli')).h.title).toBe(
+        'Khvyli Lyrics | WBM'
+      )
+    })
+
+    it('lyrics descriptions are 120-155 chars in both locales', async () => {
+      for (const locale of ['ua', 'en'] as const) {
+        await setTestLocale(locale)
+        for (const slug of ['khvyli', 'alina', 'mania', 'chorni-ptahy']) {
+          const { meta } = await head(slug, 'lyrics')
+          const len = meta('description', 'name')!.length
+          expect(len).toBeGreaterThanOrEqual(120)
+          expect(len).toBeLessThanOrEqual(155)
+        }
+      }
     })
   })
 })

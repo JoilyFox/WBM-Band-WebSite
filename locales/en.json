@@ -3,7 +3,7 @@
     "name": "WBM Band",
     "home_title": "Woman Based Mechanics (WBM) — Kyiv Alternative Rock Band",
     "tagline": "Ukrainian alternative rock band",
-    "meta_description": "WBM Band — a Ukrainian alternative rock band. Listen to our new release {release}!",
+    "meta_description": "Woman Based Mechanics (WBM) — Ukrainian alternative rock band from Kyiv. Listen on all platforms, read the lyrics and follow our new releases.",
     "welcome": "Welcome to {name}!",
     "ready": "Your modern Nuxt 3 application is ready to rock! 🎸",
     "all_rights": "All rights reserved."
@@ -261,7 +261,7 @@
       "release_label": "Release {date}",
       "lyrics_title": "Lyrics",
       "lyrics_page_title": "{songName} Lyrics",
-      "lyrics_meta_description": "Read the full official lyrics to “{songName}” by WBM (Woman Based Mechanics), a Ukrainian alternative rock band."
+      "lyrics_meta_description": "Read the full official lyrics to “{songName}” by WBM (Woman Based Mechanics), a Ukrainian alternative rock band. Listen on Spotify and Apple Music."
     },
     "a11y": {
       "back_to_section": "Back to music section",
@@ -430,7 +430,11 @@
     "media_materials_button": "Media Materials"
   },
   "listen": {
-    "meta_description": "{songName} - listen on all platforms!"
+    "meta_description": "{songName} - listen on all platforms!",
+    "title": "{songName} — song by WBM (Woman Based Mechanics)",
+    "description_full": "{description} By WBM (Woman Based Mechanics) — listen on Spotify, Apple Music, YouTube Music.",
+    "description_short": "{description} By WBM — listen on all platforms.",
+    "description_min": "{description} By WBM."
   },
   "cookies": {
     "banner": {

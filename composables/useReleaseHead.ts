@@ -3,6 +3,7 @@ import { useI18n } from 'vue-i18n'
 import { SITE_URL } from '~/constants/app'
 import { getReleaseBySlug } from '~/data/musicLibrary'
 import { isUpcomingRelease } from '~/utils/configHelpers'
+import { fitDescription } from '~/utils/seoCopy'
 
 /** Real pixel size of the square release cover JPEGs used for og:image. */
 const COVER_IMAGE_SIZE = 800
@@ -55,12 +56,18 @@ export function useReleaseHead(opts: UseReleaseHeadOptions) {
       const enUrl = `${SITE_URL}/en${path}`
       const canonical = isEn ? enUrl : uaUrl
 
+      // Titles: song first (the query), then who it is by. The listen title spells out
+      // the full band name ("WBM" alone is ambiguous); lyrics titles stay compact.
       const title = isLyrics
-        ? `${t('music.detail.lyrics_page_title', { songName })} | WBM Band`
-        : `${songName} | WBM Band`
+        ? `${t('music.detail.lyrics_page_title', { songName })} | WBM`
+        : (t('listen.title', { songName }) as string)
       const description = isLyrics
         ? (t('music.detail.lyrics_meta_description', { songName }) as string)
-        : opts.localizedDescription.value
+        : fitDescription(opts.localizedDescription.value, (d) =>
+            ['description_full', 'description_short', 'description_min'].map(
+              (k) => t(`listen.${k}`, { description: d }) as string
+            )
+          )
 
       return {
         title,
