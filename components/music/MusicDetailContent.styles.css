@@ -501,6 +501,29 @@ body.lg-tier-low .share-glass-btn {
   will-change: auto;
 }
 
+/* Desktop modal: balanced hero spacing. The page hero reserves a tall band for the
+     fixed header (pt-16 = 64px) and pads the cover inside min-height boxes
+     (hero 400px / content 320px → +16px above and below the 288px cover), so the
+     cover sat 80px from the panel top vs 32px from its left. The modal has no header
+     — BaseModal's close button floats (absolute) over the corner — so the cover and
+     text get the SAME 32px inset on top as on the left. */
+@media (min-width: 768px) {
+  .music-detail-content.modal-mode .music-hero {
+    min-height: 0;
+    padding-top: 2rem;
+  }
+
+  .music-detail-content.modal-mode .music-hero-content {
+    min-height: 0;
+  }
+
+  /* Keep the title clear of the floating close button (40px wide, 24px in from the
+       corner): reserve its footprint + a gap on the title's right edge. */
+  .music-detail-content.modal-mode .music-title {
+    padding-right: 3rem;
+  }
+}
+
 /* Modal album cover optimizations */
 .modal-cover {
   animation: none !important;
