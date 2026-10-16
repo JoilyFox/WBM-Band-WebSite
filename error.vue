@@ -1,11 +1,14 @@
 <template>
-  <CommonErrorPage
-    :title="errorTitle"
-    :message="errorMessage"
-    :button-text="buttonText"
-    :button-link="buttonLink"
-    :button-icon="buttonIcon"
-  />
+  <!-- The whole error screen is the page's single landmark. -->
+  <main>
+    <CommonErrorPage
+      :title="errorTitle"
+      :message="errorMessage"
+      :button-text="buttonText"
+      :button-link="buttonLink"
+      :button-icon="buttonIcon"
+    />
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -18,7 +21,7 @@
     layout: false
   })
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const localePath = useLocalePath()
 
   const props = defineProps<{
@@ -101,7 +104,10 @@
   })
 
   // Handle the error for better SEO and user experience
+  // error.vue REPLACES app.vue when it renders, so app.vue's <html lang> never
+  // runs: without this the document has no language (WCAG 3.1.1, axe html-has-lang).
   useHead({
+    htmlAttrs: { lang: computed(() => (locale.value === 'en' ? 'en-US' : 'uk-UA')) },
     title: createErrorTitle(props.error?.statusCode || 'Error'),
     meta: [{ name: 'robots', content: 'noindex' }]
   })
