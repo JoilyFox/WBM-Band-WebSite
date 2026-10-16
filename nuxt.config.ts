@@ -256,10 +256,8 @@ export default defineNuxtConfig({
             (process.env.DEPLOY_TARGET === 'github' ? '/WBM-Band-WebSite' : '') +
             '/site.webmanifest'
         }
-        // NOTE: Font Awesome is NOT loaded here. The old render-blocking cdnjs
-        // <link> was a duplicate — plugins/fontawesome.client.ts already bundles
-        // the same all.css. Removing the CDN link drops a render-blocking
-        // third-party request (cdnjs) with no visual change.
+        // NOTE: no icon-font <link> here. Font Awesome is gone entirely; icons
+        // are inline SVGs (components/ui/Icon.vue + utils/icons.ts).
       ],
       meta: [
         // Standard meta tags

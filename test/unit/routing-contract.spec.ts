@@ -238,8 +238,8 @@ describe('nuxt.config.ts DEPLOY_TARGET head-prefixing invariant', () => {
   })
 
   it('external absolute URLs (og:image etc.) are NOT prefixed with the baseURL', () => {
-    // The render-blocking Font Awesome cdnjs <link> was removed (it duplicated
-    // the bundled plugins/fontawesome.client.ts import). Whatever absolute https
+    // The render-blocking Font Awesome cdnjs <link> is long gone (icons are
+    // inline SVGs now). Whatever absolute https
     // URLs remain in the head (e.g. og:image / twitter:image on SITE_URL) must
     // never get the DEPLOY_TARGET baseURL glued in front of them.
     expect(config).not.toContain(`${PREFIX}` + 'https://')
