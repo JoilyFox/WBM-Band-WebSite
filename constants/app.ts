@@ -14,15 +14,8 @@ export const APP_SLUG = 'wbm-band'
  */
 export const SITE_URL = 'https://www.wbmband.com'
 
-export const APP_DESCRIPTION =
-  'A modern Nuxt 3 application for the WBM Band with advanced features including API caching, global loading system, and notification management.'
-
 // Dynamic constants based on core identity
 export const WEBSITE_TITLE = `${APP_NAME} Website`
-export const CACHE_NAME = `${APP_SLUG}-api-cache`
-
-/** Default GET-cache time-to-live (5 minutes), shared by the API + cache layer. */
-export const DEFAULT_CACHE_TTL_MS = 5 * 60 * 1000
 
 /**
  * Helper function to create page titles
