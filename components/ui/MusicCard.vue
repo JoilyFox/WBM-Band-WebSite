@@ -84,6 +84,8 @@
   })
 
   const formattedDate = computed(() => {
+    // An undated (TBA) release has nothing to format.
+    if (!props.release.releaseDate) return ''
     const date = new Date(props.release.releaseDate)
     const currentLocale = locale.value === 'ua' ? 'uk-UA' : 'en-US'
     const formatted = date.toLocaleDateString(currentLocale, {
