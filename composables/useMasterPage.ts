@@ -1,4 +1,4 @@
-import { computed, onMounted, nextTick } from 'vue'
+import { computed, onMounted, nextTick, type ComputedRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getReleaseBySlug, type MusicRelease } from '~/data/musicLibrary'
 import { SITE_URL } from '~/constants/app'
@@ -21,12 +21,12 @@ export interface UseMasterPageOptions {
 
 export interface UseMasterPageReturn {
   release: MusicRelease
-  localizedTitle: ReturnType<typeof computed<string>>
-  localizedDescription: ReturnType<typeof computed<string>>
-  metaImageUrl: ReturnType<typeof computed<string>>
-  pageUrl: ReturnType<typeof computed<string>>
+  localizedTitle: ComputedRef<string>
+  localizedDescription: ComputedRef<string>
+  metaImageUrl: ComputedRef<string>
+  pageUrl: ComputedRef<string>
   /** Clean prefix-less URL for this locale — use as `rel=canonical`. */
-  canonicalUrl: ReturnType<typeof computed<string>>
+  canonicalUrl: ComputedRef<string>
   resolvedSource: SourcePlatform | null
 }
 

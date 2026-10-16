@@ -4,10 +4,10 @@ This directory contains documentation for all the main features of the WBM Band 
 
 ## Features Documentation
 
-- [Deployment Guide](./deployment-guide.md) - Complete guide for deploying to production hosting (wbmband.com) with manual FTP deployment
+- [Deployment Guide](./deployment-guide.md) - Complete guide for deploying to production hosting (wbmband.com) via rsync to the VPS (nginx), plus the GitHub Pages staging flow
 - [Performance Optimization](./performance-optimization.md) - Automatic device performance detection and adaptive optimizations for smooth 60 FPS on all devices
-- [PageSpeed / Lighthouse Regression Testing](./pagespeed-regression-testing.md) - `npm run test:perf` runs the real Lighthouse engine (the PageSpeed lab profile) against `/`, `/ua`, `/en` and fails on score/byte-budget regressions; why local Lighthouse replaced the now-quota-0 keyless PSI API, plus the opt-in PSI field-data check
-- [API Caching](./api-caching.md) - Browser-based API response caching system with localStorage fallback
+- [PageSpeed / Lighthouse Regression Testing](./pagespeed-regression-testing.md) - `npm run test:perf` runs the real Lighthouse engine (the PageSpeed lab profile) against `/` and `/en` and fails on score/byte-budget regressions; why local Lighthouse replaced the now-quota-0 keyless PSI API, plus the opt-in PSI field-data check
+- [Build Pipeline](./build-pipeline.md) - What `npm run generate` does end to end: prerender route list, the `prerender:generate` HTML rewrite hook (font preload, `noindex` stubs), sitemap + bio-link generation, output checks, and the routing contract nginx must honour
 - [Global Loading System](./global-loading-system.md) - Top bar progress indicator for async operations
 - [Snackbar Notifications](./snackbar-notifications.md) - Custom notification system with modern animations and multiple types
 - [Error Page System](./error-page-system.md) - Comprehensive error handling with custom messages and glassmorphism design

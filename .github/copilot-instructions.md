@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-Nuxt 3 static site for a music band with dual-deployment strategy: GitHub Pages for testing, FTP to production (wbmband.com). Built with Vue 3 Composition API, TypeScript, Tailwind CSS, PrimeVue, and Pinia.
+Nuxt 3 static site for a music band with dual-deployment strategy: GitHub Pages for testing, rsync to a VPS served by nginx for production (wbmband.com). Built with Vue 3 Composition API, TypeScript, Tailwind CSS, PrimeVue, and Pinia.
 
 **Key architectural pattern**: Static-first with aggressive performance optimization. No runtime image processing—all assets pre-optimized at build time.
 
@@ -12,7 +12,7 @@ Nuxt 3 static site for a music band with dual-deployment strategy: GitHub Pages 
 
 ```bash
 npm run dev              # Starts dev server on 0.0.0.0:3000
-npm run generate         # Full SSG build + creates non-localized route aliases
+npm run generate         # Full SSG build + sitemap.xml + bio-link sheet (see docs/build-pipeline.md)
 npm run build:production # Alias for generate (production-ready)
 ```
 
@@ -20,8 +20,10 @@ npm run build:production # Alias for generate (production-ready)
 
 ```bash
 npm run deploy:github      # Sets DEPLOY_TARGET=github, builds for GH Pages with /WBM-Band-WebSite/ baseURL
-npm run deploy:production  # Runs generate + FTP upload to wbmband.com (needs .env.production)
+npm run deploy:production  # Runs generate + rsync to the VPS (DEPLOY_SSH_HOST/USER/KEY, DEPLOY_PATH; DRY_RUN=1 to preview)
 ```
+
+Production routing (redirects, 404s, cache headers) lives in `deploy/nginx/`; `public/.htaccess` and `public/_redirects` are legacy/fallback only.
 
 **Environment variable pattern**: `DEPLOY_TARGET=github` switches `nuxt.config.ts` to GitHub Pages paths. Without it, uses root paths for production.
 
@@ -37,11 +39,9 @@ npm run generate-favicons  # Generate multi-platform icons from source
 
 ### i18n Architecture
 
-- **Strategy**: Prefix-based (`/en/*`, `/ua/*`)
-- **Default locale**: `ua` (Ukrainian)
+- **Strategy**: `prefix_except_default` - English under `/en/*`, Ukrainian (default `ua`) unprefixed. There is no `/ua/*`.
 - **Translation keys**: Defined in `locales/en.json` and `locales/uk.json`
-- **Non-localized routes**: `/pre-save/*` and `/listen/*` work without locale prefix via `scripts/create-nonlocalized-aliases.js` (copies `/ua/pre-save/*` to `/pre-save/*` in build output)
-- **Root `/`**: serves the Ukrainian home (build copies `ua/index.html` → `index.html`); no browser-language redirect — see `docs/search-console.md`
+- **Clean URLs**: `/`, `/listen/<slug>`, `/pre-save/<slug>`, `/lyrics/<slug>` are the real Ukrainian routes (no alias copying); no browser-language redirect - see `docs/search-console.md`
 
 ### Configuration System
 
@@ -87,16 +87,7 @@ Apply via Tailwind classes conditioned on performance tier, not runtime JS.
 
 - **Pinia stores**: `store/globalLoading.ts` (top progress bar), `store/snackbar.ts` (notifications)
 - **Composables pattern**: Prefer `useGlobalLoading()` over direct store access for better encapsulation
-- **API layer**: `composables/useApi.ts` wraps `utils/api.ts` with loading states and error handling
-
-### Caching Strategy
-
-Files: `utils/cache.ts`, `utils/api.ts`, `composables/useApi.ts`
-
-- **ApiCache class**: Uses Web Cache API, falls back to localStorage
-- **Default TTL**: 5 minutes for GET requests
-- **Key format**: `METHOD|URL|params|body`
-- **Invalidation**: `invalidateCache(url)` or `apiCache.clear()`
+- There is no client API/cache layer; the site is static.
 
 ### Styling Conventions
 
@@ -107,10 +98,10 @@ Files: `utils/cache.ts`, `utils/api.ts`, `composables/useApi.ts`
 
 ### Route Middleware Execution Order
 
-1. `redirect-share-urls.global.ts`: Converts old share URLs to new format
-2. (removed) `i18n-root-redirect.global.ts` — `/` now serves the Ukrainian build output directly
-3. `presave-access.ts`: Validates pre-save access and redirects to `/listen/*` if released
-4. `listen-access.ts`: Validates listen page access
+1. `presave-access.ts`: Validates pre-save access and redirects to `/listen/*` if released
+2. `listen-access.ts`: Validates listen page access
+
+(The old `redirect-share-urls.global.ts` and `i18n-root-redirect.global.ts` middlewares were deleted.)
 
 ### Component Organization
 
@@ -128,12 +119,12 @@ Files: `utils/cache.ts`, `utils/api.ts`, `composables/useApi.ts`
 ### Static Site Generation
 
 - **Prerender routes**: Manually defined in `nuxt.config.ts` → `nitro.prerender.routes`
-- **Add new routes**: Must add both `/en/path` and `/ua/path` to prerender list
+- **Add new routes**: Must add both `/path` (Ukrainian, unprefixed) and `/en/path` to the prerender list
 - **Maintenance mode**: When `general.maintenanceMode=true`, main page redirects to error (other pages accessible)
 
 ## Common Pitfalls
 
-1. **Forgetting to run `npm run generate`**: Always run full generate (not just `build`) to create non-localized route aliases
+1. **Forgetting to run `npm run generate`**: Always run full generate (not just `build`); it also writes the sitemap and bio-link sheet
 2. **Adding images without optimization**: Run `npm run compress-images` and `npm run generate-blurred` before committing
 3. **Hardcoded URLs**: Use `useLocalePath()` from Nuxt i18n module for all internal navigation
 4. **Locale-sensitive dates**: Always use `formatReleaseDate(date, locale)` from `configHelpers.ts`
@@ -143,4 +134,4 @@ Files: `utils/cache.ts`, `utils/api.ts`, `composables/useApi.ts`
 
 ## Documentation
 
-See `docs/` for deep dives: `deployment-guide.md`, `performance-optimization.md`, `image-optimization-guide.md`, `presave-functionality.md`, `api-caching.md`, `global-loading-system.md`, `snackbar-notifications.md`.
+See `docs/` for deep dives: `deployment-guide.md`, `performance-optimization.md`, `image-optimization-guide.md`, `presave-functionality.md`, `build-pipeline.md`, `global-loading-system.md`, `snackbar-notifications.md`.

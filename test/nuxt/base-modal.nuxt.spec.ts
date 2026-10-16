@@ -73,8 +73,15 @@ const fireKey = (key: string, init: KeyboardEventInit = {}) => {
   return ev
 }
 
-const mountModal = async (props: Record<string, unknown>, slot: string = SLOT) => {
-  const w = await mountSuspended(BaseModal, { props, slots: { default: slot } })
+type ModalProps = InstanceType<typeof BaseModal>['$props']
+const mountModal = async (
+  props: Partial<ModalProps> & { isVisible: boolean },
+  slot: string = SLOT
+) => {
+  const w = await mountSuspended(BaseModal, {
+    props: props as ModalProps,
+    slots: { default: slot }
+  })
   mounted.push(w)
   return w
 }

@@ -1,4 +1,4 @@
-import { ref, computed, readonly } from 'vue'
+import { ref, computed, shallowReadonly } from 'vue'
 import { useLocalePath } from '#i18n'
 import type { MusicRelease } from '~/data/musicLibrary'
 import { isUpcomingRelease } from '~/utils/configHelpers'
@@ -112,9 +112,11 @@ export const useMusicNavigation = () => {
   }
 
   return {
-    selectedRelease: readonly(selectedRelease),
-    isModalOpen: readonly(isModalOpen),
-    isSelectedReleasePreSave: readonly(isSelectedReleasePreSave),
+    // shallowReadonly: callers can't reassign the ref, but the release object stays
+    // assignable to the mutable MusicRelease prop type (DeepReadonly broke that).
+    selectedRelease: shallowReadonly(selectedRelease),
+    isModalOpen: shallowReadonly(isModalOpen),
+    isSelectedReleasePreSave: shallowReadonly(isSelectedReleasePreSave),
     isMobile,
     handleMusicClick,
     closeModal,

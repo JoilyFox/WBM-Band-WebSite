@@ -7,7 +7,7 @@ Lyrics pill slides the links out to the left while the lyrics slide in from the 
 
 The lyrics view is **deep-linkable and independently indexable**. Each release that
 ships lyrics also gets a dedicated, prerendered page at **`/lyrics/<slug>`** (bilingual
-`/ua/lyrics/<slug>` + `/en/lyrics/<slug>`, plus the clean non-localized alias) whose
+`/lyrics/<slug>` for Ukrainian + `/en/lyrics/<slug>`) whose
 static HTML contains the actual lyric text, its own `<title>` ("Mania Lyrics" /
 "Манія — Текст пісні"), self-canonical, and `MusicComposition.lyrics` JSON-LD — so a
 search like "mania wbm lyrics" can surface it. Opening that URL boots the release page
@@ -55,9 +55,8 @@ rewrite, sitemap) one-for-one.
   `music.a11y.back_to_platforms` in
   [`locales/uk.json`](../locales/uk.json) + [`locales/en.json`](../locales/en.json).
 - Build wiring (mirrors `/listen`): `LYRICS_SLUGS` + the lyrics loop in
-  [`nuxt.config.ts`](../nuxt.config.ts) prerender list, the `ua/lyrics` alias in
-  [`scripts/create-nonlocalized-aliases.js`](../scripts/create-nonlocalized-aliases.js),
-  the `/lyrics` rewrites in [`public/.htaccess`](../public/.htaccess), and the lyrics
+  [`nuxt.config.ts`](../nuxt.config.ts) prerender list, the production routing in
+  [`deploy/nginx/`](../deploy/nginx/README.md), and the lyrics
   entries in [`scripts/generate-sitemap.js`](../scripts/generate-sitemap.js).
 
 ## Adding lyrics to a release
@@ -86,7 +85,7 @@ rewrite, sitemap) one-for-one.
    (`LYRICS_SLUGS` in `nuxt.config.ts`) and the sitemap both derive the lyrics
    routes from "release has a non-empty `lyrics` array", so no i18n, route, or
    prerender changes are needed for a new song. Run `npm run generate` and the
-   new `/lyrics/<slug>` (+ `/ua`, `/en`, clean alias) is built and sitemapped.
+   new `/lyrics/<slug>` (+ `/en/lyrics/<slug>`) is built and sitemapped.
 
 ## Adding a new song-part label
 

@@ -108,10 +108,10 @@ afterAll(async () => {
 })
 
 describe('real-browser hydration', () => {
-  it('boots the ua home and hydrates (client-only consent toast appears)', async () => {
+  it('boots the Ukrainian home (/) and hydrates (client-only consent toast appears)', async () => {
     const ctx = await freshContext()
     const page = await ctx.newPage()
-    await page.goto(`${origin}/ua`, { waitUntil: 'load' })
+    await page.goto(`${origin}/`, { waitUntil: 'load' })
     // The consent toast is client-only and revealed after a delay — its presence
     // proves the app hydrated (SSR HTML alone would never show it).
     const toast = page.locator('[role="dialog"].cookie-toast')
@@ -125,7 +125,7 @@ describe('cookie-consent gate (P0)', () => {
   it('accept dismisses the toast and persists "accepted"', async () => {
     const ctx = await freshContext()
     const page = await ctx.newPage()
-    await page.goto(`${origin}/ua`, { waitUntil: 'load' })
+    await page.goto(`${origin}/`, { waitUntil: 'load' })
     const toast = page.locator('[role="dialog"].cookie-toast')
     await toast.waitFor({ state: 'visible', timeout: 8000 })
     await page.locator('.cookie-toast__btn--accept').click()
@@ -138,7 +138,7 @@ describe('cookie-consent gate (P0)', () => {
   it('decline dismisses the toast and persists "declined"', async () => {
     const ctx = await freshContext()
     const page = await ctx.newPage()
-    await page.goto(`${origin}/ua`, { waitUntil: 'load' })
+    await page.goto(`${origin}/`, { waitUntil: 'load' })
     const toast = page.locator('[role="dialog"].cookie-toast')
     await toast.waitFor({ state: 'visible', timeout: 8000 })
     await page.locator('.cookie-toast__btn--decline').click()

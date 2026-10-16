@@ -71,8 +71,10 @@
   const latestRelease = computed(() => {
     const now = new Date()
     const released = musicLibrary
-      .filter((release) => new Date(release.releaseDate) <= now)
-      .sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime())
+      .filter((release) => release.releaseDate && new Date(release.releaseDate) <= now)
+      .sort(
+        (a, b) => new Date(b.releaseDate ?? 0).getTime() - new Date(a.releaseDate ?? 0).getTime()
+      )
     return released.length > 0 ? released[0] : null
   })
 

@@ -1,12 +1,13 @@
 # Testing Strategy — WBM Band Website
 
-> Status: **Waves 0–5 implemented (2026-06-02).** Full suite green: **1106 unit/nuxt tests** (44 specs)
+> Note: the API/cache layer (`utils/api.ts`, `utils/cache.ts`, `useApi`), `AppButton` and the share-URL middleware were deleted as dead code (Oct 2026); rows below that mention them are historical.
 >
-> - **17 e2e tests** (static-output + real-browser). `npm run test` (unit+nuxt), `npm run test:e2e`
->   (build + prerender assertions + chromium smoke), and `npm run coverage` (ratchet floor: lines 54 /
->   stmts 53 / funcs 52 / branches 50; baseline ~57% on utils/composables/middleware/config) all pass.
->   CI: `.github/workflows/test.yml` (lint + unit/nuxt, then e2e); `deploy.yml` build now `needs: test`;
->   husky `pre-push` runs the fast suites. Node bumped to 22.
+> Status: **Waves 0-5 implemented (2026-06-02), kept current by CI.** Counts and coverage move with every
+> change, so they are not recorded here: see the `Tests` workflow (`.github/workflows/test.yml`) for the
+> live test count and `vitest.config.ts` for the enforced coverage floor (CI runs `npm run coverage`, so a
+> drop below the floor fails the build). `npm run test` (unit+nuxt), `npm run test:e2e` (build +
+> prerender assertions + chromium smoke) and `npm run typecheck` (vue-tsc) are the local equivalents.
+> `deploy.yml` build `needs: test`; husky `pre-push` runs the fast suites. Node 22.
 >
 > **Bugs fixed during implementation (beyond the original 9):** `helpers.formatDate` invalid-date
 > guard; `getMusicPlatform` prototype-pollution leak (`Object.hasOwn`); `useReleaseTheme.hslHex`
@@ -15,7 +16,7 @@
 >
 > **Open findings (surfaced, not fixed — maintainer's call):** `data/teamMembers.ts` ships 5
 > placeholder members (ids 101–105, pravatar.cc URLs) marked "remove before production"; dev pages
-> `/test` + `/performance-test` are prerendered into production output; `AlbumCover` per-locale
+> `/test` + `/performance-test` were REMOVED (Oct 2026) and the e2e suite now asserts they are not generated; `AlbumCover` per-locale
 > fallback maps are dead code; `BaseModal` attaches its keydown listener to `document` (only an issue
 > if multiple modals mount at once); duplicate `MasterPageType` export (useAnalytics vs useMasterPage).
 >
@@ -49,7 +50,7 @@ These aren't test tasks — they're real issues found while reading the code. Ea
 or at minimum **pinned with a characterization test** so the current behavior can't silently change.
 
 | #   | Severity | Issue                                                                                                                                                                                                                                                         | Location                                                                                                              |
-| --- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| --- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | 1   | **High** | `getResponsiveImageSrcSet()` emits the **same URL for every width descriptor** — `getOptimizedImageUrl()` ignores `width`, so the `srcset` is `url 400w, url 800w, …` all pointing at one file. Responsive images aren't actually responsive.                 | `utils/imageHelpers.ts`                                                                                               |
 | 2   | **High** | `getLatestReleases()` / `getAllReleases()` / `getReleasesByType()` call `musicLibrary.sort()` which **mutates the shared module-level array in place**. Interleaved calls corrupt ordering app-wide.                                                          | `data/musicLibrary.ts`                                                                                                |
 | 3   | **High** | `public/robots.txt` is **0 bytes (empty)** and there is **no `sitemap.xml`** anywhere — a concrete crawl/SEO defect on a site whose whole point is discoverability.                                                                                           | `public/`                                                                                                             |
@@ -57,7 +58,6 @@ or at minimum **pinned with a characterization test** so the current behavior ca
 | 5   | Med      | **No modal a11y**: `BaseModal` (and the music/team modals) have **no `role="dialog"`, no `aria-modal`, no focus trap, no focus restore** — only an Escape listener. Keyboard/SR users tab into the page behind the open modal.                                | `components/**/*Modal*.vue`                                                                                           |
 | 6   | Med      | `SITE_BASE_URL = 'https://www.wbmband.com'` is **triplicated** (and hardcoded in the source-prefixed canonical pages) with a **www-vs-apex inconsistency** vs the deploy log's apex form. Not `DEPLOY_TARGET`-aware.                                          | `useMasterPage.ts`, `scripts/generate-bio-links.js`, `pages/index.vue`, `pages/{listen,pre-save}/[source]/[slug].vue` |
 | 7   | Med      | `scripts/generate-bio-links.js` **hard-copies the 12 `SOURCE_PREFIXES` keys** from `utils/sourceAttribution.ts` with only a "keep in sync" comment. Drift → stale bio links that misattribute paid/social traffic.                                            | `scripts/generate-bio-links.js`                                                                                       |
-| 8   | Low      | **Cache invalidation encoding asymmetry**: Cache-API mode matches against `encodeURIComponent`-encoded `request.url`; localStorage mode matches the raw key. A `                                                                                              | `/`/` pattern behaves differently per backend.                                                                        | `utils/api.ts` / `utils/cache.ts` |
 | 9   | Low      | `isValidEmail()` accepts `a@b..c` (double dot) — weak regex used by the contact form.                                                                                                                                                                         | `utils/helpers.ts`                                                                                                    |
 
 ---
@@ -140,17 +140,15 @@ Each wave is independently shippable and leaves CI green.
 
 ### 5.2 Infrastructure utils — `unit` / `integration`
 
-| Target                                                                 | Pri | Eff               | What to assert                                                                                                                                                                  |
-| ---------------------------------------------------------------------- | --- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cache.generateCacheKey()`                                             | P0  | S                 | Deterministic `METHOD\|URL\|params\|body`; method uppercased; empty parts dropped (no dangling `\|`); **param-key-order produces different keys** (document).                   |
-| `cache.get/set` TTL (Cache API)                                        | P0  | M                 | Round-trip; expire at `now-ts > ttl` boundary (off-by-one); expiry deletes entry; corrupt JSON→null.                                                                            |
-| `cache` localStorage fallback                                          | P0  | M                 | No `caches`→fallback; prefixed keys; `clear()` leaves foreign keys; quota throw swallowed; SSR no-op.                                                                           |
-| `api.invalidateCache()`                                                | P1  | M                 | String `includes` vs RegExp `test`; **Cache-API vs localStorage encoding asymmetry** (defect #8); SSR no-op.                                                                    |
-| `api.cachedApiRequest()`                                               | P0  | L                 | Query build (null/undefined dropped, `?`vs`&`); cache only when `enabled && GET`; hit short-circuits fetch; non-2xx throws `HTTP <status>`; `apiDelete` forces `enabled:false`. |
-| `imageHelpers.getOptimizedImageUrl()`                                  | P1  | S                 | `/images/`→`/images/optimized/` avif/webp/jpg; already-optimized early-return; **width/quality have no effect on URL** (pin).                                                   |
-| `imageHelpers.generatePictureSources()` / `getResponsiveImageSrcSet()` | P1  | S                 | type strings; `sizes` default `100vw`; **witness defect #1: all srcset URLs identical**.                                                                                        |
-| `imageHelpers.useImageLoading()`                                       | P1  | M (component env) | IntersectionObserver lazy-load state machine; load/error handlers flip flags.                                                                                                   |
-| `cache.startAutoCleanup()` / singleton side effects                    | P2  | M                 | setInterval scheduled only when `window && 'caches'`; `cleanup(maxAge)` evicts stale.                                                                                           |
+| Target                                                                 | Pri | Eff               | What to assert                                                                                                                                                |
+| ---------------------------------------------------------------------- | --- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cache.generateCacheKey()`                                             | P0  | S                 | Deterministic `METHOD\|URL\|params\|body`; method uppercased; empty parts dropped (no dangling `\|`); **param-key-order produces different keys** (document). |
+| `cache.get/set` TTL (Cache API)                                        | P0  | M                 | Round-trip; expire at `now-ts > ttl` boundary (off-by-one); expiry deletes entry; corrupt JSON→null.                                                          |
+| `cache` localStorage fallback                                          | P0  | M                 | No `caches`→fallback; prefixed keys; `clear()` leaves foreign keys; quota throw swallowed; SSR no-op.                                                         |
+| `imageHelpers.getOptimizedImageUrl()`                                  | P1  | S                 | `/images/`→`/images/optimized/` avif/webp/jpg; already-optimized early-return; **width/quality have no effect on URL** (pin).                                 |
+| `imageHelpers.generatePictureSources()` / `getResponsiveImageSrcSet()` | P1  | S                 | type strings; `sizes` default `100vw`; **witness defect #1: all srcset URLs identical**.                                                                      |
+| `imageHelpers.useImageLoading()`                                       | P1  | M (component env) | IntersectionObserver lazy-load state machine; load/error handlers flip flags.                                                                                 |
+| `cache.startAutoCleanup()` / singleton side effects                    | P2  | M                 | setInterval scheduled only when `window && 'caches'`; `cleanup(maxAge)` evicts stale.                                                                         |
 
 ### 5.3 Data/logic composables — `unit` (`nuxt` env where noted)
 
@@ -164,7 +162,6 @@ Each wave is independently shippable and leaves CI green.
 | `useMusicNavigation` routing                                               | P1  | M   | `isReleaseInPreSaveMode` = upcoming && (presave links \|\| distributor URL); `handleMusicClick` branch routing; modal keyboard. |
 | `useShareFunctionality`                                                    | P2  | M   | `getCleanUrl` strips `from` param, SSR→`''`; Web Share→clipboard→`execCommand` ladder.                                          |
 | `useErrorPage.redirectToError`                                             | P2  | S   | Builds `/404` query with only provided keys (undefined omitted); 4 preset redirects.                                            |
-| `useApi.request()` lifecycle                                               | P2  | M   | loading toggle (respects `manageLoading:false`); error reset/set; cache defaults per verb.                                      |
 
 ### 5.4 UI/behavior composables — `unit`
 
@@ -195,7 +192,6 @@ Each wave is independently shippable and leaves CI green.
 | `musicLibrary.getLatestReleases/getAllReleases`                            | P1  | S   | **Pin/fix the in-place `.sort()` mutation (defect #2).**                                                            |
 | `configHelpers.formatReleaseDate()`                                        | P2  | S   | date-vs-datetime branch (`T`/`:`); locale output.                                                                   |
 | `configHelpers.getConfig()` + `shouldShowNextReleasePreview()`             | P2  | S   | Flag reads middleware depends on.                                                                                   |
-| `middleware/redirect-share-urls.global.ts`                                 | P1  | S   | **Stays inert** (unconditional early `return`); regression guard so it isn't re-enabled.                            |
 
 | `pages/index.vue` maintenance gate + `latestRelease` | P2 | M | `maintenanceMode`→`createError 503`; `new Date(undefined)` edge. |
 | `pages/pre-save/[slug].vue` + `[source]/[slug].vue` distributor redirect | P1 | L | `willAutoRedirect`/`showRedirectScreen` onMounted flow (component-level). |
@@ -233,7 +229,6 @@ Each wave is independently shippable and leaves CI green.
 | `MusicLibrarySection.vue` gating computeds | P2  | L   | `displayedReleases` filters upcoming + dedupes; `shouldShowPreSaveCard`/`shouldShowComingSoon`/`upcomingRelease`.                   |
 | `TeamMemberCard.vue`                       | P2  | L   | `selectRandomImage` exclusion; crossfade; hover debounce; mobile auto-rotate; click/keyboard emit.                                  |
 | `Snackbar.vue`                             | P3  | S   | class-mapper helpers per type (default info); store-driven render.                                                                  |
-| `AppButton.vue`                            | P3  | S   | `handleClick` suppressed when disabled/loading; `buttonClasses`/`iconClasses`.                                                      |
 
 ### 5.8 End-to-end — Playwright vs prerendered `.output/public`
 
@@ -245,10 +240,8 @@ Each wave is independently shippable and leaves CI green.
 | **Cookie-consent gate** blocks GA4 until accepted          | P0  | L   | Consent-Mode default-deny; no analytics cookies pre-accept.                                   |
 | `?bypass=true` escape hatch                                | P1  | S   | Cancels distributor nav, reveals full pre-save body.                                          |
 | Locale routing + bare `/`→localized home                   | P1  | S   | Default ua; `/en/...` English; localePath links.                                              |
-| **Non-localized share-URL aliases** resolve                | P1  | M   | `create-nonlocalized-aliases.js` actually ran; root `/listen/*` + `/pre-save/*` exist.        |
 | `/404` contextual contract                                 | P1  | S   | query params render verbatim; `errorCode` derivation.                                         |
 | Maintenance mode 503 (home only)                           | P1  | M   | Home throws 503; other pages stay up.                                                         |
-| Dev-only pages excluded from output                        | P2  | S   | `test.vue`/`performance-test.vue` absent from `.output/public`.                               |
 | Policy pages render + link integrity                       | P2  | S   | cookies/privacy/terms in both locales; cookies-policy reset calls `useCookieConsent().reset`. |
 
 ---
@@ -262,7 +255,6 @@ These are **whole categories with zero entry** above. Several are cheap and high
 | **Prerender completeness**: `nitro.prerender.routes` ⊇ every release slug × {listen,pre-save} × {prefixed,unprefixed} × {en,ua}; `.htaccess`/alias targets all exist in output | **P0** | e2e         | Single biggest static-output gap. Add a release / a prefix and skip `generate` → shared link 404s with only a warning. Post-generate test asserts each `index.html` exists.                                  |
 | **`.htaccess` ↔ `_redirects` contract**                                                                                                                                       | P1     | integration | Two backends encode the same share-URL routing with **different semantics** (Apache internal rewrite vs Netlify 301), both hardcode `/ua/`. Parse + assert both agree and target existing prerendered paths. |
 | **`generate-bio-links.js` SOURCE_PREFIXES drift**                                                                                                                              | P1     | unit        | Hard-copies the 12 keys (defect #7). Node test: `Object.keys(canonical)` deep-equals the script's copy + base-URL match.                                                                                     |
-| **`create-nonlocalized-aliases.js` actually ran**                                                                                                                              | P1     | e2e         | Silent no-op if source dir missing → root share URLs 404. Assert root `listen/<slug>/index.html` exists and mirrors the ua build.                                                                            |
 | **`DEPLOY_TARGET=github` head prefixing**                                                                                                                                      | P1     | integration | ~30 hand-written `(github ? '/WBM-Band-WebSite' : '') + path` concatenations across favicons/manifest/og. Assert every href is prefixed exactly once under github and not at all when unset.                 |
 | **i18n silent-fallback masking**                                                                                                                                               | P1     | integration | Defect #4 — mount each EN release page, assert no title/description equals its uk.json value (didn't fall through to UA).                                                                                    |
 | **`robots.txt` non-empty + sitemap present**                                                                                                                                   | P1     | e2e         | Defect #3 — currently 0 bytes, no sitemap.                                                                                                                                                                   |

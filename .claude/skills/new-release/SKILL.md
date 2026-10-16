@@ -53,7 +53,7 @@ A release normally arrives in **two passes**: pre-save now (§1–§5), released
 
 ## 3. Verify
 
-1. `npx vitest run --project unit` — **adding a release predictably breaks `test/unit/music-library.spec.ts`**; fix the assertions, don't work around them (see Gotchas).
+1. `npx vitest run --project unit` — `test/unit/music-library.spec.ts` now runs ordering/upcoming tests against a fixture library, so a new release no longer breaks it (the real-data lookup tests only pin ids 1-3).
 2. `npx vitest run --project nuxt`, then `npm run lint` (0 errors; the ~290 warnings are pre-existing).
 3. `npm run generate` (never `build`). Then check the output:
    - `.output/public/pre-save/<slug>/index.html` exists, `<title>` localized in `ua` + `en`
@@ -63,7 +63,7 @@ A release normally arrives in **two passes**: pre-save now (§1–§5), released
 
 ## 4. Ship
 
-Per `ship-deploy`: staging = push to `main` (GitHub Pages CI builds from git); production = `npm run deploy:production` (FTP, **builds from the WORKING TREE** — uncommitted changes ship, so reconcile first). Restart any `npm run dev` afterwards — a build overwrites `.nuxt` and 500s the running dev server.
+Per `ship-deploy`: staging = push to `main` (GitHub Pages CI builds from git); production = `npm run deploy:production` (rsync to the VPS, **builds from the WORKING TREE** — uncommitted changes ship, so reconcile first). Restart any `npm run dev` afterwards — a build overwrites `.nuxt` and 500s the running dev server.
 
 Hand Bohdan the share links from `.output/bio-links.md` (per-platform `/pre-save/<prefix>/<slug>` URLs feed GA4 source attribution — see `analytics-tracking`).
 
@@ -90,7 +90,7 @@ The state machine flips itself once `releaseDate` passes (`presave-access.ts` re
 
 ## Gotchas
 
-- **Every new release breaks the same 4 assertions in `test/unit/music-library.spec.ts`** — the two newest-first ordering lists (`getLatestReleases`, `getAllReleases`), `getLatestReleases(1)`, and _"treats a release whose moment exactly equals now as NOT upcoming"_. That last one must be pinned to the **newest** release's instant, or a newer release stays ahead of `now` and the strict `>` is never exercised. Add the new id constant and update all four.
+- `test/unit/music-library.spec.ts` no longer needs editing per release (fixture-driven). If it fails after adding a release, the new entry broke a real invariant: unique id/slug or missing `musicPlatformLinks`.
 - `musicPlatformLinks` is **required** by the type — ship `{}` for a pre-save, not an omission.
 - The blurred cover is a _preview-mode_ asset, not a pre-save one (§1.4).
 - `/listen/<slug>` is in the sitemap from day one, but before the release date it prerenders to a meta-refresh into `/404` (listen-access gate). Harmless and self-correcting on release day — just don't request indexing for it early.
