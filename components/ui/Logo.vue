@@ -6,20 +6,41 @@
     :aria-label="ariaLabel || t('a11y.home')"
     @click="handleClick"
   >
-    <LogoSvg :class="computedImageClass" />
+    <img
+      :src="logoSrc"
+      alt=""
+      :class="['wbm-logo-img', computedImageClass]"
+      :loading="loading"
+      :fetchpriority="fetchpriority"
+      decoding="async"
+      draggable="false"
+    />
   </button>
 
   <div v-else :class="computedContainerClass">
-    <LogoSvg :class="computedImageClass" />
+    <img
+      :src="logoSrc"
+      alt=""
+      :class="['wbm-logo-img', computedImageClass]"
+      :loading="loading"
+      :fetchpriority="fetchpriority"
+      decoding="async"
+      draggable="false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
   import { useI18n } from 'vue-i18n'
   import { useScrollTo } from '~/composables/useScrollTo'
-  import LogoSvg from './LogoSvg.vue'
 
   const { t } = useI18n()
+  const { resolveUrl } = useAssetUrl()
+
+  // One SVGO-optimized static file (browser-cached once) instead of ~110 KB of
+  // inline <svg> markup per placement. The art is white; every placement renders it
+  // white (currentColor was always #fff here), so an <img> is pixel-equivalent.
+  const logoSrc = resolveUrl('/images/wbm-logo.svg')
 
   interface Props {
     clickable?: boolean
@@ -29,11 +50,15 @@
     blendMode?: 'normal' | 'exclusion' | 'multiply' | 'screen' | 'overlay'
     // Accessible name for the clickable logo button. Falls back to a11y.home.
     ariaLabel?: string
+    loading?: 'eager' | 'lazy'
+    fetchpriority?: 'high' | 'low' | 'auto'
   }
 
   const props = withDefaults(defineProps<Props>(), {
     clickable: true,
-    blendMode: 'normal'
+    blendMode: 'normal',
+    loading: undefined,
+    fetchpriority: undefined
   })
 
   // Computed class for the container (includes blend mode)
@@ -76,6 +101,12 @@
 </script>
 
 <style scoped>
+  /* Reserve the box before the SVG arrives (same ratio as the artwork viewBox),
+     so `h-* w-auto` / `w-* h-auto` placements never reflow. */
+  .wbm-logo-img {
+    aspect-ratio: 2158.53 / 2769.16;
+  }
+
   .blend-exclusion {
     mix-blend-mode: exclusion;
     color: white;
