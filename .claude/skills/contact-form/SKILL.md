@@ -9,7 +9,7 @@ Working on the contact form: changing fields, the success/error flow, the recipi
 
 ## Steps
 
-1. Edit markup, validation (`required` inputs), or submit logic in `components/sections/ContactsSection.vue` (`handleSubmit`).
+1. Edit markup, validation (`validate()`, `novalidate` form), or submit logic in `components/sections/ContactsSection.vue` (`handleSubmit`).
 2. The submit POSTs JSON to `https://api.web3forms.com/submit` with `{ access_key, name, email, message, subject }`. `access_key` comes from `getConfig('general.web3formsApiKey')`.
 3. To rotate/replace the key: edit `web3formsApiKey` in `config/general.ts` (~line 141). It is a plain string literal in config, NOT an env var. There is no `.env` entry.
 4. To change the recipient: do it in the Web3Forms dashboard (not in code) and re-verify the new email.
@@ -30,7 +30,8 @@ Working on the contact form: changing fields, the success/error flow, the recipi
 
 - The access key is committed in `config/general.ts` — it ships to the static client bundle (Web3Forms keys are public-by-design, but treat rotation as a config edit, not a secret swap). The brief's "env keys" framing is inaccurate: there are none.
 - No server/backend — pure client `fetch`; success is gated on `result.success` from the JSON response, not the HTTP status.
-- Success/error banners auto-hide after 5s via `setTimeout`; the form resets only on success.
+- Validation is ours, not the browser's: the form is `novalidate`, `validate()` sets per-field i18n keys (`contacts.*_required` / `email_invalid`) rendered as `role="alert"` paragraphs wired with `aria-invalid` + `aria-describedby`. Add a field = add its error key to BOTH locales.
+- The success banner auto-hides after 5s; the error banner does NOT (it stays until the next submit) and names the contact email (`contacts.error_fallback`). The form resets only on success.
 - `useCookieConsent.ts` is unrelated to the form — it only gates GA4 consent. Don't conflate it.
 - Static SSG: no per-deploy key swap; `DEPLOY_TARGET` does not affect this form.
 
