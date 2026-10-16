@@ -70,7 +70,7 @@
     size?: Size
     /** capsule (default) | rounded | circle (use with iconOnly). */
     shape?: Shape
-    /** Leading/trailing icon class, e.g. "pi pi-times" or "fab fa-spotify". */
+    /** Leading/trailing icon class, e.g. "pi pi-times" or "pi pi-youtube". */
     icon?: string | null
     iconPos?: 'left' | 'right'
     iconOnly?: boolean

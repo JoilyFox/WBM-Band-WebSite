@@ -27,7 +27,7 @@
           @click="handleBack"
         >
           <i v-if="shouldShowBackArrow" class="pi pi-arrow-left text-xl"></i>
-          <i v-else class="fa-solid fa-home text-lg"></i>
+          <UiIcon v-else name="house" class="text-lg" />
         </button>
 
         <!-- Logo and Share button only on mobile -->
@@ -331,7 +331,7 @@
           <!-- Slotted (not the icon/label props) so the label can collapse to an
                icon-only pill on narrow phones when the lyrics view is open —
                see `.mv-label` + the max-width:400px rule in the styles. -->
-          <i class="fab fa-youtube text-base leading-none" aria-hidden="true"></i>
+          <UiIcon name="youtube" class="text-base leading-none" />
           <span class="mv-label">{{ t('music.buttons.music_video') }}</span>
         </MusicHeroPill>
         <!-- Lyrics: swaps the platform-links section below for the song lyrics

@@ -53,7 +53,7 @@
    * Shared glass "pill" used for the release-page hero actions (Music Video,
    * Lyrics, Collapse, Back). One look, prop-driven states:
    *  - `as`        : 'button' (default) or 'a' (renders the matching NATIVE element)
-   *  - `icon`      : full icon class string incl. size, e.g. 'fab fa-youtube text-base'
+   *  - `icon`      : full icon class string incl. size, e.g. 'pi pi-youtube text-base'
    *  - `label`     : fixed label, OR
    *  - narrow/wide : responsive label that swaps at `breakpoint` (UiResponsiveText)
    *  - `accent`    : 'video' adds the soft red YouTube glow on the LEFT edge

@@ -121,7 +121,7 @@ target (see `memory/reference_ios_button_appearance.md`).
 | `variant`                                                   | `clear` · `dimmed` · `solid` · `outline` · `ghost` | `clear`/`dimmed` are glass; rest are flat          |
 | `size`                                                      | `sm` (32px) · `md` (40px) · `lg` (48px)            |                                                    |
 | `shape`                                                     | `capsule` · `rounded` (12px) · `circle`            | radius via `--lg-radius`                           |
-| `icon`                                                      | icon class, e.g. `pi pi-times`, `fab fa-spotify`   | + `iconPos` `left`/`right`                         |
+| `icon`                                                      | icon class, e.g. `pi pi-times`, `pi pi-spotify`    | + `iconPos` `left`/`right`                         |
 | `iconOnly`                                                  | boolean                                            | squares the button; **requires `ariaLabel`**       |
 | `label` / default slot                                      | text                                               |                                                    |
 | `block`                                                     | boolean                                            | full width                                         |

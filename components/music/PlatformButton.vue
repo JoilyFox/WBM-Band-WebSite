@@ -9,7 +9,7 @@
     @click="handleClick"
   >
     <div class="platform-icon">
-      <i :class="platformIcon"></i>
+      <UiIcon :name="platformIcon" />
     </div>
     <div class="platform-content">
       <span class="platform-name">{{ platformName }}</span>
@@ -52,79 +52,79 @@
   const platformConfig = {
     spotify: {
       name: 'Spotify',
-      icon: 'fab fa-spotify',
+      icon: 'spotify',
       color: '#1DB954',
       gradient: 'linear-gradient(135deg, #1DB954 0%, #1ed760 100%)'
     },
     appleMusic: {
       name: 'Apple Music',
-      icon: 'fab fa-apple',
+      icon: 'apple',
       color: '#FA243C',
       gradient: 'linear-gradient(135deg, #FA243C 0%, #ff4757 100%)'
     },
     youtubeMusic: {
       name: 'YouTube Music',
-      icon: 'fas fa-play-circle',
+      icon: 'circle-play',
       color: '#FF0000',
       gradient: 'linear-gradient(135deg, #FF0000 0%, #ff4444 100%)'
     },
     youtube: {
       name: 'YouTube',
-      icon: 'fab fa-youtube',
+      icon: 'youtube',
       color: '#FF0000',
       gradient: 'linear-gradient(135deg, #FF0000 0%, #ff4444 100%)'
     },
     deezer: {
       name: 'Deezer',
-      icon: 'fas fa-music',
+      icon: 'music',
       color: '#FF9500',
       gradient: 'linear-gradient(135deg, #FF9500 0%, #ffb347 100%)'
     },
     soundcloud: {
       name: 'SoundCloud',
-      icon: 'fab fa-soundcloud',
+      icon: 'soundcloud',
       color: '#FF5500',
       gradient: 'linear-gradient(135deg, #FF5500 0%, #ff7733 100%)'
     },
     bandcamp: {
       name: 'Bandcamp',
-      icon: 'fab fa-bandcamp',
+      icon: 'bandcamp',
       color: '#629AA0',
       gradient: 'linear-gradient(135deg, #629AA0 0%, #7bb3bb 100%)'
     },
     tidal: {
       name: 'Tidal',
-      icon: 'fas fa-water',
+      icon: 'water',
       color: '#000000',
       gradient: 'linear-gradient(135deg, #000000 0%, #333333 100%)'
     },
     amazonMusic: {
       name: 'Amazon Music',
-      icon: 'fab fa-amazon',
+      icon: 'amazon',
       color: '#FF9900',
       gradient: 'linear-gradient(135deg, #FF9900 0%, #ffb84d 100%)'
     },
     pandora: {
       name: 'Pandora',
-      icon: 'fas fa-radio',
+      icon: 'radio',
       color: '#005483',
       gradient: 'linear-gradient(135deg, #005483 0%, #0074b7 100%)'
     },
     googlePlay: {
       name: 'Google Play Music',
-      icon: 'fab fa-google-play',
+      icon: 'google-play',
       color: '#FF6F00',
       gradient: 'linear-gradient(135deg, #FF6F00 0%, #ff8f00 100%)'
     },
     itunes: {
       name: 'iTunes',
-      icon: 'fab fa-itunes',
+      icon: 'itunes',
       color: '#FA243C',
       gradient: 'linear-gradient(135deg, #FA243C 0%, #ff4757 100%)'
     },
     musicVideo: {
       name: 'YouTube',
-      icon: 'fab fa-youtube',
+      icon: 'youtube',
       color: '#FF0000',
       gradient: 'linear-gradient(135deg, #FF0000 0%, #ff4444 100%)'
     }
@@ -132,7 +132,7 @@
 
   const defaultConfig = {
     name: props.platform,
-    icon: 'fas fa-music',
+    icon: 'music',
     color: '#6B7280',
     gradient: 'linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%)'
   }
