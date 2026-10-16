@@ -1,5 +1,5 @@
 // @vitest-environment nuxt
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import BaseModal from '~/components/common/BaseModal.vue'
@@ -311,10 +311,13 @@ describe('BaseModal', () => {
       expect(document.body.classList.contains('modal-open')).toBe(true)
       expect(document.body.style.overflow).toBe('hidden')
 
+      // The lock is held through the leave transition (so the scrollbar doesn't pop
+      // back in under the fading scrim) and released once it completes.
       await w.setProps({ isVisible: false })
-      await nextTick()
-      expect(document.body.classList.contains('modal-open')).toBe(false)
-      expect(document.body.style.overflow).toBe('')
+      await vi.waitFor(() => {
+        expect(document.body.classList.contains('modal-open')).toBe(false)
+        expect(document.body.style.overflow).toBe('')
+      })
     })
 
     it('does not lock body scroll when mounted closed', async () => {
