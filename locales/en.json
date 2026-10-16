@@ -70,6 +70,19 @@
       "message": "Our website is currently under construction. We're working hard to bring you an amazing experience!",
       "coming_soon": "Coming Soon"
     },
+    "date_tba": "soon",
+    "release_locked": {
+      "title": "Release Not Available",
+      "message": "This track unlocks on {date}. Please check back soon."
+    },
+    "presave_disabled": {
+      "title": "Pre-save Disabled",
+      "message": "Pre-save access is currently turned off for this release."
+    },
+    "presave_not_ready": {
+      "title": "Pre-save Not Ready",
+      "message": "Pre-save links for this release are not configured yet. Please try again closer to {date}."
+    },
     "support_hint": "If this problem persists, please contact support"
   },
   "pages": {
@@ -290,7 +303,8 @@
     "presave": {
       "card_title_fallback": "Pre-save",
       "coming_prefix": "Release {date}",
-      "redirecting": "Taking you to pre-save…"
+      "redirecting": "Taking you to pre-save…",
+      "redirect_fallback": "Not redirected? Open the pre-save page"
     },
     "days_remaining": {
       "prefix": "in",

@@ -1,6 +1,8 @@
 import { useLocalePath } from '#i18n'
 import { getReleaseBySlug } from '~/data/musicLibrary'
-import { formatReleaseDate, getConfig, isUpcomingRelease } from '~/utils/configHelpers'
+import { getConfig, isUpcomingRelease } from '~/utils/configHelpers'
+import { hasPreSaveLinks } from '~/utils/preSave'
+import { releaseGateLocation } from '~/utils/releaseGate'
 import { SOURCE_PREFIXES } from '~/utils/sourceAttribution'
 
 export default defineNuxtRouteMiddleware(async (to) => {
@@ -10,59 +12,32 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   const sourceParam = to.params?.source
   const sourceRaw = Array.isArray(sourceParam) ? sourceParam[0] : sourceParam
-  const sourcePrefix = sourceRaw && sourceRaw in SOURCE_PREFIXES ? sourceRaw : undefined
+  const sourcePrefix =
+    sourceRaw && Object.hasOwn(SOURCE_PREFIXES, sourceRaw) ? sourceRaw : undefined
 
   const release = getReleaseBySlug(slug)
   if (!release) return
 
-  const enablePreSave = Boolean(getConfig('general.enablePreSave', { fallback: false }))
-  if (!enablePreSave) {
-    return navigateTo(
-      {
-        path: '/404',
-        query: {
-          title: 'Pre-save Disabled',
-          message: 'Pre-save access is currently turned off for this release.',
-          buttonText: 'Go to Home',
-          buttonLink: '/',
-          buttonIcon: 'pi pi-home'
-        }
-      },
-      { replace: true }
-    )
-  }
+  const localePath = useLocalePath()
 
+  // An already-released track always forwards to /listen — checked BEFORE the
+  // global enablePreSave flag so old QR codes / stories / emails keep working
+  // after the campaign is switched off.
   if (!isUpcomingRelease(release.releaseDate)) {
-    const localePath = useLocalePath()
     const target = sourcePrefix ? `/listen/${sourcePrefix}/${slug}` : `/listen/${slug}`
     // Carry the query across: it holds the promo-campaign id (`?c=…`), which
     // would otherwise be dropped by the redirect.
     return navigateTo({ path: localePath(target), query: to.query ?? {} }, { redirectCode: 302 })
   }
 
-  const hasPreSaveLinks = Boolean(
-    (release.preSaveMusicPlatformLinks &&
-      Object.values(release.preSaveMusicPlatformLinks).some(Boolean)) ||
-      release.distributorPreSaveUrl
-  )
-  if (!hasPreSaveLinks) {
-    const i18nLocale = useNuxtApp()?.$i18n?.locale?.value
-    const normalizedLocale =
-      i18nLocale === 'ua' ? 'uk-UA' : i18nLocale === 'en' ? 'en-US' : i18nLocale || 'en-US'
-    const formattedDate = release.releaseDate
-      ? formatReleaseDate(release.releaseDate, normalizedLocale)
-      : 'TBA'
+  const enablePreSave = Boolean(getConfig('general.enablePreSave', { fallback: false }))
+  if (!enablePreSave) {
+    return navigateTo(releaseGateLocation(localePath, 'presave_disabled'), { replace: true })
+  }
+
+  if (!hasPreSaveLinks(release)) {
     return navigateTo(
-      {
-        path: '/404',
-        query: {
-          title: 'Pre-save Not Ready',
-          message: `Pre-save links for this release are not configured yet. Please try again closer to ${formattedDate}.`,
-          buttonText: 'Go to Home',
-          buttonLink: '/',
-          buttonIcon: 'pi pi-home'
-        }
-      },
+      releaseGateLocation(localePath, 'presave_not_ready', release.releaseDate || undefined),
       { replace: true }
     )
   }

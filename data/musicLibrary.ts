@@ -1,3 +1,5 @@
+import { hasPreSaveLinks } from '../utils/preSave'
+
 /**
  * Optional per-release theming override for the cover-driven release page
  * atmosphere (see composables/useReleaseTheme.ts). Every field is optional and
@@ -558,11 +560,7 @@ export const getNearestUpcomingPreSaveRelease = (): MusicRelease | undefined => 
   const upcomingWithPreSave = musicLibrary.filter((release) => {
     // If no release date, it's definitely in future, but we check if it has links
     const releaseTime = getReleaseTime(release.releaseDate)
-    const hasPreSaveLinks =
-      (release.preSaveMusicPlatformLinks &&
-        Object.keys(release.preSaveMusicPlatformLinks).length > 0) ||
-      !!release.distributorPreSaveUrl
-    return releaseTime > now && hasPreSaveLinks
+    return releaseTime > now && hasPreSaveLinks(release)
   })
 
   // Sort by release date (nearest first) and return the first one

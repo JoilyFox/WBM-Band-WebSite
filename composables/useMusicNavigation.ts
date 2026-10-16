@@ -2,6 +2,7 @@ import { ref, computed, readonly } from 'vue'
 import { useLocalePath } from '#i18n'
 import type { MusicRelease } from '~/data/musicLibrary'
 import { isUpcomingRelease } from '~/utils/configHelpers'
+import { hasPreSaveLinks } from '~/utils/preSave'
 
 export const useMusicNavigation = () => {
   const selectedRelease = ref<MusicRelease | null>(null)
@@ -20,10 +21,7 @@ export const useMusicNavigation = () => {
    * Determine if a release is in pre-save mode
    */
   const isReleaseInPreSaveMode = (release: MusicRelease): boolean => {
-    return (
-      isUpcomingRelease(release.releaseDate) &&
-      (!!release.preSaveMusicPlatformLinks || !!release.distributorPreSaveUrl)
-    )
+    return isUpcomingRelease(release.releaseDate) && hasPreSaveLinks(release)
   }
 
   /**

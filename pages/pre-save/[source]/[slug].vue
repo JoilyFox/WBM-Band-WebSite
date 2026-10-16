@@ -13,6 +13,7 @@
   import { useMasterPage } from '~/composables/useMasterPage'
   import { useAnalytics } from '~/composables/useAnalytics'
   import { isUpcomingRelease } from '~/utils/configHelpers'
+  import { hasPreSaveLinks } from '~/utils/preSave'
   import { SOURCE_PREFIXES } from '~/utils/sourceAttribution'
 
   definePageMeta({
@@ -24,7 +25,7 @@
   const slug = route.params.slug as string
   const sourcePrefix = route.params.source as string
 
-  if (!(sourcePrefix in SOURCE_PREFIXES)) {
+  if (!Object.hasOwn(SOURCE_PREFIXES, sourcePrefix)) {
     const localePath = useLocalePath()
     await navigateTo(localePath(`/pre-save/${slug}`), { redirectCode: 302 })
   }
@@ -44,11 +45,7 @@
     await navigateTo(localePath(`/listen/${sourcePrefix}/${slug}`), { redirectCode: 301 })
   }
 
-  if (
-    (!release.preSaveMusicPlatformLinks ||
-      Object.keys(release.preSaveMusicPlatformLinks).length === 0) &&
-    !release.distributorPreSaveUrl
-  ) {
+  if (!hasPreSaveLinks(release)) {
     throw createError({
       statusCode: 404,
       statusMessage: `Pre-save not available for "${slug}"`,
@@ -85,18 +82,24 @@
       // distributor conversion). Releases flagged skipDistributorConversionEvent
       // opt out of the synthetic conversion; release_view still counts the
       // per-source visit (the whole point of the /pre-save/<source>/<slug> link).
-      const pending = [trackReleaseView({ releaseSlug: slug, pageType: 'pre-save' })]
-      if (!release.skipDistributorConversionEvent) {
-        pending.push(
-          trackPlatformClick({
-            platformName: 'distributor',
-            releaseSlug: slug,
-            pageType: 'pre-save'
-          })
-        )
+      try {
+        const pending = [trackReleaseView({ releaseSlug: slug, pageType: 'pre-save' })]
+        if (!release.skipDistributorConversionEvent) {
+          pending.push(
+            trackPlatformClick({
+              platformName: 'distributor',
+              releaseSlug: slug,
+              pageType: 'pre-save'
+            })
+          )
+        }
+        await Promise.all(pending)
+      } catch (error) {
+        // Tracking must never trap the visitor on the redirect screen.
+        if (import.meta.dev) console.warn('[pre-save] tracking failed before redirect', error)
+      } finally {
+        await navigateTo(release.distributorPreSaveUrl, { external: true, redirectCode: 302 })
       }
-      await Promise.all(pending)
-      await navigateTo(release.distributorPreSaveUrl, { external: true, redirectCode: 302 })
       return
     }
     trackReleaseView({ releaseSlug: slug, pageType: 'pre-save' })
@@ -110,7 +113,7 @@
     ogDescription: () => localizedDescription.value,
     ogImage: () => metaImageUrl.value,
     ogType: 'music.song',
-    twitterCard: 'summary_large_image',
+    twitterCard: 'summary',
     twitterTitle: () => `Pre-save ${localizedTitle.value} | WBM Band`,
     twitterDescription: () => localizedDescription.value,
     twitterImage: () => metaImageUrl.value

@@ -8,6 +8,9 @@
     middleware: ['presave-access']
   })
 
+  // Pure redirect hub with no content of its own: never index it.
+  useHead({ meta: [{ name: 'robots', content: 'noindex, follow' }] })
+
   const route = useRoute()
   const localePath = useLocalePath()
 

@@ -68,20 +68,31 @@ export const getConfig = (path: string, options: GetConfigOptions = {}): any => 
   }
 }
 
+/** Releases go live at midnight Kyiv time; every displayed date uses this zone. */
+export const RELEASE_TIME_ZONE = 'Europe/Kyiv'
+
 /**
  * Helper function to format release date
  * Supports ISO 8601 format with optional time
  */
-export const formatReleaseDate = (dateString: string, locale: string = 'en-US'): string => {
+export const formatReleaseDate = (
+  dateString: string,
+  locale: string = 'en-US',
+  { includeTime = true }: { includeTime?: boolean } = {}
+): string => {
   const date = new Date(dateString)
 
   // Check if the release date includes time (not just date)
-  const hasTime = dateString.includes('T') || dateString.includes(':')
+  const hasTime = includeTime && (dateString.includes('T') || dateString.includes(':'))
 
+  // Always format in the band's home timezone: the release is scheduled at
+  // midnight Kyiv time, so the printed day must not depend on the build
+  // machine's (UTC in CI) or the visitor's timezone.
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: RELEASE_TIME_ZONE
   }
 
   // Add time formatting if time is specified
@@ -136,7 +147,8 @@ export const formatReleaseDateShort = (dateString: string): string => {
   const options: Intl.DateTimeFormatOptions = {
     month: 'short',
     day: 'numeric',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone: RELEASE_TIME_ZONE
   }
   return date.toLocaleDateString('en-US', options)
 }
