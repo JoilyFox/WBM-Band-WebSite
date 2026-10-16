@@ -531,11 +531,30 @@ export default defineNuxtConfig({
     defaults: {
       weights: [400, 500, 600, 700],
       styles: ['normal'],
-      subsets: ['latin', 'latin-ext', 'cyrillic']
+      subsets: ['latin', 'cyrillic']
     },
     families: [
-      { name: 'Inter', provider: 'google', weights: [300, 400, 500, 600, 700] },
-      { name: 'Space Grotesk', provider: 'google', weights: [400, 500, 600, 700] }
+      // Inter carries all body copy, Ukrainian included -> latin + cyrillic only
+      // (no latin-ext glyph appears anywhere in the copy), weights 400-700 (300
+      // was never used; 800/900 requests resolve to the 700 face as before).
+      // `preload: true` also preloads the cyrillic face (the default only
+      // preloads faces WITHOUT a unicode-range), so the primary (ua) locale's
+      // body text no longer waits for it to be discovered from CSS.
+      {
+        name: 'Inter',
+        provider: 'google',
+        weights: [400, 500, 600, 700],
+        subsets: ['latin', 'cyrillic'],
+        preload: true
+      },
+      // Space Grotesk has no Cyrillic glyphs, headings in ua fall back to the
+      // stack in base.scss, so only its latin subset is provisioned.
+      {
+        name: 'Space Grotesk',
+        provider: 'google',
+        weights: [400, 500, 600, 700],
+        subsets: ['latin']
+      }
     ]
   },
 
