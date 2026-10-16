@@ -25,12 +25,12 @@ export default defineConfig({
       reporter: ['text', 'html', 'lcov'],
       include: ['utils/**', 'composables/**', 'middleware/**', 'config/**'],
       exclude: ['**/*.d.ts', 'scripts/**', '**/types/**'],
-      // Ratchet floor, set to the measured baseline rounded DOWN (Oct 2026, after the
-      // dead API/cache layer was deleted: lines 52.7 / stmts 51.7 / funcs 54.3 /
-      // branches 45.9). CI runs `npm run coverage`, so a drop below fails the build.
+      // Ratchet floor, set to the measured baseline rounded DOWN (16 Oct 2026, after the
+      // dead API/cache layer was deleted and the SEO/middleware specs landed: lines 66.4 /
+      // stmts 65.3 / funcs 66.4 / branches 57.4). CI runs `npm run coverage`, so a drop below fails the build.
       // Raise these as the untested perf/scroll composables get covered; never set a
       // threshold you aren't already above (docs/testing-strategy.md §7).
-      thresholds: { lines: 52, statements: 51, functions: 54, branches: 45 }
+      thresholds: { lines: 65, statements: 64, functions: 65, branches: 56 }
     },
     projects: [
       {

@@ -31,11 +31,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # Non-blocking until the audit branches (MusicCard / listen-access /
-      # useStructuredData type fixes) merge; then drop continue-on-error.
       - name: Typecheck (vue-tsc)
         run: npm run typecheck
-        continue-on-error: true
 
       - name: Unit + Nuxt tests (with coverage thresholds)
         run: npm run coverage

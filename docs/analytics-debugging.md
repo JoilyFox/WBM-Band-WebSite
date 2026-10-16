@@ -86,6 +86,13 @@ deliberately; don't flip silently.
 Run this **before** concluding the wiring is broken, and again after any change. (Phase 0.2 / 3.3 / 5.5 of the task
 plan were never executed — this is them.)
 
+**gtag.js loads lazily (since Oct 2026).** `nuxt.config` sets `gtag.initMode: 'manual'`, so no `/g/collect` request
+appears at page load. `utils/gtagLoader.ts` (`ensureGtagLoaded`) injects gtag.js on whichever comes first: idle after
+`load` (`plugins/analytics.client.ts`), the first interaction, or an awaited event in `useAnalytics.sendEvent`.
+Everything pushed earlier, including the consent default, is queued in `dataLayer` and replayed in order. When you
+validate, wait a second after load or click once before deciding that a hit is missing. Client JS errors arrive as GA4
+`exception` events, and contact-form failures as `form_error` events.
+
 **Decode a `/g/collect` request** (DevTools → Network → filter `collect`):
 
 | Param         | Meaning                                                                                 |

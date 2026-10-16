@@ -206,26 +206,28 @@
   const { selectedRelease, isModalOpen, isSelectedReleasePreSave, handleMusicClick, closeModal } =
     useMusicNavigation()
 
-  // Hero images for preloading — first slide of each orientation set so the
-  // LCP image is warm regardless of device orientation. The hero slider
-  // (orientation-aware) will pick whichever matches the viewport.
-  const heroImages = computed(() => [
-    {
+  // First hero slide per orientation. These must match the first entry of
+  // HeroSection's horizontalImages / verticalImages, or the preload fetches an
+  // image the slider never shows.
+  const heroImages = computed(() => ({
+    landscape: {
       src: '/images/optimized/hero-images/horizontal/hero-1.avif',
       alt: `${bandName.value} performing live on stage`,
       preset: 'hero'
     },
-    {
-      src: '/images/optimized/hero-images/vertical/hero-1.avif',
+    portrait: {
+      src: '/images/optimized/hero-images/vertical/hero-6.avif',
       alt: `${bandName.value} performing live on stage`,
       preset: 'heroVertical'
     }
-  ])
+  }))
 
   // Preload critical images on mount
   onMounted(async () => {
-    // Preload hero images with high priority
-    await preloadHeroImages(heroImages.value)
+    // Only the orientation the slider will actually render; warming the other
+    // one cost phones a full-size landscape image they never display.
+    const portrait = window.matchMedia('(orientation: portrait)').matches
+    await preloadHeroImages([portrait ? heroImages.value.portrait : heroImages.value.landscape])
 
     // Preload first 6 album covers (above the fold)
     const albumImageUrls = musicLibrary.slice(0, 6).map((release) => release.imageUrl)
