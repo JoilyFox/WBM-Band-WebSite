@@ -939,6 +939,48 @@
     color: rgba(255, 255, 255, 0.7);
   }
 
+  /* Touch targets (WCAG 2.5.5 / Apple HIG: >= 44px). The footer's text links and
+     streaming icons are visually small by design, so the hit area is grown with an
+     invisible ::after overlay instead of changing their look. Touch-only, so mouse
+     hover areas on desktop are untouched. Horizontal insets stay below half the gap
+     to the neighbouring link so adjacent targets never overlap. */
+  @media (pointer: coarse) {
+    .legal-link,
+    .legal-link-minimal,
+    .developer-link,
+    .streaming-icon-link,
+    a.footer-link {
+      position: relative;
+    }
+
+    .legal-link::after,
+    .legal-link-minimal::after,
+    .developer-link::after,
+    .streaming-icon-link::after,
+    a.footer-link::after {
+      content: '';
+      position: absolute;
+      /* 12-17px text -> +14px top/bottom reaches 44-45px */
+      inset: -14px -6px;
+    }
+
+    /* NB: in the full footer the credit sits in a `.two-line-clamp` (overflow:
+       hidden) box, which clips this overlay to the text height; it only reaches
+       44px in the minimized footer. */
+    .developer-link::after {
+      inset: -15px -6px;
+    }
+
+    a.footer-link::after {
+      inset: -13px -6px;
+    }
+
+    .streaming-icon-link::after {
+      /* 28px icon -> +8px each side = 44px square */
+      inset: -8px;
+    }
+  }
+
   /* Reduced motion support for minimized footer */
   @media (prefers-reduced-motion: reduce) {
     .footer-logo-link-minimal,

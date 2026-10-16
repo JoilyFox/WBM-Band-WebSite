@@ -19,6 +19,8 @@
            ::before (present from the first server paint — no flash). After mount
            the persistent JS thumb takes over (same spot, seamless) so it can
            SLIDE between labels. -->
+      <!-- Invisible >=44px touch target (the pill itself is 28px tall). -->
+      <span class="lang-hit" aria-hidden="true" />
       <span ref="thumbEl" class="lang-thumb" aria-hidden="true" />
       <span
         ref="enEl"
@@ -169,6 +171,17 @@
     /* Lightish control: keep the frost subtle so the header chrome stays light */
     --lg-tint: rgb(255 255 255 / 0.06);
     --lg-rim: rgb(255 255 255 / 0.4);
+  }
+  /* Touch-only hit-area expansion: 28px pill -> 44px tall tap target, look unchanged. */
+  .lang-hit {
+    display: none;
+  }
+  @media (pointer: coarse) {
+    .lang-hit {
+      display: block;
+      position: absolute;
+      inset: -8px -4px;
+    }
   }
   .lang-switch--big {
     padding: 2px; /* keep container compact */
