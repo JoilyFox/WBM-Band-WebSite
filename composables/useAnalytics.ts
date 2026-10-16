@@ -1,6 +1,7 @@
 import { getOrPersistSourcePlatform, type SourcePlatform } from '~/utils/sourceAttribution'
 import { getOrPersistCampaign, NO_CAMPAIGN } from '~/utils/campaignAttribution'
 import { isLikelyBot } from '~/utils/isLikelyBot'
+import { ensureGtagLoaded } from '~/utils/gtagLoader'
 
 export type MasterPageType = 'listen' | 'pre-save'
 
@@ -54,7 +55,9 @@ function markViewSeen(key: string): void {
  * tolerable but inflated conversion counts would break the dashboards.
  */
 export function useAnalytics() {
-  const { gtag } = useGtag()
+  const { gtag, initialize } = useGtag()
+  // Captured now (setup context) so click handlers can start gtag.js later.
+  const nuxtApp = tryUseNuxtApp()
 
   function getSourcePlatform(): SourcePlatform {
     if (typeof window === 'undefined') return 'direct'
@@ -91,6 +94,11 @@ export function useAnalytics() {
         resolve()
       }
       const timer = setTimeout(done, EVENT_FLUSH_TIMEOUT_MS)
+      // gtag.js is loaded lazily (initMode: 'manual'); an event someone awaits
+      // must not sit in the dataLayer until an idle window, so start it now.
+      ensureGtagLoaded(() =>
+        nuxtApp ? nuxtApp.runWithContext(() => initialize?.()) : initialize?.()
+      )
       gtag('event', name, {
         ...params,
         event_callback: done,

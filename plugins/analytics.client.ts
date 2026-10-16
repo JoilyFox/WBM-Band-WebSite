@@ -1,5 +1,6 @@
 import { getOrPersistSourcePlatform } from '~/utils/sourceAttribution'
 import { getOrPersistCampaign } from '~/utils/campaignAttribution'
+import { ensureGtagLoaded } from '~/utils/gtagLoader'
 
 /**
  * Lock in first-touch source + promo-campaign attribution as soon as the app
@@ -33,7 +34,34 @@ import { getOrPersistCampaign } from '~/utils/campaignAttribution'
 const PRODUCTION_HOSTS = ['wbmband.com', 'www.wbmband.com']
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const { gtag } = useGtag()
+  const { gtag, initialize } = useGtag()
+
+  // gtag.js (176 KB) is off the critical path: the module runs in
+  // `initMode: 'manual'`, so the dataLayer + Consent Mode default are queued at
+  // boot (order unchanged) and the script itself is injected here, on the first
+  // interaction or once the page has loaded and the main thread is idle,
+  // whichever comes first. An awaited event (useAnalytics.sendEvent) also
+  // starts it immediately. See utils/gtagLoader.ts.
+  const startGtag = () => ensureGtagLoaded(() => nuxtApp.runWithContext(() => initialize()))
+
+  const scheduleGtag = () => {
+    const events = ['pointerdown', 'keydown', 'scroll', 'touchstart'] as const
+    const stop = () => events.forEach((e) => window.removeEventListener(e, start))
+    const start = () => {
+      stop()
+      startGtag()
+    }
+    events.forEach((e) => window.addEventListener(e, start, { passive: true, once: true }))
+
+    const afterLoad = () => {
+      const ric = (window as unknown as { requestIdleCallback?: typeof requestIdleCallback })
+        .requestIdleCallback
+      if (ric) ric(start, { timeout: 3000 })
+      else setTimeout(start, 2000)
+    }
+    if (document.readyState === 'complete') afterLoad()
+    else window.addEventListener('load', afterLoad, { once: true })
+  }
 
   // Read the campaign id from the LANDING url, in the plugin body — route
   // middleware (pre-save → listen, unknown-prefix → clean url) runs later and
@@ -43,6 +71,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const campaign = getOrPersistCampaign()
 
   nuxtApp.hook('app:mounted', () => {
+    scheduleGtag()
     if (!PRODUCTION_HOSTS.includes(window.location.hostname)) {
       gtag('set', { traffic_type: 'internal' })
     }

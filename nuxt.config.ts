@@ -97,11 +97,11 @@ export default defineNuxtConfig({
 
       // Favicon and App Icon Configuration
       link: [
-        // Warm up the analytics origins early so gtag.js + the first /collect
-        // beacon aren't delayed by a cold DNS+TLS handshake. External absolute
-        // URLs — never carry the DEPLOY_TARGET baseURL prefix.
-        { rel: 'preconnect', href: 'https://www.googletagmanager.com', crossorigin: '' },
-        { rel: 'preconnect', href: 'https://www.google-analytics.com', crossorigin: '' },
+        // gtag.js is loaded lazily (idle / first interaction, see gtag.initMode
+        // below), so no preconnect: an early TLS handshake to origins nothing
+        // fetches for seconds only steals bandwidth (Lighthouse flagged both
+        // as unused). The cheap dns-prefetch hints stay. External absolute
+        // URLs never carry the DEPLOY_TARGET baseURL prefix.
         { rel: 'dns-prefetch', href: 'https://www.googletagmanager.com' },
         { rel: 'dns-prefetch', href: 'https://www.google-analytics.com' },
         // Scalable SVG icon — modern browsers use this for the TAB (the bare
@@ -461,6 +461,10 @@ export default defineNuxtConfig({
     // useGtag()/useAnalytics() become safe no-ops when disabled.
     enabled: process.env.NODE_ENV !== 'development' && process.env.DEPLOY_TARGET !== 'github',
     id: 'G-Z8QRF6TWC2',
+    // 'manual': the module queues the dataLayer + consent default at boot but
+    // does NOT inject gtag.js; plugins/analytics.client.ts starts it on idle /
+    // first interaction (utils/gtagLoader.ts) and useAnalytics.sendEvent on demand.
+    initMode: 'manual',
     initCommands: [
       [
         'consent',
