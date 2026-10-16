@@ -228,3 +228,12 @@
     }
   }
 }
+
+/* Page scroll lock, no-gutter fallback (utils/scrollLock.ts): when the browser
+   can't keep the scrollbar gutter (Safari < 18.2) the lock pads <body> by the
+   scrollbar width, and the fixed header must stop short of the widened viewport by
+   the same amount (--lock-comp, 0 otherwise) or its centred logo/nav would shift.
+   Deliberately UNLAYERED so it beats Tailwind's `right-0` utility. */
+.liquid-glass--bar.fixed {
+  right: var(--lock-comp, 0px);
+}

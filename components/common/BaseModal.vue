@@ -55,6 +55,7 @@
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
   import { useI18n } from 'vue-i18n'
+  import { lockPageScroll, unlockPageScroll } from '~/utils/scrollLock'
 
   const { t } = useI18n()
 
@@ -177,6 +178,7 @@
   const onAfterLeave = () => {
     isAnimating.value = false
     setBodyAnimating(false)
+    if (!props.isVisible) restoreBodyScroll()
   }
 
   // Eagerly pre-decode when the preload URL changes (helps next open)
@@ -224,26 +226,25 @@
     }
   }
 
+  // Page scroll lock (utils/scrollLock.ts): hides the page scrollbar WITHOUT moving
+  // anything — gutter kept via `scrollbar-gutter: stable` where supported, measured
+  // body padding otherwise. Held per instance and released AFTER the leave
+  // transition so the scrollbar doesn't pop back in under the fading scrim.
+  let holdsScrollLock = false
+  let unlockTimer: ReturnType<typeof setTimeout> | undefined
+
   const preventBodyScroll = () => {
-    if (typeof window === 'undefined') return
-
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-    const body = document.body
-
-    body.style.overflow = 'hidden'
-    body.style.paddingRight = `${scrollbarWidth}px`
-
-    body.classList.add('modal-open')
+    clearTimeout(unlockTimer)
+    if (holdsScrollLock) return
+    holdsScrollLock = true
+    lockPageScroll()
   }
 
   const restoreBodyScroll = () => {
-    if (typeof window === 'undefined') return
-
-    const body = document.body
-    body.style.overflow = ''
-    body.style.paddingRight = ''
-
-    body.classList.remove('modal-open')
+    clearTimeout(unlockTimer)
+    if (!holdsScrollLock) return
+    holdsScrollLock = false
+    unlockPageScroll()
   }
 
   onMounted(() => {
@@ -272,7 +273,9 @@
         preventBodyScroll()
         focusDialog()
       } else {
-        restoreBodyScroll()
+        // Unlock after the leave transition (onAfterLeave); the timer is a safety
+        // net in case the transition never reports completion.
+        unlockTimer = setTimeout(restoreBodyScroll, 900)
         // Return focus to whatever opened the modal (keyboard a11y).
         previouslyFocused?.focus?.()
         previouslyFocused = null
@@ -293,6 +296,12 @@
     align-items: center;
     justify-content: center;
     padding: 1rem;
+    /* Page scroll lock without a kept gutter (older Safari, see
+       utils/scrollLock.ts): the viewport widens by the hidden scrollbar's width,
+       so pad by it (--lock-comp, 0 otherwise) to keep the panel centred on the
+       page content where it was. With scrollbar-gutter: stable the fixed
+       viewport doesn't widen and this is 0. */
+    padding-right: calc(1rem + var(--lock-comp, 0px));
 
     /* Just a SMALL darkening scrim — no blur. The page stays clearly visible
        behind it so the glass panel has something real to refract; the darkening
@@ -478,6 +487,7 @@
   @media (max-width: 768px) {
     .modal-backdrop {
       padding: 0.5rem;
+      padding-right: calc(0.5rem + var(--lock-comp, 0px));
     }
 
     .modal-content {
