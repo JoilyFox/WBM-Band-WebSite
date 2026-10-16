@@ -137,6 +137,36 @@ export interface MusicRelease {
 
 export const musicLibrary: MusicRelease[] = [
   {
+    id: '5',
+    slug: 'slipa-vulytsya',
+    title: 'Сліпа вулиця',
+    titleKey: 'releases.slipa_vulytsya.title',
+    type: 'single',
+    releaseDate: '2026-10-29T22:00:00Z', // Midnight Kyiv time (EET/UTC+2) → 00:00 on 2026-10-30
+    imageUrl: '/images/optimized/albums-images/slipa-vulytsya/cover.avif',
+    // No `blurredImageUrl` on purpose: this ships with a pre-save, so the upcoming
+    // card shows the sharp cover (the blurred variant is preview-mode only).
+    descriptionKey: 'releases.slipa_vulytsya.description',
+    genre: ['Alternative rock', 'Art rock'],
+    featured: true,
+    // The cover is black-and-white, so auto-extraction yields a muddy dusty-pink.
+    // Override with a cool steel/silver palette that matches the glass-block wall.
+    theme: {
+      primary: '#8fa3b8',
+      secondary: '#5d6b7a',
+      accent: '#c9d4e0'
+    },
+    musicPlatformLinks: {},
+    useDistributorPreSave: true,
+    distributorPreSaveUrl: 'https://kontrabass.lnk.to/slipa_vulytsya',
+    // Linkfire handles the actual save off-site, so skip the synthetic
+    // distributor conversion event.
+    skipDistributorConversionEvent: true,
+    // Same Linkfire link becomes the "Listen on all platforms" CTA on /listen
+    // after release, until the individual platform links are filled in.
+    releaseSmartLink: 'https://kontrabass.lnk.to/slipa_vulytsya'
+  },
+  {
     id: '4',
     slug: 'khvyli',
     title: 'Хвилі',

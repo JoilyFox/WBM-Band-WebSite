@@ -69,6 +69,16 @@ export const coverColors: Record<string, CoverPalette> = {
     palette: ['#754f87', '#58587e', '#4c6d8a'],
     isDark: true,
     isMuted: false
+  },
+  'slipa-vulytsya': {
+    primary: '#7e5858',
+    secondary: '#7e5858',
+    accent: '#9c7171',
+    dark: '#1b1818',
+    light: '#e2d5d5',
+    palette: ['#7e5858', '#9c7171'],
+    isDark: true,
+    isMuted: true
   }
 }
 
