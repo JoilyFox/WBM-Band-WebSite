@@ -44,6 +44,23 @@ npm run generate-favicons
 2. Run `npm run generate-favicons`
 3. All formats automatically updated!
 
+### Lightweight monogram SVGs (`public/favicon.svg`, `public/safari-pinned-tab.svg`)
+
+`public/favicon.svg` is fetched on every page, so it must stay small (it was 339 KB when it was a
+double-traced copy of the logo; it is now ~15 KB). Both it and the Safari pinned-tab glyph are
+**generated** from the full-detail logo `public/images/wbm-logo-white.svg` by:
+
+```bash
+node scripts/build-lite-logo.mjs     # writes assets/favicons/logo-lite.svg + public/favicon.svg
+npm run generate-favicons            # re-derives safari-pinned-tab.svg from logo-lite.svg (+ PNG/ICO)
+```
+
+The script flattens the traced contours, drops sub-pixel specks and runs Douglas-Peucker with a
+tolerance of 2 logo units (~0.1% of the width; invisible at tab sizes). Tunables are at the top of the
+script (`LITE_TOL` / `LITE_SPECK` env vars for experiments). Keep each original `<path>` as its own
+element when touching it: merging them into one path changes winding and punches holes in the mark.
+The ≥48 px raster set still comes from `assets/favicons/favicon-badge.svg` (unchanged).
+
 ## 📱 Browser Support
 
 Your favicons now work perfectly on:

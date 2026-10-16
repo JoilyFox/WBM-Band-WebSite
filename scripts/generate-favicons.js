@@ -33,7 +33,7 @@ const config = {
   // Largest icon still rendered from the tab (monogram) source; larger → badge.
   tabMaxSize: 32,
   // Logo glyph (white on transparent) used only for the Safari pinned tab.
-  logoSilhouette: path.join(__dirname, '../public/images/wbm-logo-white.svg'),
+  logoSilhouette: path.join(__dirname, '../assets/favicons/logo-lite.svg'),
   outputDir: path.join(__dirname, '../public'),
   baseURL: '/WBM-Band-WebSite', // GitHub Pages base URL
   sizes: {
@@ -264,11 +264,13 @@ async function generateSafariPinnedTab() {
   console.log('\n🦁 Generating Safari Pinned Tab...')
 
   try {
-    // Source the LOGO SILHOUETTE, not favicon.svg. favicon.svg now carries a
-    // solid black backing square (so Google/PWA crop to a black circle with the
-    // white mark) — recoloring that to monochrome black would yield an all-black
-    // block. Safari pinned tabs want the bare glyph in black on transparent.
-    const logoSource = path.join(__dirname, '../public/images/wbm-logo-white.svg')
+    // Source the LOGO SILHOUETTE, not favicon.svg (which carries a black halo) —
+    // recoloring that to monochrome black would yield an all-black blob. Safari
+    // pinned tabs want the bare glyph in black on transparent.
+    // Use the LITE silhouette (assets/favicons/logo-lite.svg, built by
+    // scripts/build-lite-logo.mjs from the full-detail logo): the pinned tab is
+    // masked at ~16pt, so the 110 KB hand-traced original is pure overhead.
+    const logoSource = path.join(__dirname, '../assets/favicons/logo-lite.svg')
     const svgContent = await fs.readFile(logoSource, 'utf8')
 
     // Recolor the white monogram (both the `.cls-1 { fill: #fff }` style block
