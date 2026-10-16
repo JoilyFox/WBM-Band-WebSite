@@ -1,5 +1,7 @@
 import { getOrPersistSourcePlatform } from '~/utils/sourceAttribution'
 import { getOrPersistCampaign } from '~/utils/campaignAttribution'
+import { createErrorReporter } from '~/utils/errorReporting'
+import { isLikelyBot } from '~/utils/isLikelyBot'
 
 /**
  * Lock in first-touch source + promo-campaign attribution as soon as the app
@@ -41,6 +43,25 @@ export default defineNuxtPlugin((nuxtApp) => {
   // the redirect target still reports the campaign. Everything else can wait
   // for app:mounted, where gtag is live.
   const campaign = getOrPersistCampaign()
+
+  // Client errors -> GA4 `exception` events (O-01). On a site whose KPI is
+  // outbound platform clicks, a hydration crash or a failed pre-save redirect is
+  // otherwise invisible. Goes through gtag like every other event, so Consent
+  // Mode v2 still decides what is stored (denied = cookieless ping). No PII:
+  // see utils/errorReporting.ts - class name + scrubbed/truncated message only,
+  // deduped per description and capped per page load.
+  const reportError = createErrorReporter((description) => {
+    if (isLikelyBot()) return
+    gtag('event', 'exception', { description, fatal: false })
+  })
+
+  nuxtApp.hook('vue:error', (error) => {
+    reportError(error, 'vue')
+  })
+
+  window.addEventListener('unhandledrejection', (event) => {
+    reportError(event.reason, 'promise')
+  })
 
   nuxtApp.hook('app:mounted', () => {
     if (!PRODUCTION_HOSTS.includes(window.location.hostname)) {

@@ -235,7 +235,7 @@
     (newSrc, oldSrc) => {
       if (newSrc !== oldSrc) {
         resetImageStates()
-        if (import.meta.client) {
+        if (import.meta.dev) {
           console.log('[ProgressiveImage] src change', { oldSrc, newSrc })
         }
       }
