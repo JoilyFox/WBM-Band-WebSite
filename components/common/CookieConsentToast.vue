@@ -15,7 +15,7 @@
       <div class="cookie-toast__actions">
         <UiButton
           variant="solid"
-          size="sm"
+          size="md"
           shape="rounded"
           class="cookie-toast__btn--accept"
           @click="onAccept"
@@ -24,7 +24,7 @@
         </UiButton>
         <UiButton
           variant="outline"
-          size="sm"
+          size="md"
           shape="rounded"
           class="cookie-toast__btn--decline"
           @click="onDecline"
@@ -221,10 +221,29 @@
     flex-wrap: wrap;
   }
 
-  /* Accept/decline are now <UiButton variant="solid|outline" size="sm"> — styling
-     + interaction come from the unified button. Only the details link is bespoke. */
+  /* Accept/decline are <UiButton variant="solid|outline" size="md"> — styling
+     + interaction come from the unified button. Only the details link is bespoke.
+     Touch: UiButton md is 40px; bump the two toast buttons to a 44px tap target
+     (the WCAG 2.5.5 / Apple HIG minimum) on coarse pointers and phones. */
+  @media (pointer: coarse), (max-width: 640px) {
+    .cookie-toast .cookie-toast__btn--accept,
+    .cookie-toast .cookie-toast__btn--decline {
+      height: 2.75rem;
+    }
+    .cookie-toast .cookie-toast__link {
+      min-height: 2.75rem;
+    }
+  }
+
   .cookie-toast__link {
     margin-left: auto;
+    /* 44px-tall hit area without changing the look: the link keeps its text
+       size, padding grows the box and the negative right margin cancels the
+       extra inline padding so it still sits flush with the toast edge. */
+    display: inline-flex;
+    align-items: center;
+    padding-inline: 0.5rem;
+    margin-right: -0.5rem;
     font-size: 0.78rem;
     color: rgba(255, 255, 255, 0.6);
     text-decoration: underline;
