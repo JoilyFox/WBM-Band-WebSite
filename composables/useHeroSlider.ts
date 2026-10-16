@@ -21,6 +21,22 @@ export interface SliderOptions {
   transitionDuration?: number // Duration in ms for slide transitions
 }
 
+/**
+ * True when the visitor asked to save data or is on a slow link (2g/3g). Used to
+ * avoid pulling the extra hero slides (each 100-350 KB) in the background.
+ * Safe on the server (returns false).
+ */
+export function isConstrainedConnection(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const conn = (
+    navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string }
+    }
+  ).connection
+  if (!conn) return false
+  return !!conn.saveData || ['slow-2g', '2g', '3g'].includes(conn.effectiveType ?? '')
+}
+
 export function useHeroSlider(
   imagesSource: MaybeRefOrGetter<HeroImage[]>,
   options: SliderOptions = {}
@@ -147,14 +163,50 @@ export function useHeroSlider(
     }
   }
 
+  // --- Autoplay guards (WCAG 2.2.2 / 2.3.3) -------------------------------
+  // Autoplay is off for visitors who prefer reduced motion or are on a
+  // constrained connection (the slides are only worth fetching if they will be
+  // seen), and the timer is suspended while the tab is hidden so background tabs
+  // neither rotate nor fetch images. Manual prev/next/dots still work.
+  let reducedMotionMql: MediaQueryList | null = null
+
+  const autoplayAllowed = () =>
+    autoPlay && !(reducedMotionMql?.matches ?? false) && !isConstrainedConnection()
+
+  const syncAutoplayPolicy = () => {
+    if (autoplayAllowed()) {
+      if (!isPlaying.value) isPlaying.value = true
+      if (canSlide.value && !document.hidden) startAutoPlay()
+    } else {
+      isPlaying.value = false
+      stopAutoPlay()
+    }
+  }
+
+  const handleVisibilityChange = () => {
+    if (document.hidden) {
+      stopAutoPlay()
+    } else if (isPlaying.value && canSlide.value) {
+      startAutoPlay()
+    }
+  }
+
   // Lifecycle
   onMounted(() => {
-    if (autoPlay && canSlide.value) {
+    reducedMotionMql = window.matchMedia('(prefers-reduced-motion: reduce)')
+    reducedMotionMql.addEventListener('change', syncAutoplayPolicy)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    if (!autoplayAllowed()) {
+      isPlaying.value = false
+    } else if (canSlide.value && !document.hidden) {
       startAutoPlay()
     }
   })
 
   onUnmounted(() => {
+    reducedMotionMql?.removeEventListener('change', syncAutoplayPolicy)
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
     stopAutoPlay()
     if (transitionTimer) {
       clearTimeout(transitionTimer)
