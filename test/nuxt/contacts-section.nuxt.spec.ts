@@ -1,13 +1,24 @@
 // @vitest-environment nuxt
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { mountSuspended } from '@nuxt/test-utils/runtime'
+import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import ContactsSection from '~/components/sections/ContactsSection.vue'
+
+// Capture the GA4 calls (useAnalytics -> useGtag) so we can assert form_error.
+const { gtag } = vi.hoisted(() => ({ gtag: vi.fn() }))
+mockNuxtImport('useGtag', () => () => ({ gtag }))
+// happy-dom has no usable user agent, which the bot heuristic treats as a bot.
+vi.mock('~/utils/isLikelyBot', () => ({ isLikelyBot: () => false }))
 
 // The form posts to Web3Forms via the global fetch() and then reads
 // response.json(). We replace globalThis.fetch with a controllable mock so we
 // can drive the submit state machine (success / error / rejection) per test.
-const okResponse = (success: boolean) => ({
-  json: async () => ({ success })
+const okResponse = (
+  success: boolean,
+  init: { ok?: boolean; status?: number; message?: string } = {}
+) => ({
+  ok: init.ok ?? true,
+  status: init.status ?? 200,
+  json: async () => ({ success, ...(init.message ? { message: init.message } : {}) })
 })
 
 // Fill the three required fields and submit the form. Returns the wrapper's
@@ -22,6 +33,7 @@ const fillForm = async (w: any) => {
 describe('ContactsSection.vue', () => {
   beforeEach(() => {
     vi.useFakeTimers()
+    gtag.mockClear()
     globalThis.fetch = vi.fn()
   })
 
@@ -250,6 +262,77 @@ describe('ContactsSection.vue', () => {
 
       expect(w.find('.form-message-error').exists()).toBe(true)
       expect(errSpy).toHaveBeenCalled()
+    })
+
+    describe('failure diagnostics (B-10)', () => {
+      const submit = async (w: any) => {
+        await fillForm(w)
+        await w.get('form').trigger('submit')
+        await w.vm.$nextTick()
+        await w.vm.$nextTick()
+      }
+      const formErrors = () => gtag.mock.calls.filter(([, name]) => name === 'form_error')
+
+      it('treats a non-2xx response as a failure even if the body says success', async () => {
+        ;(globalThis.fetch as any).mockResolvedValue(okResponse(true, { ok: false, status: 502 }))
+        const w = await mountSuspended(ContactsSection)
+        await submit(w)
+        expect(w.find('.form-message-error').exists()).toBe(true)
+        expect(w.find('.form-message-success').exists()).toBe(false)
+      })
+
+      it('sends form_error (http) with the status and the service message', async () => {
+        ;(globalThis.fetch as any).mockResolvedValue(
+          okResponse(false, { ok: false, status: 429, message: 'Rate limit exceeded' })
+        )
+        const w = await mountSuspended(ContactsSection)
+        await submit(w)
+        expect(formErrors()).toHaveLength(1)
+        expect(formErrors()[0][2]).toEqual({
+          form_name: 'contact',
+          error_type: 'http',
+          http_status: 429,
+          description: 'Rate limit exceeded'
+        })
+      })
+
+      it('sends form_error (api) for a 200 with success:false', async () => {
+        ;(globalThis.fetch as any).mockResolvedValue(
+          okResponse(false, { message: 'Invalid API key' })
+        )
+        const w = await mountSuspended(ContactsSection)
+        await submit(w)
+        expect(formErrors()[0][2]).toMatchObject({
+          error_type: 'api',
+          description: 'Invalid API key'
+        })
+      })
+
+      it('sends form_error (network) when fetch rejects', async () => {
+        vi.spyOn(console, 'error').mockImplementation(() => {})
+        ;(globalThis.fetch as any).mockRejectedValue(new Error('network down'))
+        const w = await mountSuspended(ContactsSection)
+        await submit(w)
+        expect(formErrors()[0][2]).toMatchObject({ error_type: 'network' })
+        expect(formErrors()[0][2]).not.toHaveProperty('http_status')
+      })
+
+      it('never sends what the visitor typed', async () => {
+        ;(globalThis.fetch as any).mockResolvedValue(okResponse(false))
+        const w = await mountSuspended(ContactsSection)
+        await submit(w)
+        const sent = JSON.stringify(formErrors())
+        expect(sent).not.toContain('Ada Lovelace')
+        expect(sent).not.toContain('ada@example.com')
+        expect(sent).not.toContain('Hello WBM')
+      })
+
+      it('does not send form_error on success', async () => {
+        ;(globalThis.fetch as any).mockResolvedValue(okResponse(true))
+        const w = await mountSuspended(ContactsSection)
+        await submit(w)
+        expect(formErrors()).toHaveLength(0)
+      })
     })
 
     it('re-enables the submit button after an error so the user can retry', async () => {

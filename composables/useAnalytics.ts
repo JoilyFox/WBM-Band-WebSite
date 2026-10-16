@@ -1,6 +1,7 @@
 import { getOrPersistSourcePlatform, type SourcePlatform } from '~/utils/sourceAttribution'
 import { getOrPersistCampaign, NO_CAMPAIGN } from '~/utils/campaignAttribution'
 import { isLikelyBot } from '~/utils/isLikelyBot'
+import { MAX_DESCRIPTION_LENGTH, scrubMessage } from '~/utils/errorReporting'
 
 export type MasterPageType = 'listen' | 'pre-save'
 
@@ -13,6 +14,17 @@ export interface PlatformClickParams {
   platformName: string
   releaseSlug: string
   pageType: MasterPageType
+}
+
+export interface FormErrorParams {
+  /** Which form failed, e.g. 'contact'. */
+  formName: string
+  /** 'http' = non-2xx response, 'api' = 2xx but the service said success:false, 'network' = fetch/parse threw. */
+  errorType: 'http' | 'api' | 'network'
+  /** HTTP status when there was a response. */
+  status?: number
+  /** The service's own message (e.g. Web3Forms "Invalid API key") - scrubbed + truncated here. */
+  description?: string
 }
 
 const VIEW_DEDUP_KEY = 'wbm_release_views_seen'
@@ -135,10 +147,29 @@ export function useAnalytics() {
     })
   }
 
+  /**
+   * A form submission failed. Fire-and-forget (the page stays open). The
+   * service's message is scrubbed of URLs/e-mails and capped - never send what
+   * the visitor typed.
+   */
+  function trackFormError({ formName, errorType, status, description }: FormErrorParams): void {
+    if (typeof window === 'undefined') return
+    if (isLikelyBot()) return
+    gtag('event', 'form_error', {
+      form_name: formName,
+      error_type: errorType,
+      ...(status !== undefined ? { http_status: status } : {}),
+      ...(description
+        ? { description: scrubMessage(description).slice(0, MAX_DESCRIPTION_LENGTH) }
+        : {})
+    })
+  }
+
   return {
     getSourcePlatform,
     getCampaignId,
     trackReleaseView,
-    trackPlatformClick
+    trackPlatformClick,
+    trackFormError
   }
 }

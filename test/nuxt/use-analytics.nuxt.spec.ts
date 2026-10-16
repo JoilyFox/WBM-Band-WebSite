@@ -259,4 +259,37 @@ describe('useAnalytics()', () => {
       expect(params.platform_name).toBe('deezer')
     })
   })
+
+  describe('trackFormError()', () => {
+    it('fires form_error with the form, error type, status and a scrubbed description', () => {
+      const { trackFormError } = useAnalytics()
+      trackFormError({
+        formName: 'contact',
+        errorType: 'http',
+        status: 429,
+        description: 'Too many requests, see https://web3forms.com/docs or mail me@example.com'
+      })
+      expect(gtag).toHaveBeenCalledWith('event', 'form_error', {
+        form_name: 'contact',
+        error_type: 'http',
+        http_status: 429,
+        description: 'Too many requests, see [url] or mail [email]'
+      })
+    })
+
+    it('omits status/description when unknown', () => {
+      const { trackFormError } = useAnalytics()
+      trackFormError({ formName: 'contact', errorType: 'network' })
+      expect(gtag).toHaveBeenCalledWith('event', 'form_error', {
+        form_name: 'contact',
+        error_type: 'network'
+      })
+    })
+
+    it('is suppressed for bots', () => {
+      isLikelyBot.mockReturnValue(true)
+      useAnalytics().trackFormError({ formName: 'contact', errorType: 'api' })
+      expect(gtag).not.toHaveBeenCalled()
+    })
+  })
 })
