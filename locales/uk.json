@@ -3,7 +3,7 @@
     "name": "WBM Band",
     "home_title": "Woman Based Mechanics (WBM, ВБМ) — рок-гурт із Києва",
     "tagline": "Український альтернативний рок-гурт",
-    "meta_description": "WBM Band — український альтернативний рок-гурт. Слухайте наш новий реліз {release}!",
+    "meta_description": "WBM (Woman Based Mechanics, ВБМ) — український альтернативний рок-гурт із Києва. Слухайте на всіх платформах, читайте тексти й слідкуйте за новинками.",
     "welcome": "Ласкаво просимо до {name}!",
     "ready": "Ваша сучасна Nuxt 3 апка готова запалювати! 🎸",
     "all_rights": "Всі права захищено."
@@ -261,7 +261,7 @@
       "release_label": "Реліз {date}",
       "lyrics_title": "Слова пісні",
       "lyrics_page_title": "{songName} — слова пісні",
-      "lyrics_meta_description": "Слова та повний текст пісні «{songName}» гурту WBM (ВБМ, Woman Based Mechanics). Офіційний текст українською."
+      "lyrics_meta_description": "Слова та повний текст пісні «{songName}» гурту WBM (ВБМ, Woman Based Mechanics). Офіційний текст українською. Слухайте на Spotify і Apple Music."
     },
     "a11y": {
       "back_to_section": "Назад до розділу музики",
@@ -433,7 +433,11 @@
     "media_materials_button": "Медіа матеріали"
   },
   "listen": {
-    "meta_description": "{songName} - слухати на всіх платформах!"
+    "meta_description": "{songName} - слухати на всіх платформах!",
+    "title": "{songName} — пісня WBM (Woman Based Mechanics)",
+    "description_full": "{description} WBM (Woman Based Mechanics) — слухайте на Spotify, Apple Music, YouTube Music.",
+    "description_short": "{description} WBM — слухайте на всіх платформах.",
+    "description_min": "{description} WBM — слухайте онлайн."
   },
   "cookies": {
     "banner": {
