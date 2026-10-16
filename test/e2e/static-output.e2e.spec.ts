@@ -81,10 +81,13 @@ describe('Ukrainian pages are native (prefix_except_default)', () => {
 
 describe('redirect stubs are noindex (soft-404 guard)', () => {
   it.each(UPCOMING.map((r) => r.slug))(
-    'unreleased /listen/%s is a noindex refresh stub',
+    'unreleased /listen/%s is a real noindex page (flips itself on release day)',
     (slug) => {
       const body = html('listen', slug)
-      expect(body).toMatch(/http-equiv="refresh"/i)
+      // Not a frozen meta-refresh stub: the app JS decides at runtime, so the
+      // page works on release day without a redeploy (listen-access.ts).
+      expect(body).not.toMatch(/http-equiv="refresh"/i)
+      expect(body).toMatch(/<script[^>]+src="\/_nuxt\//)
       expect(body).toMatch(/<meta name="robots" content="noindex">/)
     }
   )

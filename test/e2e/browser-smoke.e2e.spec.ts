@@ -168,9 +168,18 @@ describe('release modal renders (collapse regression guard)', () => {
     const page = await ctx.newPage()
     await page.goto(`${origin}/en`, { waitUntil: 'load' })
     // Desktop click on a release card opens the modal (mobile navigates instead).
-    await page.locator('.music-card').first().click()
+    // The music section is `hydrate-on-visible`: scrolling it into view starts
+    // hydration, and a click that lands before it finishes is a no-op. Retry the
+    // click until the modal shows instead of racing hydration.
+    const card = page.locator('.music-card').first()
     const content = page.locator('.modal-content')
-    await content.waitFor({ state: 'visible', timeout: 8000 })
+    await card.scrollIntoViewIfNeeded()
+    const deadline = Date.now() + 10000
+    while (!(await content.isVisible())) {
+      if (Date.now() > deadline) throw new Error('release modal never opened')
+      await card.click()
+      await content.waitFor({ state: 'visible', timeout: 750 }).catch(() => {})
+    }
     // Guards the content-visibility collapse: the modal body must have real height,
     // not collapse to a thin line.
     const box = await content.boundingBox()
