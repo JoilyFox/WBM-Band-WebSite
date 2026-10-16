@@ -465,8 +465,14 @@
     transform: scale(0.95);
   }
 
-  .nav-link-mobile:focus {
+  .nav-link-mobile:focus:not(:focus-visible) {
     outline: none;
+    box-shadow: none;
+  }
+
+  .nav-link-mobile:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
     box-shadow: none;
   }
 
@@ -511,8 +517,14 @@
     background-color: rgba(255, 255, 255, 0.1);
   }
 
-  .mobile-menu-button:focus {
+  .mobile-menu-button:focus:not(:focus-visible) {
     outline: none;
+    box-shadow: none;
+  }
+
+  .mobile-menu-button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
     box-shadow: none;
   }
 
@@ -524,12 +536,20 @@
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   }
 
-  /* Remove all focus rings and outlines */
+  /* No rings for pointer/touch focus. Keyboard focus (:focus-visible) is left alone
+     so the explicit rings below (and the global *:focus-visible ring) can show —
+     the old blanket `outline:none !important` on every a/button/:focus hid them
+     all (WCAG 2.4.7). */
+  a:not(:focus-visible),
+  button:not(:focus-visible),
+  *:focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   a,
   button,
   *:focus {
-    outline: none !important;
-    box-shadow: none !important;
     -webkit-tap-highlight-color: transparent;
   }
 
