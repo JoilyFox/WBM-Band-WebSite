@@ -34,7 +34,7 @@
           >
             <div :class="shouldShowPreSaveCard ? 'presave-content' : 'new-release-content'">
               <!-- Album Cover with Progressive Loading -->
-              <div class="relative">
+              <div :class="['relative', { 'presave-cover': shouldShowPreSaveCard }]">
                 <UiAlbumCover
                   :image-url="upcomingReleaseImageUrl"
                   :alt="upcomingReleaseTitle || t('music.new_release.card_title_fallback')"
@@ -896,6 +896,10 @@
   /* Pre-save Card (clickable, similar to new-release-preview but with different styling) */
   .presave-card {
     @include card-sizing-large;
+    /* Let the cover tile stretch to the full height of its row. The sibling
+       release cards are cover + title + date + description (~1.5x the cover
+       height); a bare square left an empty hole under the pre-save card. */
+    display: flex;
   }
 
   /* Keyboard focus ring (the card is a role="link" div, so it needs its own). */
@@ -907,7 +911,9 @@
 
   .presave-content {
     position: relative;
+    /* Square at minimum (alone on a row), taller when the row is taller. */
     aspect-ratio: 1;
+    align-self: stretch;
     border-radius: 16px;
     overflow: hidden;
     width: 100%;
@@ -978,15 +984,32 @@
     align-items: center;
     justify-content: center;
     @include absolute-overlay;
-    /* Always-on darkening behind the centered text so it stays legible over
-       bright cover art. The .presave-overlay above only fades in on hover, which
-       left the text low-contrast at rest and on touch devices. */
-    background: radial-gradient(
-      120% 95% at 50% 55%,
-      rgba(0, 0, 0, 0.42) 0%,
-      rgba(0, 0, 0, 0.2) 55%,
-      transparent 82%
+    /* Text sits at the bottom of the (now taller) tile, like a poster, on an
+       always-on scrim: near-opaque black behind the text fading to clear at the
+       top so the cover art still reads. Keeps the date/countdown at WCAG AA
+       (>= 4.5:1) even over the brightest cover pixels. The .presave-overlay above
+       only fades in on hover, which left the text low-contrast at rest and on
+       touch devices. */
+    justify-content: flex-end;
+    padding-bottom: 1.1rem;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.92) 0%,
+      rgba(0, 0, 0, 0.84) 42%,
+      rgba(0, 0, 0, 0.45) 72%,
+      transparent 100%
     );
+  }
+
+  /* Cover fills the whole tile (object-fit cover) instead of being a fixed square. */
+  .presave-cover {
+    position: absolute;
+    inset: 0;
+  }
+  .presave-cover :deep(.aspect-square) {
+    aspect-ratio: auto;
+    height: 100%;
+    border-radius: 0;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -1047,7 +1070,7 @@
   }
 
   .presave-date {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.92);
     font-size: 0.875rem;
     margin-bottom: 0.1rem;
     @include text-shadow-light;
@@ -1060,7 +1083,7 @@
   }
 
   .presave-days {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.85);
     font-size: 0.8rem;
     font-weight: 500;
     margin-bottom: 0.5rem;
