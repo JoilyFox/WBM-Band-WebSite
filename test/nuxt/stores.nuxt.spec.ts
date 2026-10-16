@@ -478,6 +478,23 @@ describe('composables/useGlobalLoading.ts', () => {
     expect(store.loadingProgress).toBe(100)
   })
 
+  it('B-11: isLoading / loadingProgress are live refs, not a snapshot', () => {
+    // Destructuring used to freeze the values at call time, so a component using
+    // them never saw updates.
+    const { isLoading, loadingProgress, showLoading, setProgress, hideLoading } = useGlobalLoading()
+    expect(isLoading.value).toBe(false)
+
+    showLoading()
+    expect(isLoading.value).toBe(true)
+
+    setProgress(55)
+    expect(loadingProgress.value).toBe(55)
+
+    hideLoading()
+    expect(isLoading.value).toBe(false)
+    expect(loadingProgress.value).toBe(100)
+  })
+
   it('setProgress through the composable still clamps via the store', () => {
     const { setProgress } = useGlobalLoading()
     const store = useGlobalLoadingStore()
