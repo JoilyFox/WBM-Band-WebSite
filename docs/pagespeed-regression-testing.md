@@ -38,11 +38,9 @@ PAGESPEED_API_KEY=xxx node scripts/perf/psi-check.mjs
 
 ## What it checks
 
-`scripts/perf/lighthouse-check.mjs` audits `/`, `/ua`, `/en` and **exits 1** if:
+`scripts/perf/lighthouse-check.mjs` audits `/` (Ukrainian) and `/en` and **exits 1** if:
 
-- **Category scores** fall below threshold. Perf is per-route (`/` is lower
-  because the bare root client-redirects to a locale — an unavoidable hop;
-  `/ua` and `/en` carry the strict bar). A11y / Best-Practices / SEO apply to all.
+- **Category scores** fall below threshold. Perf is per-route; `/` and `/en` both carry the strict bar. A11y / Best-Practices / SEO apply to all.
 - **Resource budgets** are exceeded — `imageKB`, `scriptKB`, `totalKB` transferred
   on initial load. The `imageKB` budget is the one that would have caught the
   all-hero-slides-load-eagerly regression.
@@ -61,8 +59,7 @@ job).
 
 ## Gotchas
 
-- Headless Chrome defaults to **English locale**, so auditing `/` redirects to
-  `/en` (not `/ua`). That's expected — `/` is a redirect shell.
+- Headless Chrome defaults to the **English locale**, but `/` is the real Ukrainian page (no browser-language redirect), so the audit is deterministic.
 - Simulated-throttling scores vary ±a few points run to run; thresholds account
   for this. Don't set them to the exact observed score.
 - Needs a Chrome/Chromium on the machine (`chrome-launcher` finds the system

@@ -129,7 +129,7 @@ You cannot hill-climb without a baseline, and the loop is unsafe without a locke
 phase is the honest "hard part."
 
 - **0.1 Perf baseline.** Build (`npm run generate`), serve `.output/public`, run Lighthouse
-  (mobile, throttled) on a route set: `/ua`, a release `/ua/listen/<slug>`, about/contacts.
+  (mobile, throttled) on a route set: `/`, a release `/listen/<slug>`, about/contacts.
   Persist JSON + composite (LCP, TBT, CLS, total transfer, JS bytes). Committed; every loop
   reports deltas vs this.
 - **0.2 Held-out image set.** ~10–12 representative **source** originals across presets (hero

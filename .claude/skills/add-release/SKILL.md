@@ -16,7 +16,7 @@ Adding or editing a music release, flipping it between Preview / Pre-save / Rele
 2. Set flags in `config/general.ts`: `enablePreSave` (true → pre-save card; overrides preview), `enableNextReleasePreview`.
 3. Cover art: drop `public/images/.../albums-images/<slug>/cover.jpg`, then `npm run compress-images` → `npm run generate-blurred` → **`npm run extract-colors`** (rewrites `data/coverColors.generated.ts`). Muddy/monochrome cover? add a `theme:` (`ReleaseTheme`) override in the release.
 4. Lyrics (optional): add `lyrics: LyricsSection[]` (original language, `part`/`num`/`lines`). The in-page Lyrics button **and** a dedicated, indexable `/lyrics/<slug>` page (prerender + sitemap, auto-derived from the lyrics array) appear automatically. New part label → extend `LyricsPartKey` + add `music.parts.<key>` to **both** locale files.
-5. Build with `npm run generate` (not `build`) — prerender slugs auto-derive from `musicLibrary`, no `nuxt.config.ts` edit needed. Deploy: `npm run deploy:production` (FTP) or `npm run deploy:github` (staging).
+5. Build with `npm run generate` (not `build`) — prerender slugs auto-derive from `musicLibrary`, no `nuxt.config.ts` edit needed. Deploy: `npm run deploy:production` (rsync to the VPS) or `npm run deploy:github` (staging).
 
 ## Source of truth
 
@@ -41,7 +41,7 @@ Adding or editing a music release, flipping it between Preview / Pre-save / Rele
 - `extract-colors` reads `optimized/albums-images/<slug>/cover.jpg` — run `compress-images` first or it has nothing to scan.
 - Lyric LINES never localize; only section labels do. Every `music.parts.*` key must exist in BOTH `uk.json` + `en.json`.
 - No desktop lyrics trigger on `/listen` yet — pill is `md:hidden` (mobile/tablet only); desktop reaches lyrics via the `/lyrics/<slug>` URL.
-- Use `npm run generate`, never `build` — non-localized `/pre-save` `/listen` `/lyrics` aliases come from `create-nonlocalized-aliases.js`.
+- Use `npm run generate`, never `build` — it also writes `sitemap.xml` and the bio-link sheet (see `docs/build-pipeline.md`).
 - Lyrics ARE embedded in JSON-LD on the `/lyrics/<slug>` page only (the band owns them); the plain `/listen/<slug>` page still omits them. See `docs/lyrics-feature.md`.
 
 ## Related

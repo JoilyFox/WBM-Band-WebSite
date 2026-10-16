@@ -159,18 +159,17 @@ globalLoadingStore.setProgress(n) // Set progress
 
 ## Real-World Examples
 
-### API Integration
+### Wrapping a fetch
 
 ```typescript
-// composables/useApiWithLoading.ts
-export function useApiWithLoading() {
+// composables/useFetchWithLoading.ts (example; the site has no built-in API layer)
+export function useFetchWithLoading() {
   const { withLoading } = useGlobalLoading()
-  const api = useApi()
 
   const fetchUsers = async () => {
     return await withLoading(
       async () => {
-        return await api.get('/api/users')
+        return await $fetch('/api/users')
       },
       {
         showProgress: true,
@@ -181,7 +180,7 @@ export function useApiWithLoading() {
 
   const saveUser = async (userData: any) => {
     return await withLoading(async () => {
-      return await api.post('/api/users', userData)
+      return await $fetch('/api/users', { method: 'POST', body: userData })
     })
   }
 

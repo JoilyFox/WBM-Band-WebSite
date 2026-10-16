@@ -60,8 +60,11 @@ Runs `npm run build:production` (= `npm run generate`) and then
 2. `rsync -az --delete`s `.output/public/` to `DEPLOY_PATH` over SSH (permissions set with
    `--chmod=D755,F644`). `--delete` removes anything on the server that is not in the build, so a
    deleted page disappears on the next deploy. `.well-known/` is excluded and survives.
-3. Skips unreferenced source image originals (see the `--exclude` list in the script), which keeps
-   the upload and the public file tree small.
+3. Hides unreferenced source image originals (`--filter 'H ...'` rules in the script: `images/hero-images/`,
+   `about-us-images/`, `our-team/`, `albums-images/*/cover.*`) from rsync, so they are neither uploaded nor kept on
+   the server (`--delete` removes old copies). The site only requests `images/optimized/*` plus the
+   `*-blurred.*` placeholders, icons, logos and meta-images; verified against the built HTML/JS (full output 541 MB,
+   deployed 117 MB). Original sources stay in `public/images/` for `npm run compress-images`.
 4. Prints the HTTP status of `https://www.wbmband.com/`.
 
 ### Configuration

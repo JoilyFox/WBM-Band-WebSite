@@ -9,10 +9,12 @@ npm run dev                # Dev server on 0.0.0.0:3000
 npm run generate           # SSG build + sitemap + bio-link sheet (use this, not `build`)
 npm run build:production   # Alias for `npm run generate` (production output)
 npm run deploy:github      # SSG build for GitHub Pages (sets DEPLOY_TARGET=github → /WBM-Band-WebSite/ baseURL)
-npm run deploy:production  # Build + FTP upload to wbmband.com (requires .env.production)
+npm run deploy:production  # Build + rsync to the VPS (nginx) → wbmband.com. Preview: DRY_RUN=1 bash scripts/deploy-production-vps.sh
 
 npm run lint               # ESLint
 npm run lint:fix           # ESLint with autofix
+npm run typecheck          # vue-tsc --noEmit
+npm run test               # Vitest (unit + nuxt); `npm run coverage` enforces thresholds, `npm run test:e2e` checks the built output
 npm run format             # Prettier write
 npm run analyze            # Bundle analyzer
 
@@ -39,17 +41,19 @@ When adding head links/meta with paths, follow the same conditional-prefix patte
 ### i18n (`prefix_except_default`, default `ua`)
 
 - Locales: `ua` (Ukrainian, **default and unprefixed**, file `locales/uk.json`) and `en` (`/en/...`, `locales/en.json`). Config in `i18n/i18n.config.ts`.
-- **Ukrainian URLs carry no prefix**: `/`, `/listen/<slug>`, `/lyrics/<slug>`, `/privacy-policy`. There is no `/ua/...` — `public/.htaccess` 301s the retired prefix to the clean form. English is `/en/...`.
+- **Ukrainian URLs carry no prefix**: `/`, `/listen/<slug>`, `/lyrics/<slug>`, `/privacy-policy`. There is no `/ua/...` — production nginx (`deploy/nginx/`) 301s the retired prefix to the clean form (`public/.htaccess` / `_redirects` are legacy/fallback only). English is `/en/...`.
 - All internal navigation must use `useLocalePath()` — never hardcode `/en/...`.
 - `detectBrowserLanguage` is **`false`** and must stay that way. With it on, Googlebot (English `Accept-Language`) rendered the English home at `/` and Google indexed `<html lang="en-US">` at the Ukrainian canonical URL. Language choice is `<CommonLanguageSwitcher>`. See `docs/search-console.md`.
-- The empty SPA shell is `200.html` — that is what the `.htaccess` fallback serves. `index.html` is the real Ukrainian home.
-- The runtime middleware `redirect-share-urls.global.ts` is intentionally disabled — the routes are native now. Don't re-enable it.
+- `index.html` is the real Ukrainian home. Unknown URLs get a real 404 from nginx (`404.html`, the empty SPA shell) — there is no catch-all SPA fallback (see `deploy/nginx/README.md`).
+- There is no runtime share-URL redirect middleware any more — the `/listen` and `/pre-save` routes are native. Don't reintroduce one.
 
 ### Static generation & prerender list
 
 `nitro.prerender.routes` in `nuxt.config.ts` is the explicit list of pages that get generated. **When adding a new page, add both `/path` (Ukrainian, unprefixed) and `/en/path` entries** — otherwise the route won't be in the static output. `failOnError: false` is set so maintenance mode (returning 503) doesn't break the build.
 
 `experimental.appManifest: false` is intentional — disabled to prevent 404s for build-metadata requests on static hosts.
+
+The build also rewrites generated HTML (font preload, `noindex` on redirect stubs) and then generates `sitemap.xml` + the bio-link sheet. What runs, in what order, and what to keep in sync: `docs/build-pipeline.md`.
 
 ### Music release state machine
 
@@ -65,10 +69,9 @@ The state of a release is derived from `releaseDate` in `data/musicLibrary.ts` p
 
 Central config lives in `config/general.ts` (band info, contact, social, feature flags like `enablePreSave`, `enableNextReleasePreview`, `maintenanceMode`) and `config/navigation.ts`. Read it via `getConfig('general.contact.email', { fallback: '...' })` from `utils/configHelpers.ts` — uses dot-notation against a `configRegistry`. Add new config files to that registry to make them readable by path.
 
-### State, API, caching
+### State
 
-- Pinia stores: `store/globalLoading.ts`, `store/snackbar.ts`. Prefer the composable wrappers `useGlobalLoading()` and `useSnackbar()` over direct store imports.
-- API layer: `composables/useApi.ts` wraps `utils/api.ts`. Caching via `utils/cache.ts` (`ApiCache` uses Web Cache API with `localStorage` fallback, default 5-min TTL on GET, key = `METHOD|URL|params|body`). Invalidate with `invalidateCache(url)` or `apiCache.clear()`.
+- Pinia stores: `store/globalLoading.ts`, `store/snackbar.ts`. Prefer the composable wrappers `useGlobalLoading()` and `useSnackbar()` over direct store imports. There is no client API/cache layer — the site is static and fetches no runtime data.
 
 ### Performance system
 
@@ -103,8 +106,8 @@ Feature work starts with the task-oriented **skills** in [`.claude/skills/`](.cl
 | `analytics-tracking`      | GA4 events, path-prefix source attribution (`useAnalytics`), promo-campaign `?c=` links (`npm run campaigns`)                            |
 | `ui-feedback`             | global loading bar, snackbars, contextual `/404` error pages                                                                             |
 | `performance`             | device-tier perf system, `--perf-*` CSS vars, reduced-motion                                                                             |
-| `state-data-api`          | `useApi` + `ApiCache`, Pinia stores, `getConfig` config access                                                                           |
-| `ship-deploy`             | tests/lint, `npm run generate`, FTP + GitHub Pages, `DEPLOY_TARGET`                                                                      |
+| `state-data-api`          | Pinia stores, `getConfig` config access                                                                                                  |
+| `ship-deploy`             | tests/lint, `npm run generate`, VPS rsync + nginx, GitHub Pages, `DEPLOY_TARGET`                                                         |
 | `search-console`          | **Google Search Console** — reading reports, indexing diagnostics, sitemap submission, post-release indexing pass, console configuration |
 | `seo-entity`              | JSON-LD, MusicBrainz/Wikidata entity (never add llms.txt / Review schema)                                                                |
 | `contact-form`            | Web3Forms contact submission                                                                                                             |
