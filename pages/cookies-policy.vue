@@ -200,6 +200,7 @@
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, computed } from 'vue'
   import { getConfig } from '~/utils/configHelpers'
+  import { formatLegalDate } from '~/utils/legalDate'
   import { useI18n } from 'vue-i18n'
   import { useCookieConsent } from '~/composables/useCookieConsent'
   import { useSnackbar } from '~/composables/useSnackbar'
@@ -257,16 +258,9 @@
   const dataResponseTime = computed(() => getConfig('general.legal.dataResponseTime'))
 
   // Computed
-  const lastUpdated = computed(() => {
-    return new Date(getConfig('general.legal.cookiesPolicyLastUpdated')).toLocaleDateString(
-      'en-US',
-      {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }
-    )
-  })
+  const lastUpdated = computed(() =>
+    formatLegalDate(getConfig('general.legal.cookiesPolicyLastUpdated'), locale.value)
+  )
 
   // Methods
   const scrollToTop = () => {
@@ -292,7 +286,7 @@
 
 <style scoped>
   /* Variables for consistent theming */
-  :root {
+  .cookies-policy-page {
     --glassmorphic-bg: rgba(255, 255, 255, 0.05);
     --glassmorphic-border: rgba(255, 255, 255, 0.1);
     --glassmorphic-hover: rgba(255, 255, 255, 0.08);
@@ -387,10 +381,10 @@
   .hero-title {
     font-size: 3.5rem;
     font-weight: 700;
+    color: #fff; /* solid fallback: stays readable if the gradient/clip is unsupported */
     background: var(--accent-gradient);
     background-clip: text;
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     text-align: center;
     margin-bottom: 1rem;
     position: relative;
@@ -1152,6 +1146,12 @@
     .third-party-description,
     .management-description {
       color: #ffffff;
+    }
+  }
+
+  @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    .hero-title {
+      -webkit-text-fill-color: transparent;
     }
   }
 </style>
