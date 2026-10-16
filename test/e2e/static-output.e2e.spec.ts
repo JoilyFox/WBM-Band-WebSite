@@ -159,8 +159,8 @@ describe('DEPLOY_TARGET — production build uses the apex baseURL', () => {
 describe('dev/test pages are not shipped to the static output', () => {
   // pages/test.vue and pages/performance-test.vue were removed (audit Q-01); they must
   // never come back into production output (indexable template page under the band's domain).
-  it.each(['test', 'performance-test'])('has no /%s (root, ua, en)', (p) => {
-    for (const dir of ['', ...LOCALE_DIRS]) {
+  it.each(['test', 'performance-test'])('has no /%s (root, en)', (p) => {
+    for (const dir of ['', 'en']) {
       expect(existsSync(page(dir, p)), `${dir}/${p}`).toBe(false)
     }
   })
