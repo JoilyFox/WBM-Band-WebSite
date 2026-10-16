@@ -219,6 +219,37 @@ describe('MusicCard.vue', () => {
     })
   })
 
+  describe('title link', () => {
+    it('is a plain anchor to the canonical listen URL', async () => {
+      const w = await mountSuspended(MusicCard, { props: { release: makeRelease() } })
+      const a = w.get('a.release-title-link')
+      expect(a.attributes('href')).toMatch(/\/listen\/mania$/)
+    })
+
+    it('plain click opens the modal (emits once) and cancels the navigation', async () => {
+      const w = await mountSuspended(MusicCard, { props: { release: makeRelease() } })
+      const ev = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 })
+      w.get('a.release-title-link').element.dispatchEvent(ev)
+      expect(ev.defaultPrevented).toBe(true)
+      expect(w.emitted('click')).toHaveLength(1)
+    })
+
+    it('modifier click keeps the native navigation and does not open the modal', async () => {
+      const w = await mountSuspended(MusicCard, { props: { release: makeRelease() } })
+      for (const mod of ['ctrlKey', 'metaKey', 'shiftKey'] as const) {
+        const ev = new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          button: 0,
+          [mod]: true
+        })
+        w.get('a.release-title-link').element.dispatchEvent(ev)
+        expect(ev.defaultPrevented).toBe(false)
+      }
+      expect(w.emitted('click')).toBeUndefined()
+    })
+  })
+
   describe('structure', () => {
     it('renders the album cover container as a child', async () => {
       const w = await mountSuspended(MusicCard, {

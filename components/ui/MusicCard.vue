@@ -11,21 +11,20 @@
         <!-- Real <a> so Google has a crawlable path from the home page to every
              release page — the card itself can't be an anchor because it also
              contains the streaming links, and <a> inside <a> is invalid HTML.
-             A plain left click is prevented so the card's own handler still
-             opens the modal exactly as before; modified clicks (cmd/ctrl/shift)
-             stop propagation and let the browser open the real URL.
+             It is a plain <a>, not <NuxtLink>: RouterLink runs its own
+             navigation in its internal click handler BEFORE any fallthrough
+             `@click.prevent` listener, so the modal used to open and then the
+             router navigated to /listen/<slug> ~0.7s later. Here a plain left
+             click is preventDefault-ed and bubbles to the card's own handler
+             (opens the modal, exactly like the cover); modified clicks
+             (cmd/ctrl/shift/alt) stop propagation and let the browser open the
+             real URL in a new tab/window; middle click fires `auxclick`, which
+             is never handled. Enter on the focused link fires `click`, so
+             keyboard behaves like a plain click.
              See docs/search-console.md. -->
-        <NuxtLink
-          v-if="listenPath"
-          :to="listenPath"
-          class="release-title-link"
-          @click.exact.prevent
-          @click.meta.stop
-          @click.ctrl.stop
-          @click.shift.stop
-        >
+        <a v-if="listenPath" :href="listenHref" class="release-title-link" @click="onTitleClick">
           {{ displayTitle }}
-        </NuxtLink>
+        </a>
         <template v-else>{{ displayTitle }}</template>
       </h3>
       <p class="text-white/60 text-xs">
@@ -110,6 +109,21 @@
     const prefix = locale.value === 'en' ? '/en' : ''
     return `${prefix}/listen/${props.release.slug}`
   })
+
+  // Resolve through the router so the href carries the app baseURL (GitHub
+  // Pages staging serves under /WBM-Band-WebSite/) — a bare path would not.
+  const router = useRouter()
+  const listenHref = computed(() => (listenPath.value ? router.resolve(listenPath.value).href : ''))
+
+  const onTitleClick = (e: MouseEvent) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+      // Let the browser follow the href (new tab/window); don't open the modal.
+      e.stopPropagation()
+      return
+    }
+    // Plain click: cancel the navigation, let it bubble to the card -> modal.
+    e.preventDefault()
+  }
 
   const handleClick = () => {
     emit('click', props.release)
