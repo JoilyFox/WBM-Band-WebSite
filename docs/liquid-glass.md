@@ -183,33 +183,54 @@ inconsistency — convert only on request):
 - **Streaming mini-buttons** (`StreamingButtons`) — brand-coloured logos.
 - **Text nav / legal / footer links** — links, not button controls; converting
   risks the header glass/scroll-animation system for no visual gain.
-- **Mobile hero quick-actions** (`MusicHeroPill` Music Video + Lyrics⇄Back morph in
-  `MusicDetailContent`) — see below.
+- **Mobile hero quick-actions** (`components/music/HeroQuickActions.vue`, the Music
+  Video + Lyrics⇄Back morph) — see below.
 
-### Mobile hero quick-actions morph (one animated number)
+### Mobile hero quick-actions morph (compositor-only)
 
-The Music Video ⇄ Lyrics/Back morph on `/listen/<slug>` (<md) is driven by ONE
-registered `<number>`, `--hqa-p` (0 = links view, 1 = lyrics view), declared with
-`@property` in `MusicDetailContent.styles.css`. It is the only thing that
-transitions (`0.42s cubic-bezier(.4,0,.2,1)` on `.hero-quick-actions`, same length as
-the pane swipe). Everything else is `calc()` on it: the Music Video width is an
-explicit lerp, the Lyrics/Back pill is `flex: 1` (always exactly the remainder of the
-row), the label collapse, icon↔label gap and the two faces' slide + cross-fade are
-affine in p — so every element has the same progress curve, starts/ends on the same
-frame, is monotonic and cannot collide with a sibling. **Do not** add per-element
-`transition`s, `flex-*` animation, `max-width` transitions or `%`-based `translateX`
-to these elements — that is exactly what made the old version overshoot/stall.
+The Music Video ⇄ Lyrics/Back morph on `/listen/<slug>` (<md) lives in
+`components/music/HeroQuickActions.vue`. It animates **only `translate`, `scale`
+and `opacity`**, so it runs on the compositor (Core Animation on iOS). It keeps
+full refresh rate (120 Hz on ProMotion iPhones) even while the main thread is busy.
+The previous version transitioned a registered `--hqa-p` number that resized the
+pills. That ran on the main thread: it dropped frames whenever the page was busy,
+and on iPhone it ran at 60 fps next to the 120 fps pane swipe.
 
-- The Music Video label's natural width is measured in JS (`measureMvLabel`, a
-  Range) into `--mv-label-w` on the row; CSS falls back to `7rem`.
-- Perf/motion policy: the global `.mobile-conservative * { transition: none }` /
-  `.reduce-animations * { transition: opacity .2s }` rules are beaten with
-  specificity + `!important` only for `--hqa-p` (low-perf keeps the movement; its
-  blanket `transform: none` turns the slide into a cross-fade). The p-derived
-  opacities must NOT have their own transition (they would lag behind p). A real OS
-  reduce-motion request gets an instant swap (faces still fade 0.2s).
-- No `will-change`/`contain`/`transform` on ancestors of the pills (backdrop-root
-  trap, §1).
+- **Nothing resizes.** Each pill's box is laid out at its _largest_ extent. The
+  visible pill is the intersection of the pill itself (`overflow: hidden`,
+  rounded, never moves) and `.hqa-clip`, a same-size rounded clip that slides
+  sideways. The overlap of two equal stadiums offset by `d` is again a stadium, of
+  width `w − d`. `.hqa-body` (fill, sheen, rim, content) is counter-slid inside the
+  clip, so it stays put while being clipped.
+- **Rim.** `.hqa-body::after` draws the rim everywhere except the moving end, and
+  `.hqa-cap` (it rides on the clip) draws only the moving end. The masks
+  cross-fade over the last 3px of the cap curve. At rest the result matches the
+  `HeroPill` rim.
+- **Resting geometry is CSS** (`.is-lyrics`), using `100cqw` (the row is
+  `container-type: inline-size`). SSR and every resting frame are correct without
+  JS. The only JS-measured values are `--mv-label-w` (above 450px the video pill
+  keeps its label) and `--hqa-glow-k` (the YouTube glow's squeeze factor; calc()
+  cannot divide lengths).
+- **Animation = FLIP over computed values.** `capture()` reads each `[data-hqa]`
+  part's computed `translate`/`scale`/`opacity`. The class flips, then
+  `animate()` animates each changed value with WAAPI. Fades use two overlapping
+  windows of eased progress (out over 0–0.6, in over 0.4–1) so the labels never
+  double-expose.
+- **One clock.** `utils/lyricsMorph.ts` holds the timing (`420ms`,
+  `cubic-bezier(.4,0,.2,1)`). `MusicDetailContent`'s `setView` creates the pill
+  animations, both pane swipes and the container-height tween in one task, so they
+  start and end on the same frame. A toggle mid-flight `reverse()`s all of them in
+  place.
+- WAAPI on `translate`/`scale` is immune to the global perf overrides
+  (`* { transition: none }`, `* { transform: none !important }`). Do not move the
+  resting offsets to `transform`, or the conservative tier zeroes them. Reduced
+  motion swaps instantly.
+- **Do not** add CSS transitions on these parts, animate `width`/`flex`/custom
+  properties, or put `will-change`/`contain`/`transform` on ancestors of the pills
+  (backdrop-root trap, §1). The pills carry no `backdrop-filter`; measured, it made
+  ≤5/255 difference on this background.
+- Below 360px the video label is the short form (`music.buttons.music_video_short`):
+  "Дивитись Кліп" does not fit half of a 320px row.
 
 When adding a button: reach for `<UiButton>`. Only drop to bespoke CSS for a
 genuinely distinct identity, and if it's glass, build on `.liquid-glass` +

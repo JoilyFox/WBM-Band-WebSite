@@ -98,23 +98,23 @@ To support a part not already in `LyricsPartKey`:
 ## How it works
 
 - The platform-links pane and the lyrics pane are two children of a CSS-grid
-  cell (`grid-area: 1 / 1`), so they overlap and cross-slide. `showLyrics` flips
-  the keyed `<Transition>` child; `swapDirection` picks the slide direction.
-- **Two animation modes, chosen by `shouldReduceAnimations`** (`prefersReducedMotion
-|| level === 'low'`):
-  - Default → the directional **swipe** (`lyrics-swap-forward` / `-back`), a
-    fully-opaque `translateX` cross-slide at a fixed `0.42s`. The two panes tile
-    (one left-half, one right-half) and move together — lyrics in/out from the
-    right, links in/out from the left.
-  - Low-perf / reduced-motion → a clean opacity **fade** (`lyrics-fade`) with
-    `<Transition mode="out-in">` so the old pane fully leaves before the new
-    enters (**no overlap**). No horizontal travel.
-- The transition `transition:` declarations use `!important` so the blunt global
-  mobile perf overrides in `base.scss` can't clobber them: `.mobile-standard *
-{ transition-duration: 0.2s !important }` (keeps the swipe at 0.42s) and
-  `.mobile-conservative * { transition: none !important }` (keeps the fade alive).
-- `is-swapping` toggles `overflow: hidden` on the swap wrapper **only while a
-  transition runs**, so resting platform-button shadows aren't clipped.
+  cell (`grid-area: 1 / 1`), so they overlap and cross-slide. Both stay mounted
+  once created, and at rest the hidden one is `display: none` (`.is-hidden`) and
+  `inert`. The requested view is server-rendered. The other pane mounts on idle,
+  or on `pointerdown` on the Lyrics pill, so a tap never pays for a component mount
+  mid-animation. That mount was a ~200 ms stall at the start of the old swipe.
+- `setView(lyrics)` in `MusicDetailContent` animates everything with WAAPI on one
+  clock (`utils/lyricsMorph.ts`, 420 ms, `cubic-bezier(.4,0,.2,1)`): both panes'
+  `translate` (lyrics in/out from the right, links from the left), the container's
+  `height` and the hero pills' morph (`HeroQuickActions.vue`). They start and end
+  on the same frame, and a toggle mid-flight reverses them all in place. WAAPI is
+  not affected by the global perf overrides in `base.scss`
+  (`transition: none`, `transform: none !important`).
+- **Motion modes.** Default → the directional swipe. Low-perf tier → a sequential
+  opacity cross-fade (out over the first half, in over the second, no travel).
+  OS reduce-motion → an instant swap.
+- `.lyrics-swap` always clips (`overflow: hidden`); resting shadows live inside
+  each pane's padded inner container.
 - The floating back-arrow (top-left) first returns to the links view when lyrics
   are open, instead of leaving the page.
 - There is **no auto-scroll** on open — the swap happens in place.

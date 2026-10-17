@@ -312,75 +312,22 @@
            (md:hidden) so the music video stays reachable whether the hero is
            collapsed or expanded — it is removed from the platform grid below at
            this breakpoint, while desktop keeps it in the grid and hides this row. -->
-      <!-- ONE animated number (`--hqa-p`, 0 → 1, see the "Hero quick-actions
-           morph" block in the styles) drives the whole open/close morph: the Music
-           Video width, the Lyrics/Back width (the remainder of the row), the icon
-           and label travel and both faces' cross-fade are all derived from it, so
-           they share one easing and one duration and cannot fight each other. -->
-      <div
+      <!-- The open/close morph is compositor-only and shares one clock with the
+           pane swipe below; see HeroQuickActions.vue + utils/lyricsMorph.ts. -->
+      <MusicHeroQuickActions
         v-if="!isModal && showHeroActions"
-        ref="heroActionsEl"
-        class="hero-quick-actions md:hidden relative z-10 mt-3 flex w-full max-w-[500px] mx-auto items-center gap-3"
-        :class="{ 'lyrics-active': showLyrics, 'hqa--pair': bothActions }"
-      >
-        <MusicHeroPill
-          v-if="musicVideoUrl"
-          as="a"
-          :href="musicVideoUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          accent="video"
-          :aria-label="t('music.buttons.watch_video')"
-          @click="handleMusicVideoClick"
-        >
-          <!-- Slotted (not the icon/label props) so the label can collapse to an
-               icon-only pill on narrow phones when the lyrics view is open —
-               see `.mv-label` + the max-width:400px rule in the styles. -->
-          <UiIcon name="youtube" class="text-base leading-none" />
-          <span class="mv-label">{{ t('music.buttons.music_video') }}</span>
-        </MusicHeroPill>
-        <!-- Lyrics: swaps the platform-links section below for the song lyrics
-             (horizontal cross-slide). Only present when the release ships lyrics.
-             Alone (no Music Video): `--solo` makes it half the row on the links
-             view (right-pinned via ml-auto, like a paired Lyrics pill) and grows it
-             to the full row on the lyrics view. The label swaps short↔long at 440px
-             via the pill's responsive label. -->
-        <MusicHeroPill
-          v-if="lyricsAvailable"
-          :as="lyricsMorphHref ? 'a' : 'button'"
-          :href="lyricsMorphHref || undefined"
-          :aria-label="showLyrics ? lyricsBackLabel : t('music.a11y.show_lyrics')"
-          :class="['lyrics-morph-pill', { 'lyrics-morph-pill--solo ml-auto': !bothActions }]"
-          @click="onLyricsPillClick"
-        >
-          <!-- Morphing content: the SAME pill is the Lyrics trigger (links view)
-               and the "Back to Music" control (lyrics view). Both faces are
-               grid-stacked and clipped by the pill; both slide one short step
-               together (a filmstrip) while they cross-fade, driven by --hqa-p.
-               The pill's border/size never change. Faces are aria-hidden — the
-               button's dynamic aria-label is the authoritative accessible name. -->
-          <span class="pill-morph" :class="{ 'is-back': showLyrics }">
-            <span class="pill-morph__face pill-morph__face--lyrics" aria-hidden="true">
-              <i class="pi pi-align-left text-base leading-none"></i>
-              <UiResponsiveText
-                :narrow="t('music.buttons.lyrics')"
-                :wide="t('music.buttons.song_lyrics')"
-                :breakpoint="440"
-              />
-            </span>
-            <span class="pill-morph__face pill-morph__face--back" aria-hidden="true">
-              <!-- Cold visitors (no prior context) get a play glyph + "Listen to
-                   the Song"; once they've used the toggle it morphs to the back
-                   arrow + "Back to Music". -->
-              <i
-                class="text-base leading-none"
-                :class="hasMusicNavContext ? 'pi pi-arrow-left' : 'pi pi-play'"
-              ></i>
-              <span>{{ lyricsBackLabel }}</span>
-            </span>
-          </span>
-        </MusicHeroPill>
-      </div>
+        ref="heroActions"
+        class="md:hidden z-10 mt-3 w-full max-w-[500px] mx-auto"
+        :video-url="musicVideoUrl"
+        :lyrics-available="lyricsAvailable"
+        :active="showLyrics"
+        :lyrics-href="lyricsMorphHref"
+        :back-label="lyricsBackLabel"
+        :back-is-arrow="hasMusicNavContext"
+        @video-click="handleMusicVideoClick"
+        @lyrics-click="onLyricsPillClick"
+        @lyrics-intent="mountLyricsPane"
+      />
     </section>
 
     <!-- Custom Share Popup for Desktop -->
@@ -398,63 +345,78 @@
            edges, so the two panes cross-slide edge-to-edge (links exit left while
            lyrics enter right, reversed on the way back) with nothing cutting them
            off. The horizontal padding + max-width live on each pane's inner
-           container instead of the section. The reduced-motion fallback is CSS-only. -->
+           container instead of the section. Both panes stay mounted once created
+           (the hidden one is display:none), so a toggle never mounts a component
+           mid-animation; the swipe is WAAPI on `translate` (see runLyricsSwap). -->
       <div ref="lyricsSwapEl" class="lyrics-swap">
-        <Transition :name="swapTransitionName" :mode="swapMode">
-          <div :key="showLyrics ? 'lyrics' : 'links'" class="lyrics-swap__pane">
-            <div class="platforms-container max-w-3xl mx-auto px-4 md:px-8 rounded-xl">
-              <!-- LINKS VIEW -->
-              <template v-if="!showLyrics">
-                <h2
-                  class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-6 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md"
-                >
-                  {{ listenNowTitle }}
-                </h2>
-                <div
-                  v-if="hasPlatformLinks"
-                  class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch"
-                >
-                  <div
-                    v-for="(url, platform) in availablePlatforms"
-                    :key="platform"
-                    class="platform-button-wrapper w-full h-full min-h-[110px] flex"
-                    :class="{ 'max-md:!hidden': platform === 'musicVideo' }"
-                  >
-                    <MusicPlatformButton
-                      :platform="platform"
-                      :url="url"
-                      :is-pre-save="isPreSave"
-                      :release-slug="release.slug"
-                      :page-type="pageType"
-                      class="w-full h-full flex-1"
-                    />
-                  </div>
-                </div>
+        <!-- LINKS VIEW -->
+        <div
+          v-if="linksPaneMounted"
+          ref="linksPaneEl"
+          class="lyrics-swap__pane"
+          :class="{ 'is-hidden': showLyrics && !swapInFlight }"
+          :inert="showLyrics || undefined"
+        >
+          <div class="platforms-container max-w-3xl mx-auto px-4 md:px-8 rounded-xl">
+            <h2
+              class="platforms-title text-center text-2xl md:text-3xl font-extrabold mb-6 bg-gradient-to-br from-primary-50 to-primary-200 bg-clip-text text-transparent drop-shadow-md"
+            >
+              {{ listenNowTitle }}
+            </h2>
+            <div
+              v-if="hasPlatformLinks"
+              class="platforms-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-stretch"
+            >
+              <div
+                v-for="(url, platform) in availablePlatforms"
+                :key="platform"
+                class="platform-button-wrapper w-full h-full min-h-[110px] flex"
+                :class="{ 'max-md:!hidden': platform === 'musicVideo' }"
+              >
+                <MusicPlatformButton
+                  :platform="platform"
+                  :url="url"
+                  :is-pre-save="isPreSave"
+                  :release-slug="release.slug"
+                  :page-type="pageType"
+                  class="w-full h-full flex-1"
+                />
+              </div>
+            </div>
 
-                <!-- Released-state fallback: no individual platform links yet → a
+            <!-- Released-state fallback: no individual platform links yet → a
                      single "Listen on all platforms" CTA to the distributor
                      smart-link. The moment real musicPlatformLinks are added, the
                      grid above replaces it. No redirect, so /listen stays a real,
                      indexable page. -->
-                <div v-else-if="showSmartLinkCta" class="flex justify-center">
-                  <a
-                    :href="releaseSmartLink"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="smart-link-cta inline-flex items-center justify-center gap-2.5 rounded-2xl px-8 py-4 text-base font-bold text-surface-950 bg-gradient-to-br from-primary-50 to-primary-200 shadow-lg shadow-black/30 transition-transform duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 sm:text-lg"
-                    @click="handleSmartLinkClick"
-                  >
-                    <i class="pi pi-play text-sm leading-none" aria-hidden="true"></i>
-                    <span>{{ t('music.buttons.stream_all') }}</span>
-                  </a>
-                </div>
-              </template>
-
-              <!-- LYRICS VIEW -->
-              <MusicLyrics v-else :sections="lyricsSections" />
+            <div v-else-if="showSmartLinkCta" class="flex justify-center">
+              <a
+                :href="releaseSmartLink"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="smart-link-cta inline-flex items-center justify-center gap-2.5 rounded-2xl px-8 py-4 text-base font-bold text-surface-950 bg-gradient-to-br from-primary-50 to-primary-200 shadow-lg shadow-black/30 transition-transform duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 sm:text-lg"
+                @click="handleSmartLinkClick"
+              >
+                <i class="pi pi-play text-sm leading-none" aria-hidden="true"></i>
+                <span>{{ t('music.buttons.stream_all') }}</span>
+              </a>
             </div>
           </div>
-        </Transition>
+        </div>
+
+        <!-- LYRICS VIEW — client-mounted on idle (or on pointerdown) so it is
+             ready before the first tap; SSR-rendered only on /lyrics/<slug>. -->
+        <div
+          v-if="lyricsPaneMounted"
+          ref="lyricsPaneEl"
+          class="lyrics-swap__pane"
+          :class="{ 'is-hidden': !showLyrics && !swapInFlight }"
+          :inert="!showLyrics || undefined"
+        >
+          <div class="platforms-container max-w-3xl mx-auto px-4 md:px-8 rounded-xl">
+            <MusicLyrics :sections="lyricsSections" />
+          </div>
+        </div>
       </div>
     </section>
   </div>
@@ -470,6 +432,7 @@
   import { useReleaseTheme } from '~/composables/useReleaseTheme'
   import { useAnalytics } from '~/composables/useAnalytics'
   import { getLocalizedCountdown } from '~/utils/countdown'
+  import { fadeKeyframes, lyricsMorphTiming } from '~/utils/lyricsMorph'
   import type { MusicRelease } from '~/data/musicLibrary'
   import Logo from '~/components/ui/Logo.vue'
   import CustomSharePopup from '~/components/common/CustomSharePopup.vue'
@@ -512,6 +475,7 @@
     isMediumPerformanceDevice,
     isHighPerformanceDevice,
     shouldReduceAnimations,
+    prefersReducedMotion,
     isMobileFlagship,
     shouldUseMobileFallback,
     performanceCSSVars,
@@ -546,9 +510,6 @@
   const lyricsSections = computed(() => props.release?.lyrics ?? [])
   const lyricsAvailable = computed(() => lyricsSections.value.length > 0)
   const showHeroActions = computed(() => Boolean(musicVideoUrl.value) || lyricsAvailable.value)
-  // With both pills present they grow to share the row equally; a lone pill
-  // keeps its natural content width (left for video, right for lyrics).
-  const bothActions = computed(() => Boolean(musicVideoUrl.value) && lyricsAvailable.value)
 
   // Desktop hero action row: Share is always present; the Lyrics button joins it
   // when the release ships lyrics. Share collapses to icon-only once it's no longer
@@ -572,75 +533,104 @@
   // --- Lyrics view: in-place horizontal swap of the platform links <-> lyrics.
   // `showLyrics` drives a directional cross-slide (links exit left, lyrics enter
   // right; reversed on the way back). Pure client state — no route change — so SSR
-  // renders the links view and there is no hydration mismatch.
+  // renders the requested view and there is no hydration mismatch.
   const showLyrics = ref(props.initialShowLyrics)
-  const swapDirection = ref<'forward' | 'back'>('forward')
 
-  // Reduced-motion OR a genuinely low-perf device gets a clean opacity crossfade
-  // (sequential, via `out-in`, so the two panes never overlap); everything else
-  // gets the directional translateX swipe — lyrics in/out from the RIGHT, links
-  // in/out from the LEFT. `shouldReduceAnimations` is `prefersReducedMotion ||
-  // level === 'low'`; Client Hints now keep modern flagships out of the 'low'
-  // tier (see usePerformanceOptimization) so they get the swipe, not the fade.
-  const swapTransitionName = computed(() =>
-    shouldReduceAnimations.value ? 'lyrics-fade' : `lyrics-swap-${swapDirection.value}`
-  )
-  // `out-in` for the fade (old fully leaves before new enters → no overlap);
-  // default/simultaneous for the cross-slide so both panes move together.
-  const swapMode = computed<'out-in' | undefined>(() =>
-    shouldReduceAnimations.value ? 'out-in' : undefined
-  )
+  // Both panes stay mounted once created; at rest only the current one is
+  // displayed. The requested view is server-rendered, and the other pane mounts
+  // on idle (or on pointerdown on the pill) so a toggle never pays for a
+  // component mount in the middle of its animation. That mount was the
+  // ~200 ms stall at the start of the old swipe.
+  const linksPaneMounted = ref(!props.initialShowLyrics)
+  const lyricsPaneMounted = ref(props.initialShowLyrics)
+  const mountLyricsPane = () => {
+    if (lyricsAvailable.value) lyricsPaneMounted.value = true
+  }
 
-  // --- Smooth height change on the links <-> lyrics swap --------------------
-  // The two panes share one grid cell, so the container's natural height changes
-  // in a single frame when the views swap — which on the full page yanks the
-  // footer up, and in the modal makes the body resize abruptly. We tween the
-  // container's height across the same 0.42s/easing instead.
-  //
-  // Two details keep it glitch-free in modal mode, where the global
-  // `transition: none` would otherwise remove the leaving pane instantly:
-  //   • lock the CURRENT height BEFORE the panes swap (the watch is pre-flush, so
-  //     this runs before the DOM update) — otherwise the container snaps to the new
-  //     height first and our tween then yanks it back, the flicker that was seen;
-  //   • set the height transition with `important`, to beat the modal's
-  //     `transition: none !important`.
-  // Skipped only for reduced motion (its out-in fade has no overlap to bridge).
   const lyricsSwapEl = ref<HTMLElement | null>(null)
-  let cancelSwapHeight: (() => void) | null = null
+  const linksPaneEl = ref<HTMLElement | null>(null)
+  const lyricsPaneEl = ref<HTMLElement | null>(null)
 
-  watch(showLyrics, async (isLyrics) => {
-    const el = lyricsSwapEl.value
-    if (!el || !import.meta.client || shouldReduceAnimations.value) return
-    if (cancelSwapHeight) cancelSwapHeight() // rapid re-toggle: drop the in-flight tween
-    const startH = el.offsetHeight
-    el.style.height = `${startH}px` // lock before the DOM swaps the panes
-    await nextTick()
-    // The entering pane is the one whose content matches the new view; its own
-    // height is the natural target even while the container is height-locked.
-    const panes = Array.from(el.querySelectorAll<HTMLElement>('.lyrics-swap__pane'))
-    const target = panes.find((p) => Boolean(p.querySelector('.music-lyrics')) === isLyrics)
-    const targetH = target ? target.offsetHeight : 0
-    if (!targetH || targetH === startH) {
-      el.style.height = ''
+  type HeroMorphSnapshot = Map<HTMLElement, { translate: string; opacity: number }>
+  const heroActions = ref<{
+    capture: () => HeroMorphSnapshot
+    animate: (from: HeroMorphSnapshot) => Animation[]
+  } | null>(null)
+
+  // --- One clock for the whole switch ----------------------------------------
+  // The hero pills, both panes and the container height animate with the same
+  // timing (utils/lyricsMorph.ts) and are created in the same task, so they share
+  // a start frame, a duration and an easing curve. Pills and panes move with
+  // `translate`/`opacity` only (compositor). The height tween is the one
+  // main-thread part and only moves what is below the panes. While the switch
+  // runs, both panes are displayed (`swapInFlight`). A toggle mid-flight
+  // reverses every running animation in place, so nothing jumps. Low-tier
+  // devices get a sequential opacity cross-fade instead of the swipe. A
+  // reduce-motion request swaps instantly. WAAPI is used instead of CSS
+  // classes so the global perf overrides (`transition: none`,
+  // `transform: none`) cannot freeze or snap it.
+  const swapInFlight = ref(false)
+  let swapAnims: Animation[] = []
+
+  const settleSwap = () => {
+    swapAnims = []
+    swapInFlight.value = false
+  }
+
+  const setView = async (lyrics: boolean) => {
+    if (lyrics === showLyrics.value) return
+    if (lyrics) mountLyricsPane()
+    else linksPaneMounted.value = true
+
+    if (!import.meta.client || prefersReducedMotion.value || !('animate' in Element.prototype)) {
+      showLyrics.value = lyrics
       return
     }
-    void el.offsetHeight // commit the locked start height
-    el.style.setProperty('transition', 'height 0.42s cubic-bezier(0.22, 1, 0.36, 1)', 'important')
-    el.style.height = `${targetH}px`
-    const finish = () => {
-      el.style.height = ''
-      el.style.removeProperty('transition')
-      el.removeEventListener('transitionend', onEnd)
-      clearTimeout(timer)
-      cancelSwapHeight = null
+
+    if (swapInFlight.value && swapAnims.length) {
+      showLyrics.value = lyrics
+      swapAnims.forEach((anim) => anim.reverse())
+      return
     }
-    const onEnd = (e: TransitionEvent) => {
-      if (e.target === el && e.propertyName === 'height') finish()
+
+    const heroSnap = heroActions.value?.capture()
+    const box = lyricsSwapEl.value
+    const fromH = box?.offsetHeight ?? 0
+    showLyrics.value = lyrics
+    swapInFlight.value = true
+    await nextTick()
+
+    const timing = lyricsMorphTiming()
+    const anims: Animation[] =
+      heroSnap && heroActions.value ? heroActions.value.animate(heroSnap) : []
+    const incoming = lyrics ? lyricsPaneEl.value : linksPaneEl.value
+    const outgoing = lyrics ? linksPaneEl.value : lyricsPaneEl.value
+    if (shouldReduceAnimations.value) {
+      if (outgoing) anims.push(outgoing.animate(fadeKeyframes(1, 0), timing))
+      if (incoming) anims.push(incoming.animate(fadeKeyframes(0, 1), timing))
+    } else {
+      // Forward: lyrics come in from the right, links leave to the left.
+      const dir = lyrics ? 1 : -1
+      if (incoming) {
+        anims.push(
+          incoming.animate([{ translate: `${dir * 100}% 0` }, { translate: '0 0' }], timing)
+        )
+      }
+      if (outgoing) {
+        anims.push(
+          outgoing.animate([{ translate: '0 0' }, { translate: `${-dir * 100}% 0` }], timing)
+        )
+      }
     }
-    el.addEventListener('transitionend', onEnd)
-    const timer = setTimeout(finish, 600) // safety net if transitionend never fires
-    cancelSwapHeight = finish
-  })
+    const toH = incoming?.offsetHeight ?? 0
+    if (box && fromH && toH && fromH !== toH) {
+      anims.push(box.animate([{ height: `${fromH}px` }, { height: `${toH}px` }], timing))
+    }
+
+    swapAnims = anims
+    // Resolves when the animations come to rest, whichever way they last ran.
+    Promise.all(anims.map((anim) => anim.finished)).then(settleSwap, settleSwap)
+  }
 
   // --- URL sync (release page <-> /lyrics/<slug>) --------------------------
   // We change the URL with the History API directly — NOT router navigation —
@@ -670,8 +660,7 @@
 
   const openLyrics = () => {
     if (!lyricsAvailable.value) return
-    swapDirection.value = 'forward'
-    showLyrics.value = true
+    setView(true)
     if (props.lyricsUrlSync) {
       syncLyricsUrl('lyrics', 'push')
       emit('view-change', 'lyrics')
@@ -679,8 +668,7 @@
   }
 
   const closeLyrics = () => {
-    swapDirection.value = 'back'
-    showLyrics.value = false
+    setView(false)
     if (props.lyricsUrlSync) {
       syncLyricsUrl('links', 'replace')
       emit('view-change', 'links')
@@ -713,29 +701,10 @@
     toggleLyrics()
   }
 
-  // --- Hero quick-actions morph: label geometry --------------------------------
-  // The Music Video label collapses (≤450px) / the pill settles to its natural
-  // width (>450px) by interpolating real lengths, so CSS needs the label's natural
-  // text width. Measure it with a Range (fractional px, independent of the label's
-  // own max-width collapse) and expose it as `--mv-label-w` on the row. The CSS
-  // falls back to 7rem (≥ the longest label) until this runs, so SSR and first
-  // paint are identical to the at-rest layout.
-  const heroActionsEl = ref<HTMLElement | null>(null)
-  const measureMvLabel = () => {
-    const row = heroActionsEl.value
-    const label = row?.querySelector<HTMLElement>('.mv-label')
-    if (!row || !label || !import.meta.client) return
-    const range = document.createRange()
-    range.selectNodeContents(label)
-    const width = range.getBoundingClientRect().width
-    if (width > 0) row.style.setProperty('--mv-label-w', `${width}px`)
-  }
-
   // The morphing hero pill is the single open/close control (the in-pane back
   // button was removed): open the lyrics when on the links view, close them when
   // on the lyrics view. The floating top-left back-arrow still closes too.
   const toggleLyrics = () => {
-    measureMvLabel() // keep the morph's label geometry exact for the current font/locale
     // A real tap on the pill is the "interaction" that earns the visitor the
     // context for the "Back to Music" label (vs the cold-entry "Listen to the
     // Song"). Persisted ~2h so it survives refreshes/navigation in this session.
@@ -749,8 +718,7 @@
     if (!props.lyricsUrlSync) return
     const shouldShow = isLyricsPath(window.location.pathname)
     if (shouldShow === showLyrics.value) return
-    swapDirection.value = shouldShow ? 'forward' : 'back'
-    showLyrics.value = shouldShow
+    setView(shouldShow)
     emit('view-change', shouldShow ? 'lyrics' : 'links')
   }
 
@@ -758,9 +726,12 @@
     // Promote the cold "Listen to the Song" label to "Back to Music" if this
     // visitor has interacted with the toggle within the TTL (client-only read).
     hydrateMusicNavContext()
-    measureMvLabel()
-    // Web fonts swap in after first paint and change the label's width.
-    if (document.fonts?.ready) document.fonts.ready.then(measureMvLabel).catch(() => {})
+    // Mount the other pane once the page is idle, so the first toggle is ready.
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1200))
+    idle(() => {
+      linksPaneMounted.value = true
+      mountLyricsPane()
+    })
     if (import.meta.client && props.lyricsUrlSync) {
       window.addEventListener('popstate', handleLyricsPopState)
     }
@@ -768,9 +739,6 @@
   onBeforeUnmount(() => {
     if (import.meta.client) window.removeEventListener('popstate', handleLyricsPopState)
   })
-
-  // The label text (and so its width) changes with the locale.
-  watch(locale, () => nextTick(measureMvLabel))
 
   // Optimized scroll handling
   const { isScrolled } = useOptimizedScroll({ threshold: 60 })

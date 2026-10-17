@@ -550,7 +550,9 @@ body.lg-tier-low .share-glass-btn {
   .music-detail-content,
   .music-hero::before,
   .music-hero::after,
-  .music-hero-overlay {
+  .music-hero-overlay,
+  .music-hero-overlay::before,
+  .music-hero-overlay::after {
     animation: none !important;
     transition: none !important;
     background-attachment: initial !important;
@@ -660,10 +662,43 @@ body.lg-tier-low .share-glass-btn {
   will-change: auto;
 }
 
-/* High performance gets overlay animation */
+/* High performance gets the drifting overlay. The two colour blooms are their
+     own layers moved with `translate`, so the drift runs on the compositor.
+     It used to animate `background-position`, which repainted the whole hero
+     on the main thread every frame, under the hero pills, for as long as the
+     page was open. Each layer is its background image at the old size (130% /
+     120%). The keyframe offsets reproduce the old background-position path:
+     (1 − size) × position, expressed in % of the layer's own size. */
 .perf-high .music-hero-overlay {
-  animation: overlayDrift 22s ease-in-out infinite alternate;
-  will-change: transform;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.65) 100%);
+}
+
+.perf-high .music-hero-overlay::before,
+.perf-high .music-hero-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  will-change: translate;
+}
+
+/* accent2 bloom: painted first, as it was the lower background layer. */
+.perf-high .music-hero-overlay::before {
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle at 70% 30%, var(--accent2), transparent 50%);
+  translate: -11.67% -5%;
+  animation: overlayDriftB 22s ease-in-out infinite alternate;
+}
+
+.perf-high .music-hero-overlay::after {
+  width: 130%;
+  height: 130%;
+  background: radial-gradient(circle at 30% 70%, var(--accent1), transparent 50%);
+  translate: -6.92% -16.15%;
+  animation: overlayDriftA 22s ease-in-out infinite alternate;
 }
 
 /* Medium and low performance get static overlay */
@@ -951,209 +986,10 @@ body.lg-tier-low .share-glass-btn {
   grid-area: 1 / 1;
 }
 
-/* Forward (links → lyrics): lyrics slides IN from the right, links slides OUT
-     to the left. */
-.lyrics-swap-forward-enter-from {
-  transform: translateX(100%);
-}
-
-.lyrics-swap-forward-leave-to {
-  transform: translateX(-100%);
-}
-
-/* Back (lyrics → links): links slides IN from the left, lyrics slides OUT to
-     the right. */
-.lyrics-swap-back-enter-from {
-  transform: translateX(-100%);
-}
-
-.lyrics-swap-back-leave-to {
-  transform: translateX(100%);
-}
-
-/* Deliberate, consistent swipe timing with a snappy ease-out. `!important` so
-     the global mobile perf overrides in base.scss
-     (`.mobile-standard * { transition-duration: 0.2s !important }`) can't clobber
-     the intended timing on mid/flagship phones. */
-.lyrics-swap-forward-enter-active,
-.lyrics-swap-forward-leave-active,
-.lyrics-swap-back-enter-active,
-.lyrics-swap-back-leave-active {
-  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
-}
-
-/* Low-perf / reduced-motion fallback: a clean opacity crossfade with NO
-     horizontal travel. Paired with `mode="out-in"` in the template so the old
-     pane fully fades out before the new fades in (the panes never overlap).
-     `!important` keeps the fade alive even under the conservative blanket rule
-     `.mobile-conservative * { transition: none !important }` in base.scss. */
-.lyrics-fade-enter-from,
-.lyrics-fade-leave-to {
-  opacity: 0;
-}
-
-.lyrics-fade-enter-active,
-.lyrics-fade-leave-active {
-  transition: opacity 0.2s ease !important;
-}
-
-/* --- Hero quick-actions morph ------------------------------------------- */
-/* ONE source of truth. The whole Music Video / Lyrics⇄Back morph is a function
-     of a single registered number, `--hqa-p` (0 = links view, 1 = lyrics view;
-     the @property just below), which is the ONLY thing that
-     transitions. Every width, offset and opacity below is plain calc() on it, so
-     all of them share one duration and one easing curve, start and end on the
-     same frame, and — being affine in p — move monotonically with identical
-     progress curves. Nothing here animates `flex-*`, `max-width` or `%`-translate
-     on its own any more: the old per-property transitions (0.25s widths vs 0.42s
-     faces vs flex re-solving with min-content clamps vs translateX(±100%) of a
-     width that was itself changing) are what made siblings collide, stall and
-     overshoot. The Music Video width is explicit; the Lyrics/Back pill is
-     `flex: 1` (the remainder of the row), so the two can never overlap or leave
-     a gap, whatever the frame timing. Reversing mid-flight is just the number
-     retargeting. */
-@property --hqa-p {
-  syntax: '<number>';
-  inherits: true;
-  initial-value: 0;
-}
-
-.hero-quick-actions {
-  --hqa-dur: 0.42s; /* = the pane swipe + height tween, so everything lands together */
-  --hqa-ease: cubic-bezier(0.4, 0, 0.2, 1); /* smooth ease-in-out */
-  --hqa-slide: 1.25rem; /* travel of the Lyrics⇄Back label filmstrip */
-  --hqa-pad: 0.875rem; /* the pill's px-3.5 */
-  --hqa-icon: 1.25rem; /* UiIcon is 1.25em wide at text-base */
-  --hqa-gap: 0.5rem; /* pill gap-2 between icon and label */
-  --hqa-half: calc(50% - 0.375rem); /* half the row minus half the gap-3 */
-  --mv-label: var(--mv-label-w, 7rem); /* natural label width, measured in JS */
-  --mv-icon-only: calc(var(--hqa-pad) * 2 + var(--hqa-icon));
-  --mv-full: calc(var(--mv-icon-only) + var(--hqa-gap) + var(--mv-label));
-  transition: --hqa-p var(--hqa-dur) var(--hqa-ease);
-}
-
-.hero-quick-actions.lyrics-active {
-  --hqa-p: 1;
-}
-
-/* Lyrics/Back pill: clip the sliding faces at the BORDER (the breathing room
-     lives on the faces), exactly as before. */
-.lyrics-morph-pill {
-  position: relative;
-  overflow: hidden;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-.pill-morph {
-  display: grid;
-  width: 100%;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.pill-morph__face {
-  grid-area: 1 / 1;
-  width: 100%;
-  padding-inline: 0.875rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-}
-
-/* The two faces move as ONE filmstrip: both shift left by --hqa-slide as p goes
-     0→1 (the way the pane swipe travels on "forward"), reversing on the way back.
-     Their offset is always exactly one --hqa-slide apart and they ride inside a
-     pill whose centre is itself moving monotonically, so no label ever travels
-     one way and then returns. The cross-fade is linear in p as well, in two
-     overlapping windows (out: p 0→.6, in: p .4→1) so the two labels never show
-     as a legible double-exposure — opacity is clamped to [0,1] by the browser. */
-.pill-morph__face--lyrics {
-  opacity: calc(1 - var(--hqa-p) * 1.6667);
-  transform: translateX(calc(var(--hqa-p) * var(--hqa-slide) * -1));
-}
-
-.pill-morph__face--back {
-  opacity: calc((var(--hqa-p) - 0.4) * 1.6667);
-  transform: translateX(calc((1 - var(--hqa-p)) * var(--hqa-slide)));
-}
-
-/* --- Paired layout (Music Video + Lyrics) ------------------------------- */
-/* Music Video: explicit width, interpolated from half the row to its lyrics-view
-     width. >450px that is its natural width (label kept); ≤450px (below) it is
-     icon-only. The YouTube glow widens in step. */
-.hqa--pair > .music-hero-pill--video {
-  --mv-end: var(--mv-full);
-  --mv-glow-add: 15%; /* 45% → 60% */
-  flex: none;
-  width: calc(var(--hqa-half) + (var(--mv-end) - var(--hqa-half)) * var(--hqa-p));
-  background-size: calc(45% + var(--mv-glow-add) * var(--hqa-p)) 100%;
-}
-
-/* Lyrics/Back: whatever the Music Video leaves of the row. */
-.hqa--pair > .lyrics-morph-pill {
-  flex: 1 1 0%;
-  min-width: 0;
-}
-
-/* Lone Lyrics pill (no Music Video on this release): half the row on the links
-     view (right-pinned via ml-auto), growing leftward to the full row. */
-.hero-quick-actions > .lyrics-morph-pill--solo {
-  flex: none;
-  width: calc(var(--hqa-half) + (100% - var(--hqa-half)) * var(--hqa-p));
-}
-
-/* The Music Video label sits on its own span so it can collapse to nothing,
-     leaving just the YouTube icon (≤450px, below). */
-.mv-label {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-/* On phones (≤450px — SE through the Pro Max widths) the lyrics view cannot fit
-     BOTH labels, so the Music Video pill shrinks to an icon-only button: its label
-     width and the icon↔label gap interpolate to 0 while it fades out. All
-     lengths and opacities are linear in p. */
-@media (max-width: 450px) {
-  .hqa--pair > .music-hero-pill--video {
-    --mv-end: var(--mv-icon-only);
-    --mv-glow-add: 55%; /* 45% → 100%: the glow fills the icon-only button */
-  }
-
-  .hqa--pair .mv-label {
-    max-width: calc(var(--mv-label) * (1 - var(--hqa-p)));
-    margin-left: calc(var(--hqa-gap) * var(--hqa-p) * -1);
-    opacity: calc(1 - var(--hqa-p) * 1.6667);
-  }
-}
-
-/* --- Motion policy ------------------------------------------------------- */
-/* The global perf/reduced-motion rules (`.mobile-conservative * { transition:
-     none }`, `.reduce-animations * { transition: opacity .2s }`) would freeze the
-     morph or lag the label opacities behind p. Re-assert it with enough
-     specificity + !important: only `--hqa-p` transitions (cheap — two tiny pills,
-     no layout outside the row), and the p-derived opacities must NOT run their
-     own transition on top of it. Low-perf mobile still gets the movement (the
-     blanket `transform: none` there turns the label slide into a pure cross-fade).
-     A genuine OS reduce-motion request gets an instant swap instead. */
-@media (prefers-reduced-motion: no-preference) {
-  .music-detail-content .hero-quick-actions.hero-quick-actions {
-    transition: --hqa-p var(--hqa-dur) var(--hqa-ease) !important;
-  }
-
-  .music-detail-content .hero-quick-actions .pill-morph__face,
-  .music-detail-content .hero-quick-actions .mv-label {
-    transition: none !important;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .music-detail-content .hero-quick-actions.hero-quick-actions {
-    transition: none !important;
-  }
+/* At rest only the current view's pane is displayed; during a switch both are
+     (see setView in MusicDetailContent.vue, which animates them with WAAPI). */
+.lyrics-swap__pane.is-hidden {
+  display: none;
 }
 
 @keyframes fadeInUpSmooth {
@@ -1299,38 +1135,41 @@ body.lg-tier-low .share-glass-btn {
   }
 }
 
-@keyframes overlayDrift {
+@keyframes overlayDriftA {
   0%,
   100% {
-    background-position:
-      30% 70%,
-      70% 30%,
-      0% 0%;
-    transform: translateZ(0);
+    translate: -6.92% -16.15%;
   }
 
   25% {
-    background-position:
-      60% 40%,
-      40% 60%,
-      0% 0%;
-    transform: translateZ(0) scale(1.01);
+    translate: -13.85% -9.23%;
   }
 
   50% {
-    background-position:
-      80% 20%,
-      20% 80%,
-      0% 0%;
-    transform: translateZ(0) scale(0.99);
+    translate: -18.46% -4.62%;
   }
 
   75% {
-    background-position:
-      45% 55%,
-      55% 45%,
-      0% 0%;
-    transform: translateZ(0) scale(1.005);
+    translate: -10.38% -12.69%;
+  }
+}
+
+@keyframes overlayDriftB {
+  0%,
+  100% {
+    translate: -11.67% -5%;
+  }
+
+  25% {
+    translate: -6.67% -10%;
+  }
+
+  50% {
+    translate: -3.33% -13.33%;
+  }
+
+  75% {
+    translate: -9.17% -7.5%;
   }
 }
 
