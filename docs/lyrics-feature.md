@@ -104,7 +104,7 @@ To support a part not already in `LyricsPartKey`:
   or on `pointerdown` on the Lyrics pill, so a tap never pays for a component mount
   mid-animation. That mount was a ~200 ms stall at the start of the old swipe.
 - `setView(lyrics)` in `MusicDetailContent` animates everything with WAAPI on one
-  clock (`utils/lyricsMorph.ts`, 420 ms, `cubic-bezier(.4,0,.2,1)`): both panes'
+  clock (`utils/lyricsMorph.ts`, 380 ms, ease-out `cubic-bezier(.22,1,.36,1)`): both panes'
   `translate` (lyrics in/out from the right, links from the left), the container's
   `height` and the hero pills' morph (`HeroQuickActions.vue`). They start and end
   on the same frame, and a toggle mid-flight reverses them all in place. WAAPI is

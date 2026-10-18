@@ -12,8 +12,9 @@
  * is busy. The old `--hqa-p` custom-property morph ran on the main thread, so
  * every busy frame dropped a step.
  */
-export const LYRICS_MORPH_MS = 420
-export const LYRICS_MORPH_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)'
+export const LYRICS_MORPH_MS = 380
+// Ease-out: the motion answers the tap on the first frame, then settles softly.
+export const LYRICS_MORPH_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)'
 
 export const lyricsMorphTiming = (): KeyframeAnimationOptions => ({
   duration: LYRICS_MORPH_MS,

@@ -216,8 +216,8 @@ and on iPhone it ran at 60 fps next to the 120 fps pane swipe.
   `animate()` animates each changed value with WAAPI. Fades use two overlapping
   windows of eased progress (out over 0–0.6, in over 0.4–1) so the labels never
   double-expose.
-- **One clock.** `utils/lyricsMorph.ts` holds the timing (`420ms`,
-  `cubic-bezier(.4,0,.2,1)`). `MusicDetailContent`'s `setView` creates the pill
+- **One clock.** `utils/lyricsMorph.ts` holds the timing (`380ms`,
+  `cubic-bezier(.22,1,.36,1)`, ease-out). `MusicDetailContent`'s `setView` creates the pill
   animations, both pane swipes and the container-height tween in one task, so they
   start and end on the same frame. A toggle mid-flight `reverse()`s all of them in
   place.
