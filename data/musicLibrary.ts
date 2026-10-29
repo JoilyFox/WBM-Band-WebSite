@@ -175,7 +175,42 @@ export const musicLibrary: MusicRelease[] = [
     skipDistributorConversionEvent: true,
     // The platform grid above replaces this Linkfire CTA on /listen; it stays as
     // the fallback chooser if the platform links are ever cleared.
-    releaseSmartLink: 'https://kontrabass.lnk.to/slipa_vulytsya'
+    releaseSmartLink: 'https://kontrabass.lnk.to/slipa_vulytsya',
+    lyrics: [
+      {
+        part: 'verse',
+        num: 1,
+        lines: [
+          'Тижнями мертво тиняюся містом',
+          'Вихлопи замінять кисень',
+          'Метро залишить гнитючий присмак',
+          'В пустих серцях так тісно'
+        ]
+      },
+      {
+        part: 'refrain',
+        lines: ['Вони не бачать нас', 'Вони не бачать нас']
+      },
+      {
+        part: 'verse',
+        num: 2,
+        lines: [
+          'Крижані, сліпі до ближнього болю',
+          'Чужих думки тамує сором',
+          'Хто має очі вважається хворим',
+          'Не знаєш хто твій ліпший друг чи ворог'
+        ]
+      },
+      {
+        part: 'chorus',
+        lines: [
+          'Але в решті решт, немає причин',
+          'Не розірватись вщент.',
+          'Ми лікуємо біль бозна чим,',
+          'І просимо ще'
+        ]
+      }
+    ]
   },
   {
     id: '4',
