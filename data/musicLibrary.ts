@@ -158,15 +158,16 @@ export const musicLibrary: MusicRelease[] = [
       secondary: '#5d6b7a',
       accent: '#c9d4e0'
     },
-    // Released 2026-10-30. Amazon Music and Tidal had not listed the single yet
-    // on release morning; add them here once they appear.
+    // Released 2026-10-30. Amazon Music had not listed the single yet on
+    // release morning; add it here once it appears.
     musicPlatformLinks: {
       spotify: 'https://open.spotify.com/track/0AGHtc4OtadNrxjxhNp9Tu',
       appleMusic:
         'https://music.apple.com/ua/album/%D1%81%D0%BB%D1%96%D0%BF%D0%B0-%D0%B2%D1%83%D0%BB%D0%B8%D1%86%D1%8F/6822715408?i=6822715658',
       youtubeMusic:
         'https://music.youtube.com/playlist?list=OLAK5uy_nSPdJgzNql3dw_YBIsmVoJsm579xjNoRc',
-      deezer: 'https://www.deezer.com/track/4347498942'
+      deezer: 'https://www.deezer.com/track/4347498942',
+      tidal: 'https://tidal.com/track/569786603'
     },
     useDistributorPreSave: true,
     distributorPreSaveUrl: 'https://kontrabass.lnk.to/slipa_vulytsya',
