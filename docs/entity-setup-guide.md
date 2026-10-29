@@ -65,12 +65,13 @@ Keep this open while you fill in each platform.
 
 **Releases (singles):**
 
-| Title       | Latin        | Date       | Spotify                        | Apple              |
-| ----------- | ------------ | ---------- | ------------------------------ | ------------------ |
-| Манія       | Mania        | 2025-11-14 | album `0pjAORRhgVsS7eP4R6JbMF` | album `1849021879` |
-| Чорні Птахи | Chorni Ptahy | 2026-02-06 | track `2hujOwcGE21eCQHMz61y75` | song `1868500237`  |
-| Аліна       | Alina        | 2026-06-12 | track `13UFLpXjAoVNW3IKCW6Hzf` | album `6774072720` |
-| Хвилі       | Khvyli       | 2026-08-21 | track `1xR3GJBaTDBEjbPfP1GZKA` | album `6798661748` |
+| Title        | Latin          | Date       | Spotify                        | Apple              |
+| ------------ | -------------- | ---------- | ------------------------------ | ------------------ |
+| Манія        | Mania          | 2025-11-14 | album `0pjAORRhgVsS7eP4R6JbMF` | album `1849021879` |
+| Чорні Птахи  | Chorni Ptahy   | 2026-02-06 | track `2hujOwcGE21eCQHMz61y75` | song `1868500237`  |
+| Аліна        | Alina          | 2026-06-12 | track `13UFLpXjAoVNW3IKCW6Hzf` | album `6774072720` |
+| Хвилі        | Khvyli         | 2026-08-21 | track `1xR3GJBaTDBEjbPfP1GZKA` | album `6798661748` |
+| Сліпа вулиця | Slipa Vulytsia | 2026-10-30 | track `0AGHtc4OtadNrxjxhNp9Tu` | album `6822715408` |
 
 **MusicBrainz release MBIDs** (all four singles are on the artist as of 23 Aug 2026 — never create a second artist):
 

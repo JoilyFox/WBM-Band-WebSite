@@ -158,14 +158,23 @@ export const musicLibrary: MusicRelease[] = [
       secondary: '#5d6b7a',
       accent: '#c9d4e0'
     },
-    musicPlatformLinks: {},
+    // Released 2026-10-30. Amazon Music and Tidal had not listed the single yet
+    // on release morning; add them here once they appear.
+    musicPlatformLinks: {
+      spotify: 'https://open.spotify.com/track/0AGHtc4OtadNrxjxhNp9Tu',
+      appleMusic:
+        'https://music.apple.com/ua/album/%D1%81%D0%BB%D1%96%D0%BF%D0%B0-%D0%B2%D1%83%D0%BB%D0%B8%D1%86%D1%8F/6822715408?i=6822715658',
+      youtubeMusic:
+        'https://music.youtube.com/playlist?list=OLAK5uy_nSPdJgzNql3dw_YBIsmVoJsm579xjNoRc',
+      deezer: 'https://www.deezer.com/track/4347498942'
+    },
     useDistributorPreSave: true,
     distributorPreSaveUrl: 'https://kontrabass.lnk.to/slipa_vulytsya',
     // Linkfire handles the actual save off-site, so skip the synthetic
     // distributor conversion event.
     skipDistributorConversionEvent: true,
-    // Same Linkfire link becomes the "Listen on all platforms" CTA on /listen
-    // after release, until the individual platform links are filled in.
+    // The platform grid above replaces this Linkfire CTA on /listen; it stays as
+    // the fallback chooser if the platform links are ever cleared.
     releaseSmartLink: 'https://kontrabass.lnk.to/slipa_vulytsya'
   },
   {
