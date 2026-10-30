@@ -29,6 +29,7 @@ This directory contains documentation for all the main features of the WBM Band 
 - [Promo Campaigns — Per-Placement Tracking](./analytics-campaigns.md) - Paid/barter placements: the `?c=<id>` link scheme alongside path-prefix source attribution, the `data/campaigns.json` registry + `npm run campaigns` generator, the `campaign_id` custom dimension, cost-per-click reports (`ga-report.mjs --campaigns`) and the Looker Studio campaigns page
 - [GA4 Dashboards & Per-Song Reports](./analytics-dashboards.md) - Three ways to see per-song/per-source numbers: the `scripts/ga-report.mjs` CLI, per-song additions to existing GA4 Explorations (filter / tabs / release_slug-as-row), and a full Looker Studio master-dashboard walkthrough with a dynamic release dropdown + general stats
 - [Microsoft Clarity — Heatmaps & Recordings](./clarity.md) - Consent-gated Clarity loader (`utils/clarity.ts`), the project-id switch in `nuxt.config.ts`, source-platform custom tags for filtering recordings, dashboard settings and the legal-copy rule
+- [Uptime Monitoring & IndexNow](./uptime-monitoring.md) - GitHub Actions uptime check with Telegram down/recovered DMs via @wbmband_bot, TLS-expiry warning, and the post-deploy IndexNow ping of changed sitemap URLs
 - [Testing Strategy](./testing-strategy.md) - Prioritized testing audit and implemented suites (unit/nuxt + e2e), coverage ratchet floors, CI wiring, and open findings
 
 ## Tech Stack

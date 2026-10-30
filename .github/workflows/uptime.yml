@@ -1,0 +1,60 @@
+name: Uptime
+
+# External monitor for wbmband.com: Telegram DM (@wbmband_bot) when the site goes down
+# and when it recovers. Logic and checks: scripts/uptime-check.sh, docs/uptime-monitoring.md.
+# GitHub may start scheduled runs a few minutes late; that is fine for this site.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+    # Daily run also checks the TLS certificate expiry.
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'check or daily (daily adds the certificate check)'
+        default: 'check'
+
+permissions:
+  contents: read
+
+# Never run two checks at once: both would read the same previous state.
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout script
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/uptime-check.sh
+          sparse-checkout-cone-mode: false
+
+      # Previous up/down state. Cache keys are immutable, so a state change saves a new
+      # key and later runs restore the newest one by prefix (restoring also keeps it
+      # from the 7-day eviction).
+      - name: Restore state
+        uses: actions/cache/restore@v4
+        with:
+          path: .uptime
+          key: uptime-state-${{ github.run_id }}
+          restore-keys: uptime-state-
+
+      - name: Check the site
+        id: check
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MODE: ${{ github.event.schedule == '17 6 * * *' && 'daily' || inputs.mode || 'check' }}
+          STATE_FILE: .uptime/state
+        run: bash scripts/uptime-check.sh
+
+      - name: Save state
+        if: steps.check.outputs.changed == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .uptime
+          key: uptime-state-${{ github.run_id }}

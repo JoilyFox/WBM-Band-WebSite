@@ -43,9 +43,16 @@ FLAGS+=(
   --filter 'H /images/albums-images/*/cover.*'
 )
 [ "${DRY_RUN:-}" = 1 ] && FLAGS+=(-n -i)
+# The live sitemap before this deploy, so IndexNow is told only about changed URLs.
+LIVE_SITEMAP=$(mktemp)
+curl -s --max-time 15 -o "$LIVE_SITEMAP" https://www.wbmband.com/sitemap.xml || : >"$LIVE_SITEMAP"
 echo "▶ $SRC → $USER_@$HOST:$DEST ${DRY_RUN:+(dry run)}"
 rsync "${FLAGS[@]}" -e "$SSH" "$SRC" "$USER_@$HOST:$DEST/"
 if [ "${DRY_RUN:-}" != 1 ]; then
   code=$(curl -s -o /dev/null -w '%{http_code}' https://www.wbmband.com/ || true)
   echo "✓ deployed; https://www.wbmband.com/ → $code"
+  node scripts/indexnow.mjs --before "$LIVE_SITEMAP"
+else
+  DRY_RUN=1 node scripts/indexnow.mjs --before "$LIVE_SITEMAP"
 fi
+rm -f "$LIVE_SITEMAP"
