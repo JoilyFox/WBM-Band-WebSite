@@ -8,7 +8,7 @@ const LOCALES = ['ua', 'en'] as const
 
 // Microsoft Clarity project id from clarity.microsoft.com → Settings → Overview.
 // Public, like the GA4 measurement id. Empty string keeps Clarity off.
-const CLARITY_PROJECT_ID = ''
+const CLARITY_PROJECT_ID = 'z5zghuvo3i'
 const RELEASE_SLUGS = musicLibrary.map((r) => r.slug)
 // Releases that ship lyrics get a dedicated, indexable /lyrics/<slug> page.
 const LYRICS_SLUGS = musicLibrary.filter((r) => r.lyrics && r.lyrics.length > 0).map((r) => r.slug)
