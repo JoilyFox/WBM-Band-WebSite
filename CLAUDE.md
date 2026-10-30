@@ -97,20 +97,21 @@ Prettier (`.prettierrc`): no semis, single quotes, 2-space, no trailing commas, 
 
 Feature work starts with the task-oriented **skills** in [`.claude/skills/`](.claude/skills/) — each is auto-triggered by its description, bundles the procedure + the exact helper files, and links the deep-dive `docs/*.md` that remain the **source of truth** for API, edge-cases, and gotchas. Follow the matching skill instead of reading every doc. Full doc index + the new-doc template: [`docs/README.md`](docs/README.md). When you add a feature/system: add its doc to `docs/`, link it from `docs/README.md`, and fold it into the relevant skill (or add a new skill).
 
-| Skill (`.claude/skills/`) | Covers — see linked `docs/*.md` for depth                                                                                                |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `new-release`             | **end-to-end release cycle** — intake → cover → data → verify → deploy → off-site catalogues → release-day flip                          |
-| `add-release`             | release in `musicLibrary.ts`, preview/pre-save/released state, cover theming, lyrics                                                     |
-| `work-with-images`        | AVIF/WebP/JPEG pipeline, `<UiProgressiveImage>`, blur placeholders, favicons                                                             |
-| `add-page-route`          | new page/route, i18n (ua/en) parity, prerender list, `useLocalePath`                                                                     |
-| `analytics-tracking`      | GA4 events, path-prefix source attribution (`useAnalytics`), promo-campaign `?c=` links (`npm run campaigns`)                            |
-| `ui-feedback`             | global loading bar, snackbars, contextual `/404` error pages                                                                             |
-| `performance`             | device-tier perf system, `--perf-*` CSS vars, reduced-motion                                                                             |
-| `state-data-api`          | Pinia stores, `getConfig` config access                                                                                                  |
-| `ship-deploy`             | tests/lint, `npm run generate`, VPS rsync + nginx, GitHub Pages, `DEPLOY_TARGET`                                                         |
-| `search-console`          | **Google Search Console** — reading reports, indexing diagnostics, sitemap submission, post-release indexing pass, console configuration |
-| `seo-entity`              | JSON-LD, MusicBrainz/Wikidata entity (never add llms.txt / Review schema)                                                                |
-| `contact-form`            | Web3Forms contact submission                                                                                                             |
+| Skill (`.claude/skills/`) | Covers — see linked `docs/*.md` for depth                                                                                                         |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `new-release`             | **end-to-end release cycle** — intake → cover → data → verify → deploy → off-site catalogues → release-day flip                                   |
+| `add-release`             | release in `musicLibrary.ts`, preview/pre-save/released state, cover theming, lyrics                                                              |
+| `work-with-images`        | AVIF/WebP/JPEG pipeline, `<UiProgressiveImage>`, blur placeholders, favicons                                                                      |
+| `add-page-route`          | new page/route, i18n (ua/en) parity, prerender list, `useLocalePath`                                                                              |
+| `analytics-tracking`      | GA4 events, path-prefix source attribution (`useAnalytics`), promo-campaign `?c=` links (`npm run campaigns`)                                     |
+| `ui-feedback`             | global loading bar, snackbars, contextual `/404` error pages                                                                                      |
+| `performance`             | device-tier perf system, `--perf-*` CSS vars, reduced-motion                                                                                      |
+| `state-data-api`          | Pinia stores, `getConfig` config access                                                                                                           |
+| `ship-deploy`             | tests/lint, `npm run generate`, VPS rsync + nginx, GitHub Pages, `DEPLOY_TARGET`                                                                  |
+| `services-check`          | **external services health** — GA4, GSC, Bing/IndexNow, Clarity, Ahrefs, uptime, TLS; registry of IDs/accounts/secrets in `docs/site-services.md` |
+| `search-console`          | **Google Search Console** — reading reports, indexing diagnostics, sitemap submission, post-release indexing pass, console configuration          |
+| `seo-entity`              | JSON-LD, MusicBrainz/Wikidata entity (never add llms.txt / Review schema)                                                                         |
+| `contact-form`            | Web3Forms contact submission                                                                                                                      |
 
 ## Other pointers
 

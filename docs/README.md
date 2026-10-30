@@ -30,6 +30,7 @@ This directory contains documentation for all the main features of the WBM Band 
 - [GA4 Dashboards & Per-Song Reports](./analytics-dashboards.md) - Three ways to see per-song/per-source numbers: the `scripts/ga-report.mjs` CLI, per-song additions to existing GA4 Explorations (filter / tabs / release_slug-as-row), and a full Looker Studio master-dashboard walkthrough with a dynamic release dropdown + general stats
 - [Microsoft Clarity — Heatmaps & Recordings](./clarity.md) - Consent-gated Clarity loader (`utils/clarity.ts`), the project-id switch in `nuxt.config.ts`, source-platform custom tags for filtering recordings, dashboard settings and the legal-copy rule
 - [Uptime Monitoring & IndexNow](./uptime-monitoring.md) - GitHub Actions uptime check with Telegram down/recovered DMs via @wbmband_bot, TLS-expiry warning, and the post-deploy IndexNow ping of changed sitemap URLs
+- [Site Services — Registry & Health Checks](./site-services.md) - **Start here when you forget how something is wired:** every external service (GA4, Search Console, Bing, IndexNow, Clarity, Ahrefs, uptime, VPS, DNS, Web3Forms, MusicBrainz/Wikidata) with console URL, account, IDs, code location, where its secret lives, and the automatic + monthly manual checks
 - [Testing Strategy](./testing-strategy.md) - Prioritized testing audit and implemented suites (unit/nuxt + e2e), coverage ratchet floors, CI wiring, and open findings
 
 ## Tech Stack

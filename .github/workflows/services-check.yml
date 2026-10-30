@@ -1,0 +1,30 @@
+name: Services check
+
+# Monthly digest: verifies the analytics/SEO wiring that breaks silently and sends a
+# Telegram checklist (scripts/services-check.sh, docs/site-services.md).
+on:
+  schedule:
+    - cron: '0 7 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout script
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/services-check.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Check services
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/services-check.sh
