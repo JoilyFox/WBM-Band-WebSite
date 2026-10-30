@@ -35,12 +35,18 @@ send() {
     echo "[telegram disabled] $1"
     return
   fi
-  curl -sS --max-time 20 -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+  local response
+  response=$(curl -sS --max-time 20 -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
     --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
     --data-urlencode "text=$1" \
     --data-urlencode "parse_mode=HTML" \
-    --data-urlencode "disable_web_page_preview=true" >/dev/null ||
-    echo "::warning::Telegram send failed"
+    --data-urlencode "disable_web_page_preview=true" 2>&1)
+  # Telegram answers errors with HTTP 4xx + {"ok":false,"description":…}; curl still exits 0.
+  if [[ "$response" == *'"ok":true'* ]]; then
+    echo "Telegram: sent"
+  else
+    echo "::warning::Telegram send failed: $(echo "$response" | grep -o '"description":"[^"]*"')"
+  fi
 }
 
 # Prints a reason for every failing check; prints nothing when all pass.
