@@ -208,7 +208,7 @@
       "essential_examples": "Your cookie choice (localStorage), the source that brought you to the site during a session (sessionStorage)",
       "nonessential_title": "Non-Essential Cookies",
       "nonessential_desc": "These cookies are used for various purposes including analytics and enhanced functionality. They help us understand how visitors use our website and remember your preferences.",
-      "nonessential_examples": "Google Analytics 4 (_ga, _ga_*, up to 2 years) for visit statistics; Microsoft Clarity (_clck for 1 year, _clsk for 1 day) for click and scroll heatmaps and session recordings, in which text typed into forms is masked",
+      "nonessential_examples": "Google Analytics 4 (_ga, _ga_*, up to 13 months) for visit statistics; Microsoft Clarity (_clck for 1 year, _clsk for 1 day, plus Microsoft's own cookies on clarity.ms and bing.com such as MUID and CLID, up to 13 months) for click and scroll heatmaps and session recordings, in which text typed into forms is masked",
       "manage_title": "How to Manage Cookies",
       "manage_text_1": "You can change your choice at any time: the \"Reset cookie preferences\" button on this page brings the consent banner back on the next page load. After you decline, Clarity no longer loads and Google Analytics returns to anonymous, cookieless signals.",
       "manage_text_2": "You can also control cookies through your browser settings. Most browsers allow you to view, delete, and block cookies.",

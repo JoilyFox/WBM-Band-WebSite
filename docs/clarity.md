@@ -40,6 +40,6 @@ the sessions that came from one bio link.
 ## Legal copy
 
 Privacy and Cookie policies (`pages.privacy.*`, `pages.cookies.*`) and the toast
-text name GA4 and Clarity and their cookies (`_ga`, `_ga_*`, `_clck`, `_clsk`).
+text name GA4 and Clarity and their cookies (`_ga`, `_ga_*` 400 d; `_clck` 1 y, `_clsk` 1 d; Microsoft's `MUID`/`CLID` on clarity.ms + bing.com, verified on prod 2026-10-30).
 Update them, and `general.legal.*LastUpdated`, whenever a tracker is added or
 removed.
