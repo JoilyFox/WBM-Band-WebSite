@@ -5,7 +5,8 @@ import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 // useGtag is a Nuxt auto-import (nuxt-gtag). Re-mock it here so we can capture
 // the gtag calls that useAnalytics makes. A hoisted vi.fn lets us assert per test.
 const { gtag } = vi.hoisted(() => ({ gtag: vi.fn() }))
-mockNuxtImport('useGtag', () => () => ({ gtag }))
+// initialize: the analytics plugin starts gtag on an idle callback, which can fire mid-file.
+mockNuxtImport('useGtag', () => () => ({ gtag, initialize: vi.fn() }))
 
 // isLikelyBot and getOrPersistSourcePlatform are EXPLICIT imports in the source,
 // so mockNuxtImport would NOT intercept them — they need vi.mock.

@@ -5,7 +5,8 @@ import ContactsSection from '~/components/sections/ContactsSection.vue'
 
 // Capture the GA4 calls (useAnalytics -> useGtag) so we can assert form_error.
 const { gtag } = vi.hoisted(() => ({ gtag: vi.fn() }))
-mockNuxtImport('useGtag', () => () => ({ gtag }))
+// initialize: the analytics plugin starts gtag on an idle callback, which can fire mid-file.
+mockNuxtImport('useGtag', () => () => ({ gtag, initialize: vi.fn() }))
 // happy-dom has no usable user agent, which the bot heuristic treats as a bot.
 vi.mock('~/utils/isLikelyBot', () => ({ isLikelyBot: () => false }))
 

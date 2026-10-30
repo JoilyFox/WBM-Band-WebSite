@@ -7,7 +7,8 @@ import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 // for every call, letting us assert the exact Consent-Mode v2 payloads. This
 // override shadows the generic stub in test/setup.nuxt.ts for this file only.
 const { gtag } = vi.hoisted(() => ({ gtag: vi.fn() }))
-mockNuxtImport('useGtag', () => () => ({ gtag }))
+// initialize: the analytics plugin starts gtag on an idle callback, which can fire mid-file.
+mockNuxtImport('useGtag', () => () => ({ gtag, initialize: vi.fn() }))
 
 const STORAGE_KEY = 'wbm_cookie_consent'
 
