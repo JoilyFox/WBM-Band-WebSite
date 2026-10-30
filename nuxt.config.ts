@@ -276,6 +276,13 @@ export default defineNuxtConfig({
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
         { name: 'mobile-web-app-capable', content: 'yes' },
 
+        // Ahrefs Webmaster Tools ownership check (project "WBM Band"). Ahrefs reads it
+        // from the homepage without running JS, so it must stay in the static head.
+        {
+          name: 'ahrefs-site-verification',
+          content: 'a1834761f56f4b888449939d5539a1f0ab17c8df9e277f3ff548bf41a8c743b3'
+        },
+
         // Theme colors
         { name: 'theme-color', content: '#000000' },
         { name: 'msapplication-TileColor', content: '#000000' },
