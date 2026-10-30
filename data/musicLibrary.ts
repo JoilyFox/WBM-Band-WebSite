@@ -167,7 +167,8 @@ export const musicLibrary: MusicRelease[] = [
       youtubeMusic:
         'https://music.youtube.com/playlist?list=OLAK5uy_nSPdJgzNql3dw_YBIsmVoJsm579xjNoRc',
       deezer: 'https://www.deezer.com/track/4347498942',
-      tidal: 'https://tidal.com/track/569786603'
+      tidal: 'https://tidal.com/track/569786603',
+      musicVideo: 'https://www.youtube.com/watch?v=eBBNeSUNw5E'
     },
     useDistributorPreSave: true,
     distributorPreSaveUrl: 'https://kontrabass.lnk.to/slipa_vulytsya',
