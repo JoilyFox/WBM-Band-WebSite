@@ -26,7 +26,16 @@ retried after 45 s before it counts. The up/down state survives between runs in
 warns when the TLS certificate has < 14 days left (Let's Encrypt renewal broken).
 
 **Secrets** (repo → Settings → Secrets → Actions): `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`.
-Without them the script only logs.
+Without them the script only logs. The live bot token is the one on the VPS at
+`/etc/wbm-secrets/telegram-token` (the publisher's local `.env` copy was stale on
+2026-10-30 and Telegram answered `Unauthorized`). Refresh the secret with:
+
+```bash
+t=$(ssh -i ~/.ssh/wbm_deploy root@151.80.140.64 'cat /etc/wbm-secrets/telegram-token' | tr -d '\r\n')
+printf %s "$t" | gh secret set TELEGRAM_BOT_TOKEN -R JoilyFox/WBM-Band-WebSite
+```
+
+A send error shows as a `Telegram send failed: <description>` warning in the run log.
 
 **Operate:**
 
