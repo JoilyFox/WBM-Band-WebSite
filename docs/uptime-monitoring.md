@@ -30,7 +30,7 @@ Without them the script only logs.
 
 **Operate:**
 
-- Test by hand: Actions → Uptime → Run workflow (mode `daily` adds the cert check).
+- Test by hand: Actions → Uptime → Run workflow. Mode `test` sends a test DM, `daily` adds the cert check.
 - Local run (prints instead of sending): `TELEGRAM_BOT_TOKEN= bash scripts/uptime-check.sh`.
 - Simulate an outage: `UPTIME_SITE=https://www.wbmband.com/nope …` (the apex check stays green).
 - GitHub can start scheduled runs 5–15 min late, and disables schedules in a public repo

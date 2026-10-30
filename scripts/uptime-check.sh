@@ -12,7 +12,7 @@
 # The daily run (MODE=daily) also warns when the TLS certificate expires in < 14 days,
 # i.e. the Let's Encrypt renewal on the VPS has stopped working.
 #
-# Env: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID (repo secrets), STATE_FILE, MODE.
+# Env: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID (repo secrets), STATE_FILE, MODE (check | daily | test).
 # Locally: TELEGRAM_BOT_TOKEN= bash scripts/uptime-check.sh   (prints instead of sending)
 
 set -uo pipefail
@@ -75,6 +75,11 @@ check_cert() {
 Перевір: <code>certbot renew --dry-run</code>"
   fi
 }
+
+if [[ "$MODE" == test ]]; then
+  send "🧪 Тест монітора wbmband.com: якщо ти це бачиш, алерти про падіння сайту дійдуть сюди."
+  exit 0
+fi
 
 mkdir -p "$(dirname "$STATE_FILE")"
 previous=$(cat "$STATE_FILE" 2>/dev/null || echo up)

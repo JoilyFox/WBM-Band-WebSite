@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'check or daily (daily adds the certificate check)'
+        description: 'check, daily (adds the certificate check) or test (sends a test DM)'
         default: 'check'
 
 permissions:
