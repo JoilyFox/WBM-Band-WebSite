@@ -31,6 +31,7 @@ This directory contains documentation for all the main features of the WBM Band 
 - [Microsoft Clarity — Heatmaps & Recordings](./clarity.md) - Consent-gated Clarity loader (`utils/clarity.ts`), the project-id switch in `nuxt.config.ts`, source-platform custom tags for filtering recordings, dashboard settings and the legal-copy rule
 - [Uptime Monitoring & IndexNow](./uptime-monitoring.md) - GitHub Actions uptime check with Telegram down/recovered DMs via @wbmband_bot, TLS-expiry warning, and the post-deploy IndexNow ping of changed sitemap URLs
 - [Site Services — Registry & Health Checks](./site-services.md) - **Start here when you forget how something is wired:** every external service (GA4, Search Console, Bing, IndexNow, Clarity, Ahrefs, uptime, VPS, DNS, Web3Forms, MusicBrainz/Wikidata) with console URL, account, IDs, code location, where its secret lives, and the automatic + monthly manual checks
+- [Unified Analytics Dashboard — Research](./analytics-dashboard-research.md) - 2026-10-30 research for a private "command center": what every source's API gives (and what is UI-only/lost if not snapshotted), metric tree, small-data statistics rules, screen list, recommended architecture (SQLite + TS ingest on the VPS, metrics.yaml, read-only MCP, Nuxt on the studio-ui M3 layer) and open decisions
 - [Testing Strategy](./testing-strategy.md) - Prioritized testing audit and implemented suites (unit/nuxt + e2e), coverage ratchet floors, CI wiring, and open findings
 
 ## Tech Stack
