@@ -73,6 +73,7 @@ Custom definitions. Build the attribution Exploration (filter `^(release_view|pl
   (`gtag('set', {…})`) AND a user property, so it feeds the dimension regardless of registered scope.
 - `components/music/PlatformButton.vue` — calls `trackPlatformClick()` (needs `releaseSlug` + `pageType`).
 - `composables/useCookieConsent.ts` — Consent Mode v2 grant/deny + `.reset()` / `.hydrate()`.
+- `utils/clarity.ts` — Microsoft Clarity, loaded only after consent; id in `nuxt.config.ts` `CLARITY_PROJECT_ID`. See `docs/clarity.md`.
 - `nuxt.config.ts → gtag` — Measurement ID `G-Z8QRF6TWC2` + default-deny Consent Mode v2.
 
 ## Gotchas

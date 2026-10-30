@@ -1,7 +1,9 @@
 import { ref, computed } from 'vue'
+import { applyClarityConsent } from '~/utils/clarity'
 
 /**
- * Single source of truth for the visitor's GA4 consent state.
+ * Single source of truth for the visitor's analytics consent state
+ * (GA4 + Microsoft Clarity).
  *
  * Wrapper around Google Consent Mode v2: the gtag default in
  * nuxt.config.ts is `denied` for every storage type, and we call
@@ -47,6 +49,7 @@ function safeReadStorage(): 'accepted' | 'declined' | null {
 
 export function useCookieConsent() {
   const { gtag } = useGtag()
+  const clarityProjectId = useRuntimeConfig().public.clarityProjectId as string
 
   function applyToGtag(decision: 'accepted' | 'declined'): void {
     const value = decision === 'accepted' ? 'granted' : 'denied'
@@ -56,6 +59,8 @@ export function useCookieConsent() {
       ad_personalization: value,
       analytics_storage: value
     })
+    // Clarity is loaded only on `accepted` (see utils/clarity.ts).
+    applyClarityConsent(clarityProjectId, decision === 'accepted')
   }
 
   /**

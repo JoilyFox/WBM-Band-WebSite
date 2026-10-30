@@ -5,6 +5,10 @@ import { SITE_URL } from './constants/app'
 import ukLocale from './locales/uk.json'
 
 const LOCALES = ['ua', 'en'] as const
+
+// Microsoft Clarity project id from clarity.microsoft.com → Settings → Overview.
+// Public, like the GA4 measurement id. Empty string keeps Clarity off.
+const CLARITY_PROJECT_ID = ''
 const RELEASE_SLUGS = musicLibrary.map((r) => r.slug)
 // Releases that ship lyrics get a dedicated, indexable /lyrics/<slug> page.
 const LYRICS_SLUGS = musicLibrary.filter((r) => r.lyrics && r.lyrics.length > 0).map((r) => r.slug)
@@ -579,6 +583,13 @@ export default defineNuxtConfig({
   // Runtime configuration
   runtimeConfig: {
     public: {
+      // Microsoft Clarity project id (heatmaps + recordings, loaded only after
+      // cookie consent: utils/clarity.ts). Empty = off. Same build gate as gtag,
+      // so dev and GitHub Pages staging never record.
+      clarityProjectId:
+        process.env.NODE_ENV !== 'development' && process.env.DEPLOY_TARGET !== 'github'
+          ? CLARITY_PROJECT_ID
+          : '',
       imageOptimization: {
         enableLazyLoading: true,
         enableProgressiveLoading: true,

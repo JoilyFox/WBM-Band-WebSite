@@ -122,9 +122,9 @@ export const generalConfig: GeneralConfig = {
 
   // Legal and policy information
   legal: {
-    privacyPolicyLastUpdated: '2025-07-31', // ISO date string
+    privacyPolicyLastUpdated: '2026-10-30', // ISO date string
     termsOfServiceLastUpdated: '2025-07-31', // ISO date string
-    cookiesPolicyLastUpdated: '2025-07-31', // ISO date string
+    cookiesPolicyLastUpdated: '2026-10-30', // ISO date string
     dataResponseTime: '30 days'
   },
 
