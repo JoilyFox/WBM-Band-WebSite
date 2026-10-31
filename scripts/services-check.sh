@@ -40,6 +40,9 @@ urls=$(curl -sS --max-time 20 "$SITE/sitemap.xml" 2>/dev/null | grep -c '<loc>' 
 curl -sS --max-time 20 "$SITE/robots.txt" 2>/dev/null | grep -qi '^Sitemap: ' &&
   pass "robots.txt points to the sitemap" || fail "robots.txt has no Sitemap line"
 
+curl -fsS --max-time 20 https://stats.wbmband.com/api/health >/dev/null 2>&1 &&
+  pass "WBM Stats panel is up" || fail "WBM Stats (stats.wbmband.com) is not answering"
+
 end=$(echo | openssl s_client -servername www.wbmband.com -connect www.wbmband.com:443 2>/dev/null |
   openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
 if [[ -n "$end" ]]; then

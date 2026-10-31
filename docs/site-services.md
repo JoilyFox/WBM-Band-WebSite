@@ -22,6 +22,7 @@ Last full review: **2026-10-30**.
 | IndexNow               | Instant URL submission to Bing & co.                                        | (no console; results in Bing WMT → IndexNow)            | —                                                           | key `71141a0999f8cf6d51894c1f5317f855` = `public/<key>.txt`                                                           |
 | Ahrefs Webmaster Tools | Site audit, backlinks, keywords                                             | app.ahrefs.com                                          | owner's Google login (not wbmbandofficial)                  | project **WBM Band**, workspace "Woman Based Mechanics's workspace"                                                   |
 | Uptime monitor         | Telegram DM on down/recovered, TLS expiry                                   | GitHub → Actions → Uptime                               | GitHub `JoilyFox`                                           | bot `@wbmband_bot` → chat `372477039`                                                                                 |
+| WBM Stats (own panel)  | All the numbers below in one place, Telegram sign-in, MCP for Claude        | stats.wbmband.com                                       | Telegram; admins add people by @username                    | repo `JoilyFox/wbm-stats`, container `wbm-stats` on the VPS, data `/opt/wbm-stats/data`                               |
 | Web3Forms              | Contact form email                                                          | web3forms.com                                           | wbmbandofficial@gmail.com                                   | access key in `config/general.ts` (public by design)                                                                  |
 | MusicBrainz / Wikidata | Entity data for search/AI                                                   | musicbrainz.org / wikidata.org                          | `wbmband` / `WBMBand`                                       | artist MBID `62589d1f-dcf9-4e94-b5fc-a5e48c2e2368`, item `Q140043384`                                                 |
 
@@ -40,12 +41,13 @@ Last full review: **2026-10-30**.
 
 ## Secrets — where they live
 
-| Secret                              | Location                                                                                        | Used by                           |
-| ----------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------- |
-| VPS deploy key                      | `~/.ssh/wbm_deploy` (owner's Mac)                                                               | `npm run deploy:production`       |
-| Telegram bot token (`@wbmband_bot`) | live copy on the VPS `/etc/wbm-secrets/telegram-token`; GitHub repo secret `TELEGRAM_BOT_TOKEN` | uptime workflow, VPS health check |
-| Telegram chat id                    | GitHub repo secret `TELEGRAM_CHAT_ID` (`372477039`, not secret)                                 | uptime workflow                   |
-| GA4 service account key             | JSON file on the owner's Mac, pointed to by `GOOGLE_APPLICATION_CREDENTIALS`                    | `scripts/ga-*.mjs`, GA4 MCP       |
+| Secret                                                              | Location                                                                                        | Used by                           |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------- |
+| VPS deploy key                                                      | `~/.ssh/wbm_deploy` (owner's Mac)                                                               | `npm run deploy:production`       |
+| Telegram bot token (`@wbmband_bot`)                                 | live copy on the VPS `/etc/wbm-secrets/telegram-token`; GitHub repo secret `TELEGRAM_BOT_TOKEN` | uptime workflow, VPS health check |
+| Telegram chat id                                                    | GitHub repo secret `TELEGRAM_CHAT_ID` (`372477039`, not secret)                                 | uptime workflow                   |
+| WBM Stats source keys (Clarity, Bing, PageSpeed, Google, login bot) | VPS `/etc/wbm-secrets/stats/` (list: `wbm-stats/docs/secrets.md`)                               | WBM Stats ingest                  |
+| GA4 service account key                                             | JSON file on the owner's Mac, pointed to by `GOOGLE_APPLICATION_CREDENTIALS`                    | `scripts/ga-*.mjs`, GA4 MCP       |
 
 The Social Media Video Publisher's local `.env` copy of the bot token was **stale** on
 2026-10-30 (Telegram: `Unauthorized`). Copy from the VPS, see `uptime-monitoring.md`.
@@ -69,6 +71,11 @@ The Social Media Video Publisher's local `.env` copy of the bot token was **stal
 3. **Clarity** → Dashboard: dead clicks, rage clicks, quick backs; watch 3–5 recordings of `/listen/<latest>`.
 4. **Ahrefs** → Site Audit: health score and new errors since last crawl.
 5. **GA4** → `platform_click` by `source_platform` for the latest release.
+
+### WBM Stats panel
+
+`https://stats.wbmband.com` → «Дані» shows each source's last successful collection and errors; a failed
+collection DMs the owner. Docs: the `wbm-stats` repo, `docs/README.md`.
 
 ### Ask Claude
 
