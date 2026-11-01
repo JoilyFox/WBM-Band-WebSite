@@ -976,10 +976,18 @@ body.lg-tier-low .share-glass-btn {
   display: grid;
   align-items: start;
   /* Full-bleed: spans the viewport and clips the off-screen panes at the SCREEN
-       edges. Resting shadows live inside each pane's padded inner container, well
-       inside the screen edges, so they are never cut off. Always-on (not toggled)
-       so there's no overflow flip-flop repaint when the swap starts/ends. */
+       edges. Always-on (not toggled) so there's no overflow flip-flop repaint when
+       the swap starts/ends. Horizontal only: `hidden` also cut the platform buttons'
+       drop shadows flat at the pane's bottom edge. `clip` (unlike `hidden`) may pair
+       with a visible other axis; old engines keep the `hidden` fallback. */
   overflow: hidden;
+}
+
+@supports (overflow: clip) {
+  .lyrics-swap {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
 }
 
 .lyrics-swap > * {

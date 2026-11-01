@@ -25,14 +25,14 @@
       <span
         ref="enEl"
         class="lang-btn"
-        :class="[{ active: locale === 'en' }, size === 'big' ? 'lang-btn--big' : '']"
+        :class="[{ active: shown === 'en' }, size === 'big' ? 'lang-btn--big' : '']"
       >
         EN
       </span>
       <span
         ref="uaEl"
         class="lang-btn"
-        :class="[{ active: locale === 'ua' }, size === 'big' ? 'lang-btn--big' : '']"
+        :class="[{ active: shown === 'ua' }, size === 'big' ? 'lang-btn--big' : '']"
       >
         УКР
       </span>
@@ -57,9 +57,26 @@
 
   const { locale, setLocale, t } = useI18n()
 
+  // The label that looks active. It flips on tap, ahead of the locale itself (see toggleLocale).
+  const shown = ref(locale.value)
+  let switching = false
+
+  // Slide FIRST, switch after. Changing the locale navigates to the other-language URL and
+  // re-renders the whole page (this switcher included) in one long main-thread task; started
+  // together, the width animation froze mid-way for ~400 ms and the re-mounted switcher then
+  // appeared already in the end state. So the pill finishes its slide, then the page changes.
   const toggleLocale = async () => {
+    if (switching) return
+    switching = true
     const next = locale.value === 'en' ? 'ua' : 'en'
-    await setLocale(next)
+    shown.value = next
+    await slide(locale.value, next)?.finished.catch(() => {})
+    try {
+      await setLocale(next)
+    } finally {
+      switching = false
+      shown.value = locale.value
+    }
   }
 
   // --- Liquid slide -------------------------------------------------------
@@ -77,6 +94,8 @@
 
   const jsReady = ref(false)
   let running: Animation | null = null
+  // The locale whose label the thumb rests on.
+  let placedFor = ''
   let ro: ResizeObserver | null = null
 
   type Box = { left: number; top: number; w: number; h: number }
@@ -112,6 +131,7 @@
         const b = boxFor(locale.value)
         if (!b) return
         placeThumb(b)
+        placedFor = locale.value
         jsReady.value = true
         ro = new ResizeObserver(() => {
           // Re-fit (font load / container resize) without a morph.
@@ -123,16 +143,29 @@
     )
   })
 
+  // A locale change from elsewhere (another switcher on the page) slides this one too;
+  // after our own tap the thumb is already there.
   watch(locale, (newLoc, oldLoc) => {
+    shown.value = newLoc
+    if (placedFor === newLoc) {
+      const b = boxFor(newLoc)
+      if (b && !running) placeThumb(b)
+      return
+    }
+    slide(oldLoc, newLoc)
+  })
+
+  function slide(fromLoc: string, toLoc: string): Animation | null {
     const t = thumbEl.value
-    if (!t || !jsReady.value) return
-    const from = boxFor(oldLoc)
-    const to = boxFor(newLoc)
-    if (!from || !to) return
+    if (!t || !jsReady.value) return null
+    const from = boxFor(fromLoc)
+    const to = boxFor(toLoc)
+    if (!from || !to) return null
 
     // Settle on the destination first so the animation can drop its fill cleanly.
     placeThumb(to)
-    if (!wantsMotion()) return
+    placedFor = toLoc
+    if (!wantsMotion()) return null
 
     const dx = from.left - to.left
     // Stretch a touch wider than either end mid-travel + a slight vertical squash
@@ -146,14 +179,15 @@
         { width: `${midW}px`, transform: `translateX(${dx * 0.5}px) scaleY(0.88)`, offset: 0.5 },
         { width: `${to.w}px`, transform: `translateX(0px) scaleY(1)` }
       ],
-      { duration: 440, easing: 'cubic-bezier(0.34, 1.32, 0.46, 1)', fill: 'none' }
+      { duration: 380, easing: 'cubic-bezier(0.34, 1.32, 0.46, 1)', fill: 'none' }
     )
     const clear = () => {
       if (running) running = null
     }
     running.onfinish = clear
     running.oncancel = clear
-  })
+    return running
+  }
 
   onBeforeUnmount(() => {
     running?.cancel()
