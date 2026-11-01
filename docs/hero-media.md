@@ -1,0 +1,85 @@
+# Hero media — a clip or a still behind the release hero
+
+A release page's hero (cover + title, `.music-hero`) can carry a darkened background:
+a muted looping clip from the music video, or a still. Without it the hero is the
+cover-coloured gradient as before; with it the gradient stays as a light wash on top.
+
+Status: **preview on branch `feature/hero-media`**, not on production. First user:
+«Сліпа вулиця» (0:20–0:44 of the music video).
+
+## Add one
+
+1. Cut and encode from the source video (needs Homebrew `ffmpeg` with libsvtav1 + libx264):
+   ```bash
+   npm run hero-media -- ~/Desktop/clip.mp4 <slug> --from 20 --to 44
+   ```
+   Pick a calm stretch: no flashes, the subject near the centre (phones see the middle
+   9:16 of the frame). 15–30 s; the loop is a hard cut, which reads fine when the
+   footage itself cuts every few seconds.
+2. Add to the release in `data/musicLibrary.ts`:
+   ```ts
+   heroMedia: {
+     kind: 'video',
+     wide: '/videos/releases/<slug>/hero-1280',
+     tall: '/videos/releases/<slug>/hero-540x960',
+     anchor: 0.36 // optional: the clip's height kept centred in the collapsed phone hero
+   }
+   ```
+   `kind: 'image'` uses only `<prefix>.poster.{avif,webp,jpg}` (a still, no clip).
+   `focus` sets `object-position` if the subject is off-centre.
+
+## Files (`public/videos/releases/<slug>/`)
+
+| File                                 | What                                                                                          | Size («Сліпа вулиця», 24 s) |
+| ------------------------------------ | --------------------------------------------------------------------------------------------- | --------------------------- |
+| `hero-1280.av1.mp4` / `.h264.mp4`    | 16:9 1280×720, windows ≥ 768px                                                                | 1.0 MB / 1.8 MB             |
+| `hero-540x960.av1.mp4` / `.h264.mp4` | 9:16 centre crop, phones, blurred (σ 3.5) so lyrics burnt into the clip don't fight the title | 0.2 MB / 0.5 MB             |
+| `<rendition>.poster.{avif,webp,jpg}` | first frame                                                                                   | 4–47 KB                     |
+
+No audio, 24 fps, keyframe every 4 s, `faststart`. Film grain is denoised (`hqdn3d`)
+first: grain is most of the bitrate and invisible under the darkening.
+
+## How it plays (`components/music/HeroMedia.vue`)
+
+- **Never in the way of first paint**: nothing on the server; the clip starts after the
+  `load` event when the main thread is idle (~200 ms after load locally). It fades in
+  (1.6 s) only once its first frame is painted (`requestVideoFrameCallback`).
+- **Codec**: AV1 only where `navigator.mediaCapabilities` says it decodes
+  `powerEfficient` (hardware); otherwise H.264. Software AV1 would cost a phone's CPU for
+  the whole visit.
+- **Rendition**: `wide` from 768px, `tall` below (chosen once, at start).
+- **Falls back to the plain hero**: Save-Data or 2g, a load error. **Falls back to the
+  still**: `prefers-reduced-motion`, `.perf-low` tier, autoplay refused (iOS Low Power
+  Mode), `kind: 'image'`.
+- **Paused** off screen (IntersectionObserver) and in a hidden tab; the decoder is
+  released on unmount.
+- Release pages only: not in the home-page release modal.
+
+## Collapse / expand on phones
+
+The clip sits in a box at least 760px tall (`--hm-min-h`), so the 228px collapsed hero
+and the ~680px expanded one crop the same picture instead of rescaling it. On every hero
+resize the box is re-placed (`--hm-shift`: the `anchor` point at the hero's centre,
+clamped so no edge shows) and slides there with a compositor `translate` transition
+(0.6 s, the curve of the hero content's own animation). The box's soft lower edge (mask)
+covers the strip the expanding hero hasn't reached yet.
+
+## Look
+
+- Darkening is the clip's own scrim (`.hero-media__box::after`): radial (lighter in the
+  middle) + vertical; the hero overlay above drops to 55 % opacity.
+- The clip fades out over the hero's lower 38 % (mask), into the page.
+- Desktop hero grows to `clamp(416px, 60vh, 580px)` when it has media.
+
+## Production checklist
+
+- `deploy/nginx/wbm-site.conf` has a `location ^~ /videos/` (one-year cache). Without it
+  `.mp4` falls through to `location /` and is sent `no-cache`. Install the nginx config
+  on the VPS (`deploy/nginx/README.md`) before or with the first deploy.
+- About 2 MB per release in git; the source video never goes in the repo.
+
+## Extending
+
+`kind` is the switch: a future `'scene'` (an interactive canvas or WebGL piece) would be
+another branch in `HeroMedia.vue`, with the same contract — client-only, starts when idle,
+fades in when ready, falls back to the still/plain hero, pauses off screen.

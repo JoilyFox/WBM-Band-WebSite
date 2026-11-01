@@ -18,6 +18,7 @@ This directory contains documentation for all the main features of the WBM Band 
 - [Favicon Setup](./favicon-setup.md) - Complete favicon generation system with multi-platform support and PWA compatibility
 - [Pre-save Functionality](./presave-functionality.md) - Pre-save system for upcoming music releases with automatic state transitions
 - [Release States System](./release-states-system.md) - Automatic preview / pre-save / released state management for each release based on release date and config flags
+- [Hero Media](./hero-media.md) - Darkened background clip / still behind a release hero (`heroMedia`, `npm run hero-media`, loading + fallbacks)
 - [Release Page Theming](./release-page-theming.md) - Cover-driven "Ambient Bloom" atmosphere on release pages (build-time palette extraction + per-release overrides, performance-tiered)
 - [Song Lyrics](./lyrics-feature.md) - Per-release lyrics that cross-slide in over the platform links; structured `lyrics[]` data, localized section labels, data-driven button
 - [AI Search & SEO Optimization Strategy](./ai-search-optimization-strategy.md) - Strategy for Google Search / AI Overviews / AI-assistant discoverability: gap audit, phased plan (Phase 1 done), include/exclude with pros-cons, and the off-site music-entity playbook (MusicBrainz/Wikidata)

@@ -106,6 +106,7 @@
       :class="[
         'music-hero flex flex-col items-center justify-center relative overflow-hidden',
         {
+          'has-hero-media': heroMedia,
           // md:pt-16 md:pb-8 (not md:py-16) so the SSR/pre-hydration desktop hero already
           // has the padding of the `isDesktop` branch below — no -32px jump on mount.
           'pt-20 pb-3 px-4 md:pt-16 md:pb-8 md:px-8': !isHeroExpanded && !isDesktop && !isModal,
@@ -121,6 +122,7 @@
           'modal-bg': isModal
         }"
       >
+        <MusicHeroMedia v-if="heroMedia" :media="heroMedia" />
         <div
           class="music-hero-overlay"
           :class="{
@@ -882,6 +884,8 @@
 
   // Mobile hero expansion state (default collapsed on mobile)
   const isHeroExpanded = ref(false)
+  // Background clip / still of the hero; release pages only, not the home-page modal.
+  const heroMedia = computed(() => (props.isModal ? undefined : props.release.heroMedia))
   // The first page-open shows the compact card with a gentle opacity fade (smooth
   // even during the busy initial mount — cover image loading, layout settling).
   // The bouncier slideInCompact entrance is reserved for when the card re-appears

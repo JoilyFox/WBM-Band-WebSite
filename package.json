@@ -33,7 +33,8 @@
     "test:e2e:run": "vitest run --config vitest.e2e.config.ts",
     "format": "prettier --write .",
     "prepare": "husky",
-    "screenshots": "node scripts/screenshot-devices.mjs"
+    "screenshots": "node scripts/screenshot-devices.mjs",
+    "hero-media": "node scripts/make-hero-media.mjs"
   },
   "lint-staged": {
     "*.{js,ts,vue,json,md}": [

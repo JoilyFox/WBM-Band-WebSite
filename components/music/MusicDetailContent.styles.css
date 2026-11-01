@@ -1517,3 +1517,17 @@ body.lg-tier-low .share-glass-btn {
     Arial,
     sans-serif;
 }
+
+/* ── Hero background media (MusicHeroMedia, release.heroMedia) ───────────────
+     The clip carries its own darkening scrim, so the hero overlay above it keeps
+     only a light wash of the cover colours. On wider screens the hero grows a
+     little so the clip reads as a scene, not a strip. */
+.music-hero.has-hero-media .music-hero-overlay {
+  opacity: 0.55;
+}
+
+@media (min-width: 768px) {
+  .music-hero.has-hero-media {
+    min-height: clamp(416px, 60vh, 580px);
+  }
+}

@@ -66,6 +66,28 @@ export interface LyricsSection {
   lines: string[]
 }
 
+/**
+ * Background media of the release hero (behind the cover and title), darkened.
+ * Each value is a rendition path prefix under public/, without extension:
+ *   <prefix>.av1.mp4, <prefix>.h264.mp4  — the clip (kind 'video')
+ *   <prefix>.poster.{avif,webp,jpg}      — its first frame; the still for 'image',
+ *                                           reduced motion, low-tier devices
+ * `npm run hero-media` cuts and encodes both renditions from a source video.
+ * See docs/hero-media.md.
+ */
+export interface ReleaseHeroMedia {
+  kind: 'video' | 'image'
+  /** Landscape 16:9 rendition, for windows ≥ 768px. */
+  wide: string
+  /** Portrait 9:16 rendition, for phones. */
+  tall: string
+  /** CSS object-position of the picture (default centre). */
+  focus?: string
+  /** The height of the clip (0 top … 1 bottom) kept at the centre of the hero while
+   *  the hero is shorter than the clip, e.g. the collapsed phone hero (default 0.5). */
+  anchor?: number
+}
+
 export interface MusicRelease {
   id: string
   slug: string
@@ -78,6 +100,8 @@ export interface MusicRelease {
   blurredImageUrl?: string
   /** Optional cover-driven theme override; see ReleaseTheme. */
   theme?: ReleaseTheme
+  /** Optional darkened clip or still behind the hero; see ReleaseHeroMedia. */
+  heroMedia?: ReleaseHeroMedia
   description?: string
   /** i18n key for localized description; falls back to slug-based default when omitted */
   descriptionKey?: string
@@ -151,6 +175,14 @@ export const musicLibrary: MusicRelease[] = [
     descriptionKey: 'releases.slipa_vulytsya.description',
     genre: ['Alternative rock', 'Art rock'],
     featured: true,
+    // 0:20–0:44 of the music video (the calm street shots), darkened behind the hero.
+    heroMedia: {
+      kind: 'video',
+      wide: '/videos/releases/slipa-vulytsya/hero-1280',
+      tall: '/videos/releases/slipa-vulytsya/hero-540x960',
+      // the red sun, not the lyric line under it, behind the collapsed phone hero
+      anchor: 0.36
+    },
     // The cover is black-and-white, so auto-extraction yields a muddy dusty-pink.
     // Override with a cool steel/silver palette that matches the glass-block wall.
     theme: {
