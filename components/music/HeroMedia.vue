@@ -249,8 +249,8 @@
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(120% 90% at 50% 45%, rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.62) 75%),
-      linear-gradient(to bottom, rgb(0 0 0 / 0.35), rgb(0 0 0 / 0.25) 40%, rgb(0 0 0 / 0.5));
+      radial-gradient(120% 90% at 50% 45%, rgb(0 0 0 / 0.32), rgb(0 0 0 / 0.72) 75%),
+      linear-gradient(to bottom, rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.38) 40%, rgb(0 0 0 / 0.6));
   }
 
   @media (prefers-reduced-motion: reduce) {
