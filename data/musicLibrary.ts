@@ -86,9 +86,6 @@ export interface ReleaseHeroMedia {
   /** The height of the clip (0 top … 1 bottom) kept at the centre of the hero while
    *  the hero is shorter than the clip, e.g. the collapsed phone hero (default 0.5). */
   anchor?: number
-  /** Colour of the light wash over the clip, e.g. a colour from the clip itself
-   *  (default: the cover palette). */
-  tint?: string
 }
 
 export interface MusicRelease {
@@ -184,9 +181,7 @@ export const musicLibrary: MusicRelease[] = [
       wide: '/videos/releases/slipa-vulytsya/hero-1280',
       tall: '/videos/releases/slipa-vulytsya/hero-540x960',
       // the red sun, not the lyric line under it, behind the collapsed phone hero
-      anchor: 0.36,
-      // the wash takes the clip's red sun instead of the black-and-white cover's grey
-      tint: 'rgb(233 0 18)'
+      anchor: 0.36
     },
     // The cover is black-and-white, so auto-extraction yields a muddy dusty-pink.
     // Override with a cool steel/silver palette that matches the glass-block wall.

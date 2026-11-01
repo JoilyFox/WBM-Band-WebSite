@@ -3,7 +3,7 @@
     v-if="media"
     ref="rootEl"
     class="hero-media"
-    :class="{ 'is-ready': ready, 'is-settled': settled }"
+    :class="{ 'is-ready': ready, 'is-settled': settled, 'is-translucent': translucent }"
     :style="{ '--hm-focus': media.focus }"
     aria-hidden="true"
   >
@@ -55,7 +55,12 @@
   // exactly as it does without media. See docs/hero-media.md.
   import type { ReleaseHeroMedia } from '~/data/musicLibrary'
 
-  const props = defineProps<{ media?: ReleaseHeroMedia }>()
+  const props = defineProps<{
+    media?: ReleaseHeroMedia
+    /** Over a glass surface (the desktop release modal): the clip is see-through, so
+     *  what is behind the glass still shows through it. */
+    translucent?: boolean
+  }>()
 
   const rootEl = ref<HTMLElement | null>(null)
   const videoEl = ref<HTMLVideoElement | null>(null)
@@ -216,6 +221,9 @@
   .hero-media.is-ready {
     opacity: 1;
   }
+  .hero-media.is-translucent.is-ready {
+    opacity: 0.5;
+  }
 
   .hero-media__box {
     position: absolute;
@@ -251,6 +259,11 @@
     background:
       radial-gradient(120% 90% at 50% 45%, rgb(0 0 0 / 0.32), rgb(0 0 0 / 0.72) 75%),
       linear-gradient(to bottom, rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.38) 40%, rgb(0 0 0 / 0.6));
+  }
+
+  /* on glass the scrim only shades: a dark one would turn the glass opaque again */
+  .hero-media.is-translucent .hero-media__box::after {
+    background: radial-gradient(120% 90% at 50% 45%, transparent, rgb(0 0 0 / 0.3) 75%);
   }
 
   @media (prefers-reduced-motion: reduce) {

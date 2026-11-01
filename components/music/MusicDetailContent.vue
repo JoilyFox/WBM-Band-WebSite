@@ -119,12 +119,10 @@
       <div
         class="music-hero-background absolute inset-0 z-0"
         :class="{
-          'modal-bg': isModal,
-          'has-hero-tint': heroMedia?.tint
+          'modal-bg': isModal
         }"
-        :style="heroMedia?.tint ? { '--hero-tint': heroMedia.tint } : undefined"
       >
-        <MusicHeroMedia v-if="heroMedia" :media="heroMedia" />
+        <MusicHeroMedia v-if="heroMedia" :media="heroMedia" :translucent="isModal" />
         <div
           class="music-hero-overlay"
           :class="{

@@ -6,11 +6,11 @@ cover-coloured gradient as before; with it the gradient stays as a light wash on
 
 Status: **preview on branch `feature/hero-media`**, not on production.
 
-| Release        | Clip                         | Options                                               |
-| -------------- | ---------------------------- | ----------------------------------------------------- |
-| «Сліпа вулиця» | 0:20–0:44 of the music video | `anchor: 0.36` (the red sun), `tint: 'rgb(233 0 18)'` |
-| «Манія»        | 0:30–0:50                    | `--squeeze 4` (club footage: flares, fast cuts)       |
-| «Хвилі»        | 2:27–2:57                    | —                                                     |
+| Release        | Clip                         | Options                                                                                                 |
+| -------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------- |
+| «Сліпа вулиця» | 0:20–0:44 of the music video | `anchor: 0.36` (the red sun). A red `tint` of the wash was tried and dropped: the owner prefers it dark |
+| «Манія»        | 0:30–0:50                    | `--squeeze 4` (club footage: flares, fast cuts)                                                         |
+| «Хвилі»        | 2:27–2:57                    | —                                                                                                       |
 
 ## Add one
 
@@ -33,9 +33,7 @@ Status: **preview on branch `feature/hero-media`**, not on production.
    }
    ```
    `kind: 'image'` uses only `<prefix>.poster.{avif,webp,jpg}` (a still, no clip).
-   `focus` sets `object-position` if the subject is off-centre. `tint` (any CSS colour,
-   ideally one picked from the clip) recolours the light wash over the clip instead of
-   the cover palette — for a black-and-white cover whose palette washes the clip grey.
+   `focus` sets `object-position` if the subject is off-centre.
    Busy footage: `--squeeze 4` raises both CRFs (roughly halves the size). The source can
    be a section downloaded from YouTube (`yt-dlp --download-sections "*0:25-1:05"`);
    keep it out of the repo.
@@ -66,7 +64,9 @@ first: grain is most of the bitrate and invisible under the darkening.
 - **Paused** off screen (IntersectionObserver) and in a hidden tab; the decoder is
   released on unmount.
 - Release pages, and the home-page release modal on desktop (not the phone sheet);
-  closing the modal unmounts it and releases the decoder.
+  closing the modal unmounts it and releases the decoder. In the modal the clip is
+  `translucent` (50 % opacity, a light vignette instead of the dark scrim) so the glass
+  panel stays see-through: the page behind shows through the clip.
 
 ## Collapse / expand on phones
 
