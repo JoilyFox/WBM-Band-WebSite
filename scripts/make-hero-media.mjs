@@ -4,13 +4,15 @@
 //
 //   npm run hero-media -- <source.mp4> <slug> [--from 20] [--to 44] [--xfade 1.5]
 //
+// --squeeze N raises both CRFs by N for busy footage (3–5 roughly halves the size).
+//
 // The loop is seamless: the clip is cut --xfade seconds longer and its last seconds
 // dissolve into its first ones (a plain crossfade, no dip to black), so the last frame
 // of the file continues straight into its first.
 //
 // Writes public/videos/releases/<slug>/
 //   hero-1280.{av1,h264}.mp4         16:9, 1280×720  (windows ≥ 768px)
-//   hero-540x960.{av1,h264}.mp4      9:16 centre crop, 540×960 (phones), slightly softened
+//   hero-540x960.{av1,h264}.mp4      9:16 centre crop, 540×960 (phones)
 //   <rendition>.poster.{avif,webp,jpg}  the first frame (still / reduced motion / low tier)
 // No audio, 24 fps, keyframe every 4 s, faststart. Film grain is denoised first: it is
 // what makes a background clip expensive, and nobody sees it under the darkening.
@@ -29,9 +31,11 @@ const opt = (name, fallback) => {
 const from = opt('from', 20)
 const to = opt('to', 44)
 const xf = opt('xfade', 1.5)
+// added to both CRFs: busy, high-motion footage (cuts, flares) needs it to stay small
+const squeeze = opt('squeeze', 0)
 const [source, slug] = args
 if (!source || !slug || !(to > from) || !(xf >= 0 && xf < (to - from) / 2)) {
-  console.error('usage: npm run hero-media -- <source.mp4> <slug> [--from 20] [--to 44] [--xfade 1.5]')
+  console.error('usage: npm run hero-media -- <source.mp4> <slug> [--from 20] [--to 44] [--xfade 1.5] [--squeeze 0]')
   process.exit(1)
 }
 
@@ -61,16 +65,15 @@ ff('-ss', String(from), '-t', String(d + xf), '-i', source, '-an',
 const DENOISE = 'hqdn3d=6:5:10:8'
 const renditions = [
   { name: 'hero-1280', vf: `${DENOISE},scale=1280:720:flags=lanczos` },
-  // 9:16 from the centre; softened a little because the phone crop enlarges the clip
-  // (lyrics burnt into it would otherwise compete with the page title)
-  { name: 'hero-540x960', vf: `crop=608:1080,${DENOISE},scale=540:960:flags=lanczos,gblur=sigma=3.5` }
+  // 9:16 from the centre
+  { name: 'hero-540x960', vf: `crop=608:1080,${DENOISE},scale=540:960:flags=lanczos` }
 ]
 const common = ['-g', '96', '-pix_fmt', 'yuv420p', '-movflags', '+faststart']
 for (const r of renditions) {
   const base = join(out, r.name)
   console.log(`▸ ${r.name}: AV1 + H.264`)
-  ff('-i', mid, '-vf', r.vf, '-c:v', 'libsvtav1', '-crf', '44', '-preset', '5', '-svtav1-params', 'progress=0', ...common, `${base}.av1.mp4`)
-  ff('-i', mid, '-vf', r.vf, '-c:v', 'libx264', '-crf', '30', '-preset', 'slower', '-profile:v', 'high', ...common, `${base}.h264.mp4`)
+  ff('-i', mid, '-vf', r.vf, '-c:v', 'libsvtav1', '-crf', String(44 + squeeze), '-preset', '5', '-svtav1-params', 'progress=0', ...common, `${base}.av1.mp4`)
+  ff('-i', mid, '-vf', r.vf, '-c:v', 'libx264', '-crf', String(30 + squeeze), '-preset', 'slower', '-profile:v', 'high', ...common, `${base}.h264.mp4`)
   const png = join(tmp, `${r.name}.png`)
   ff('-i', `${base}.h264.mp4`, '-frames:v', '1', png)
   await sharp(png).avif({ quality: 45 }).toFile(`${base}.poster.avif`)

@@ -119,8 +119,10 @@
       <div
         class="music-hero-background absolute inset-0 z-0"
         :class="{
-          'modal-bg': isModal
+          'modal-bg': isModal,
+          'has-hero-tint': heroMedia?.tint
         }"
+        :style="heroMedia?.tint ? { '--hero-tint': heroMedia.tint } : undefined"
       >
         <MusicHeroMedia v-if="heroMedia" :media="heroMedia" />
         <div
@@ -884,8 +886,11 @@
 
   // Mobile hero expansion state (default collapsed on mobile)
   const isHeroExpanded = ref(false)
-  // Background clip / still of the hero; release pages only, not the home-page modal.
-  const heroMedia = computed(() => (props.isModal ? undefined : props.release.heroMedia))
+  // Background clip / still of the hero: release pages, and the home-page modal on
+  // desktop (on phones the modal is a sheet with no room for it).
+  const heroMedia = computed(() =>
+    props.isModal && !isDesktop.value ? undefined : props.release.heroMedia
+  )
   // The first page-open shows the compact card with a gentle opacity fade (smooth
   // even during the busy initial mount — cover image loading, layout settling).
   // The bouncier slideInCompact entrance is reserved for when the card re-appears

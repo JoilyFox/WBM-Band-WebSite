@@ -86,6 +86,9 @@ export interface ReleaseHeroMedia {
   /** The height of the clip (0 top … 1 bottom) kept at the centre of the hero while
    *  the hero is shorter than the clip, e.g. the collapsed phone hero (default 0.5). */
   anchor?: number
+  /** Colour of the light wash over the clip, e.g. a colour from the clip itself
+   *  (default: the cover palette). */
+  tint?: string
 }
 
 export interface MusicRelease {
@@ -181,7 +184,9 @@ export const musicLibrary: MusicRelease[] = [
       wide: '/videos/releases/slipa-vulytsya/hero-1280',
       tall: '/videos/releases/slipa-vulytsya/hero-540x960',
       // the red sun, not the lyric line under it, behind the collapsed phone hero
-      anchor: 0.36
+      anchor: 0.36,
+      // the wash takes the clip's red sun instead of the black-and-white cover's grey
+      tint: 'rgb(233 0 18)'
     },
     // The cover is black-and-white, so auto-extraction yields a muddy dusty-pink.
     // Override with a cool steel/silver palette that matches the glass-block wall.
@@ -254,6 +259,12 @@ export const musicLibrary: MusicRelease[] = [
     type: 'single',
     releaseDate: '2026-08-20T21:00:00Z', // Midnight Kyiv time (EEST/UTC+3) → 00:00 on 2026-08-21
     imageUrl: '/images/optimized/albums-images/khvyli/cover.avif',
+    // 2:27–2:57 of the music video (the lake), darkened behind the hero.
+    heroMedia: {
+      kind: 'video',
+      wide: '/videos/releases/khvyli/hero-1280',
+      tall: '/videos/releases/khvyli/hero-540x960'
+    },
     // No `blurredImageUrl` on purpose: the artwork was already public before the
     // drop, so the card always showed it sharp — first in pre-save mode, now in
     // released mode. Both use `imageUrl` directly (never the blurred variant).
@@ -500,6 +511,12 @@ export const musicLibrary: MusicRelease[] = [
     type: 'single',
     releaseDate: '2025-11-14T12:00:00Z',
     imageUrl: '/images/optimized/albums-images/mania/cover.avif',
+    // 0:30–0:50 of the music video (the club set), darkened behind the hero.
+    heroMedia: {
+      kind: 'video',
+      wide: '/videos/releases/mania/hero-1280',
+      tall: '/videos/releases/mania/hero-540x960'
+    },
     blurredImageUrl: '/images/albums-images/mania/cover-blurred.jpg',
     descriptionKey: 'releases.mania.description',
     genre: ['Alternative rock', 'Pop rock'],

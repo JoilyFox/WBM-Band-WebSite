@@ -4,8 +4,13 @@ A release page's hero (cover + title, `.music-hero`) can carry a darkened backgr
 a muted looping clip from the music video, or a still. Without it the hero is the
 cover-coloured gradient as before; with it the gradient stays as a light wash on top.
 
-Status: **preview on branch `feature/hero-media`**, not on production. First user:
-«Сліпа вулиця» (0:20–0:44 of the music video).
+Status: **preview on branch `feature/hero-media`**, not on production.
+
+| Release        | Clip                         | Options                                               |
+| -------------- | ---------------------------- | ----------------------------------------------------- |
+| «Сліпа вулиця» | 0:20–0:44 of the music video | `anchor: 0.36` (the red sun), `tint: 'rgb(233 0 18)'` |
+| «Манія»        | 0:30–0:50                    | `--squeeze 4` (club footage: flares, fast cuts)       |
+| «Хвилі»        | 2:27–2:57                    | —                                                     |
 
 ## Add one
 
@@ -28,15 +33,20 @@ Status: **preview on branch `feature/hero-media`**, not on production. First use
    }
    ```
    `kind: 'image'` uses only `<prefix>.poster.{avif,webp,jpg}` (a still, no clip).
-   `focus` sets `object-position` if the subject is off-centre.
+   `focus` sets `object-position` if the subject is off-centre. `tint` (any CSS colour,
+   ideally one picked from the clip) recolours the light wash over the clip instead of
+   the cover palette — for a black-and-white cover whose palette washes the clip grey.
+   Busy footage: `--squeeze 4` raises both CRFs (roughly halves the size). The source can
+   be a section downloaded from YouTube (`yt-dlp --download-sections "*0:25-1:05"`);
+   keep it out of the repo.
 
 ## Files (`public/videos/releases/<slug>/`)
 
-| File                                 | What                                                                                          | Size («Сліпа вулиця», 24 s) |
-| ------------------------------------ | --------------------------------------------------------------------------------------------- | --------------------------- |
-| `hero-1280.av1.mp4` / `.h264.mp4`    | 16:9 1280×720, windows ≥ 768px                                                                | 1.0 MB / 1.8 MB             |
-| `hero-540x960.av1.mp4` / `.h264.mp4` | 9:16 centre crop, phones, blurred (σ 3.5) so lyrics burnt into the clip don't fight the title | 0.2 MB / 0.5 MB             |
-| `<rendition>.poster.{avif,webp,jpg}` | first frame                                                                                   | 4–47 KB                     |
+| File                                 | What                                                               | Size («Сліпа вулиця», 24 s) |
+| ------------------------------------ | ------------------------------------------------------------------ | --------------------------- |
+| `hero-1280.av1.mp4` / `.h264.mp4`    | 16:9 1280×720, windows ≥ 768px                                     | 1.0 MB / 1.8 MB             |
+| `hero-540x960.av1.mp4` / `.h264.mp4` | 9:16 centre crop, phones (no blur: the owner wants the clip sharp) | 0.3 MB / 0.7 MB             |
+| `<rendition>.poster.{avif,webp,jpg}` | first frame                                                        | 4–47 KB                     |
 
 No audio, 24 fps, keyframe every 4 s, `faststart`. Film grain is denoised (`hqdn3d`)
 first: grain is most of the bitrate and invisible under the darkening.
@@ -55,7 +65,8 @@ first: grain is most of the bitrate and invisible under the darkening.
   Mode), `kind: 'image'`.
 - **Paused** off screen (IntersectionObserver) and in a hidden tab; the decoder is
   released on unmount.
-- Release pages only: not in the home-page release modal.
+- Release pages, and the home-page release modal on desktop (not the phone sheet);
+  closing the modal unmounts it and releases the decoder.
 
 ## Collapse / expand on phones
 

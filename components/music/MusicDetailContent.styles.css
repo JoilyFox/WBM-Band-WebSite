@@ -1526,6 +1526,13 @@ body.lg-tier-low .share-glass-btn {
   opacity: 0.55;
 }
 
+/* heroMedia.tint: the wash's two blooms take a colour from the clip instead of the
+     cover palette (same strengths as the palette's 0.26 / 0.2, a touch stronger) */
+.music-hero-background.has-hero-tint {
+  --accent1: color-mix(in srgb, var(--hero-tint) 34%, transparent);
+  --accent2: color-mix(in srgb, var(--hero-tint) 24%, transparent);
+}
+
 @media (min-width: 768px) {
   .music-hero.has-hero-media {
     min-height: clamp(416px, 60vh, 580px);
