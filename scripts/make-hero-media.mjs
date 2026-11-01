@@ -2,7 +2,11 @@
 // Cut a release's hero background clip from a source video and encode the renditions
 // that <MusicHeroMedia> expects (see docs/hero-media.md):
 //
-//   npm run hero-media -- <source.mp4> <slug> [--from 20] [--to 44]
+//   npm run hero-media -- <source.mp4> <slug> [--from 20] [--to 44] [--xfade 1.5]
+//
+// The loop is seamless: the clip is cut --xfade seconds longer and its last seconds
+// dissolve into its first ones (a plain crossfade, no dip to black), so the last frame
+// of the file continues straight into its first.
 //
 // Writes public/videos/releases/<slug>/
 //   hero-1280.{av1,h264}.mp4         16:9, 1280×720  (windows ≥ 768px)
@@ -24,9 +28,10 @@ const opt = (name, fallback) => {
 }
 const from = opt('from', 20)
 const to = opt('to', 44)
+const xf = opt('xfade', 1.5)
 const [source, slug] = args
-if (!source || !slug || !(to > from)) {
-  console.error('usage: npm run hero-media -- <source.mp4> <slug> [--from 20] [--to 44]')
+if (!source || !slug || !(to > from) || !(xf >= 0 && xf < (to - from) / 2)) {
+  console.error('usage: npm run hero-media -- <source.mp4> <slug> [--from 20] [--to 44] [--xfade 1.5]')
   process.exit(1)
 }
 
@@ -36,10 +41,22 @@ const tmp = mkdtempSync(join(tmpdir(), 'hero-media-'))
 const ff = (...a) => execFileSync('ffmpeg', ['-v', 'error', '-y', ...a], { stdio: 'inherit' })
 
 // 1. The segment at 1080p, near-lossless, so both renditions start from the same frames.
+//    Cut `xf` longer: the extra tail [d, d+xf) dissolves into the head [0, xf), and the
+//    file is body [xf, d) + that dissolve, so it ends on the frame before its first.
+const d = to - from
 const mid = join(tmp, 'mid.mp4')
-console.log(`▸ cutting ${from}–${to} s`)
-ff('-ss', String(from), '-t', String(to - from), '-i', source, '-an',
-  '-vf', 'scale=1920:1080:flags=lanczos,format=yuv420p', '-c:v', 'libx264', '-crf', '10', '-preset', 'fast', mid)
+console.log(`▸ cutting ${from}–${to} s, ${xf} s crossfade loop`)
+const base1080 = 'scale=1920:1080:flags=lanczos,format=yuv420p,settb=AVTB,fps=24'
+const loop = xf > 0
+  ? `[0:v]${base1080},split=3[a][b][c];` +
+    `[a]trim=start=${xf}:end=${d},setpts=PTS-STARTPTS[body];` +
+    `[b]trim=start=${d}:end=${d + xf},setpts=PTS-STARTPTS[tail];` +
+    `[c]trim=start=0:end=${xf},setpts=PTS-STARTPTS[head];` +
+    `[tail][head]xfade=transition=fade:duration=${xf}:offset=0[x];` +
+    `[body][x]concat=n=2:v=1:a=0[v]`
+  : `[0:v]${base1080}[v]`
+ff('-ss', String(from), '-t', String(d + xf), '-i', source, '-an',
+  '-filter_complex', loop, '-map', '[v]', '-c:v', 'libx264', '-crf', '10', '-preset', 'fast', mid)
 
 const DENOISE = 'hqdn3d=6:5:10:8'
 const renditions = [

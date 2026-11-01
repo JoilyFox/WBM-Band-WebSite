@@ -14,8 +14,10 @@ Status: **preview on branch `feature/hero-media`**, not on production. First use
    npm run hero-media -- ~/Desktop/clip.mp4 <slug> --from 20 --to 44
    ```
    Pick a calm stretch: no flashes, the subject near the centre (phones see the middle
-   9:16 of the frame). 15–30 s; the loop is a hard cut, which reads fine when the
-   footage itself cuts every few seconds.
+   9:16 of the frame). 15–30 s. The loop is seamless: the script cuts `--xfade` (default
+   1.5 s) past `--to` and dissolves that tail into the first frames (a plain crossfade,
+   no dip to black), so the file's last frame runs straight into its first. Mean luma
+   across the seam of «Сліпа вулиця» stays within 48–52 (no darkening).
 2. Add to the release in `data/musicLibrary.ts`:
    ```ts
    heroMedia: {
