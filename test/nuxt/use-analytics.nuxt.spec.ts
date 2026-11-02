@@ -261,6 +261,33 @@ describe('useAnalytics()', () => {
     })
   })
 
+  describe('trackSocialClick()', () => {
+    it('fires social_click with the network, where the link sits and the source', () => {
+      getOrPersistSourcePlatform.mockReturnValue('direct')
+      const { trackSocialClick } = useAnalytics()
+
+      trackSocialClick({ network: 'tiktok', location: 'hero' })
+
+      expect(gtag).toHaveBeenCalledTimes(1)
+      expect(gtag).toHaveBeenCalledWith(
+        'event',
+        'social_click',
+        expect.objectContaining({
+          social_network: 'tiktok',
+          link_location: 'hero',
+          source_platform: 'direct'
+        })
+      )
+    })
+
+    it('is suppressed for bots', () => {
+      isLikelyBot.mockReturnValue(true)
+      const { trackSocialClick } = useAnalytics()
+      trackSocialClick({ network: 'youtube', location: 'footer' })
+      expect(gtag).not.toHaveBeenCalled()
+    })
+  })
+
   describe('trackFormError()', () => {
     it('fires form_error with the form, error type, status and a scrubbed description', () => {
       const { trackFormError } = useAnalytics()

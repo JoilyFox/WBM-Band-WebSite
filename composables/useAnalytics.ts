@@ -17,6 +17,13 @@ export interface PlatformClickParams {
   pageType: MasterPageType
 }
 
+export interface SocialClickParams {
+  /** 'instagram' | 'tiktok' | 'youtube' (useSocialLinks names). */
+  network: string
+  /** Where the link sits: the home hero under the main CTA, or the footer. */
+  location: 'hero' | 'footer'
+}
+
 export interface FormErrorParams {
   /** Which form failed, e.g. 'contact'. */
   formName: string
@@ -156,6 +163,22 @@ export function useAnalytics() {
   }
 
   /**
+   * A click on one of the band's social profiles. Fire-and-forget: the link opens in a
+   * new tab, so this page stays and the hit is not lost. Bot-filtered like
+   * platform_click. `link_location` tells the hero row from the footer one.
+   */
+  function trackSocialClick({ network, location }: SocialClickParams): void {
+    if (typeof window === 'undefined') return
+    if (isLikelyBot()) return
+    void sendEvent('social_click', {
+      social_network: network,
+      link_location: location,
+      source_platform: getSourcePlatform(),
+      campaign_id: getCampaignId()
+    })
+  }
+
+  /**
    * A form submission failed. Fire-and-forget (the page stays open). The
    * service's message is scrubbed of URLs/e-mails and capped - never send what
    * the visitor typed.
@@ -178,6 +201,7 @@ export function useAnalytics() {
     getCampaignId,
     trackReleaseView,
     trackPlatformClick,
+    trackSocialClick,
     trackFormError
   }
 }

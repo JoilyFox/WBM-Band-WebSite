@@ -91,7 +91,10 @@ appears at page load. `utils/gtagLoader.ts` (`ensureGtagLoaded`) injects gtag.js
 `load` (`plugins/analytics.client.ts`), the first interaction, or an awaited event in `useAnalytics.sendEvent`.
 Everything pushed earlier, including the consent default, is queued in `dataLayer` and replayed in order. When you
 validate, wait a second after load or click once before deciding that a hit is missing. Client JS errors arrive as GA4
-`exception` events, and contact-form failures as `form_error` events.
+`exception` events, and contact-form failures as `form_error` events. Clicks on the band's Instagram / TikTok /
+YouTube profiles are `social_click` (`social_network`, `link_location` = `hero` | `footer`, plus `source_platform`,
+`campaign_id`; bot-filtered); `social_network` and `link_location` need Event-scoped custom dimensions in GA4 Admin
+to be reportable.
 
 **Decode a `/g/collect` request** (DevTools → Network → filter `collect`):
 

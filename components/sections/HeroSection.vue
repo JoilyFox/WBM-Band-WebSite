@@ -125,6 +125,7 @@
           rel="noopener noreferrer"
           :class="['hero-social', `hero-social--${social.name}`]"
           :aria-label="social.label"
+          @click="trackSocialClick({ network: social.name, location: 'hero' })"
         >
           <i :class="social.icon" aria-hidden="true" />
         </a>
@@ -158,12 +159,14 @@
   import { useScrollTo } from '~/composables/useScrollTo'
   import { getConfig } from '~/utils/configHelpers'
   import { useSocialLinks } from '~/composables/useSocialLinks'
+  import { useAnalytics } from '~/composables/useAnalytics'
 
   const { t } = useI18n()
 
   // Computed properties for config values
   const bandName = computed(() => getConfig('general.bandName'))
   const socialLinks = useSocialLinks()
+  const { trackSocialClick } = useAnalytics()
   const fullBandName = computed(() => getConfig('general.fullBandName'))
   const tagline = computed(() => t('app.tagline'))
 
@@ -669,6 +672,8 @@
     margin-top: 1.25rem;
   }
   .hero-social {
+    /* brand tint of the hover glow, per network below */
+    --social-glow: rgb(255 255 255 / 0.3);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -678,34 +683,75 @@
     color: rgb(255 255 255 / 0.62);
     font-size: 1.375rem;
     line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s ease;
+  }
+  /* The glyph moves, not the link: the 44px target stays put under the pointer. */
+  .hero-social i {
+    display: block;
     /* a tight contact shadow plus a soft halo: legible over light parts of the photo */
     text-shadow:
       0 1px 2px rgb(0 0 0 / 0.55),
       0 4px 14px rgb(0 0 0 / 0.45);
     transition:
-      color 0.2s ease,
-      text-shadow 0.2s ease;
+      transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+      text-shadow 0.3s ease;
+  }
+  .hero-social--instagram {
+    --social-glow: rgb(225 48 108 / 0.55);
   }
   .hero-social--instagram i {
     font-size: 0.86em;
   }
+  .hero-social--tiktok {
+    --social-glow: rgb(37 244 238 / 0.45);
+  }
   .hero-social--tiktok i {
     font-size: 0.92em;
   }
+  .hero-social--youtube {
+    --social-glow: rgb(255 0 0 / 0.5);
+  }
   .hero-social--youtube i {
-    font-size: 1.04em;
+    font-size: 0.98em;
   }
   .hero-social:focus-visible {
     color: #fff;
     outline: 2px solid rgb(255 255 255 / 0.5);
     outline-offset: 2px;
   }
+  /* Desktop hover: the glyph turns white, lifts a little and glows in its platform's colour. */
   @media (hover: hover) and (pointer: fine) {
     .hero-social:hover {
-      color: rgb(255 255 255 / 0.95);
+      color: rgb(255 255 255 / 0.96);
+    }
+    .hero-social:hover i {
+      transform: translateY(-2px) scale(1.12);
       text-shadow:
-        0 1px 2px rgb(0 0 0 / 0.55),
-        0 0 16px rgb(255 255 255 / 0.25);
+        0 1px 2px rgb(0 0 0 / 0.5),
+        0 0 18px var(--social-glow);
+    }
+  }
+  /* Press (mouse and touch): a quick squeeze; on release the spring curve above
+     brings it back with a small overshoot. */
+  .hero-social:active {
+    color: #fff;
+  }
+  .hero-social:active i {
+    transform: scale(0.86);
+    transition-duration: 0.1s;
+    text-shadow:
+      0 1px 2px rgb(0 0 0 / 0.5),
+      0 0 14px var(--social-glow);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-social i,
+    .hero-social:active i {
+      transition: text-shadow 0.2s ease;
+    }
+    .hero-social:hover i,
+    .hero-social:active i {
+      transform: none;
     }
   }
   .animate-socials-in {

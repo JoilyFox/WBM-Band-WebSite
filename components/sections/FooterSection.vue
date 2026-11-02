@@ -37,6 +37,7 @@
               :href="social.url"
               :aria-label="social.label"
               target="_blank"
+              @click="trackSocialClick({ network: social.name, location: 'footer' })"
             />
           </div>
 
@@ -102,6 +103,7 @@
               :href="social.url"
               :aria-label="social.label"
               target="_blank"
+              @click="trackSocialClick({ network: social.name, location: 'footer' })"
             />
           </div>
 
@@ -177,6 +179,7 @@
                   :href="social.url"
                   :aria-label="social.label"
                   target="_blank"
+                  @click="trackSocialClick({ network: social.name, location: 'footer' })"
                 />
               </div>
             </div>
@@ -305,6 +308,7 @@
   import { useSnackbar } from '~/composables/useSnackbar'
   import { useScrollTo } from '~/composables/useScrollTo'
   import { useSocialLinks } from '~/composables/useSocialLinks'
+  import { useAnalytics } from '~/composables/useAnalytics'
   import { getConfig } from '~/utils/configHelpers'
   import { footerNavigation } from '~/config/navigation'
   import Logo from '~/components/ui/Logo.vue'
@@ -354,6 +358,7 @@
 
   // Social media links (labels reactive to locale changes)
   const socialLinks = useSocialLinks()
+  const { trackSocialClick } = useAnalytics()
 
   // Streaming platforms - using computed to ensure proper path resolution
   const streamingPlatforms = computed(() => {
