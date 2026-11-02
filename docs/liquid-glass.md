@@ -37,7 +37,10 @@ Consequences baked into the system:
   identity filter (`blur(0) saturate(1)`) is NOT equivalent and still snapped.
 - The panel's enter-from / leave-to frost is the identity `blur(0) saturate(1)
 brightness(1)`: keeping the vibrancy there lifted the page under the invisible
-  panel, a rectangle that snapped off when the closed modal was removed.
+  panel, a rectangle that snapped off when the closed modal was removed. The panel's
+  `::before` also fades to `opacity: 0` there: its Chromium lens (`filter: url()`)
+  doesn't interpolate and kept bending the page under the invisible panel until the
+  modal was removed (a one-frame shift of a couple of pixels).
 - The home page clears `selectedRelease` only after the close animation
   (`useMusicNavigation.closeModal`, 450 ms); clearing it at once unmounted the
   modal mid-close, so it vanished in one frame.

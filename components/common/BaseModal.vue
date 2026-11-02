@@ -431,7 +431,8 @@
   .modal-content::before {
     transition:
       backdrop-filter 0.38s cubic-bezier(0.33, 0, 0.2, 1),
-      -webkit-backdrop-filter 0.38s cubic-bezier(0.33, 0, 0.2, 1);
+      -webkit-backdrop-filter 0.38s cubic-bezier(0.33, 0, 0.2, 1),
+      opacity 0.34s ease;
   }
   .modal-scroll-wrapper,
   .modal-close-btn {
@@ -463,11 +464,17 @@
   /* Identity at both ends, not just blur(0): the vibrancy (saturate / brightness) left
      on, the invisible panel still lifted the page behind it, so a brighter rectangle
      popped in on the first frame of the open and snapped off when the closed modal was
-     removed. */
+     removed. Same for the lens, below. */
   .modal-backdrop.modal-enter-from .modal-content::before,
   .modal-backdrop.modal-leave-to .modal-content::before {
     -webkit-backdrop-filter: blur(0) saturate(1) brightness(1);
     backdrop-filter: blur(0) saturate(1) brightness(1);
+    /* The Chromium lens (filter: url(), v-lg-physics) does not interpolate: at the
+       end of the close it still bent the page under the invisible panel, which
+       jumped back a couple of pixels when the modal was removed. Fading the layer
+       out fades the lens with it. Opacity on the ::before itself is not an ancestor
+       of any glass, so no backdrop root. */
+    opacity: 0;
   }
   .modal-backdrop.modal-enter-from .modal-scroll-wrapper,
   .modal-backdrop.modal-enter-from .modal-close-btn,
