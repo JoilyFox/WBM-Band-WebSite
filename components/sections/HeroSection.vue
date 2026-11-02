@@ -114,6 +114,21 @@
           @click="handleSecondaryAction"
         /> -->
       </div>
+
+      <!-- Social profiles: quiet white glyphs under the main CTA, not competing with it -->
+      <div v-if="socialLinks.length" class="hero-socials animate-socials-in">
+        <a
+          v-for="social in socialLinks"
+          :key="social.name"
+          :href="social.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hero-social"
+          :aria-label="social.label"
+        >
+          <i :class="social.icon" aria-hidden="true" />
+        </a>
+      </div>
     </div>
 
     <!-- Scroll indicator -->
@@ -142,11 +157,13 @@
   } from '~/composables/useHeroSlider'
   import { useScrollTo } from '~/composables/useScrollTo'
   import { getConfig } from '~/utils/configHelpers'
+  import { useSocialLinks } from '~/composables/useSocialLinks'
 
   const { t } = useI18n()
 
   // Computed properties for config values
   const bandName = computed(() => getConfig('general.bandName'))
+  const socialLinks = useSocialLinks()
   const fullBandName = computed(() => getConfig('general.fullBandName'))
   const tagline = computed(() => t('app.tagline'))
 
@@ -638,6 +655,45 @@
 
   .animate-scale-in {
     animation: scale-in 1s ease-out 0.6s both;
+  }
+
+  /* Social glyphs: semi-transparent white, brighter on hover / focus. Each link is a
+     44px target around a 20px glyph; the row arrives just after the CTA. */
+  .hero-socials {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+  .hero-social {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    color: rgb(255 255 255 / 0.55);
+    font-size: 1.25rem;
+    text-shadow: 0 2px 6px rgb(0 0 0 / 0.6);
+    transition: color 0.2s ease;
+  }
+  .hero-social:focus-visible {
+    color: #fff;
+    outline: 2px solid rgb(255 255 255 / 0.5);
+    outline-offset: 2px;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hero-social:hover {
+      color: rgb(255 255 255 / 0.95);
+    }
+  }
+  .animate-socials-in {
+    animation: slide-up 0.9s ease-out 0.9s both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-socials-in {
+      animation: none;
+    }
   }
 
   /* Text shadow for better readability over image */

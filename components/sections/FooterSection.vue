@@ -304,6 +304,7 @@
   import { computed } from 'vue'
   import { useSnackbar } from '~/composables/useSnackbar'
   import { useScrollTo } from '~/composables/useScrollTo'
+  import { useSocialLinks } from '~/composables/useSocialLinks'
   import { getConfig } from '~/utils/configHelpers'
   import { footerNavigation } from '~/config/navigation'
   import Logo from '~/components/ui/Logo.vue'
@@ -352,42 +353,7 @@
   const currentYear = computed(() => new Date().getFullYear())
 
   // Social media links (labels reactive to locale changes)
-  const socialLinks = computed(() => {
-    const links = []
-
-    const instagramUrl = getConfig('general.socialMedia.instagram')
-    const tiktokUrl = getConfig('general.socialMedia.tiktok')
-    const youtubeUrl = getConfig('general.socialMedia.youtube')
-
-    if (instagramUrl) {
-      links.push({
-        name: 'instagram',
-        icon: 'pi pi-instagram',
-        url: instagramUrl,
-        label: t('footer.follow_instagram')
-      })
-    }
-
-    if (tiktokUrl) {
-      links.push({
-        name: 'tiktok',
-        icon: 'pi pi-tiktok',
-        url: tiktokUrl,
-        label: t('footer.follow_tiktok')
-      })
-    }
-
-    if (youtubeUrl) {
-      links.push({
-        name: 'youtube',
-        icon: 'pi pi-youtube',
-        url: youtubeUrl,
-        label: t('footer.subscribe_youtube')
-      })
-    }
-
-    return links
-  })
+  const socialLinks = useSocialLinks()
 
   // Streaming platforms - using computed to ensure proper path resolution
   const streamingPlatforms = computed(() => {
