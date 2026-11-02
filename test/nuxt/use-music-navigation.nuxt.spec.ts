@@ -347,7 +347,12 @@ describe('useMusicNavigation', () => {
   })
 
   describe('closeModal', () => {
-    it('clears isModalOpen and selectedRelease', async () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('hides the modal at once and clears the release after its close animation', async () => {
+      vi.useFakeTimers()
       isUpcomingRelease.mockReturnValue(false)
       setDesktop()
       const nav = useMusicNavigation()
@@ -355,7 +360,23 @@ describe('useMusicNavigation', () => {
       expect(nav.isModalOpen.value).toBe(true)
       nav.closeModal()
       expect(nav.isModalOpen.value).toBe(false)
+      // still mounted, so the leave transition can play
+      expect(nav.selectedRelease.value).not.toBeNull()
+      vi.advanceTimersByTime(450)
       expect(nav.selectedRelease.value).toBeNull()
+    })
+
+    it('keeps a release opened while the previous one was closing', async () => {
+      vi.useFakeTimers()
+      isUpcomingRelease.mockReturnValue(false)
+      setDesktop()
+      const nav = useMusicNavigation()
+      await nav.handleMusicClick(makeRelease())
+      nav.closeModal()
+      await nav.handleMusicClick(makeRelease({ id: 'rel-7', slug: 'khvyli' }))
+      vi.advanceTimersByTime(450)
+      expect(nav.isModalOpen.value).toBe(true)
+      expect(nav.selectedRelease.value).toMatchObject({ slug: 'khvyli' })
     })
   })
 
@@ -368,7 +389,6 @@ describe('useMusicNavigation', () => {
       expect(nav.isModalOpen.value).toBe(true)
       await nav.goToFullPage(makeRelease())
       expect(nav.isModalOpen.value).toBe(false)
-      expect(nav.selectedRelease.value).toBeNull()
       expect(navigateTo).toHaveBeenCalledWith('/pre-save/mania?from=music')
     })
 
@@ -450,12 +470,15 @@ describe('useMusicNavigation', () => {
     })
 
     it('Escape closes the modal', async () => {
+      vi.useFakeTimers()
       const nav = useMusicNavigation()
       await openOn(nav, releases[1])
       expect(nav.isModalOpen.value).toBe(true)
       nav.handleModalKeyboard(new KeyboardEvent('keydown', { key: 'Escape' }), releases)
       expect(nav.isModalOpen.value).toBe(false)
+      vi.advanceTimersByTime(450)
       expect(nav.selectedRelease.value).toBeNull()
+      vi.useRealTimers()
     })
 
     it('ignores unrelated keys without changing selection or preventing default', async () => {

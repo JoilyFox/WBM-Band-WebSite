@@ -162,14 +162,56 @@
     })
   }
 
+  // Frost-in for the glass INSIDE the content (docs/liquid-glass.md §1). While the scroll
+  // wrapper fades in (opacity < 1) it is a backdrop root, so every backdrop-filter inside
+  // it (hero buttons, pills, platform buttons, the cover) can only see the wrapper's own
+  // content; the moment the fade ended they all saw the frosted panel and the page in one
+  // frame: a visible snap. So each of them has no backdrop-filter through the entrance
+  // (which looks like the suppressed state), then eases to its own value by a CSS
+  // transition (styles below). Tagged with data
+  // attributes, which Vue's class/style patching never touches.
+  const FROST_RAMP = 450
+  let frostTimer: ReturnType<typeof setTimeout> | undefined
+  const frostTargets = () => {
+    const wrapper = dialogRef.value?.querySelector('.modal-scroll-wrapper')
+    const out: [HTMLElement, 'data-lg-frost' | 'data-lg-frost-before'][] = []
+    if (!wrapper) return out
+    // an element already held reads `none`: keep it (onEnter can run twice per open)
+    const has = (el: HTMLElement, attr: string, f: string) =>
+      el.hasAttribute(attr) || (!!f && f !== 'none')
+    for (const el of wrapper.querySelectorAll<HTMLElement>('*')) {
+      if (has(el, 'data-lg-frost', getComputedStyle(el).backdropFilter))
+        out.push([el, 'data-lg-frost'])
+      if (has(el, 'data-lg-frost-before', getComputedStyle(el, '::before').backdropFilter))
+        out.push([el, 'data-lg-frost-before'])
+    }
+    return out
+  }
+  let frosted: ReturnType<typeof frostTargets> = []
+  const frostHold = () => {
+    clearTimeout(frostTimer)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    frosted = frostTargets()
+    for (const [el, attr] of frosted) el.setAttribute(attr, 'hold')
+  }
+  const frostRamp = () => {
+    for (const [el, attr] of frosted) el.setAttribute(attr, 'ramp')
+    frostTimer = setTimeout(() => {
+      for (const [el, attr] of frosted) el.removeAttribute(attr)
+      frosted = []
+    }, FROST_RAMP + 50)
+  }
+
   const onEnter = () => {
     isAnimating.value = true
     setBodyAnimating(true)
     prepareContent()
+    frostHold()
   }
   const onAfterEnter = () => {
     isAnimating.value = false
     setBodyAnimating(false)
+    frostRamp()
   }
   const onLeave = () => {
     isAnimating.value = true
@@ -409,10 +451,23 @@
     border-color: transparent;
     box-shadow: none;
   }
+  /* The specular shell (rim, sheen) fades with the tint: left at full, it stood alone as
+     an empty glass outline at the end of the close and vanished in one frame. */
+  .modal-content::after {
+    transition: opacity 0.34s ease;
+  }
+  .modal-backdrop.modal-enter-from .modal-content::after,
+  .modal-backdrop.modal-leave-to .modal-content::after {
+    opacity: 0;
+  }
+  /* Identity at both ends, not just blur(0): the vibrancy (saturate / brightness) left
+     on, the invisible panel still lifted the page behind it, so a brighter rectangle
+     popped in on the first frame of the open and snapped off when the closed modal was
+     removed. */
   .modal-backdrop.modal-enter-from .modal-content::before,
   .modal-backdrop.modal-leave-to .modal-content::before {
-    -webkit-backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
-    backdrop-filter: blur(0) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+    -webkit-backdrop-filter: blur(0) saturate(1) brightness(1);
+    backdrop-filter: blur(0) saturate(1) brightness(1);
   }
   .modal-backdrop.modal-enter-from .modal-scroll-wrapper,
   .modal-backdrop.modal-enter-from .modal-close-btn,
@@ -420,6 +475,23 @@
   .modal-backdrop.modal-leave-to .modal-close-btn {
     opacity: 0;
     transform: translateY(12px);
+  }
+
+  /* Frost-in of the glass inside the content (frostHold / frostRamp in the script):
+     no backdrop-filter through the entrance (what the fading wrapper shows anyway;
+     an identity filter does NOT look the same and still snapped), then eased from
+     `none` to each element's own value. */
+  .modal-container :deep([data-lg-frost='hold']),
+  .modal-container :deep([data-lg-frost-before='hold'])::before {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    transition: none !important;
+  }
+  .modal-container :deep([data-lg-frost='ramp']),
+  .modal-container :deep([data-lg-frost-before='ramp'])::before {
+    transition:
+      backdrop-filter 0.45s cubic-bezier(0.33, 0, 0.2, 1),
+      -webkit-backdrop-filter 0.45s cubic-bezier(0.33, 0, 0.2, 1) !important;
   }
 
   /* Reduced motion: no ramp, snap straight to the frosted panel. */

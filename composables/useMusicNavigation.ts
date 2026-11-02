@@ -67,9 +67,18 @@ export const useMusicNavigation = () => {
   /**
    * Close the modal
    */
+  // The modal plays its close animation (BaseModal's leave transition, ≈0.4 s) only
+  // while it is still mounted; clearing the release at once unmounted it (v-if) and the
+  // modal vanished in one frame. Clear it after the animation, unless another release
+  // was opened meanwhile.
+  const MODAL_LEAVE_MS = 450
+  let clearTimer: ReturnType<typeof setTimeout> | undefined
   const closeModal = () => {
     isModalOpen.value = false
-    selectedRelease.value = null
+    clearTimeout(clearTimer)
+    clearTimer = setTimeout(() => {
+      if (!isModalOpen.value) selectedRelease.value = null
+    }, MODAL_LEAVE_MS)
   }
 
   /**

@@ -29,6 +29,18 @@ Consequences baked into the system:
 - Entrances never animate a glass host (or its ancestors) with `transform` /
   `opacity` / `will-change`. Scrims fade via `background-color`; panels
   materialize by ramping the frost + tint in place; motion rides on a descendant.
+- Glass **inside** content that fades in (BaseModal's scroll wrapper, `opacity < 1`
+  for the entrance) is suppressed for the fade and came back in one frame when it
+  ended. BaseModal tags every backdrop-filtered descendant on enter
+  (`data-lg-frost` / `data-lg-frost-before`), holds it at `backdrop-filter: none`
+  and eases it to its own value after the entrance (`frostHold` / `frostRamp`). An
+  identity filter (`blur(0) saturate(1)`) is NOT equivalent and still snapped.
+- The panel's enter-from / leave-to frost is the identity `blur(0) saturate(1)
+brightness(1)`: keeping the vibrancy there lifted the page under the invisible
+  panel, a rectangle that snapped off when the closed modal was removed.
+- The home page clears `selectedRelease` only after the close animation
+  (`useMusicNavigation.closeModal`, 450 ms); clearing it at once unmounted the
+  modal mid-close, so it vanished in one frame.
 - **Hover never transforms a glass host** (a persistent transform kills the frost
   the whole time it's hovered). The "grow on hover" rides on the button's inner
   content instead. A **press** transform is allowed because it's transient — the
