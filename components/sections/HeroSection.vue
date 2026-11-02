@@ -123,7 +123,7 @@
           :href="social.url"
           target="_blank"
           rel="noopener noreferrer"
-          class="hero-social"
+          :class="['hero-social', `hero-social--${social.name}`]"
           :aria-label="social.label"
         >
           <i :class="social.icon" aria-hidden="true" />
@@ -658,11 +658,14 @@
   }
 
   /* Social glyphs: semi-transparent white, brighter on hover / focus. Each link is a
-     44px target around a 20px glyph; the row arrives just after the CTA. */
+     44px target; the row is tighter than its distance to the CTA, so it reads as one
+     group under the button. PrimeIcons draws the three at different optical sizes
+     (measured ink box at 100px: Instagram 100×100, TikTok 88×100, YouTube 100×70), so
+     each glyph gets its own size to look equal. */
   .hero-socials {
     display: flex;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 0.125rem;
     margin-top: 1.25rem;
   }
   .hero-social {
@@ -672,10 +675,25 @@
     width: 2.75rem;
     height: 2.75rem;
     border-radius: 9999px;
-    color: rgb(255 255 255 / 0.55);
-    font-size: 1.25rem;
-    text-shadow: 0 2px 6px rgb(0 0 0 / 0.6);
-    transition: color 0.2s ease;
+    color: rgb(255 255 255 / 0.62);
+    font-size: 1.375rem;
+    line-height: 1;
+    /* a tight contact shadow plus a soft halo: legible over light parts of the photo */
+    text-shadow:
+      0 1px 2px rgb(0 0 0 / 0.55),
+      0 4px 14px rgb(0 0 0 / 0.45);
+    transition:
+      color 0.2s ease,
+      text-shadow 0.2s ease;
+  }
+  .hero-social--instagram i {
+    font-size: 0.86em;
+  }
+  .hero-social--tiktok i {
+    font-size: 0.92em;
+  }
+  .hero-social--youtube i {
+    font-size: 1.04em;
   }
   .hero-social:focus-visible {
     color: #fff;
@@ -685,6 +703,9 @@
   @media (hover: hover) and (pointer: fine) {
     .hero-social:hover {
       color: rgb(255 255 255 / 0.95);
+      text-shadow:
+        0 1px 2px rgb(0 0 0 / 0.55),
+        0 0 16px rgb(255 255 255 / 0.25);
     }
   }
   .animate-socials-in {
