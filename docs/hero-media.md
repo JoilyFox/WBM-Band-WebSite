@@ -4,7 +4,7 @@ A release page's hero (cover + title, `.music-hero`) can carry a darkened backgr
 a muted looping clip from the music video, or a still. Without it the hero is the
 cover-coloured gradient as before; with it the gradient stays as a light wash on top.
 
-Status: **preview on branch `feature/hero-media`**, not on production.
+Status: **live** since 2026-11-02 (nginx `/videos/` location installed the same day).
 
 | Release        | Clip                         | Options                                                                                                 |
 | -------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------- |
