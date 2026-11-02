@@ -35,7 +35,9 @@ const xf = opt('xfade', 1.5)
 const squeeze = opt('squeeze', 0)
 const [source, slug] = args
 if (!source || !slug || !(to > from) || !(xf >= 0 && xf < (to - from) / 2)) {
-  console.error('usage: npm run hero-media -- <source.mp4> <slug> [--from 20] [--to 44] [--xfade 1.5] [--squeeze 0]')
+  console.error(
+    'usage: npm run hero-media -- <source.mp4> <slug> [--from 20] [--to 44] [--xfade 1.5] [--squeeze 0]'
+  )
   process.exit(1)
 }
 
@@ -51,16 +53,35 @@ const d = to - from
 const mid = join(tmp, 'mid.mp4')
 console.log(`▸ cutting ${from}–${to} s, ${xf} s crossfade loop`)
 const base1080 = 'scale=1920:1080:flags=lanczos,format=yuv420p,settb=AVTB,fps=24'
-const loop = xf > 0
-  ? `[0:v]${base1080},split=3[a][b][c];` +
-    `[a]trim=start=${xf}:end=${d},setpts=PTS-STARTPTS[body];` +
-    `[b]trim=start=${d}:end=${d + xf},setpts=PTS-STARTPTS[tail];` +
-    `[c]trim=start=0:end=${xf},setpts=PTS-STARTPTS[head];` +
-    `[tail][head]xfade=transition=fade:duration=${xf}:offset=0[x];` +
-    `[body][x]concat=n=2:v=1:a=0[v]`
-  : `[0:v]${base1080}[v]`
-ff('-ss', String(from), '-t', String(d + xf), '-i', source, '-an',
-  '-filter_complex', loop, '-map', '[v]', '-c:v', 'libx264', '-crf', '10', '-preset', 'fast', mid)
+const loop =
+  xf > 0
+    ? `[0:v]${base1080},split=3[a][b][c];` +
+      `[a]trim=start=${xf}:end=${d},setpts=PTS-STARTPTS[body];` +
+      `[b]trim=start=${d}:end=${d + xf},setpts=PTS-STARTPTS[tail];` +
+      `[c]trim=start=0:end=${xf},setpts=PTS-STARTPTS[head];` +
+      `[tail][head]xfade=transition=fade:duration=${xf}:offset=0[x];` +
+      `[body][x]concat=n=2:v=1:a=0[v]`
+    : `[0:v]${base1080}[v]`
+ff(
+  '-ss',
+  String(from),
+  '-t',
+  String(d + xf),
+  '-i',
+  source,
+  '-an',
+  '-filter_complex',
+  loop,
+  '-map',
+  '[v]',
+  '-c:v',
+  'libx264',
+  '-crf',
+  '10',
+  '-preset',
+  'fast',
+  mid
+)
 
 const DENOISE = 'hqdn3d=6:5:10:8'
 const renditions = [
@@ -72,8 +93,38 @@ const common = ['-g', '96', '-pix_fmt', 'yuv420p', '-movflags', '+faststart']
 for (const r of renditions) {
   const base = join(out, r.name)
   console.log(`▸ ${r.name}: AV1 + H.264`)
-  ff('-i', mid, '-vf', r.vf, '-c:v', 'libsvtav1', '-crf', String(44 + squeeze), '-preset', '5', '-svtav1-params', 'progress=0', ...common, `${base}.av1.mp4`)
-  ff('-i', mid, '-vf', r.vf, '-c:v', 'libx264', '-crf', String(30 + squeeze), '-preset', 'slower', '-profile:v', 'high', ...common, `${base}.h264.mp4`)
+  ff(
+    '-i',
+    mid,
+    '-vf',
+    r.vf,
+    '-c:v',
+    'libsvtav1',
+    '-crf',
+    String(44 + squeeze),
+    '-preset',
+    '5',
+    '-svtav1-params',
+    'progress=0',
+    ...common,
+    `${base}.av1.mp4`
+  )
+  ff(
+    '-i',
+    mid,
+    '-vf',
+    r.vf,
+    '-c:v',
+    'libx264',
+    '-crf',
+    String(30 + squeeze),
+    '-preset',
+    'slower',
+    '-profile:v',
+    'high',
+    ...common,
+    `${base}.h264.mp4`
+  )
   const png = join(tmp, `${r.name}.png`)
   ff('-i', `${base}.h264.mp4`, '-frames:v', '1', png)
   await sharp(png).avif({ quality: 45 }).toFile(`${base}.poster.avif`)
