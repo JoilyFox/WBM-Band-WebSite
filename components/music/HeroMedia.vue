@@ -222,7 +222,7 @@
     opacity: 1;
   }
   .hero-media.is-translucent.is-ready {
-    opacity: 0.5;
+    opacity: 0.38;
   }
 
   .hero-media__box {
@@ -257,13 +257,13 @@
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(120% 90% at 50% 45%, rgb(0 0 0 / 0.42), rgb(0 0 0 / 0.8) 75%),
-      linear-gradient(to bottom, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.48) 40%, rgb(0 0 0 / 0.68));
+      radial-gradient(120% 90% at 50% 45%, rgb(0 0 0 / 0.32), rgb(0 0 0 / 0.72) 75%),
+      linear-gradient(to bottom, rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.38) 40%, rgb(0 0 0 / 0.6));
   }
 
   /* on glass the scrim only shades: a dark one would turn the glass opaque again */
   .hero-media.is-translucent .hero-media__box::after {
-    background: radial-gradient(120% 90% at 50% 45%, transparent, rgb(0 0 0 / 0.3) 75%);
+    background: radial-gradient(120% 90% at 50% 45%, rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.36) 75%);
   }
 
   @media (prefers-reduced-motion: reduce) {

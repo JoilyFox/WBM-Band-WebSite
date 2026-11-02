@@ -65,7 +65,7 @@ first: grain is most of the bitrate and invisible under the darkening.
   released on unmount.
 - Release pages, and the home-page release modal on desktop (not the phone sheet);
   closing the modal unmounts it and releases the decoder. In the modal the clip is
-  `translucent` (50 % opacity, a light vignette instead of the dark scrim) so the glass
+  `translucent` (38 % opacity, a light vignette instead of the dark scrim) so the glass
   panel stays see-through: the page behind shows through the clip.
 
 ## Collapse / expand on phones
