@@ -115,7 +115,8 @@
         /> -->
       </div>
 
-      <!-- Social profiles: quiet white glyphs under the main CTA, not competing with it -->
+      <!-- Social profiles: quiet white glyphs under the main CTA, not competing with it.
+           Phones only (owner's call): on desktop the footer links are enough. -->
       <div v-if="socialLinks.length" class="hero-socials animate-socials-in">
         <a
           v-for="social in socialLinks"
@@ -660,16 +661,21 @@
     animation: scale-in 1s ease-out 0.6s both;
   }
 
-  /* Social glyphs: semi-transparent white, brighter on hover / focus. Each link is a
-     44px target; the row is tighter than its distance to the CTA, so it reads as one
-     group under the button. PrimeIcons draws the three at different optical sizes
+  /* Social glyphs (phones only): semi-transparent white, brighter on press / focus.
+     Each link is a 44px target, ~36px of air between the glyphs. PrimeIcons draws the three at different optical sizes
      (measured ink box at 100px: Instagram 100×100, TikTok 88×100, YouTube 100×70), so
      each glyph gets its own size to look equal. */
   .hero-socials {
     display: flex;
     justify-content: center;
-    gap: 0.125rem;
+    gap: 0.875rem;
     margin-top: 1.25rem;
+  }
+  /* phones only: on wider screens the footer links are enough */
+  @media (min-width: 768px) {
+    .hero-socials {
+      display: none;
+    }
   }
   .hero-social {
     /* brand tint of the hover glow, per network below */
