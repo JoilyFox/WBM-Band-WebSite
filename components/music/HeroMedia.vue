@@ -3,11 +3,26 @@
     v-if="media"
     ref="rootEl"
     class="hero-media"
-    :class="{ 'is-ready': ready, 'is-settled': settled, 'is-translucent': translucent }"
+    :class="{
+      'is-ready': ready,
+      'is-settled': settled,
+      'is-filled': filled,
+      'is-translucent': translucent
+    }"
     :style="{ '--hm-focus': media.focus }"
     aria-hidden="true"
   >
-    <div class="hero-media__box">
+    <!-- Where the hero is taller than the clip (the expanded phone hero, a portrait
+         tablet), a blurred copy of the clip fills the rest: a tiny canvas the video
+         draws itself into (no second decode), or the still itself. -->
+    <canvas v-if="mode === 'video'" ref="fillEl" class="hero-media__fill" width="32" height="18" />
+    <picture v-else-if="mode === 'still' && stillBase" class="hero-media__fill">
+      <source :srcset="`${stillBase}.poster.avif`" type="image/avif" />
+      <source :srcset="`${stillBase}.poster.webp`" type="image/webp" />
+      <img :src="`${stillBase}.poster.jpg`" alt="" decoding="async" />
+    </picture>
+
+    <div ref="boxEl" class="hero-media__box">
       <video
         v-if="mode === 'video'"
         ref="videoEl"
@@ -22,22 +37,12 @@
         @playing="onPlaying"
         @error="mode = 'off'"
       />
-      <picture v-else-if="mode === 'still'">
-        <source
-          media="(min-width: 768px)"
-          :srcset="`${media.wide}.poster.avif`"
-          type="image/avif"
-        />
-        <source
-          media="(min-width: 768px)"
-          :srcset="`${media.wide}.poster.webp`"
-          type="image/webp"
-        />
-        <source :srcset="`${media.tall}.poster.avif`" type="image/avif" />
-        <source :srcset="`${media.tall}.poster.webp`" type="image/webp" />
+      <picture v-else-if="mode === 'still' && stillBase">
+        <source :srcset="`${stillBase}.poster.avif`" type="image/avif" />
+        <source :srcset="`${stillBase}.poster.webp`" type="image/webp" />
         <img
           class="hero-media__el"
-          :src="`${media.tall}.poster.jpg`"
+          :src="`${stillBase}.poster.jpg`"
           alt=""
           decoding="async"
           @load="ready = true"
@@ -63,12 +68,18 @@
   }>()
 
   const rootEl = ref<HTMLElement | null>(null)
+  const boxEl = ref<HTMLElement | null>(null)
   const videoEl = ref<HTMLVideoElement | null>(null)
+  const fillEl = ref<HTMLCanvasElement | null>(null)
   // off = the hero as without media; still = the poster frame; video = the clip
   const mode = ref<'off' | 'video' | 'still'>('off')
   const ready = ref(false)
   // the box only animates after its first placement (no slide-in on load)
   const settled = ref(false)
+  // the hero is taller than the clip: the blurred copy shows above and below it
+  const filled = ref(false)
+  // the rendition (path prefix) in use
+  const stillBase = ref('')
 
   const AV1 = 'video/mp4; codecs="av01.0.05M.08"'
 
@@ -103,14 +114,39 @@
     })
   }
 
+  type FrameVideo = HTMLVideoElement & {
+    requestVideoFrameCallback?: (cb: () => void) => number
+  }
+
   function onPlaying() {
-    const v = videoEl.value as
-      | (HTMLVideoElement & { requestVideoFrameCallback?: (cb: () => void) => void })
-      | null
+    const v = videoEl.value as FrameVideo | null
     // fade in once a frame is actually painted (no black first frame)
     if (v?.requestVideoFrameCallback) v.requestVideoFrameCallback(() => (ready.value = true))
     else ready.value = true
+    fillLoop()
   }
+
+  // The blurred copy: each new video frame is drawn into a 32×18 canvas, which CSS scales
+  // up and blurs. Runs only while the copy is visible (`filled`), once per decoded frame;
+  // a paused clip draws nothing.
+  let filling = false
+  function fillFrame() {
+    const v = videoEl.value as FrameVideo | null
+    const c = fillEl.value
+    if (!filled.value || !v || !c || mode.value !== 'video') {
+      filling = false
+      return
+    }
+    if (v.readyState >= 2) c.getContext('2d')?.drawImage(v, 0, 0, c.width, c.height)
+    if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(fillFrame)
+    else requestAnimationFrame(fillFrame)
+  }
+  function fillLoop() {
+    if (filling || !filled.value) return
+    filling = true
+    fillFrame()
+  }
+  watch(filled, fillLoop)
 
   async function start() {
     const media = props.media
@@ -120,18 +156,15 @@
     ).connection
     // the user asked for less data, or the network can't carry it: the hero stays as is
     if (conn?.saveData || /(^|-)2g$/.test(conn?.effectiveType ?? '')) return
+    const wide = window.matchMedia('(min-width: 768px)').matches
+    stillBase.value = wide ? media.wide : media.small
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const lowTier = !!rootEl.value.closest('.perf-low')
     if (media.kind === 'image' || reduced || lowTier) {
       mode.value = 'still'
       return
     }
-    const wide = window.matchMedia('(min-width: 768px)').matches
-    const src = await pickSource(
-      wide ? media.wide : media.tall,
-      wide ? 1280 : 540,
-      wide ? 720 : 960
-    )
+    const src = await pickSource(stillBase.value, wide ? 1280 : 640, wide ? 720 : 360)
     mode.value = 'video'
     await nextTick()
     const v = videoEl.value
@@ -141,19 +174,21 @@
     play()
   }
 
-  // Keep the box's anchor point at the centre of the hero, never uncovering an edge. The
-  // box keeps its own height (at least --hm-min-h), so when the phone hero collapses or
-  // expands the picture is never rescaled: it slides (a compositor `translate`
-  // transition) while the hero crops more or less of it.
+  // The clip is shown whole-width at its own 16:9 shape, never stretched. Its anchor
+  // point is kept at the hero's centre without uncovering an edge while it is taller
+  // than the hero (the collapsed phone hero, desktop); a shorter one sits inside the hero
+  // over its blurred copy. The box keeps its size when the phone hero collapses or
+  // expands, so it only slides (a compositor `translate` transition).
   function place() {
     const root = rootEl.value
-    const box = root?.firstElementChild as HTMLElement | null
+    const box = boxEl.value
     if (!root || !box) return
     const h = root.offsetHeight
     const boxH = box.offsetHeight
     const want = h / 2 - (props.media?.anchor ?? 0.5) * boxH
-    const shift = Math.min(0, Math.max(h - boxH, want))
+    const shift = Math.min(Math.max(0, h - boxH), Math.max(Math.min(0, h - boxH), want))
     root.style.setProperty('--hm-shift', `${Math.round(shift)}px`)
+    filled.value = boxH < h - 1
     if (!settled.value) requestAnimationFrame(() => (settled.value = true))
   }
 
@@ -189,6 +224,7 @@
     ro?.disconnect()
     io?.disconnect()
     document.removeEventListener('visibilitychange', onVisibility)
+    filled.value = false
     const v = videoEl.value
     if (v) {
       v.pause()
@@ -200,9 +236,6 @@
 
 <style scoped>
   .hero-media {
-    /* phones: the box is at least this tall, so collapsing / expanding the hero
-       crops the clip instead of rescaling it */
-    --hm-min-h: 0px;
     position: absolute;
     inset: 0;
     overflow: hidden;
@@ -213,11 +246,6 @@
     -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 62%, transparent 100%);
     mask-image: linear-gradient(to bottom, #000 0, #000 62%, transparent 100%);
   }
-  @media (max-width: 767px) {
-    .hero-media {
-      --hm-min-h: 760px;
-    }
-  }
   .hero-media.is-ready {
     opacity: 1;
   }
@@ -225,21 +253,33 @@
     opacity: 0.38;
   }
 
+  /* the clip at its own 16:9 shape, full width */
   .hero-media__box {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: max(100%, var(--hm-min-h));
+    aspect-ratio: 16 / 9;
     translate: 0 var(--hm-shift, 0px);
-    /* soft lower edge: while the expanding hero is still sliding it into place the
-       not-yet-covered strip reads as a fade, not a gap */
-    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 80%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 0, #000 80%, transparent 100%);
+  }
+  /* phones: at least the collapsed hero's height (228px), so on narrow phones the clip
+     covers it with a slight zoom (390px: 219 → 240, +10 %) instead of showing the
+     blurred copy above and below a 9px-short strip */
+  @media (max-width: 767px) {
+    .hero-media__box {
+      /* width stays the hero's (= the viewport on phones); `cover` trims the sides */
+      aspect-ratio: auto;
+      height: max(56.25vw, 240px);
+    }
   }
   .hero-media.is-settled .hero-media__box {
     /* the curve and length of the hero content's own expand animation */
     transition: translate 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* over its blurred copy the clip's top and bottom edges feather into it */
+  .hero-media.is-filled .hero-media__box {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
   }
 
   .hero-media__el {
@@ -250,9 +290,31 @@
     object-position: var(--hm-focus, 50% 50%);
   }
 
+  /* the blurred copy, oversized so the blur has no soft transparent rim */
+  .hero-media__fill {
+    position: absolute;
+    inset: -12%;
+    width: 124%;
+    height: 124%;
+    opacity: 0;
+    filter: blur(18px) saturate(1.15);
+    transition: opacity 0.6s ease;
+  }
+  .hero-media__fill img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  canvas.hero-media__fill {
+    object-fit: cover;
+  }
+  .hero-media.is-filled .hero-media__fill {
+    opacity: 1;
+  }
+
   /* darkened so the cover, title and buttons keep their contrast: heavier at the
      edges and under the text column, lighter around the clip's centre */
-  .hero-media__box::after {
+  .hero-media::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -260,15 +322,15 @@
       radial-gradient(120% 90% at 50% 45%, rgb(0 0 0 / 0.32), rgb(0 0 0 / 0.72) 75%),
       linear-gradient(to bottom, rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.38) 40%, rgb(0 0 0 / 0.6));
   }
-
   /* on glass the scrim only shades: a dark one would turn the glass opaque again */
-  .hero-media.is-translucent .hero-media__box::after {
+  .hero-media.is-translucent::after {
     background: radial-gradient(120% 90% at 50% 45%, rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.36) 75%);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .hero-media,
-    .hero-media.is-settled .hero-media__box {
+    .hero-media.is-settled .hero-media__box,
+    .hero-media__fill {
       transition-duration: 0.01s;
     }
   }

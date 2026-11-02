@@ -77,14 +77,14 @@ export interface LyricsSection {
  */
 export interface ReleaseHeroMedia {
   kind: 'video' | 'image'
-  /** Landscape 16:9 rendition, for windows ≥ 768px. */
+  /** 16:9 1280×720 rendition, for windows ≥ 768px. */
   wide: string
-  /** Portrait 9:16 rendition, for phones. */
-  tall: string
+  /** 16:9 640×360 rendition, for phones (shown at its own shape, never stretched). */
+  small: string
   /** CSS object-position of the picture (default centre). */
   focus?: string
-  /** The height of the clip (0 top … 1 bottom) kept at the centre of the hero while
-   *  the hero is shorter than the clip, e.g. the collapsed phone hero (default 0.5). */
+  /** The height of the clip (0 top … 1 bottom) kept at the centre of the hero
+   *  (default 0.5), as far as the clip still covers the hero. */
   anchor?: number
 }
 
@@ -179,7 +179,7 @@ export const musicLibrary: MusicRelease[] = [
     heroMedia: {
       kind: 'video',
       wide: '/videos/releases/slipa-vulytsya/hero-1280',
-      tall: '/videos/releases/slipa-vulytsya/hero-540x960',
+      small: '/videos/releases/slipa-vulytsya/hero-640',
       // the red sun, not the lyric line under it, behind the collapsed phone hero
       anchor: 0.36
     },
@@ -258,7 +258,7 @@ export const musicLibrary: MusicRelease[] = [
     heroMedia: {
       kind: 'video',
       wide: '/videos/releases/khvyli/hero-1280',
-      tall: '/videos/releases/khvyli/hero-540x960'
+      small: '/videos/releases/khvyli/hero-640'
     },
     // No `blurredImageUrl` on purpose: the artwork was already public before the
     // drop, so the card always showed it sharp — first in pre-save mode, now in
@@ -510,7 +510,7 @@ export const musicLibrary: MusicRelease[] = [
     heroMedia: {
       kind: 'video',
       wide: '/videos/releases/mania/hero-1280',
-      tall: '/videos/releases/mania/hero-540x960'
+      small: '/videos/releases/mania/hero-640'
     },
     blurredImageUrl: '/images/albums-images/mania/cover-blurred.jpg',
     descriptionKey: 'releases.mania.description',

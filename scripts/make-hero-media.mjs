@@ -12,7 +12,7 @@
 //
 // Writes public/videos/releases/<slug>/
 //   hero-1280.{av1,h264}.mp4         16:9, 1280×720  (windows ≥ 768px)
-//   hero-540x960.{av1,h264}.mp4      9:16 centre crop, 540×960 (phones)
+//   hero-640.{av1,h264}.mp4          16:9, 640×360  (phones)
 //   <rendition>.poster.{avif,webp,jpg}  the first frame (still / reduced motion / low tier)
 // No audio, 24 fps, keyframe every 4 s, faststart. Film grain is denoised first: it is
 // what makes a background clip expensive, and nobody sees it under the darkening.
@@ -86,8 +86,8 @@ ff(
 const DENOISE = 'hqdn3d=6:5:10:8'
 const renditions = [
   { name: 'hero-1280', vf: `${DENOISE},scale=1280:720:flags=lanczos` },
-  // 9:16 from the centre
-  { name: 'hero-540x960', vf: `crop=608:1080,${DENOISE},scale=540:960:flags=lanczos` }
+  // phones show the clip whole-width at its own shape (a blurred copy fills the rest)
+  { name: 'hero-640', vf: `${DENOISE},scale=640:360:flags=lanczos` }
 ]
 const common = ['-g', '96', '-pix_fmt', 'yuv420p', '-movflags', '+faststart']
 for (const r of renditions) {
@@ -135,4 +135,4 @@ for (const r of renditions) {
 }
 rmSync(tmp, { recursive: true, force: true })
 console.log(`✓ ${out}\n  add to the release in data/musicLibrary.ts:
-  heroMedia: { kind: 'video', wide: '/videos/releases/${slug}/hero-1280', tall: '/videos/releases/${slug}/hero-540x960' }`)
+  heroMedia: { kind: 'video', wide: '/videos/releases/${slug}/hero-1280', small: '/videos/releases/${slug}/hero-640' }`)

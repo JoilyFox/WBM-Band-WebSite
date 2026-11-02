@@ -28,8 +28,8 @@ Status: **preview on branch `feature/hero-media`**, not on production.
    heroMedia: {
      kind: 'video',
      wide: '/videos/releases/<slug>/hero-1280',
-     tall: '/videos/releases/<slug>/hero-540x960',
-     anchor: 0.36 // optional: the clip's height kept centred in the collapsed phone hero
+     small: '/videos/releases/<slug>/hero-640',
+     anchor: 0.36 // optional: the clip's height kept at the hero's centre
    }
    ```
    `kind: 'image'` uses only `<prefix>.poster.{avif,webp,jpg}` (a still, no clip).
@@ -40,11 +40,11 @@ Status: **preview on branch `feature/hero-media`**, not on production.
 
 ## Files (`public/videos/releases/<slug>/`)
 
-| File                                 | What                                                               | Size («Сліпа вулиця», 24 s) |
-| ------------------------------------ | ------------------------------------------------------------------ | --------------------------- |
-| `hero-1280.av1.mp4` / `.h264.mp4`    | 16:9 1280×720, windows ≥ 768px                                     | 1.0 MB / 1.8 MB             |
-| `hero-540x960.av1.mp4` / `.h264.mp4` | 9:16 centre crop, phones (no blur: the owner wants the clip sharp) | 0.3 MB / 0.7 MB             |
-| `<rendition>.poster.{avif,webp,jpg}` | first frame                                                        | 4–47 KB                     |
+| File                                 | What                           | Size («Сліпа вулиця», 24 s) |
+| ------------------------------------ | ------------------------------ | --------------------------- |
+| `hero-1280.av1.mp4` / `.h264.mp4`    | 16:9 1280×720, windows ≥ 768px | 1.0 MB / 1.8 MB             |
+| `hero-640.av1.mp4` / `.h264.mp4`     | 16:9 640×360, phones           | 0.4 MB / 0.55 MB            |
+| `<rendition>.poster.{avif,webp,jpg}` | first frame                    | 4–47 KB                     |
 
 No audio, 24 fps, keyframe every 4 s, `faststart`. Film grain is denoised (`hqdn3d`)
 first: grain is most of the bitrate and invisible under the darkening.
@@ -57,7 +57,7 @@ first: grain is most of the bitrate and invisible under the darkening.
 - **Codec**: AV1 only where `navigator.mediaCapabilities` says it decodes
   `powerEfficient` (hardware); otherwise H.264. Software AV1 would cost a phone's CPU for
   the whole visit.
-- **Rendition**: `wide` from 768px, `tall` below (chosen once, at start).
+- **Rendition**: `wide` from 768px, `small` below (chosen once, at start). Both 16:9.
 - **Falls back to the plain hero**: Save-Data or 2g, a load error. **Falls back to the
   still**: `prefers-reduced-motion`, `.perf-low` tier, autoplay refused (iOS Low Power
   Mode), `kind: 'image'`.
@@ -68,18 +68,27 @@ first: grain is most of the bitrate and invisible under the darkening.
   `translucent` (38 % opacity, a light vignette instead of the dark scrim) so the glass
   panel stays see-through: the page behind shows through the clip.
 
-## Collapse / expand on phones
+## Shape, collapse / expand on phones
 
-The clip sits in a box at least 760px tall (`--hm-min-h`), so the 228px collapsed hero
-and the ~680px expanded one crop the same picture instead of rescaling it. On every hero
-resize the box is re-placed (`--hm-shift`: the `anchor` point at the hero's centre,
-clamped so no edge shows) and slides there with a compositor `translate` transition
-(0.6 s, the curve of the hero content's own animation). The box's soft lower edge (mask)
-covers the strip the expanding hero hasn't reached yet.
+The clip is always shown whole-width at its own 16:9 shape (`object-fit: cover` on a
+16:9 box), never stretched to the hero. Phones: the box is `max(56.25vw, 240px)` tall,
+so on narrow phones it still covers the 228px collapsed hero (a slight zoom, 390px:
+219 → 240) and shows the whole frame width.
+
+Where the hero is taller than the clip (the expanded phone hero, a portrait tablet), a
+**blurred copy** fills the rest (`is-filled`): the video draws each frame into a 32×18
+canvas (`requestVideoFrameCallback`, no second decode) that CSS scales up and blurs; the
+still uses its own image. The copy loop runs only while it is visible; the clip's top and
+bottom edges feather into it.
+
+On every hero resize the box is re-placed (`--hm-shift`: the `anchor` point at the hero's
+centre, clamped so it never uncovers an edge it can cover) and slides there with a
+compositor `translate` transition (0.6 s, the curve of the hero content's own animation).
+The box keeps its size across collapse / expand, so the picture is never rescaled.
 
 ## Look
 
-- Darkening is the clip's own scrim (`.hero-media__box::after`): radial (lighter in the
+- Darkening is the clip's own scrim (`.hero-media::after`, over the clip and its copy): radial (lighter in the
   middle) + vertical; the hero overlay above drops to 55 % opacity.
 - The clip fades out over the hero's lower 38 % (mask), into the page.
 - Desktop hero grows to `clamp(416px, 60vh, 580px)` when it has media.
